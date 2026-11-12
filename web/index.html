@@ -40,6 +40,14 @@
           </div>
 
           <div class="capture-footer">
+            <div class="demo-options" id="demo-options">
+              <label for="demo-scenario">Пример осмотра</label>
+              <select id="demo-scenario">
+                <option value="defect" data-image="demo-pump.jpg" data-response="mock-analysis.json">Признаки коррозии</option>
+                <option value="clear" data-image="demo-pump-clean.jpg" data-response="mock-analysis-clear.json">Чистый узел</option>
+                <option value="no_marker" data-image="demo-pump.jpg" data-response="mock-analysis-no-marker.json">Кадр без метки</option>
+              </select>
+            </div>
             <div class="actions">
               <button class="button primary" id="check" type="button" disabled><i class="scan-icon" aria-hidden="true"></i><span id="check-label">Проверить кадр</span></button>
               <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Включить камеру</span></button>

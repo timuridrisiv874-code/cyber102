@@ -7,6 +7,7 @@ const snapshot = byId('snapshot');
 const detection = byId('detection');
 const checkButton = byId('check');
 const cameraButton = byId('camera');
+const demoScenario = byId('demo-scenario');
 const endpoint = document.querySelector('main').dataset.analysisEndpoint.trim();
 
 const unavailableResults = {
@@ -46,7 +47,8 @@ function positionDetection() {
 function render() {
   const frozen = frameSource !== null;
   const live = Boolean(stream && !frozen);
-  const frameReady = live ? video.readyState >= 2 && video.videoWidth > 0 : example.naturalWidth > 0;
+  const frameReady = live ? video.readyState >= 2 && video.videoWidth > 0 :
+    example.complete && example.currentSrc === example.src && example.naturalWidth > 0;
   example.hidden = live || frozen;
   video.hidden = !live;
   snapshot.hidden = !frozen;
@@ -56,6 +58,8 @@ function render() {
   byId('source').dataset.live = String(live);
   byId('source-text').textContent = live ? 'Камера' : frameSource === 'camera' ? 'Кадр с камеры' : 'Пример кадра';
   byId('mode').textContent = endpoint && (live || frameSource === 'camera') ? 'Серверный анализ' : 'Тестовый режим';
+  byId('demo-options').hidden = Boolean(stream || openingCamera || frameSource === 'camera');
+  demoScenario.disabled = checking;
 
   checkButton.disabled = openingCamera || checking || (!frozen && !frameReady);
   cameraButton.disabled = checking && !stream;
@@ -189,7 +193,8 @@ async function analyzeFrame(useServer) {
       body.append('file', image, 'frame.jpg');
       Object.assign(options, { method: 'POST', body });
     }
-    const response = await fetch(useServer ? endpoint : './mock-analysis.json', options);
+    const mockPath = frameSource === 'example' ? demoScenario.selectedOptions[0].dataset.response : 'mock-analysis.json';
+    const response = await fetch(useServer ? endpoint : `./${mockPath}`, options);
     if (!response.ok) throw new Error(`Analysis returned ${response.status}`);
     return readResult(await response.json());
   } finally {
@@ -251,6 +256,15 @@ async function checkFrame() {
 
 cameraButton.addEventListener('click', toggleCamera);
 checkButton.addEventListener('click', checkFrame);
+function updateDemoExample() {
+  const { image } = demoScenario.selectedOptions[0].dataset;
+  frameSource = null;
+  result = null;
+  showMessage();
+  if (example.getAttribute('src') !== image) example.src = image;
+  render();
+}
+demoScenario.addEventListener('change', updateDemoExample);
 example.addEventListener('load', render);
 example.addEventListener('error', () => showMessage('Пример кадра недоступен. Попробуйте включить камеру.', true));
 video.addEventListener('loadeddata', render);
@@ -277,4 +291,4 @@ if ('ResizeObserver' in window) {
 } else {
   window.addEventListener('resize', positionDetection);
 }
-render();
+updateDemoExample();
