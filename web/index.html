@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6f3">
+    <title>Осмотр оборудования — Cyber102</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></div>
+        <span class="mode"><i aria-hidden="true"></i><span id="mode">Тестовый режим</span></span>
+      </div>
+    </header>
+
+    <main class="page" data-analysis-endpoint="">
+      <header class="intro">
+        <h1>Осмотр оборудования</h1>
+        <p>Наведите камеру на узел или проверьте пример кадра.</p>
+      </header>
+
+      <div class="workspace">
+        <section class="capture panel" aria-labelledby="capture-title">
+          <div class="panel-heading">
+            <h2 id="capture-title">Кадр осмотра</h2>
+            <span class="source" id="source"><i aria-hidden="true"></i><span id="source-text">Пример кадра</span></span>
+          </div>
+
+          <div class="viewfinder" id="viewfinder">
+            <img id="example" src="demo-pump.jpg" alt="Демонстрационный кадр промышленного насоса" decoding="async">
+            <video id="video" aria-label="Изображение с камеры" muted autoplay playsinline hidden></video>
+            <canvas id="snapshot" role="img" aria-label="Зафиксированный кадр осмотра" hidden></canvas>
+            <div class="finder-guide" id="guide" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+            <button type="button" class="detection" id="detection" aria-controls="result" hidden>
+              <span id="detection-label"></span>
+            </button>
+          </div>
+
+          <div class="capture-footer">
+            <div class="actions">
+              <button class="button primary" id="check" type="button" disabled><i class="scan-icon" aria-hidden="true"></i><span id="check-label">Проверить кадр</span></button>
+              <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Включить камеру</span></button>
+            </div>
+            <p class="message" id="message" role="status" hidden></p>
+          </div>
+        </section>
+
+        <section class="result panel" id="result" aria-labelledby="result-title">
+          <div class="panel-heading"><h2 id="result-title" tabindex="-1">Результат осмотра</h2></div>
+          <div class="empty" id="empty">
+            <div class="empty-icon" aria-hidden="true"><i></i></div>
+            <h3 id="empty-title">Ожидает проверки</h3>
+            <p id="empty-text">После проверки здесь появятся данные узла и рекомендация по обслуживанию.</p>
+          </div>
+
+          <div class="details" id="details" hidden>
+            <span class="finding" id="finding"></span>
+            <h3 id="equipment"></h3>
+            <p class="equipment-id" id="equipment-id"></p>
+            <dl class="facts">
+              <div><dt>Узел</dt><dd id="component"></dd></div>
+              <div><dt>Срок службы</dt><dd id="service-life"></dd></div>
+              <div><dt>Следующее ТО</dt><dd id="next-service"></dd></div>
+            </dl>
+            <div class="recommendation">
+              <h4>Рекомендация</h4>
+              <p id="recommendation"></p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
