@@ -79,6 +79,7 @@ h1 { font-size: clamp(30px, 5vw, 50px); line-height: 1.03; letter-spacing: -.056
 .camera-icon::before { content: ""; position: absolute; width: 6px; height: 6px; top: 2px; left: 4px; border: 1px solid currentColor; border-radius: 50%; }
 .camera-icon::after { content: ""; position: absolute; width: 5px; height: 3px; top: -3px; left: 4px; background: currentColor; border-radius: 1px; }
 .message { margin-top: 10px; font-size: 13px; color: var(--muted); line-height: 1.45; }
+.message:empty { margin-top: 0; }
 .message[data-error="true"] { color: #8b371e; }
 
 .result .panel-heading { border-bottom: 1px solid #e6ece6; }
@@ -111,6 +112,7 @@ h1 { font-size: clamp(30px, 5vw, 50px); line-height: 1.03; letter-spacing: -.056
   .topbar-inner { min-height: 58px; }
   .panel-heading { min-height: 53px; padding: 13px 14px; }
   .viewfinder { margin-inline: 8px; }
+  .viewfinder[data-portrait="true"] { aspect-ratio: 4 / 5; max-height: 56vh; max-height: 56svh; }
   .capture-footer { padding: 9px 8px 8px; }
   .empty { padding: 18px 14px 20px; }
   .details { padding: 14px; }

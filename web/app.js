@@ -15,8 +15,9 @@ const unavailableResults = {
 };
 
 let stream = null;
-let frozen = false;
-let pending = '';
+let frameSource = null;
+let openingCamera = false;
+let checking = false;
 let result = null;
 let cameraRequest = 0;
 
@@ -24,7 +25,6 @@ function showMessage(text = '', error = false) {
   const message = byId('message');
   message.textContent = text;
   message.dataset.error = String(error);
-  message.hidden = !text;
 }
 
 function positionDetection() {
@@ -44,21 +44,24 @@ function positionDetection() {
 }
 
 function render() {
+  const frozen = frameSource !== null;
   const live = Boolean(stream && !frozen);
   const frameReady = live ? video.readyState >= 2 && video.videoWidth > 0 : example.naturalWidth > 0;
   example.hidden = live || frozen;
   video.hidden = !live;
   snapshot.hidden = !frozen;
+  viewfinder.dataset.portrait = String(frozen ? snapshot.height > snapshot.width :
+    live && video.videoHeight > video.videoWidth);
   byId('guide').hidden = frozen;
   byId('source').dataset.live = String(live);
-  byId('source-text').textContent = live ? 'Камера' : frozen && stream ? 'Кадр с камеры' : 'Пример кадра';
-  byId('mode').textContent = endpoint && stream ? 'Серверный анализ' : 'Тестовый режим';
+  byId('source-text').textContent = live ? 'Камера' : frameSource === 'camera' ? 'Кадр с камеры' : 'Пример кадра';
+  byId('mode').textContent = endpoint && (live || frameSource === 'camera') ? 'Серверный анализ' : 'Тестовый режим';
 
-  checkButton.disabled = Boolean(pending) || (!frozen && !frameReady);
-  cameraButton.disabled = Boolean(pending);
-  byId('check-label').textContent = pending === 'analysis' ? 'Проверяем…' :
-    frozen && result ? (stream ? 'Новый кадр' : 'Проверить ещё раз') : 'Проверить кадр';
-  byId('camera-label').textContent = pending === 'camera' ? 'Открываем…' :
+  checkButton.disabled = openingCamera || checking || (!frozen && !frameReady);
+  cameraButton.disabled = checking && !stream;
+  byId('check-label').textContent = checking ? 'Проверяем…' :
+    result ? (frameSource === 'camera' ? 'Новый кадр' : 'Проверить ещё раз') : 'Проверить кадр';
+  byId('camera-label').textContent = openingCamera ? 'Отменить запуск' :
     stream ? 'Выключить камеру' : 'Включить камеру';
 
   const detected = result && (result.status === 'defect' || result.status === 'clear');
@@ -84,13 +87,14 @@ function render() {
       'Ожидает проверки',
       'После проверки здесь появятся данные узла и рекомендация по обслуживанию.',
     ];
-    byId('empty-title').textContent = pending === 'analysis' ? 'Проверяем кадр…' : title;
-    byId('empty-text').textContent = pending === 'analysis' ? '' : description;
+    byId('empty-title').textContent = checking ? 'Проверяем кадр…' : title;
+    byId('empty-text').textContent = checking ? '' : description;
   }
 }
 
 function stopCamera() {
   cameraRequest += 1;
+  openingCamera = false;
   const previousStream = stream;
   stream = null;
   video.srcObject = null;
@@ -105,13 +109,11 @@ function cameraError(error) {
 }
 
 async function toggleCamera() {
-  if (pending) return;
+  if (checking && !stream) return;
   showMessage();
 
-  if (stream) {
+  if (stream || openingCamera) {
     stopCamera();
-    frozen = false;
-    result = null;
     render();
     return;
   }
@@ -122,7 +124,8 @@ async function toggleCamera() {
   }
 
   const request = ++cameraRequest;
-  pending = 'camera';
+  openingCamera = true;
+  showMessage('Разрешите доступ к камере в запросе браузера.');
   render();
 
   try {
@@ -136,16 +139,14 @@ async function toggleCamera() {
     }
 
     stream = opened;
-    frozen = false;
+    frameSource = null;
     result = null;
+    showMessage();
     video.srcObject = stream;
     opened.getVideoTracks()[0]?.addEventListener('ended', () => {
       if (stream !== opened) return;
       stopCamera();
-      frozen = false;
-      result = null;
-      if (pending === 'camera') pending = '';
-      showMessage('Камера отключилась. Включите её снова или проверьте пример.', true);
+      showMessage('Камера отключилась. Включите её снова для нового кадра.', true);
       render();
     });
     render();
@@ -153,12 +154,11 @@ async function toggleCamera() {
   } catch (error) {
     if (request !== cameraRequest) return;
     stopCamera();
-    pending = '';
     showMessage(cameraError(error), true);
     render();
   } finally {
     if (request === cameraRequest) {
-      pending = '';
+      openingCamera = false;
       render();
     }
   }
@@ -168,13 +168,13 @@ function freezeFrame() {
   const source = stream ? video : example;
   const width = stream ? video.videoWidth : example.naturalWidth;
   const height = stream ? video.videoHeight : example.naturalHeight;
-  if (!width || !height) throw new Error('Frame unavailable');
+  if (!width || !height || (stream && video.readyState < 2)) throw new Error('Frame unavailable');
 
   const scale = Math.min(1, 1280 / Math.max(width, height));
   snapshot.width = Math.max(1, Math.round(width * scale));
   snapshot.height = Math.max(1, Math.round(height * scale));
   snapshot.getContext('2d').drawImage(source, 0, 0, snapshot.width, snapshot.height);
-  frozen = true;
+  frameSource = stream ? 'camera' : 'example';
 }
 
 async function analyzeFrame(useServer) {
@@ -212,14 +212,20 @@ function readResult(data) {
 }
 
 async function checkFrame() {
-  if (pending) return;
+  if (openingCamera || checking) return;
   showMessage();
 
-  if (frozen && result && stream) {
+  if (result && frameSource === 'camera') {
+    if (!stream) {
+      await toggleCamera();
+      return;
+    }
+    const resumedStream = stream;
     result = null;
-    frozen = false;
+    frameSource = null;
     render();
     video.play().catch(() => {
+      if (stream !== resumedStream) return;
       stopCamera();
       showMessage('Не удалось возобновить камеру. Включите её снова.', true);
       render();
@@ -228,20 +234,17 @@ async function checkFrame() {
   }
 
   result = null;
-  pending = 'analysis';
+  checking = true;
   try {
-    if (!frozen) freezeFrame();
+    if (!frameSource) freezeFrame();
     render();
-    const request = cameraRequest;
-    const analyzed = await analyzeFrame(Boolean(endpoint && stream));
-    if (request !== cameraRequest) return;
-    result = analyzed;
+    result = await analyzeFrame(Boolean(endpoint && frameSource === 'camera'));
     showMessage('Проверка завершена.');
   } catch (error) {
     showMessage(error.name === 'AbortError' ? 'Сервер не ответил вовремя. Повторите проверку.' :
       'Не удалось проверить кадр. Повторите попытку.', true);
   } finally {
-    pending = '';
+    checking = false;
     render();
   }
 }
@@ -251,18 +254,23 @@ checkButton.addEventListener('click', checkFrame);
 example.addEventListener('load', render);
 example.addEventListener('error', () => showMessage('Пример кадра недоступен. Попробуйте включить камеру.', true));
 video.addEventListener('loadeddata', render);
+video.addEventListener('canplay', render);
 video.addEventListener('playing', render);
+video.addEventListener('resize', render);
 detection.addEventListener('click', () => {
   byId('result-title').focus({ preventScroll: true });
   byId('result').scrollIntoView({ block: 'nearest' });
 });
-window.addEventListener('pagehide', () => {
-  if (!stream && pending !== 'camera') return;
+function releaseCamera() {
+  if (!stream && !openingCamera) return;
   stopCamera();
-  frozen = false;
-  result = null;
-  if (pending === 'camera') pending = '';
+  showMessage();
   render();
+}
+
+window.addEventListener('pagehide', releaseCamera);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && stream) releaseCamera();
 });
 if ('ResizeObserver' in window) {
   new ResizeObserver(positionDetection).observe(viewfinder);
