@@ -6,12 +6,27 @@
   const pending = new Map();
   let modelState = { loaded: false, busy: false, state: 'idle' };
   let controls, message, progress, loadButton, cancelButton, importButton, resultCard;
+  let frameCancelButton;
   let modelDescription;
   let historyPanel, renderedResult = null;
   const HISTORY_KEY = 'cyber102.offline.inspections.v1';
   const MODELS = new Set(['SmolVLM-256M-Instruct', 'SmolVLM-500M-Instruct', 'SmolVLM2-2.2B-Instruct', 'VisionPsy-Nano-460M']);
   const modelName = model => MODELS.has(model) ? model : 'VisionPsy-Nano-460M';
   const displayBytes = bytes => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(2).replace('.', ',')} ГБ` : `${Math.ceil(bytes / 1e6)} МБ`;
+  const findingLabels = new Map([
+    ['irregular split or hole', 'Неровная трещина или отверстие'],
+    ['electrical wires', 'Видна электропроводка'],
+    ['damaged electrical contacts', 'Повреждение электрических контактов'],
+    ['contact damaged', 'Повреждение контакта'],
+    ['electrical wires or contacts damaged', 'Повреждение проводки или контактов'],
+    ['heavy surface rust', 'Сильная поверхностная коррозия'],
+    ['liquid dripping', 'Видны капли жидкости'],
+    ['liquids dripping', 'Видны капли жидкости'],
+    ['normal', 'Явный дефект по кадру не различим'],
+    ['normal or unclear', 'Явный дефект по кадру не различим'],
+    ['unclear', 'Кадр не даёт однозначного наблюдения'],
+    ['indistinct', 'Кадр не даёт однозначного наблюдения'],
+  ]);
   let counter = 0;
   const text = (tag, value, className) => {
     const element = document.createElement(tag);
@@ -67,6 +82,7 @@
     loadButton.disabled = Boolean(modelState.busy || modelState.loaded);
     loadButton.textContent = modelState.loaded ? 'Модель готова' : 'Подготовить модель';
     cancelButton.hidden = !modelState.busy;
+    frameCancelButton.hidden = modelState.state !== 'analyzing' || !modelState.busy;
     importButton.disabled = Boolean(modelState.busy);
     controls.setAttribute('aria-busy', String(Boolean(modelState.busy)));
   }
@@ -159,16 +175,18 @@
     resultCard.setAttribute('aria-busy', String(checking));
     if (renderedResult === result) return;
     renderedResult = result;
-    resultCard.replaceChildren(text('span', 'Офлайн · предварительное наблюдение', 'finding'),
-      text('h3', `${modelName(result.model)} на этом телефоне`),
-      text('p', 'Исходный ответ модели на английском', 'equipment-id'),
-      text('p', result.observation, 'offline-observation'),
-      text('p', 'Проверьте описание по кадру. Модель не определяет скрытые неисправности, ресурс и безопасность эксплуатации; точная локализация дефекта этим режимом не выполняется.', 'equipment-id'));
-    if (Number.isFinite(result.durationSeconds)) resultCard.append(text('p', `Время на устройстве: ${result.durationSeconds.toFixed(1)} с`, 'video-metrics'));
     const capture = { camera: 'Кадр камеры', uploaded_photo: 'Загруженное фото', uploaded_video: 'Кадр загруженного видео' }[result.media?.captureSource] || 'Кадр на устройстве';
     const position = result.media?.captureSource === 'uploaded_video' && Number.isFinite(result.media.videoTimeSeconds) ? ` · ${result.media.videoTimeSeconds.toFixed(1)} с` : '';
-    resultCard.append(text('p', capture + position, 'video-metrics'));
-    resultCard.append(text('p', 'Этот результат получен без сервера. Он не добавлен в серверный журнал.', 'equipment-id'));
+    const duration = Number.isFinite(result.durationSeconds) ? ` · Анализ ${result.durationSeconds.toFixed(1)} с` : '';
+    const labelText = findingLabels.get(result.observation.toLowerCase().replace(/[.!]+$/, '').trim());
+    resultCard.replaceChildren(text('span', 'Офлайн · предварительное наблюдение', 'finding'),
+      text('h3', `${modelName(result.model)} на этом телефоне`),
+      text('p', capture + position + duration, 'video-metrics'),
+      checkedFrame());
+    if (labelText) resultCard.append(text('p', labelText, 'offline-caption'));
+    resultCard.append(text('p', 'Исходный ответ модели на английском', 'equipment-id'),
+      text('p', result.observation, 'offline-observation'),
+      text('p', 'Сверьте описание с кадром. Оценка скрытых неисправностей, ресурса и безопасности эксплуатации требует отдельной проверки.', 'equipment-id'));
     const label = text('label', 'Заметка к осмотру на телефоне'); label.htmlFor = 'offline-note';
     const note = text('textarea'); note.id = label.htmlFor; note.rows = 3; note.maxLength = 1000;
     note.style.width = '100%'; note.style.font = 'inherit';
@@ -189,6 +207,18 @@
     resultCard.querySelector('.offline-observation').style.overflowWrap = 'anywhere';
   }
 
+  function checkedFrame() {
+    const source = document.getElementById('snapshot');
+    const preview = document.createElement('canvas');
+    preview.className = 'offline-checked-frame';
+    preview.setAttribute('role', 'img');
+    preview.setAttribute('aria-label', 'Кадр, по которому получено наблюдение');
+    preview.width = source.width;
+    preview.height = source.height;
+    preview.getContext('2d').drawImage(source, 0, 0);
+    return preview;
+  }
+
   function setup() {
     if (!enabled) return;
     controls = text('section', undefined, 'panel'); controls.id = 'offline-controls';
@@ -200,10 +230,15 @@
     cancelButton = text('button', 'Остановить', 'button secondary'); cancelButton.type = 'button'; cancelButton.id = 'offline-cancel';
     importButton = text('button', 'Импортировать модель', 'button secondary'); importButton.type = 'button'; importButton.id = 'offline-import';
     loadButton.addEventListener('click', () => window.CyberSmolNative.load());
-    cancelButton.addEventListener('click', () => {
+    const cancel = () => {
       window.CyberSmolNative.cancel();
       for (const job of [...pending.values()]) job.reject(aborted());
-    });
+    };
+    cancelButton.addEventListener('click', cancel);
+    frameCancelButton = text('button', 'Остановить анализ', 'button secondary');
+    frameCancelButton.type = 'button'; frameCancelButton.id = 'offline-frame-cancel'; frameCancelButton.hidden = true;
+    frameCancelButton.addEventListener('click', cancel);
+    document.getElementById('check')?.after(frameCancelButton);
     importButton.addEventListener('click', () => window.CyberSmolNative.importModel());
     actions.append(loadButton, cancelButton, importButton);
     progress = text('progress'); progress.max = 100; progress.hidden = true; progress.setAttribute('aria-label', 'Подготовка модели');

@@ -30,7 +30,7 @@ final class SmolEngineManager {
     interface Listener { void onEvent(JSONObject event); }
     private static final int MAX_IMAGE_BYTES = 1536 * 1024;
     private static final int MAX_IMAGE_BASE64 = 4 * ((MAX_IMAGE_BYTES + 2) / 3);
-    private static final String PROMPT = "In English, briefly name the industrial part and describe any visible damage or unusual marks. If unclear, say so. Do not guess causes.";
+    private static final String PROMPT = "Which one best describes the physical condition shown? Normal or unclear; electrical wires or contacts damaged; irregular split or hole; heavy surface rust; or liquid dripping. Answer with one phrase.";
     private final Context context;
     private final Listener listener;
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -118,8 +118,11 @@ final class SmolEngineManager {
                 for (int i = 0; i < files.size(); i++) prepare(files.get(i), folder, token, i);
                 check(token);
                 status("loading", "Загружаем " + modelId + " в память телефона…", 100);
+                int processors = Runtime.getRuntime().availableProcessors();
+                // Six threads performed best on the eight-core Redmi. Leave spare CPU for WebView.
+                int threads = Math.max(2, Math.min(6, processors * 3 / 4));
                 SmolNative.load(new File(folder, "model.gguf").getAbsolutePath(),
-                        new File(folder, "projector.gguf").getAbsolutePath(), Math.min(4, Math.max(2, Runtime.getRuntime().availableProcessors() / 2)), epoch);
+                        new File(folder, "projector.gguf").getAbsolutePath(), threads, epoch);
                 check(token);
                 loaded = true;
                 status("ready", modelId + " готова. Анализ выполняется только на этом телефоне.", 100);
@@ -165,7 +168,7 @@ final class SmolEngineManager {
                 JSONObject result;
                 Trace.beginSection("Cyber102.smol.inference");
                 try {
-                    result = new JSONObject(SmolNative.analyze(image.getAbsolutePath(), PROMPT, 40, epoch));
+                    result = new JSONObject(SmolNative.analyze(image.getAbsolutePath(), PROMPT, 32, epoch));
                 } finally {
                     Trace.endSection();
                 }

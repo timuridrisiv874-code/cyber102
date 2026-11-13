@@ -70,6 +70,7 @@ async function run(browser, name, android) {
     assert.ok((await page.locator('#offline-result h3').textContent()).includes(model));
     assert.match(await page.locator('#offline-result').textContent(), /<script>alert/);
     assert.equal(await page.locator('#offline-result script').count(), 0);
+    if (android) assert.equal(await page.locator('#offline-result .offline-checked-frame').isVisible(), true);
     assert.equal(await page.locator('#detection').isVisible(), false);
     assert.equal(await page.locator('#inspection-workflow').isVisible(), false);
     assert.equal(await page.locator('#details').isVisible(), false);
@@ -105,7 +106,7 @@ async function run(browser, name, android) {
     await page.evaluate(() => { mockSmol.delay = 2000; });
     await page.locator('#check').click();
     await page.waitForFunction(() => mockSmol.calls.length === 2);
-    await page.locator('#offline-cancel').click();
+    await page.locator(android ? '#offline-frame-cancel' : '#offline-cancel').click();
     await page.waitForFunction(() => mockSmol.cancelled > 0);
     await page.locator('#check:not([disabled])').waitFor();
     assert.equal(await page.locator('#offline-result').isVisible(), false);

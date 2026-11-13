@@ -168,7 +168,7 @@ void load(const std::string & model_path, const std::string & projector_path, in
     model_params.progress_callback_user_data = nullptr;
     next->model = llama_model_load_from_file(model_path.c_str(), model_params);
     if (!next->model) throw std::runtime_error(is_cancelled() ? "Model loading cancelled" : "Cannot load local SmolVLM weights");
-    threads = std::clamp(threads, 2, 4);
+    threads = std::clamp(threads, 2, 6);
     auto context_params = llama_context_default_params();
     context_params.n_ctx = CONTEXT_SIZE;
     context_params.n_batch = BATCH_SIZE;

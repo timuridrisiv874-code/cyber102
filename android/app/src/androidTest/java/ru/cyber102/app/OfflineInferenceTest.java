@@ -114,6 +114,7 @@ public final class OfflineInferenceTest {
             await("real model observation", "!document.getElementById('offline-result').hidden", 240000);
             String observation = stringJs("document.querySelector('#offline-result .offline-observation').textContent");
             assertTrue(observation.trim().length() > 2);
+            assertEquals("true", js("(()=>{const p=document.querySelector('.offline-checked-frame');const s=document.getElementById('snapshot');return !!p && p.width===s.width && p.height===s.height && p.toDataURL()===s.toDataURL()})()"));
             assertEquals("true", js("document.getElementById('detection').hidden || getComputedStyle(document.getElementById('detection')).display==='none'"));
             assertEquals("true", js("document.getElementById('inspection-workflow').hidden"));
             originalHistory = js("localStorage.getItem('cyber102.offline.inspections.v1')");
@@ -129,12 +130,15 @@ public final class OfflineInferenceTest {
             }
             assertFalse(saved.has("image"));
             assertFalse(saved.has("base64"));
-            js("document.getElementById('offline-result').scrollIntoView({block:'start',behavior:'instant'});true");
+            await("result animation", "document.getElementById('offline-result').getAnimations().every(a=>a.playState==='finished')", 5000);
+            js("(()=>{const box=document.getElementById('offline-result').getBoundingClientRect();window.scrollTo({top:window.scrollY+box.top-12,behavior:'instant'});return true})()");
+            await("result visible for screenshot", "(()=>{const p=document.querySelector('.offline-checked-frame').getBoundingClientRect();const o=document.querySelector('.offline-observation').getBoundingClientRect();return p.top>=0 && o.bottom<=innerHeight})()", 5000);
             SystemClock.sleep(300);
             capture(target, "offline-real-result.png");
             Bundle report = new Bundle();
             report.putString("stream", "\nREAL_OFFLINE_RESULT " + saved + "\nAPP_PSS_KIB " + Debug.getPss() + "\n");
             instrumentation.sendStatus(0, report);
+            if ("true".equals(InstrumentationRegistry.getArguments().getString("captureOnly"))) return;
 
             if (videoSecond != null) {
                 assertEquals("Новый кадр", stringJs("document.getElementById('check-label').textContent"));
@@ -196,7 +200,8 @@ public final class OfflineInferenceTest {
         await("inference started", "JSON.parse(CyberSmolNative.state()).state === 'analyzing'", 10000);
         SystemClock.sleep(1000);
         long started = SystemClock.elapsedRealtime();
-        js("document.getElementById('offline-cancel').click();true");
+        assertEquals("true", js("!document.getElementById('offline-frame-cancel').hidden"));
+        js("document.getElementById('offline-frame-cancel').click();true");
         await("cancel finishes", "!JSON.parse(CyberSmolNative.state()).busy && !document.getElementById('check').disabled", 60000);
         long elapsed = SystemClock.elapsedRealtime() - started;
         assertEquals("true", js("document.getElementById('offline-result').hidden"));
