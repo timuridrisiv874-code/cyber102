@@ -7,6 +7,7 @@
     <title>Осмотр оборудования — Cyber102</title>
     <link rel="stylesheet" href="styles.css">
     <script src="inspection.js" defer></script>
+    <script src="media.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -35,6 +36,8 @@
           <div class="viewfinder" id="viewfinder">
             <img id="example" src="demo-pump.jpg" alt="Демонстрационный кадр промышленного насоса" decoding="async">
             <video id="video" aria-label="Изображение с камеры" muted autoplay playsinline hidden></video>
+            <img id="uploaded-image" alt="Выбранное фото оборудования" hidden>
+            <video id="uploaded-video" aria-label="Выбранное видео оборудования" controls muted playsinline preload="auto" hidden></video>
             <canvas id="snapshot" role="img" aria-label="Зафиксированный кадр осмотра" hidden></canvas>
             <div class="finder-guide" id="guide" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
             <button type="button" class="detection" id="detection" aria-controls="result" hidden>
@@ -43,6 +46,13 @@
           </div>
 
           <div class="capture-footer">
+            <div class="demo-options">
+              <label for="media-file">Фото или видео</label>
+              <input id="media-file" type="file" accept="image/*,video/*" aria-describedby="media-help">
+              <button id="media-clear" class="button secondary" type="button" hidden>Убрать файл</button>
+            </div>
+            <p class="video-help" id="media-help">Фото до 20 МБ; видео до 150 МБ и 2 минут. Видео остаётся на устройстве: анализируются отдельные кадры, не весь поток.</p>
+            <p class="video-metrics" id="media-progress" role="status" hidden></p>
             <div class="demo-options" id="demo-options">
               <label for="demo-scenario">Пример осмотра</label>
               <select id="demo-scenario">
@@ -52,7 +62,7 @@
               </select>
             </div>
             <div class="camera-options" id="camera-options" hidden>
-              <label for="camera-mode">Режим</label>
+              <label for="camera-mode" id="camera-mode-label">Режим</label>
               <select id="camera-mode">
                 <option value="single">Один кадр</option>
                 <option value="video">Видеопроверка</option>
@@ -98,6 +108,7 @@
             <span class="finding" id="finding"></span>
             <h3 id="equipment"></h3>
             <p class="equipment-id" id="equipment-id"></p>
+            <p class="equipment-id" id="capture-provenance" hidden></p>
             <p class="equipment-id" id="vision-observation" hidden></p>
             <dl class="facts">
               <div><dt>Узел</dt><dd id="component"></dd></div>

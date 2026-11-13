@@ -102,6 +102,13 @@ h1 { font-size: clamp(30px, 5vw, 50px); line-height: 1.03; letter-spacing: -.056
 .empty p { margin-top: 6px; max-width: 34ch; }
 .empty p, .equipment-id, .facts dt { font-size: 14px; line-height: 1.5; color: var(--muted); }
 .details { padding: 20px; }
+/* Keep the longer inspection form inside the mobile viewport. Native fieldset
+   min-content sizing otherwise expands the page and displaces touch targets. */
+#inspection-fields { min-width: 0; max-width: 100%; }
+#inspection-fields input, #inspection-fields select, #inspection-fields textarea {
+  min-width: 0; max-width: 100%; font: inherit;
+}
+#inspection-fields .demo-options > * { min-width: 0; max-width: 100%; }
 .finding { display: inline-block; margin-bottom: 12px; background: #fff0d7; color: #713c0b; border-radius: 5px; padding: 5px 8px; font-weight: 700; font-size: 12px; }
 .finding[data-status="clear"] { background: #e4f4e7; color: #1d6339; }
 .details h3 { font-size: 23px; line-height: 1.12; letter-spacing: -.035em; }
@@ -133,20 +140,3 @@ h1 { font-size: clamp(30px, 5vw, 50px); line-height: 1.03; letter-spacing: -.056
   .button { gap: 5px; font-size: 12px; }
   .source { font-size: 12px; }
 }
-
-.page { padding-top: clamp(20px, 5vw, 40px); }
-.intro a { color: var(--accent); text-underline-offset: 3px; }
-.video-summary { padding: 16px; border-bottom: 1px solid var(--line); }
-.video-summary h3 { font-size: 17px; }
-#summary-state { color: var(--muted); font-size: 14px; margin-top: 4px; }
-.summary-counts { margin: 10px 0 0; }
-.summary-counts div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
-.summary-counts div:last-child { border-bottom: 0; }
-.summary-counts dt { font-size: 14px; }
-.summary-counts dd { font-variant-numeric: tabular-nums; font-weight: 650; }
-#summary-findings { margin: 10px 0 0; padding-left: 18px; }
-#summary-findings li + li { margin-top: 9px; }
-#summary-findings p { color: var(--muted); font-size: 14px; margin-top: 3px; }
-@supports not (aspect-ratio: 3 / 2) { .viewfinder { min-height: 220px; } }
-
-.camera-idle { position: absolute; inset: 0; display: grid; place-items: center; color: #d8e5de; font-size: 14px; }

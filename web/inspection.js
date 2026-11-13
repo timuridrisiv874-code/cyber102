@@ -64,6 +64,31 @@
   const saveButton = byId('inspection-save');
   const message = byId('inspection-message');
   const confirms = byId('inspection-confirmations');
+  const manual = document.createElement('div');
+  manual.id = 'inspection-manual';
+  manual.hidden = true;
+  telemetry.closest('.demo-options').after(manual);
+  const componentRow = document.createElement('div');
+  componentRow.className = 'demo-options';
+  const componentLabel = document.createElement('label');
+  componentLabel.htmlFor = 'inspection-component';
+  componentLabel.textContent = 'Узел для паспортной рекомендации';
+  const component = document.createElement('select');
+  component.id = componentLabel.htmlFor;
+  component.append(new Option('Насос', 'pump'));
+  componentRow.append(componentLabel, component);
+  serial.closest('p').after(componentRow);
+  const serialChoices = document.createElement('datalist');
+  serialChoices.id = 'inspection-equipment-options';
+  serial.setAttribute('list', serialChoices.id);
+  serial.after(serialChoices);
+  const navigator = document.createElement('section');
+  navigator.id = 'inspection-guidance';
+  const references = document.createElement('section');
+  references.id = 'inspection-references';
+  byId('inspection-findings').after(navigator, references);
+  let manualFields = [];
+  let catalogPromise = null;
   const visionLabels = {
     seal_leak: 'Жидкость именно в зоне уплотнения вала',
     foundation_issue: 'Коррозия рамы / отсутствие или ослабление анкеров',
@@ -109,7 +134,10 @@
     saveButton.disabled = !ready || pending || cameraBusy || saved || (!preview && !savePayload);
     byId('inspection-paused').hidden = !cameraBusy;
     const selected = telemetry.value;
-    byId('inspection-source').textContent = selected ?
+    manual.hidden = selected !== 'manual';
+    manual.querySelectorAll('input, select').forEach((input) => { input.disabled = manual.hidden; });
+    byId('inspection-source').textContent = selected === 'manual' ?
+      'Показания введены оператором для выбранного серийного номера. Это не автоматическое подключение датчиков.' : selected ?
       'Демонстрационные показания: эмулятор, не реальные датчики этого кадра. Визуальные признаки сценария не используются.' :
       'Данные датчиков не подключены. Неизвестные параметры не считаются нормой.';
     byId('inspection-history').href = `/checkpoint.html?${new URLSearchParams({ serial: serial.value.trim() })}`;
@@ -125,6 +153,8 @@
     savePayload = null;
     byId('inspection-diagnosis').hidden = true;
     byId('inspection-findings').replaceChildren();
+    navigator.replaceChildren();
+    references.replaceChildren();
     saveButton.textContent = 'Сохранить осмотр';
     setMessage();
     sync();
@@ -144,17 +174,26 @@
     const requested = serial.value.trim();
     const load = ++serialLoad;
     serialReady = '';
-    telemetry.replaceChildren(new Option('Нет данных датчиков', ''));
+    telemetry.replaceChildren(new Option('Нет данных датчиков', ''), new Option('Ручные показания', 'manual'));
+    component.replaceChildren(new Option('Насос', 'pump'));
     invalidate();
     if (!requested) return;
     setMessage('Проверяем серийный номер…');
     try {
-      const data = await api(`/api/scenarios?${new URLSearchParams({ serial: requested })}`);
+      const [data, referenceData] = await Promise.all([
+        api(`/api/scenarios?${new URLSearchParams({ serial: requested })}`),
+        api(`/api/recommendations?${new URLSearchParams({ serial: requested })}`).catch(() => null),
+        loadCatalog().catch(() => null),
+      ]);
       if (load !== serialLoad || requested !== serial.value.trim()) return;
       if (data.passport?.serial !== requested || !Array.isArray(data.scenarios)) throw new Error('Сервер не подтвердил серийный номер.');
       serialReady = requested;
+      telemetry.querySelector('option[value="manual"]').disabled = !manualFields.length;
       for (const item of data.scenarios) {
         if (typeof item.id === 'string' && typeof item.label === 'string') telemetry.append(new Option(`Демо: ${item.label}`, item.id));
+      }
+      if (referenceData?.availableComponents?.length) {
+        component.replaceChildren(...referenceData.availableComponents.map((item) => new Option(item.label, item.key)));
       }
       setMessage(`Оборудование: ${data.passport.model || requested}. Источник датчиков выберите отдельно.`);
     } catch (error) {
@@ -162,6 +201,36 @@
     } finally {
       if (load === serialLoad) sync();
     }
+  }
+
+  function loadCatalog() {
+    if (catalogPromise) return catalogPromise;
+    catalogPromise = Promise.all([api('/api/customer/rules'), api('/api/equipment')]).then(([rules, equipment]) => {
+      manualFields = rules.fields.telemetry;
+      manual.replaceChildren();
+      for (const field of manualFields) {
+        const row = document.createElement('div');
+        row.className = 'demo-options';
+        const label = document.createElement('label');
+        label.htmlFor = `inspection-telemetry-${field.key}`;
+        label.textContent = `${field.label}${field.unit ? `, ${field.unit}` : ''}`;
+        const input = document.createElement(field.type === 'number' ? 'input' : 'select');
+        input.id = label.htmlFor;
+        input.dataset.telemetryKey = field.key;
+        if (field.type === 'number') {
+          input.type = 'number'; input.min = '0'; input.step = 'any'; input.placeholder = 'Не измерено';
+        } else {
+          input.append(new Option('Не измерено', ''));
+          const options = field.type === 'boolean' ? [{ value: 'true', label: 'Да' }, { value: 'false', label: 'Нет' }] : field.options;
+          for (const option of options) input.append(new Option(option.label, option.value));
+        }
+        row.append(label, input);
+        manual.append(row);
+      }
+      serialChoices.replaceChildren(...equipment.equipment.filter((item) => !item.kind || item.kind === 'pump')
+        .map((item) => new Option(`${item.serial} · ${item.model}`, item.serial)));
+    }).catch((error) => { catalogPromise = null; throw error; });
+    return catalogPromise;
   }
 
   function buildPayload() {
@@ -178,8 +247,83 @@
     }
     return {
       serial: serialReady, analysisId: current.analysisId, confirmedVision, note: note.value,
-      telemetrySource: telemetry.value ? { kind: 'demo_scenario', scenarioId: telemetry.value } : { kind: 'none' },
+      selectedComponent: component.value,
+      telemetrySource: telemetry.value === 'manual' ? { kind: 'manual', values: Object.fromEntries(manualFields
+        .filter((field) => byId(`inspection-telemetry-${field.key}`).value !== '')
+        .map((field) => {
+          const value = byId(`inspection-telemetry-${field.key}`).value;
+          return [field.key, field.type === 'number' ? Number(value) : field.type === 'boolean' ? value === 'true' : value];
+        })) } : telemetry.value ? { kind: 'demo_scenario', scenarioId: telemetry.value } : { kind: 'none' },
     };
+  }
+
+  function textNode(tag, text) {
+    const node = document.createElement(tag);
+    node.textContent = text;
+    return node;
+  }
+
+  function renderGuidance(data) {
+    navigator.replaceChildren(textNode('h3', 'Что проверить дальше'));
+    if (!data || data.applicable === false) {
+      navigator.append(textNode('p', data?.reason || 'Навигатор недоступен.'));
+      return;
+    }
+    const statuses = { triggered: 'Условия выполнены', not_triggered: 'Условия не выполнены', insufficient_data: 'Не хватает данных' };
+    navigator.append(textNode('p', `Проверено правил: ${data.summary.assessed}/${data.summary.total}. ` +
+      `Сработало: ${data.summary.triggered}. Не хватает данных: ${data.summary.insufficientData}. Это не оценка исправности.`));
+    const next = document.createElement('ol');
+    for (const check of (data.nextChecks || []).slice(0, 5)) {
+      const item = document.createElement('li');
+      item.append(textNode('strong', check.label), textNode('p', check.instruction));
+      const button = textNode('button', 'Внести результат проверки');
+      button.type = 'button'; button.className = 'button secondary';
+      button.addEventListener('click', () => {
+        const [source, key] = check.field.split('.');
+        if (source === 'telemetry') telemetry.value = 'manual';
+        const target = source === 'telemetry' ? byId(`inspection-telemetry-${key}`) :
+          key === 'gauge_pressure' ? gauge : byId(`inspection-${key}`);
+        invalidate();
+        const parentDetails = target?.closest('details');
+        if (parentDetails) parentDetails.open = true;
+        target?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        target?.focus();
+      });
+      item.append(button); next.append(item);
+    }
+    navigator.append(next);
+    const details = document.createElement('details');
+    details.append(textNode('summary', 'Основания по всем 12 правилам'));
+    for (const rule of data.rules || []) {
+      const block = document.createElement('div');
+      block.dataset.ruleId = rule.id;
+      block.append(textNode('h4', `${rule.title} · ${statuses[rule.status] || rule.status}`));
+      const checks = document.createElement('ul');
+      for (const check of rule.checks || []) {
+        checks.append(textNode('li', `${check.label}: ${{ met: 'выполнено', not_met: 'не выполнено', unknown: 'неизвестно' }[check.status] || check.status}`));
+      }
+      block.append(checks);
+      if (rule.note) block.append(textNode('p', rule.note));
+      details.append(block);
+    }
+    navigator.append(details);
+  }
+
+  function renderReferences(data) {
+    references.replaceChildren(textNode('h3', 'Основание в документации изготовителя'));
+    for (const item of data?.recommendations || []) {
+      references.append(textNode('h4', item.title), textNode('p', item.appliesTo), textNode('p', item.text));
+      for (const condition of item.conditions || []) references.append(textNode('p', condition));
+      for (const source of item.sources || []) {
+        if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(source.documentId) || !Number.isInteger(source.page) || source.page < 1) continue;
+        const link = textNode('a', `${source.title} · стр. ${source.page}`);
+        link.href = `/api/customer/documents/${source.documentId}/pdf#page=${source.page}`;
+        link.target = '_blank'; link.rel = 'noopener';
+        references.append(link, textNode('blockquote', source.quote));
+      }
+    }
+    if (!data?.recommendations?.length) references.append(textNode('p', 'Проверенной паспортной рекомендации для выбранного узла нет.'));
+    for (const limitation of data?.limitations || []) references.append(textNode('p', limitation));
   }
 
   function renderFindings(data) {
@@ -208,9 +352,11 @@
       item.textContent = 'Правила не сработали по переданным данным. Это не подтверждение исправности; часть признаков может быть неизвестна.';
       list.append(item);
     }
-    byId('inspection-diagnosis-source').textContent = data.provenance?.telemetry === 'demo_scenario' ?
-      'Кадр камеры + подтверждение инженера + демонстрационная телеметрия.' :
-      'Кадр камеры + подтверждение инженера. Телеметрии нет.';
+    const captureLabel = { camera: 'Кадр камеры', uploaded_photo: 'Загруженное фото', uploaded_video: 'Кадр загруженного видео' }[data.provenance?.captureSource] || 'Кадр';
+    byId('inspection-diagnosis-source').textContent = `${captureLabel} + подтверждение инженера. ` +
+      ({ demo_scenario: 'Демонстрационная телеметрия.', manual: 'Показания введены оператором.', none: 'Телеметрии нет.' }[data.provenance?.telemetry] || '');
+    renderGuidance(data.guidance);
+    renderReferences(data.manufacturer);
     byId('inspection-diagnosis').hidden = false;
   }
 
@@ -291,6 +437,8 @@
   serial.addEventListener('input', () => { serialReady = ''; serialLoad += 1; invalidate(); });
   serial.addEventListener('change', loadSerial);
   telemetry.addEventListener('change', invalidate);
+  manual.addEventListener('input', invalidate);
+  component.addEventListener('change', invalidate);
   confirms.addEventListener('change', invalidate);
   gauge.addEventListener('input', invalidate);
   note.addEventListener('input', invalidate);

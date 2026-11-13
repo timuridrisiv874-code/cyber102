@@ -190,7 +190,7 @@ class InspectionApiTest(unittest.TestCase):
             connection.close()
 
     def test_complete_analysis_preview_save_image_history_flow(self):
-        with patch.object(vision, 'extract_request', return_value=(b'exact-normalized-jpeg', 'standard')), \
+        with patch.object(vision, 'extract_request', return_value=(b'exact-normalized-jpeg', 'standard', {'captureSource': 'camera', 'declaredBy': 'client'})), \
              patch.object(vision, 'analyze', return_value=RESULT):
             status, _, raw = self.request('POST', '/analyze', b'upload')
         self.assertEqual(status, 200, raw)
@@ -217,12 +217,12 @@ class InspectionApiTest(unittest.TestCase):
         self.assertEqual(self.request('POST', '/api/inspections', payload | {'analysisId': 'missing', 'requestId': 'new'})[0], 404)
 
     def test_unusable_frame_is_not_saveable_and_busy_has_retry_guidance(self):
-        with patch.object(vision, 'extract_request', return_value=(b'jpeg', 'fast')), \
+        with patch.object(vision, 'extract_request', return_value=(b'jpeg', 'fast', {'captureSource': 'camera', 'declaredBy': 'client'})), \
              patch.object(vision, 'analyze', return_value={'status': 'unusable', 'source': 'local_vision'}):
             status, _, raw = self.request('POST', '/analyze', b'upload')
         self.assertEqual(status, 200)
         self.assertNotIn('analysisId', json.loads(raw))
-        with patch.object(vision, 'extract_request', return_value=(b'jpeg', 'fast')), \
+        with patch.object(vision, 'extract_request', return_value=(b'jpeg', 'fast', {'captureSource': 'camera', 'declaredBy': 'client'})), \
              patch.object(vision, 'analyze', side_effect=vision.VisionBusy('busy')):
             status, headers, raw = self.request('POST', '/analyze', b'upload')
         self.assertEqual(status, 503)

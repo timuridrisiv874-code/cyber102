@@ -209,6 +209,7 @@ class ApiTest(unittest.TestCase):
                 self.assertTrue(analysis_id)
                 self.assertTrue(card.pop('capturedAt'))
                 self.assertIn(analysis_id, card.pop('imageUrl'))
+                self.assertEqual(card.pop('media'), {'captureSource': 'camera', 'declaredBy': 'client'})
                 self.assertEqual(card, vision.result_from_observation(observation, model=model))
                 build.return_value.open.side_effect = TimeoutError("worker timed out")
                 self.json_request("POST", "/analyze", 503, body=body, headers=headers)

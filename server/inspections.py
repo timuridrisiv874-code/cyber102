@@ -5,8 +5,8 @@ import json
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
-from . import history
-from .diagnostics import evaluate, number
+from . import history, customer, assessment
+from .diagnostics import number
 
 
 ORPHAN_TTL = timedelta(hours=2)
@@ -87,7 +87,7 @@ def get_analysis(connection, identifier, *, include_image=False, now=None):
 
 
 def validate_request(data, *, saving=False):
-    allowed = {'serial', 'analysisId', 'telemetrySource', 'confirmedVision', 'note', 'requestId'}
+    allowed = {'serial', 'analysisId', 'telemetrySource', 'confirmedVision', 'note', 'requestId', 'selectedComponent'}
     if not isinstance(data, dict) or set(data) - allowed:
         raise ValueError('Недопустимые поля осмотра.')
     serial = history._identifier(data.get('serial'), 'Серийный номер')
@@ -99,8 +99,10 @@ def validate_request(data, *, saving=False):
         source = {'kind': 'none'}
     elif source.get('kind') == 'demo_scenario' and set(source) == {'kind', 'scenarioId'}:
         source = {'kind': 'demo_scenario', 'scenarioId': history._identifier(source['scenarioId'], 'Сценарий')}
+    elif source.get('kind') == 'manual' and set(source) == {'kind', 'values'}:
+        source = {'kind': 'manual', 'values': validate_telemetry(source['values'])}
     else:
-        raise ValueError('Доступны только отсутствие телеметрии или демонстрационный сценарий.')
+        raise ValueError('Укажите отсутствие телеметрии, ручные показания или демонстрационный сценарий.')
     submitted = data.get('confirmedVision')
     if not isinstance(submitted, dict) or set(submitted) - ALLOWED_VISION:
         raise ValueError('Укажите подтверждённые признаки из карты осмотра.')
@@ -119,12 +121,40 @@ def validate_request(data, *, saving=False):
         history._identifier(request_id, 'Идентификатор запроса')
     normalized = {'serial': serial, 'analysisId': analysis_id, 'telemetrySource': source,
                   'confirmedVision': confirmed, 'note': note}
+    component = data.get('selectedComponent')
+    if component is not None:
+        if component not in ('pump', 'seal', 'foundation', 'shaft_joints', 'bearing', 'gearbox', 'motor', 'temperature_transmitter'):
+            raise ValueError('Неизвестный узел оборудования.')
+        normalized['selectedComponent'] = component
     # Reject non-finite values and unpaired Unicode before any database write.
     encoded = json.dumps(normalized, allow_nan=False, ensure_ascii=False, sort_keys=True).encode('utf-8')
     return normalized, request_id, hashlib.sha256(encoded).hexdigest()
 
 
-def _preview(connection, normalized):
+def validate_telemetry(values):
+    fields = {field['key']: field for field in customer.rules()['fields']['telemetry']}
+    if not isinstance(values, dict) or set(values) - fields.keys():
+        raise ValueError('Неизвестные поля ручной телеметрии.')
+    result = {}
+    for key, value in values.items():
+        if value is None:
+            continue
+        field = fields[key]
+        if field['type'] == 'enum':
+            valid = isinstance(value, str) and value in [option['value'] for option in field['options']]
+        elif field['type'] == 'boolean':
+            valid = type(value) is bool
+        else:
+            valid = number(value) is not None and value >= 0
+        if not valid:
+            raise ValueError(f'Некорректное показание: {field["label"]}.')
+        result[key] = value
+    if 'previous_hours' in result and 'hours' in result and result['previous_hours'] > result['hours']:
+        raise ValueError('Предыдущая наработка не может превышать текущую.')
+    return result
+
+
+def _preview(connection, normalized, customer_root=customer.ROOT):
     serial = normalized['serial']
     row = connection.execute('SELECT passport_json FROM pumps WHERE serial = ?', (serial,)).fetchone()
     if row is None:
@@ -138,6 +168,10 @@ def _preview(connection, normalized):
     provenance = {'source': 'camera_inspection', 'vision': 'engineer_confirmed',
                   'telemetry': source['kind'], 'equipmentBinding': 'operator_selected',
                   'telemetryEquipmentSerial': None}
+    if source['kind'] == 'manual':
+        telemetry = source['values']
+        provenance['telemetryEquipmentSerial'] = serial
+    provenance['captureSource'] = analysis['result'].get('media', {}).get('captureSource', 'camera')
     if source['kind'] == 'demo_scenario':
         row = connection.execute('''
             SELECT telemetry_json, source FROM inspections WHERE serial = ? AND id = ?
@@ -148,17 +182,20 @@ def _preview(connection, normalized):
         provenance['scenarioId'] = source['scenarioId']
         provenance['telemetryEquipmentSerial'] = serial
     confirmed = normalized['confirmedVision']
+    assessed = assessment.diagnose(passport, telemetry, confirmed)
+    manufacturer = assessment.references(serial, normalized.get('selectedComponent'),
+        [item['id'] for item in assessed['findings']], root=customer_root)
     return {'source': 'camera_inspection', 'passport': passport, 'analysis': analysis,
             'telemetry': telemetry, 'vision': confirmed, 'provenance': provenance,
-            'findings': evaluate(telemetry, confirmed, passport['thresholds'])}
+            'manufacturer': manufacturer, **assessed}
 
 
-def preview(connection, data):
+def preview(connection, data, *, customer_root=customer.ROOT):
     normalized, _, _ = validate_request(data)
-    return _preview(connection, normalized)
+    return _preview(connection, normalized, customer_root)
 
 
-def save(connection, data):
+def save(connection, data, *, customer_root=customer.ROOT):
     """Caller owns transaction: retaining evidence and history insertion are atomic."""
     normalized, request_id, fingerprint = validate_request(data, saving=True)
     if not connection.in_transaction:
@@ -168,8 +205,9 @@ def save(connection, data):
         if previous['provenance'].get('requestFingerprint') != fingerprint:
             raise history.IdempotencyConflict('Идентификатор запроса уже использован для другого осмотра.')
         return previous, False
-    inspected = _preview(connection, normalized)
-    provenance = {**inspected['provenance'], 'requestFingerprint': fingerprint}
+    inspected = _preview(connection, normalized, customer_root)
+    provenance = {**inspected['provenance'], 'requestFingerprint': fingerprint,
+                  'guidance': inspected['guidance'], 'manufacturer': inspected['manufacturer']}
     record, created = history.save(connection, normalized['serial'], provenance.get('scenarioId'),
         inspected['telemetry'], inspected['vision'], inspected['findings'], note=normalized['note'],
         request_id=request_id, evidence=inspected['analysis'], provenance=provenance)

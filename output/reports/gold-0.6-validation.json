@@ -1,0 +1,58 @@
+{
+  "scope": "Real HTTPS and GPU with a synthetic pump photo/video; functional test, not defect accuracy.",
+  "photo": {
+    "serverSeconds": 3.031,
+    "model": "OpenGVLab/InternVL3-2B-hf",
+    "source": "uploaded_photo"
+  },
+  "inspection": {
+    "id": "45ae15bb-cdf2-430f-9be1-9521ac314b6e",
+    "nextCurrent": true,
+    "manualRule": true,
+    "savedEvidenceHashVerified": true
+  },
+  "video": {
+    "serverSeconds": 2.313,
+    "source": "uploaded_video",
+    "timeSeconds": 0
+  },
+  "manufacturer": {
+    "serial": "SAL023020084_001002",
+    "pdfPage": 1,
+    "pdfRangeVerified": true,
+    "demoRulesBlockedForAMS": true
+  },
+  "createdAt": "2026-11-13T17:02:32.659465+00:00",
+  "version": "0.6-test",
+  "windowsTests": {
+    "run": 193,
+    "passed": 193
+  },
+  "localTests": {
+    "run": 193,
+    "skipped": 1,
+    "failures": 0
+  },
+  "browserChecks": {
+    "media": "Chromium/WebKit × web/Android assets: 4/4",
+    "guidanceAndReferences": "Chromium/WebKit × web/Android assets: 4/4",
+    "inspectionRegression": "Chromium/WebKit × web/Android assets: 4/4",
+    "cameraVideoRegression": "Chromium and WebKit: passed"
+  },
+  "android": {
+    "assembleDebug": "passed",
+    "lintDebug": "passed",
+    "versionCode": 6,
+    "apkBytes": 4021396,
+    "sha256": "12a0cdf3cbccb4a5c0ff1a78086e8383e65c66dccddf0acd74a7f0363ac74e35",
+    "httpsDownloadHashVerified": true,
+    "physicalDeviceTest": "pending team installation"
+  },
+  "detector": {
+    "adapterAndWorker": "ready",
+    "contractTests": 20,
+    "trainedWeights": "not supplied",
+    "activeBackend": "internvl3"
+  },
+  "threeDimensionalReconstruction": "excluded by user request"
+}

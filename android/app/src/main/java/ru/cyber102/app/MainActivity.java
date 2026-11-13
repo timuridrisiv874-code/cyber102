@@ -3,6 +3,9 @@ package ru.cyber102.app;
 import android.Manifest;
 import androidx.activity.ComponentActivity;
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import android.content.ActivityNotFoundException;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -57,6 +60,26 @@ public final class MainActivity extends ComponentActivity {
     private String password;
     private AlertDialog settingsDialog;
     private OnBackPressedCallback webBackCallback;
+    private ValueCallback<Uri[]> pendingFileChooser;
+    private boolean filePickerActive;
+    private final ActivityResultLauncher<Intent> filePicker = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                filePickerActive = false;
+                ValueCallback<Uri[]> callback = pendingFileChooser;
+                pendingFileChooser = null;
+                if (callback == null) return;
+                Uri selected = result.getResultCode() == RESULT_OK && result.getData() != null ?
+                        result.getData().getData() : null;
+                // ACTION_OPEN_DOCUMENT grants access only to the explicitly selected file.
+                callback.onReceiveValue(selected != null && "content".equals(selected.getScheme()) ?
+                        new Uri[]{selected} : null);
+            });
+
+    private void cancelFileChooser() {
+        ValueCallback<Uri[]> callback = pendingFileChooser;
+        pendingFileChooser = null;
+        if (callback != null) callback.onReceiveValue(null);
+    }
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -175,7 +198,7 @@ public final class MainActivity extends ComponentActivity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setAllowFileAccess(false);
-        settings.setAllowContentAccess(false);
+        settings.setAllowContentAccess(true); // Explicit document-picker URI grants; no storage permission.
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setSupportMultipleWindows(false);
@@ -198,6 +221,8 @@ public final class MainActivity extends ComponentActivity {
                 switch (path) {
                     case "/__mobile_inspection/app.js":
                         return bundledAsset("inspection/app.js");
+                    case "/__mobile_inspection/media.js":
+                        return bundledAsset("inspection/media.js");
                     case "/__mobile_inspection/inspection.js":
                         return bundledAsset("inspection/inspection.js");
                     case "/__mobile_inspection/styles.css":
@@ -217,6 +242,7 @@ public final class MainActivity extends ComponentActivity {
             }
             @Override public void onPageStarted(WebView view, String url, android.graphics.Bitmap icon) {
                 cancelCamera();
+                cancelFileChooser();
                 if (!sameOrigin(Uri.parse(url), Uri.parse(activeUrl))) {
                     view.stopLoading();
                     showError("Сервер перенаправил на другой адрес. Укажите конечный HTTPS-адрес в настройках.");
@@ -266,6 +292,31 @@ public final class MainActivity extends ComponentActivity {
             }
         });
         web.setWebChromeClient(new WebChromeClient() {
+            @Override public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback,
+                    FileChooserParams params) {
+                cancelFileChooser();
+                if (filePickerActive || !foreground || isDemo() || params.getMode() != FileChooserParams.MODE_OPEN ||
+                        !sameOrigin(Uri.parse(view.getUrl() == null ? "" : view.getUrl()), Uri.parse(activeUrl))) {
+                    callback.onReceiveValue(null);
+                    return true;
+                }
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                pendingFileChooser = callback;
+                filePickerActive = true;
+                try {
+                    filePicker.launch(intent);
+                } catch (ActivityNotFoundException | IllegalStateException error) {
+                    filePickerActive = false;
+                    cancelFileChooser();
+                    Toast.makeText(MainActivity.this, "Не удалось открыть выбор файла", Toast.LENGTH_LONG).show();
+                }
+                return true;
+            }
             @Override public void onProgressChanged(WebView view, int value) { progress.setProgress(value); }
             @Override public void onPermissionRequest(PermissionRequest request) {
                 if (isDemo() || !foreground || !sameOrigin(request.getOrigin(), Uri.parse(activeUrl)) ||
@@ -617,6 +668,7 @@ public final class MainActivity extends ComponentActivity {
     @Override protected void onDestroy() {
         network.shutdownNow();
         cancelCamera();
+        cancelFileChooser();
         if (web != null) { content.removeView(web); web.destroy(); web = null; }
         super.onDestroy();
     }

@@ -15,7 +15,7 @@ MODEL = 'qwen3-vl:8b'
 ENDPOINT = 'http://127.0.0.1:11435/api/chat'
 INTERNVL_MODEL = 'OpenGVLab/InternVL3-2B-hf'
 INTERNVL_ENDPOINT = 'http://127.0.0.1:11436/analyze'
-BACKENDS = ('ollama', 'internvl3')
+BACKENDS = ('ollama', 'internvl3', 'detector')
 PROFILES = ('standard', 'fast')
 MAX_IMAGE_BYTES = 3 * 1024 * 1024
 MAX_RESPONSE_BYTES = 128 * 1024
@@ -63,7 +63,7 @@ class NoRedirects(HTTPRedirectHandler):
         raise URLError('Local vision service redirects are forbidden')
 
 
-def extract_request(content_type, body):
+def extract_request(content_type, body, *, include_metadata=False):
     if not content_type.lower().startswith('multipart/form-data;'):
         raise ValueError('Ожидается JPEG или PNG в multipart-поле file.')
     message = BytesParser(policy=policy.default).parsebytes(
@@ -75,8 +75,29 @@ def extract_request(content_type, body):
     if len(files) != 1:
         raise ValueError('Передайте ровно одно изображение в поле file.')
     profiles = [part for part in parts if part.get_param('name', header='content-disposition') == 'profile']
-    if len(profiles) > 1 or any(part.get_param('name', header='content-disposition') not in ('file', 'profile') for part in parts):
-        raise ValueError('Допустимы только поля file и profile.')
+    names = [part.get_param('name', header='content-disposition') for part in parts]
+    if len(names) != len(set(names)) or set(names) - {'file', 'profile', 'captureSource', 'videoTimeSeconds'}:
+        raise ValueError('Недопустимые или повторные поля загрузки.')
+    metadata = {'captureSource': 'camera', 'declaredBy': 'client'}
+    for part in parts:
+        name = part.get_param('name', header='content-disposition')
+        if name not in ('captureSource', 'videoTimeSeconds'):
+            continue
+        try:
+            value = part.get_payload(decode=True).decode('ascii')
+            if name == 'captureSource':
+                if value not in ('camera', 'uploaded_photo', 'uploaded_video'):
+                    raise ValueError('Неизвестный источник кадра.')
+                metadata[name] = value
+            else:
+                seconds = float(value)
+                if not math.isfinite(seconds) or not 0 <= seconds <= 120:
+                    raise ValueError('Недопустимая позиция видео.')
+                metadata[name] = seconds
+        except (UnicodeError, AttributeError) as error:
+            raise ValueError('Некорректные сведения о кадре.') from error
+    if ('videoTimeSeconds' in metadata) != (metadata['captureSource'] == 'uploaded_video'):
+        raise ValueError('Для кадра загруженного видео нужна позиция в секундах.')
     profile = 'standard'
     if profiles:
         try:
@@ -97,7 +118,8 @@ def extract_request(content_type, body):
             normalized.thumbnail((1280, 1280))
             output = BytesIO()
             normalized.save(output, format='JPEG', quality=85)
-            return output.getvalue(), profile
+            result = (output.getvalue(), profile)
+            return (*result, metadata) if include_metadata else result
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as error:
         raise ValueError('Изображение не удалось прочитать.') from error
 
@@ -173,8 +195,12 @@ def analyze(image, backend='ollama', profile='standard'):
         raise VisionBusy('Модель занята другим кадром. Повторите через несколько секунд.')
     started = time.monotonic()
     try:
-        encoded_image = base64.b64encode(image).decode('ascii')
-        if backend == 'internvl3':
+        encoded_image = base64.b64encode(image).decode('ascii') if backend != 'detector' else None
+        if backend == 'detector':
+            from . import detector
+            result = detector.analyze(image)
+            result['profile'] = 'standard'
+        elif backend == 'internvl3':
             payload = {'image': encoded_image}
             if profile != 'standard':
                 payload['profile'] = profile

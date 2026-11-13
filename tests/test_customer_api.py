@@ -65,7 +65,7 @@ class CustomerApiTest(unittest.TestCase):
         report = {'source': 'customer_sensor_import', 'rows': 1}
         for endpoint, dataset in (('materials', materials), ('sensors', sensors), ('sensor-import-report', report)):
             self.write_dataset(endpoint, dataset)
-        with patch.object(app, 'evaluate') as evaluate:
+        with patch.object(app.assessment, 'diagnose') as evaluate:
             self.assertEqual(self.get_json('materials'), materials)
             self.assertEqual(self.get_json('sensors'), sensors)
             self.assertEqual(self.get_json('sensor-import-report'), report)
