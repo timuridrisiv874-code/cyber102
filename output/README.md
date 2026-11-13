@@ -1,5 +1,10 @@
 # Готовые материалы Cyber102
 
+- [Описание продукта для команды](documents/cyber102-product-guide.docx) — интерфейс, сервер, модель, правила, Android APK и ближайшие задачи.
+- [Материалы первого чекпоинта](documents/cyber102-checkpoint-1.docx) — шесть слайдов с текстом, показ на пять и две минуты, подготовка и ответы жюри.
+
+Эти два документа выпущены отдельно от инженерного архива версии 1.4. Их исходники находятся в [TIMUR](../TIMUR/README.md), сборка — `python -m tools.build_team_briefs --node <Node.js> --marked <marked.esm.js>` с зависимостями Python из `tools/knowledge-requirements.txt`.
+
 - [Инженерный пакет Word](documents/cyber102-engineering-pack.docx) — редактируемая версия.
 - [Инженерный пакет PDF](pdf/cyber102-engineering-pack.pdf) — версия для чтения и передачи.
 - [Архив команды](cyber102-research-pack.zip) — документы, JSON-шаблоны и исходники с манифестом SHA-256.
