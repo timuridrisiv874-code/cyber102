@@ -53,6 +53,23 @@ def measurements(rows, predictions, labels, threshold, iou):
     return {'classes': summary, 'flagged_controls': sorted(flagged_controls)}
 
 
+def scene_coverage(rows, predictions, labels, threshold, iou):
+    scenes = {}
+    for frame in rows:
+        scenes.setdefault(frame['scene'], []).append(frame)
+    counts = {}
+    for label in labels:
+        positive, detected = [], []
+        for scene, frames in scenes.items():
+            result = measurements(frames, predictions, (label,), threshold, iou)['classes'][label]
+            if result['tp'] + result['fn']:
+                positive.append(scene)
+            if result['tp']:
+                detected.append(scene)
+        counts[label] = {'positive_scenes': sorted(positive), 'detected_scenes': sorted(detected)}
+    return counts
+
+
 def localization_errors(rows, predictions, threshold=.25, iou=.5):
     """Identify missed objects with an overlapping prediction of the wrong class or low score."""
     errors = []
@@ -151,6 +168,7 @@ def main():
               'support_by_scene': dict(Counter(row['scene'] for row in rows)),
               'metrics': {f'{confidence:.2f}/{iou:.2f}': measurements(rows, predictions, sorted(labels), confidence, iou)
                           for confidence in (.05, .15, .25, .40) for iou in (.30, .50)},
+              'scene_coverage_at_0.25/0.50': scene_coverage(rows, predictions, sorted(labels), .25, .50),
               'localization_errors_at_0.25/0.50': localization_errors(rows, predictions),
               'predictions': predictions}
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')

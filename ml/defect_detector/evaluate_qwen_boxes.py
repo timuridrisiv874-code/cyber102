@@ -7,7 +7,7 @@ import statistics
 import sys
 import time
 
-from evaluate import localization_errors, measurements, merge_boxes
+from evaluate import localization_errors, measurements, merge_boxes, scene_coverage
 
 
 LABELS = {
@@ -58,9 +58,13 @@ def parse_detections(raw, parse_json, labels=tuple(LABELS), mode='detailed'):
     detections = []
     for obj in items:
         if mode == 'compact':
-            if not isinstance(obj, list) or len(obj) != 5:
-                raise ValueError('Expected an array of five integers')
-            index, *box = obj
+            if isinstance(obj, list) and len(obj) == 5:
+                index, *box = obj
+            elif isinstance(obj, dict) and set(obj) == {'id', 'left', 'top', 'right', 'bottom'}:
+                index = obj['id']
+                box = [obj[key] for key in ('left', 'top', 'right', 'bottom')]
+            else:
+                raise ValueError('Expected five integers or the named coordinates with a class ID')
         elif mode == 'numbered':
             if not isinstance(obj, dict) or set(obj) != {'id', 'bbox_2d'}:
                 raise ValueError('Expected exactly id and bbox_2d')
@@ -137,6 +141,7 @@ def main():
               'support_by_scene': dict(Counter(row['scene'] for row in rows)),
               'metrics': {f'{iou:.2f}': measurements(rows, predictions, labels, 1, iou)
                           for iou in (.3, .5)},
+              'scene_coverage_at_0.50': scene_coverage(rows, predictions, labels, 1, .50),
               'localization_errors_at_0.50': localization_errors(scoped_rows, predictions, threshold=1),
               'predictions': predictions, 'samples': samples}
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
