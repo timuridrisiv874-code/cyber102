@@ -57,7 +57,7 @@ function selectPhoto(photo) {
   resetPhoto();
   selectedPhoto = photo;
   byId('photo-title').textContent = photo.filename;
-  byId('photo-source').textContent = `${photo.categoryTitle} · Фото организаторов`;
+  byId('photo-source').textContent = `${photo.categoryTitle} · Серийный номер не подтверждён`;
   const scope = photo.inspectionScope;
   const scopeTitle = scopeTitles.get(scope?.id) ?? 'Контекст не установлен';
   byId('photo-scope').textContent = [scopeTitle, scope?.note].filter(Boolean).join('. ');

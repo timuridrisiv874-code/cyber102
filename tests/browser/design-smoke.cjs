@@ -40,7 +40,11 @@ async function run(browser, engine, android, width, reducedMotion) {
     await page.waitForTimeout(450); // Bounded entry animation must settle; idle has no animation loop.
     assert.equal(await page.locator('#check').isDisabled(), true, 'No analysis before a source is chosen');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
-    assert.equal(await page.locator('.app-nav a').count(), 5, 'New shared application navigation is present');
+    assert.equal(await page.locator('.app-nav a').count(), android ? 5 : 4, 'Shared navigation keeps equipment and photos in one web section');
+    if (!android) {
+      assert.equal(await page.locator('.app-nav a[href*="materials.html"]').count(), 0);
+      assert.equal(await page.locator('.app-nav a[href*="documents.html"]').count(), 1);
+    }
     assert.equal(await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === 'running').length), 0,
       'Idle interface must not continuously animate');
     if (reducedMotion === 'reduce') {
