@@ -1,7 +1,8 @@
 'use strict';
 (() => {
+  if (window.CyberWebBoot?.blocked) return;
   const $ = id => document.getElementById(id);
-  let documents = [], equipment = [], currentPassports = {};
+  let documents = [], equipment = [], currentPassports = {}, catalogReady = false;
   function node(tag, text, className) {
     const element = document.createElement(tag);
     if (text != null) element.textContent = text;
@@ -74,6 +75,7 @@
     }
   }
   function renderDocuments() {
+    if (!catalogReady) return;
     const query = $('document-search').value.trim().toLocaleLowerCase('ru-RU');
     const matches = documents.map(document => ({document, pages: (document.pages || []).filter(page => query && page.text?.toLocaleLowerCase('ru-RU').includes(query))}))
       .filter(({document, pages}) => !query || `${document.title} ${document.filename}`.toLocaleLowerCase('ru-RU').includes(query) || pages.length);
@@ -108,7 +110,14 @@
     const active = new AbortController(); controller = active;
     const current = ++generation;
     const timeout = setTimeout(() => active.abort(), 30000);
+    catalogReady = false;
+    $('document-count').textContent = '—';
+    $('document-results').textContent = '';
+    $('document-search').disabled = true;
+    $('equipment-kind').disabled = true;
+    $('document-list').replaceChildren();
     $('documents-status').textContent = 'Загружаем документы…';
+    $('documents-status').dataset.error = 'false';
     Promise.allSettled(['/api/customer/documents', '/api/customer/equipment-passports'].map(async url => {
     const response = await fetch(url, {signal: active.signal, cache: 'no-store'});
     const data = await response.json();
@@ -116,9 +125,10 @@
     return data;
   })).then(([catalogResult, passportsResult]) => {
     if (current !== generation) return;
-    const catalog = catalogResult.status === 'fulfilled' ? catalogResult.value : null;
-    const passports = passportsResult.status === 'fulfilled' ? passportsResult.value : null;
-    documents = Array.isArray(catalog?.documents) ? catalog.documents : [];
+    const catalog = catalogResult.status === 'fulfilled' && Array.isArray(catalogResult.value?.documents) ? catalogResult.value : null;
+    const passports = passportsResult.status === 'fulfilled' && Array.isArray(passportsResult.value?.equipment) ? passportsResult.value : null;
+    catalogReady = Boolean(catalog);
+    documents = catalog?.documents || [];
     const kindTitles = {pump:'Насосы',motor:'Электродвигатели',gearbox:'Редукторы',temperature_transmitter:'Преобразователи температуры'};
     $('equipment-kind').replaceChildren();
     for (const kind of [...new Set((passports?.equipment || []).map(item => item.kind))]) {
@@ -126,15 +136,24 @@
     }
     const all = node('option', 'Все компоненты'); all.value = 'all'; $('equipment-kind').append(all);
     $('equipment-kind').value = (passports?.equipment || []).some(item => item.kind === 'pump') ? 'pump' : 'all';
-    renderEquipment(passports || {}); renderDocuments();
-    $('document-count').textContent = `${documents.length} PDF`;
+    if (passports) renderEquipment(passports);
+    else {
+      $('equipment-grid').replaceChildren(node('p', 'Паспортные данные не загрузились.'));
+      $('passport-limitations').replaceChildren(); $('requirements-panel').hidden = true;
+    }
+    $('equipment-kind').disabled = !passports;
+    renderDocuments();
+    $('document-count').textContent = catalogReady ? `${documents.length} PDF` : 'Недоступно';
+    $('document-search').disabled = !catalogReady;
     const problems = [!catalog && 'Библиотека временно недоступна.', !passports && 'Паспортные записи временно недоступны.'].filter(Boolean);
     $('documents-status').textContent = problems.join(' ');
     $('documents-status').dataset.error = String(Boolean(problems.length));
-    loaded = true;
+    loaded = catalogReady && Boolean(passports);
   }).catch(error => {
     if (current !== generation) return;
-    $('documents-status').textContent = error.name === 'AbortError' ? 'Загрузка остановлена. Обновите страницу.' : error.message;
+    $('document-count').textContent = 'Недоступно';
+    $('documents-status').textContent = error.name === 'AbortError' ? 'Загрузка остановлена. Обновите страницу.' : 'Не удалось загрузить документы. Обновите страницу.';
+    $('documents-status').dataset.error = 'true';
   }).finally(() => { clearTimeout(timeout); if (current === generation) controller = null; });
   }
   initialize();

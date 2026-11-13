@@ -1,3 +1,5 @@
+(() => {
+if (window.CyberWebBoot?.blocked) return;
 const byId = (id) => document.getElementById(id);
 const serialInput = byId('serial');
 const scenarioInput = byId('scenario');
@@ -397,3 +399,4 @@ byId('print-qr').addEventListener('click', () => window.print());
 drawSchematic();
 serialInput.value = new URLSearchParams(location.search).get('serial') || serialInput.value;
 loadPassport(serialInput.value);
+})();

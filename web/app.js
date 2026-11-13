@@ -1,3 +1,5 @@
+(() => {
+if (window.CyberWebBoot?.blocked) return;
 const byId = (id) => document.getElementById(id);
 
 const viewfinder = byId('viewfinder');
@@ -654,3 +656,4 @@ async function loadCapabilities() {
   } finally { clearTimeout(timeout); }
 }
 loadCapabilities();
+})();

@@ -1,6 +1,7 @@
 /* Shared functional inspection workflow for the browser and Android WebView. */
 (() => {
   'use strict';
+  if (window.CyberWebBoot?.blocked) return;
   const byId = (id) => document.getElementById(id);
   const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
 

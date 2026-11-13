@@ -1,3 +1,5 @@
+(() => {
+if (window.CyberWebBoot?.blocked) return;
 const byId = id => document.getElementById(id);
 const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 3 });
 const time = value => value ? value.slice(0, 16).replace('T', ' ') : '—';
@@ -568,3 +570,4 @@ window.addEventListener('pagehide', () => {
 loadCatalog();
 loadSensors();
 loadRules();
+})();

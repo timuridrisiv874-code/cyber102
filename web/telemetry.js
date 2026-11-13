@@ -38,6 +38,7 @@
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = {chartWindow, zoomWindow, revealIndex, indexAtFraction, keyIndex, seriesSegments};
   if (typeof document === 'undefined') return;
+  if (window.CyberWebBoot?.blocked) return;
   const $ = id => document.getElementById(id);
   const play = $('replay-play'), step = $('replay-step'), reset = $('replay-reset');
   const position = $('replay-position'), speed = $('replay-speed');

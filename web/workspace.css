@@ -1,4 +1,10 @@
 /* Shared application shell and data views. */
+.local-file-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.local-file-screen { width: min(100%, 460px); padding: 32px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+.local-file-brand { color: var(--accent); font-size: 15px; font-weight: 600; margin-bottom: 32px; }
+.local-file-screen h1 { font-size: clamp(24px, 5vw, 32px); line-height: 1.15; margin-bottom: 16px; }
+.local-file-screen h1 + p { color: var(--muted); line-height: 1.5; }
+.local-file-screen .button { margin-top: 24px; }
 .skip-link { position: fixed; z-index: 100; top: 10px; left: 10px; padding: 8px 16px; background: #fff; color: var(--accent); border-radius: 8px; transform: translateY(-160%); }
 .skip-link:focus { transform: none; }
 /* A quiet instrument rail frames the equipment imagery. */
