@@ -1,0 +1,941 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-11-13T20:03:15.813900+00:00",
+  "status": "cpu_experiment_not_deployed",
+  "purpose": "Assess latency, CPU process memory and unedited EN-to-RU translation on fixed industrial text. This is not a visual-model A/B test.",
+  "model": {
+    "repository": "Helsinki-NLP/opus-mt-en-ru",
+    "revision": "bb09c99d180016eac6819df3dae68edb1690fdee",
+    "license": "apache-2.0",
+    "parameterCount": 76672000,
+    "weightsBytes": 306991893,
+    "snapshotBytes": 311479440,
+    "source": "https://huggingface.co/Helsinki-NLP/opus-mt-en-ru/tree/bb09c99d180016eac6819df3dae68edb1690fdee",
+    "files": [
+      {
+        "path": "README.md",
+        "bytes": 1123,
+        "sha256": "020bfd697b7d0da0338611cf445eb44ae45dda27ff49f2bf64e21ee46882b48b",
+        "source": "https://huggingface.co/Helsinki-NLP/opus-mt-en-ru/resolve/bb09c99d180016eac6819df3dae68edb1690fdee/README.md"
+      },
+      {
+        "path": "config.json",
+        "bytes": 1381,
+        "sha256": "d3c2614fd099bc228fc257f047e46f1c6f94cfa12dee2b1fa6c0d780e6b7de06",
+        "source": "https://huggingface.co/Helsinki-NLP/opus-mt-en-ru/resolve/bb09c99d180016eac6819df3dae68edb1690fdee/config.json"
+      },
+      {
+        "path": "generation_config.json",
+        "bytes": 293,
+        "sha256": "152452cb7a96bff6c20b54f91fae2a655b72a8a9ce978ca3e9384f87253d5281",
+        "source": "https://huggingface.co/Helsinki-NLP/opus-mt-en-ru/resolve/bb09c99d180016eac6819df3dae68edb1690fdee/generation_config.json"
+      },
+      {
+        "path": "pytorch_model.bin",
+        "bytes": 306991893,
+        "sha256": "d15fa58c6bc3efd3629c1b6b86d9aa6d15d2751a4620aa4cdd7eed7b5cbe583b",
+        "source": "https://huggingface.co/Helsinki-NLP/opus-mt-en-ru/resolve/bb09c99d180016eac6819df3dae68edb1690fdee/pytorch_model.bin"
+      },
+      {
+        "path": "source.spm",
+        "bytes": 802781,
+        "sha256": "16bebef1389a0b8ab452772c4e35b9e605e5713f8ac7baa71ca701394eaa086d",
+        "source": "https://huggingface.co/Helsinki-NLP/opus-mt-en-ru/resolve/bb09c99d180016eac6819df3dae68edb1690fdee/source.spm"
+      },
+      {
+        "path": "target.spm",
+        "bytes": 1080169,
+        "sha256": "745998e51ba5b058e38b7ac7765c25c43ed5c1c39cc92b27163b9b2e323c9d7c",
+        "source": "https://huggingface.co/Helsinki-NLP/opus-mt-en-ru/resolve/bb09c99d180016eac6819df3dae68edb1690fdee/target.spm"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "bytes": 42,
+        "sha256": "eca697b0e7109b94a9f2a1de82173fdbd4ddee97d1fd46a15b3162f191e6eed2",
+        "source": "https://huggingface.co/Helsinki-NLP/opus-mt-en-ru/resolve/bb09c99d180016eac6819df3dae68edb1690fdee/tokenizer_config.json"
+      },
+      {
+        "path": "vocab.json",
+        "bytes": 2601758,
+        "sha256": "33e95da3be3fa3b50169c4c46693ba2f29fbf4cb29d99044bd07d72d181fa1e9",
+        "source": "https://huggingface.co/Helsinki-NLP/opus-mt-en-ru/resolve/bb09c99d180016eac6819df3dae68edb1690fdee/vocab.json"
+      }
+    ]
+  },
+  "dependencies": {
+    "versions": {
+      "torch": "2.8.0+cu128",
+      "transformers": "4.57.1",
+      "sentencepiece": "0.2.1",
+      "sacremoses": "0.1.1",
+      "joblib": "1.5.2",
+      "click": "8.3.0",
+      "colorama": "0.4.6"
+    },
+    "verifiedWheels": [
+      {
+        "path": "sentencepiece-0.2.1-cp311-cp311-win_amd64.whl",
+        "bytes": 1054617,
+        "sha256": "82d9ead6591015f009cb1be1cb1c015d5e6f04046dbb8c9588b931e869a29728",
+        "source": "https://files.pythonhosted.org/packages/32/b8/f709977f5fda195ae1ea24f24e7c581163b6f142b1005bc3d0bbfe4d7082/sentencepiece-0.2.1-cp311-cp311-win_amd64.whl"
+      },
+      {
+        "path": "sacremoses-0.1.1-py3-none-any.whl",
+        "bytes": 897476,
+        "sha256": "31e04c98b169bfd902144824d191825cd69220cdb4ae4bcf1ec58a7db5587b1a",
+        "source": "https://files.pythonhosted.org/packages/0b/f0/89ee2bc9da434bd78464f288fdb346bc2932f2ee80a90b2a4bbbac262c74/sacremoses-0.1.1-py3-none-any.whl"
+      },
+      {
+        "path": "joblib-1.5.2-py3-none-any.whl",
+        "bytes": 308396,
+        "sha256": "4e1f0bdbb987e6d843c70cf43714cb276623def372df3c22fe5266b2670bc241",
+        "source": "https://files.pythonhosted.org/packages/1e/e8/685f47e0d754320684db4425a0967f7d3fa70126bffd76110b7009a0090f/joblib-1.5.2-py3-none-any.whl"
+      },
+      {
+        "path": "click-8.3.0-py3-none-any.whl",
+        "bytes": 107295,
+        "sha256": "9b9f285302c6e3064f4330c05f05b81945b2a39544279343e6e7c5f27a9baddc",
+        "source": "https://files.pythonhosted.org/packages/db/d3/9dcc0f5797f070ec8edf30fbadfb200e71d9db6b84d211e3b2085a7589a0/click-8.3.0-py3-none-any.whl"
+      },
+      {
+        "path": "colorama-0.4.6-py2.py3-none-any.whl",
+        "bytes": 25335,
+        "sha256": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6",
+        "source": "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl"
+      }
+    ],
+    "isolation": "Separate CPU experiment venv. Existing torch/transformers dependencies shared read-only. Missing packages installed offline only into that venv.",
+    "liveVenvMissingPackagesBeforeAndAfter": [
+      "sentencepiece",
+      "sacremoses",
+      "joblib",
+      "click"
+    ],
+    "livePackagesAndServicesChanged": false
+  },
+  "hardware": {
+    "os": "Windows",
+    "cpu": "11th Gen Intel(R) Core(TM) i9-11900K @ 3.50GHz",
+    "cpuNameSource": "Windows ProcessorNameString registry value",
+    "torchThreads": 2,
+    "torchInteropThreads": 1,
+    "device": "cpu"
+  },
+  "protocol": {
+    "device": "cpu",
+    "precision": "float32",
+    "torchThreads": 2,
+    "interopThreads": 1,
+    "numBeams": 4,
+    "doSample": false,
+    "renormalizeLogits": true,
+    "maxNewTokens": 96,
+    "warmupRequests": 1,
+    "primaryInputs": 20,
+    "repeatRounds": 2
+  },
+  "inputSet": {
+    "count": 20,
+    "sha256": "bb61c0e570d58477229aa1c73ea160298a483223dbdc6473ad5f74a5b7d1501c",
+    "fixedBeforeTranslationOutputs": true,
+    "coverage": [
+      "negation",
+      "uncertainty",
+      "visible-versus-inferred",
+      "industrial terminology",
+      "numbers",
+      "units",
+      "equipment identifiers"
+    ]
+  },
+  "performance": {
+    "tokenizerAndModelLoadSeconds": 1.2339539998210967,
+    "warmupSeconds": 0.2980251999106258,
+    "primary": {
+      "count": 20,
+      "p50Seconds": 0.5010970999719575,
+      "p95Seconds": 0.7354806149727666,
+      "totalSeconds": 10.47693369933404
+    },
+    "allMeasured": {
+      "count": 60,
+      "p50Seconds": 0.5174543500179425,
+      "p95Seconds": 0.734168714971747,
+      "totalSeconds": 32.13852919940837
+    },
+    "percentileMethod": "Linear interpolation at rank (n-1)*q.",
+    "repeatTranslationsExact": true,
+    "anyOutputTokenCapHit": false
+  },
+  "processMemory": {
+    "method": "GetProcessMemoryInfo(GetCurrentProcess()), Windows working set and OS peak for this exact Python PID; private commit is separate. Includes interpreter/libraries.",
+    "beforeTorchImport": {
+      "pid": 30332,
+      "workingSetBytes": 22016000,
+      "peakWorkingSetBytes": 22188032,
+      "privateCommitBytes": 13742080
+    },
+    "afterTorchImport": {
+      "pid": 30332,
+      "workingSetBytes": 530108416,
+      "peakWorkingSetBytes": 530108416,
+      "privateCommitBytes": 1453060096
+    },
+    "afterModelLoad": {
+      "pid": 30332,
+      "workingSetBytes": 877662208,
+      "peakWorkingSetBytes": 877891584,
+      "privateCommitBytes": 2229960704
+    },
+    "afterWarmup": {
+      "pid": 30332,
+      "workingSetBytes": 890814464,
+      "peakWorkingSetBytes": 894693376,
+      "privateCommitBytes": 2265075712
+    },
+    "afterInference": {
+      "pid": 30332,
+      "workingSetBytes": 894074880,
+      "peakWorkingSetBytes": 899993600,
+      "privateCommitBytes": 2255933440
+    },
+    "peakWorkingSetBytes": 899993600,
+    "interpretation": "Windows working set measures resident process memory; private commit is separate. Both include interpreter and libraries, not only model tensors."
+  },
+  "gpuIsolation": {
+    "cudaVisibleDevices": "",
+    "cudaInitializedBefore": false,
+    "cudaInitializedAfter": false,
+    "noCudaContextObserved": true,
+    "wholeDeviceBefore": {
+      "name": "NVIDIA GeForce RTX 3090 Ti",
+      "deviceUsedMiB": 11009.0,
+      "deviceTotalMiB": 24564.0,
+      "experimentPidListedAsGpuComputeProcess": false
+    },
+    "wholeDeviceAfter": {
+      "name": "NVIDIA GeForce RTX 3090 Ti",
+      "deviceUsedMiB": 11007.0,
+      "deviceTotalMiB": 24564.0,
+      "experimentPidListedAsGpuComputeProcess": false
+    },
+    "note": "Whole-device nvidia-smi samples include the independent live VLM and Windows desktop; they are not translator VRAM allocations."
+  },
+  "primary": [
+    {
+      "index": 1,
+      "round": 0,
+      "phase": "primary",
+      "source": "No visible corrosion is present on the pump casing.",
+      "translation": "На корпусе насоса видимой коррозии не наблюдается.",
+      "seconds": 0.3966665999032557,
+      "inputTokens": 11,
+      "outputTokens": 14,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 2,
+      "round": 0,
+      "phase": "primary",
+      "source": "Possible corrosion is visible around the flange bolts.",
+      "translation": "Возможная коррозия видна вокруг фланцевых болтов.",
+      "seconds": 0.5032226999755949,
+      "inputTokens": 12,
+      "outputTokens": 18,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 3,
+      "round": 0,
+      "phase": "primary",
+      "source": "The dark mark may be dirt rather than rust.",
+      "translation": "Темная отметка может быть грязью, а не ржавчиной.",
+      "seconds": 0.5637956999707967,
+      "inputTokens": 11,
+      "outputTokens": 20,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 4,
+      "round": 0,
+      "phase": "primary",
+      "source": "A wet patch is visible, but an oil leak cannot be confirmed.",
+      "translation": "Влажное пятно видно, но утечка нефти не может быть подтверждена.",
+      "seconds": 0.49897149996832013,
+      "inputTokens": 15,
+      "outputTokens": 18,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 5,
+      "round": 0,
+      "phase": "primary",
+      "source": "No liquid droplets are visible below the mechanical seal.",
+      "translation": "Под механической пломбой не видно ни одной капли жидкости.",
+      "seconds": 0.4173576000612229,
+      "inputTokens": 12,
+      "outputTokens": 14,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 6,
+      "round": 0,
+      "phase": "primary",
+      "source": "The coupling is partly hidden by its guard.",
+      "translation": "Сцепление частично скрыто его охраной.",
+      "seconds": 0.34606629982590675,
+      "inputTokens": 10,
+      "outputTokens": 11,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 7,
+      "round": 0,
+      "phase": "primary",
+      "source": "The bearing housing is visible; the bearing itself is not visible.",
+      "translation": "Жилка для подшипников видна; сама подшипница не видна.",
+      "seconds": 0.5739547999110073,
+      "inputTokens": 14,
+      "outputTokens": 21,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 8,
+      "round": 0,
+      "phase": "primary",
+      "source": "The terminal box cover appears damaged.",
+      "translation": "Похоже, крышка коробки повреждена.",
+      "seconds": 0.47746860003098845,
+      "inputTokens": 8,
+      "outputTokens": 14,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 9,
+      "round": 0,
+      "phase": "primary",
+      "source": "The valve surface is wet, but the source of the liquid is unknown.",
+      "translation": "Поверхность клапана влажная, но источник жидкости неизвестен.",
+      "seconds": 0.5451756999827921,
+      "inputTokens": 16,
+      "outputTokens": 19,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 10,
+      "round": 0,
+      "phase": "primary",
+      "source": "A line is visible on the pipe insulation, but it may not be a crack.",
+      "translation": "Линия видима на изоляции трубы, но она не может быть трещиной.",
+      "seconds": 0.47772470000199974,
+      "inputTokens": 18,
+      "outputTokens": 17,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 11,
+      "round": 0,
+      "phase": "primary",
+      "source": "The image does not show whether the motor is overheating.",
+      "translation": "Изображение не показывает, перегревается ли двигатель.",
+      "seconds": 0.39142809994518757,
+      "inputTokens": 13,
+      "outputTokens": 13,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 12,
+      "round": 0,
+      "phase": "primary",
+      "source": "There are 2 visible droplets near bolt M12 on unit P-102.",
+      "translation": "На блоке P-102 вблизи болта М12 имеются две видимые капли.",
+      "seconds": 0.555550100049004,
+      "inputTokens": 18,
+      "outputTokens": 20,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 13,
+      "round": 0,
+      "phase": "primary",
+      "source": "The label reads 0.5 MPa and 75 °C; these are label values, not measured readings.",
+      "translation": "На этикетке указаны значения 0,5 МПа и 75 °C; эти значения являются значениями маркировки, а не измеренными показаниями.",
+      "seconds": 0.840216499986127,
+      "inputTokens": 21,
+      "outputTokens": 30,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 14,
+      "round": 0,
+      "phase": "primary",
+      "source": "Neither a crack nor a leak can be confirmed from this image.",
+      "translation": "Ни трещина, ни утечка не могут быть подтверждены с этого изображения.",
+      "seconds": 0.44854459981434047,
+      "inputTokens": 14,
+      "outputTokens": 15,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 15,
+      "round": 0,
+      "phase": "primary",
+      "source": "The reddish area could be corrosion, but the evidence is uncertain.",
+      "translation": "Рыжеватая зона может быть коррозией, но улики неясны.",
+      "seconds": 0.7299681999720633,
+      "inputTokens": 16,
+      "outputTokens": 22,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 16,
+      "round": 0,
+      "phase": "primary",
+      "source": "The paint is peeling; this does not prove damage to the metal underneath.",
+      "translation": "Краска очищается; это не доказывает повреждения металла под ним.",
+      "seconds": 0.490704600000754,
+      "inputTokens": 18,
+      "outputTokens": 17,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 17,
+      "round": 0,
+      "phase": "primary",
+      "source": "Moisture is visible near the seal, but its composition is unknown.",
+      "translation": "Влажность видна рядом с печатью, но ее состав неизвестен.",
+      "seconds": 0.5524881999008358,
+      "inputTokens": 15,
+      "outputTokens": 20,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 18,
+      "round": 0,
+      "phase": "primary",
+      "source": "Deposits are visible on the flange; their cause cannot be determined.",
+      "translation": "Отложения видны на фланце; их причины определить невозможно.",
+      "seconds": 0.43911410006694496,
+      "inputTokens": 15,
+      "outputTokens": 14,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 19,
+      "round": 0,
+      "phase": "primary",
+      "source": "The shaft appears stationary in this frame; rotation cannot be assessed from one image.",
+      "translation": "Вал представляется неподвижным в этой раме; вращение не может быть оценено с помощью одного изображения.",
+      "seconds": 0.7018230999819934,
+      "inputTokens": 17,
+      "outputTokens": 25,
+      "hitOutputTokenCap": false
+    },
+    {
+      "index": 20,
+      "round": 0,
+      "phase": "primary",
+      "source": "No obvious external defect is visible, but internal wear cannot be ruled out.",
+      "translation": "Никакого очевидного внешнего дефекта не видно, но нельзя исключать внутренний износ.",
+      "seconds": 0.5266919999849051,
+      "inputTokens": 16,
+      "outputTokens": 19,
+      "hitOutputTokenCap": false
+    }
+  ],
+  "repeatTimings": [
+    {
+      "index": 1,
+      "round": 1,
+      "seconds": 0.39581550005823374,
+      "inputTokens": 11,
+      "outputTokens": 14
+    },
+    {
+      "index": 2,
+      "round": 1,
+      "seconds": 0.5040772999636829,
+      "inputTokens": 12,
+      "outputTokens": 18
+    },
+    {
+      "index": 3,
+      "round": 1,
+      "seconds": 0.5729074999690056,
+      "inputTokens": 11,
+      "outputTokens": 20
+    },
+    {
+      "index": 4,
+      "round": 1,
+      "seconds": 0.5200284998863935,
+      "inputTokens": 15,
+      "outputTokens": 18
+    },
+    {
+      "index": 5,
+      "round": 1,
+      "seconds": 0.4606518999207765,
+      "inputTokens": 12,
+      "outputTokens": 14
+    },
+    {
+      "index": 6,
+      "round": 1,
+      "seconds": 0.41530540003441274,
+      "inputTokens": 10,
+      "outputTokens": 11
+    },
+    {
+      "index": 7,
+      "round": 1,
+      "seconds": 0.6774720998946577,
+      "inputTokens": 14,
+      "outputTokens": 21
+    },
+    {
+      "index": 8,
+      "round": 1,
+      "seconds": 0.6042164000682533,
+      "inputTokens": 8,
+      "outputTokens": 14
+    },
+    {
+      "index": 9,
+      "round": 1,
+      "seconds": 0.641789099900052,
+      "inputTokens": 16,
+      "outputTokens": 19
+    },
+    {
+      "index": 10,
+      "round": 1,
+      "seconds": 0.4771485000383109,
+      "inputTokens": 18,
+      "outputTokens": 17
+    },
+    {
+      "index": 11,
+      "round": 1,
+      "seconds": 0.4195901998318732,
+      "inputTokens": 13,
+      "outputTokens": 13
+    },
+    {
+      "index": 12,
+      "round": 1,
+      "seconds": 0.5800203999970108,
+      "inputTokens": 18,
+      "outputTokens": 20
+    },
+    {
+      "index": 13,
+      "round": 1,
+      "seconds": 0.8983710999600589,
+      "inputTokens": 21,
+      "outputTokens": 30
+    },
+    {
+      "index": 14,
+      "round": 1,
+      "seconds": 0.4347594000864774,
+      "inputTokens": 14,
+      "outputTokens": 15
+    },
+    {
+      "index": 15,
+      "round": 1,
+      "seconds": 0.6242267000488937,
+      "inputTokens": 16,
+      "outputTokens": 22
+    },
+    {
+      "index": 16,
+      "round": 1,
+      "seconds": 0.5058852001093328,
+      "inputTokens": 18,
+      "outputTokens": 17
+    },
+    {
+      "index": 17,
+      "round": 1,
+      "seconds": 0.5341042000800371,
+      "inputTokens": 15,
+      "outputTokens": 20
+    },
+    {
+      "index": 18,
+      "round": 1,
+      "seconds": 0.4451761001255363,
+      "inputTokens": 15,
+      "outputTokens": 14
+    },
+    {
+      "index": 19,
+      "round": 1,
+      "seconds": 0.6924164001829922,
+      "inputTokens": 17,
+      "outputTokens": 25
+    },
+    {
+      "index": 20,
+      "round": 1,
+      "seconds": 0.5164405999239534,
+      "inputTokens": 16,
+      "outputTokens": 19
+    },
+    {
+      "index": 1,
+      "round": 2,
+      "seconds": 0.40088549978099763,
+      "inputTokens": 11,
+      "outputTokens": 14
+    },
+    {
+      "index": 2,
+      "round": 2,
+      "seconds": 0.49901829985901713,
+      "inputTokens": 12,
+      "outputTokens": 18
+    },
+    {
+      "index": 3,
+      "round": 2,
+      "seconds": 0.5663094001356512,
+      "inputTokens": 11,
+      "outputTokens": 20
+    },
+    {
+      "index": 4,
+      "round": 2,
+      "seconds": 0.4959318002220243,
+      "inputTokens": 15,
+      "outputTokens": 18
+    },
+    {
+      "index": 5,
+      "round": 2,
+      "seconds": 0.46761519997380674,
+      "inputTokens": 12,
+      "outputTokens": 14
+    },
+    {
+      "index": 6,
+      "round": 2,
+      "seconds": 0.4062495001126081,
+      "inputTokens": 10,
+      "outputTokens": 11
+    },
+    {
+      "index": 7,
+      "round": 2,
+      "seconds": 0.6457879999652505,
+      "inputTokens": 14,
+      "outputTokens": 21
+    },
+    {
+      "index": 8,
+      "round": 2,
+      "seconds": 0.5460768002085388,
+      "inputTokens": 8,
+      "outputTokens": 14
+    },
+    {
+      "index": 9,
+      "round": 2,
+      "seconds": 0.604776999913156,
+      "inputTokens": 16,
+      "outputTokens": 19
+    },
+    {
+      "index": 10,
+      "round": 2,
+      "seconds": 0.5184681001119316,
+      "inputTokens": 18,
+      "outputTokens": 17
+    },
+    {
+      "index": 11,
+      "round": 2,
+      "seconds": 0.4434116000775248,
+      "inputTokens": 13,
+      "outputTokens": 13
+    },
+    {
+      "index": 12,
+      "round": 2,
+      "seconds": 0.6058620999101549,
+      "inputTokens": 18,
+      "outputTokens": 20
+    },
+    {
+      "index": 13,
+      "round": 2,
+      "seconds": 0.8139784999657422,
+      "inputTokens": 21,
+      "outputTokens": 30
+    },
+    {
+      "index": 14,
+      "round": 2,
+      "seconds": 0.45191159984096885,
+      "inputTokens": 14,
+      "outputTokens": 15
+    },
+    {
+      "index": 15,
+      "round": 2,
+      "seconds": 0.5945288999937475,
+      "inputTokens": 16,
+      "outputTokens": 22
+    },
+    {
+      "index": 16,
+      "round": 2,
+      "seconds": 0.49031660007312894,
+      "inputTokens": 18,
+      "outputTokens": 17
+    },
+    {
+      "index": 17,
+      "round": 2,
+      "seconds": 0.530035899952054,
+      "inputTokens": 15,
+      "outputTokens": 20
+    },
+    {
+      "index": 18,
+      "round": 2,
+      "seconds": 0.45049800002016127,
+      "inputTokens": 15,
+      "outputTokens": 14
+    },
+    {
+      "index": 19,
+      "round": 2,
+      "seconds": 0.6895713000558317,
+      "inputTokens": 17,
+      "outputTokens": 25
+    },
+    {
+      "index": 20,
+      "round": 2,
+      "seconds": 0.5199588998220861,
+      "inputTokens": 16,
+      "outputTokens": 19
+    }
+  ],
+  "limitations": [
+    "Twenty authored sentences are a small functional and semantic smoke, not a benchmark of production translation accuracy.",
+    "Industrial terminology and uncertainty are mistranslated in several unedited outputs. The translator was not integrated.",
+    "No English-versus-Russian VLM visual experiment was performed; better equipment-analysis accuracy cannot be inferred from this text-only test.",
+    "Timings are from one CPU process on the existing workstation, not a throughput or multi-user load benchmark."
+  ],
+  "rawArtifactSha256": "89e43b5792c054c6d3df9d0d4065026592c9083c737813df4121d3996d81f70f",
+  "experimentToolSha256": {
+    "smoke.py": "5526068f8fe6c18909e86002933e3942bd63b2842ee5729c5508b7e70c8f2d38",
+    "setup.py": "0b8edbe855ea704f8f6807191bad526c0e89a247b4c8c8c9cc7a207344cf47cd",
+    "download.py": "1e6fa48a290f32f36fa991d5ba468350fcc276fe4c348c93a565efbf1e8a5ac1",
+    "phrases.json": "bb61c0e570d58477229aa1c73ea160298a483223dbdc6473ad5f74a5b7d1501c",
+    "manifest.json": "4231ed8ddfd00b8d3c12b7392d24e6be4f7fbbeb0944c19b0bf0d13e052d105e"
+  },
+  "qualityReview": {
+    "reviewer": "AI semantic review, separate from the inference operator; not expert validation.",
+    "blinding": "Not blinded. The inference operator highlighted several problematic examples before full review.",
+    "scope": "AI semantic review of 20 handcrafted English sentences and their unedited primary Marian translations. Not expert acceptance, not representative translation accuracy and not VLM A/B. Producer pointed out several examples before this review; review is not blinded.",
+    "rubric": "Acceptable means essential meaning preserved; awkward wording alone may pass. Material errors change or omit an important object, observation or epistemic qualification. Ambiguous lexical senses are retained separately. Exact identifier preservation is assessed separately from numeric/semantic equivalence.",
+    "summary": {
+      "uniqueSentencesReviewed": 20,
+      "acceptableMeaning": 11,
+      "materialMeaningErrors": 8,
+      "ambiguous": 1,
+      "uncertaintyStrengthened": 1,
+      "exactIdentifierChanges": 1,
+      "numericMagnitudeChangesObserved": 0,
+      "allThreeRoundsExactPerSource": true
+    },
+    "rows": [
+      {
+        "index": 1,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Сохранены отсутствие видимой коррозии и корпус насоса."
+      },
+      {
+        "index": 2,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Возможность коррозии и фланцевые болты сохранены."
+      },
+      {
+        "index": 3,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Сохранена альтернатива: отметка может быть грязью, а не ржавчиной; «отметка» стилистически неловко."
+      },
+      {
+        "index": 4,
+        "semanticVerdict": "ambiguous",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Oil переведено как нефть; в насосном контексте возможно масло. Без контекста жидкости нельзя выбрать значение. Неподтверждённость утечки сохранена."
+      },
+      {
+        "index": 5,
+        "semanticVerdict": "material_error",
+        "materialMeaningError": true,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": true,
+        "protectedIdentifierExact": null,
+        "notes": "Mechanical seal — торцевое уплотнение; «механическая пломба» обозначает другой объект. Отрицание сохранено."
+      },
+      {
+        "index": 6,
+        "semanticVerdict": "material_error",
+        "materialMeaningError": true,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": true,
+        "protectedIdentifierExact": null,
+        "notes": "Coupling/guard в этом промышленном контексте — муфта/кожух. «Сцепление…его охраной» искажает название узла и физической преграды."
+      },
+      {
+        "index": 7,
+        "semanticVerdict": "material_error",
+        "materialMeaningError": true,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": true,
+        "protectedIdentifierExact": null,
+        "notes": "Bearing housing и bearing превратились в «жилку для подшипников» и «подшипницу»; названия узлов непригодны."
+      },
+      {
+        "index": 8,
+        "semanticVerdict": "material_error",
+        "materialMeaningError": true,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": true,
+        "protectedIdentifierExact": null,
+        "notes": "Потеряно terminal: конкретная клеммная коробка стала неопределённой коробкой. Модальность appears сохранена."
+      },
+      {
+        "index": 9,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Влажная поверхность клапана и неизвестный источник жидкости сохранены."
+      },
+      {
+        "index": 10,
+        "semanticVerdict": "material_error",
+        "materialMeaningError": true,
+        "uncertaintyStrengthened": true,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "May not be a crack допускает, что линия не является трещиной; «не может быть трещиной» категорически исключает трещину. Это усиление уверенности."
+      },
+      {
+        "index": 11,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Сохранено отсутствие возможности определить перегрев по изображению."
+      },
+      {
+        "index": 12,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": false,
+        "notes": "Количество, расположение и смысл идентификаторов сохранены, но латинская M в M12 заменена кириллической М; для точного ID это отдельная ошибка сохранения токена."
+      },
+      {
+        "index": 13,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Сохранены величины 0.5 MPa / 75 °C и различие между маркировкой и измерением. Десятичная запятая и МПа являются русской локализацией, не изменением величин."
+      },
+      {
+        "index": 14,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Сохранено, что ни трещина, ни утечка не подтверждены."
+      },
+      {
+        "index": 15,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Возможность коррозии и неопределённость сохранены; «улики» стилистически не подходит инженерному интерфейсу."
+      },
+      {
+        "index": 16,
+        "semanticVerdict": "material_error",
+        "materialMeaningError": true,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": true,
+        "protectedIdentifierExact": null,
+        "notes": "Peeling означает отслаивание краски; «краска очищается» меняет наблюдаемый процесс. Ограничение вывода о металле сохранено."
+      },
+      {
+        "index": 17,
+        "semanticVerdict": "material_error",
+        "materialMeaningError": true,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": true,
+        "protectedIdentifierExact": null,
+        "notes": "Seal — уплотнение; «печать» меняет объект. Moisture лучше передано как влага, а не видимая влажность; неизвестный состав сохранён."
+      },
+      {
+        "index": 18,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Отложения на фланце и невозможность определить причину сохранены."
+      },
+      {
+        "index": 19,
+        "semanticVerdict": "material_error",
+        "materialMeaningError": true,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": true,
+        "protectedIdentifierExact": null,
+        "notes": "Frame означает кадр изображения; «в этой раме» меняет визуальный контекст на конструктивную раму. Ограничение оценки вращения сохранено."
+      },
+      {
+        "index": 20,
+        "semanticVerdict": "acceptable",
+        "materialMeaningError": false,
+        "uncertaintyStrengthened": false,
+        "terminologyWrongOrOmitted": false,
+        "protectedIdentifierExact": null,
+        "notes": "Отсутствие очевидного внешнего дефекта не превращено в исправность; внутренний износ не исключается."
+      }
+    ],
+    "recommendation": "Do not deploy raw Marian for unrestricted industrial observations. Preserve structured labels/boxes/times/IDs, evaluate glossary/context or stronger MT on new fixed cases, then run a paired VLM language experiment."
+  }
+}
