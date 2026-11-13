@@ -1,0 +1,2303 @@
+{
+  "schemaVersion": 1,
+  "status": "completed_with_exploratory_visual_review",
+  "finishedAt": "2026-11-13T21:28:48.304154+00:00",
+  "purpose": "Fixed two-pass full-image then original-source crop experiment through the existing public analysis queue.",
+  "model": {
+    "repository": "Qwen/Qwen3-VL-4B-Instruct",
+    "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+    "profile": "standard"
+  },
+  "provenance": {
+    "resultsSha256": "2c3ea404d2f6d3641f863c86657ac778997acf8e3b63624318e0a2edfd80dd3b",
+    "protocolSha256": "80e735e0c2dc6f6b10575fc9f4f935bb69e52dfad5f23c9c873981197c305970",
+    "inventorySha256": "55280047e459bf9d32549d0e05766eecc2518cad3d7691247db8159bcfdaa42f",
+    "scriptSha256": "5f0ba8c02aa39c3cf4b63ce43b9541b3e6b0e3e0de97ab4e033a0f079f50763f",
+    "sourceHashes": {
+      "server/vision.py": "9d196405363c9b107f7c1e581dd9022059aa5e3aeea200fd7d69e983420917d1",
+      "server/vision_models.py": "fec444bf97cafc5a2fb68b1dbf65398c4fde49e0d2204cb12aab3ce1ece98fb7",
+      "vision_runtime/qwen_worker.py": "ca46bfd835fb9d12c7656b5e7d73840c8459d341f502ac091e7d8ef467ffa0d4",
+      "vision_runtime/worker.py": "e7f7e96059dc7fd372c5c6212ca8480173203192219e9af41076b9f4a7bcabf0"
+    }
+  },
+  "protocol": {
+    "compression": "Both A and B are JPEG85 uploads; the same public API decodes and re-encodes each as JPEG85 again.",
+    "createdAt": "2026-11-13T21:24:36.671266+00:00",
+    "endpoint": "http://127.0.0.1:8102",
+    "images": [
+      {
+        "fullInput": {
+          "bytes": 123785,
+          "height": 761,
+          "path": "inputs/07-A.jpg",
+          "sha256": "45bc98a2c20f05b52385ea77dc990b3fd3e5d218bfdaf82cb82ca0385bcaa8b9",
+          "width": 600
+        },
+        "imageId": "c02b8a5466056c6b8e0f3890e6d496d6dafc05571271dc1400d7c293cff75118",
+        "index": 7,
+        "originalSize": [
+          600,
+          761
+        ],
+        "sourcePath": "Насосные агрегаты/obsledovanie-hvs-gvs-2.jpg"
+      },
+      {
+        "fullInput": {
+          "bytes": 81113,
+          "height": 455,
+          "path": "inputs/08-A.jpg",
+          "sha256": "2add977f10d52793d253c4180ebf4f048b61fbcf15b956918efe7272acf76364",
+          "width": 666
+        },
+        "imageId": "15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8",
+        "index": 8,
+        "originalSize": [
+          666,
+          455
+        ],
+        "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-46-46.jpg"
+      },
+      {
+        "fullInput": {
+          "bytes": 244073,
+          "height": 1280,
+          "path": "inputs/09-A.jpg",
+          "sha256": "49c2c0fe5489d6a43344b3f042ce0dce01bc9c55354b1deb605798a1552e79c1",
+          "width": 960
+        },
+        "imageId": "58333a366f2c532ef3ee231474678a434b96e6904340b0dee7e7ed7cf313f222",
+        "index": 9,
+        "originalSize": [
+          960,
+          1280
+        ],
+        "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-48-02.jpg"
+      },
+      {
+        "fullInput": {
+          "bytes": 30108,
+          "height": 583,
+          "path": "inputs/12-A.jpg",
+          "sha256": "da2df3386b233928a1158b6d1606d4ddd36815ab6c2ee7968b6b980bf9b831ef",
+          "width": 413
+        },
+        "imageId": "66b2015378463cc783587aafc9f799167a90334deeaa1aa63262cb9a005ddb24",
+        "index": 12,
+        "originalSize": [
+          413,
+          583
+        ],
+        "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-51-10.jpg"
+      },
+      {
+        "fullInput": {
+          "bytes": 149570,
+          "height": 960,
+          "path": "inputs/16-A.jpg",
+          "sha256": "7f8821eb6aecaab240d8802841e71b1903a1aa413ef9c08357b1da903648f48a",
+          "width": 1280
+        },
+        "imageId": "d317e2910bbebda76780ed9402787730e82ca4224cb4904e3f492033ab43cb82",
+        "index": 16,
+        "originalSize": [
+          1600,
+          1200
+        ],
+        "sourcePath": "Насосные агрегаты/Безымянный.png"
+      },
+      {
+        "fullInput": {
+          "bytes": 99250,
+          "height": 625,
+          "path": "inputs/22-A.jpg",
+          "sha256": "64a48ef8a4678b79c71736d871153008196e3ffe3f00919426f2d8b3cf0e0fe2",
+          "width": 869
+        },
+        "imageId": "e202239dadb60ce27119f4c8e8d8b1695e361dceaf67ae0ee1f1daeaf73c5ddc",
+        "index": 22,
+        "originalSize": [
+          869,
+          625
+        ],
+        "sourcePath": "ЭД/3.PNG"
+      },
+      {
+        "fullInput": {
+          "bytes": 70073,
+          "height": 481,
+          "path": "inputs/23-A.jpg",
+          "sha256": "a56c3e28a0879ff38813c79ecf6f120c3561729c1d08c4bea5eb61980c048d0a",
+          "width": 774
+        },
+        "imageId": "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b",
+        "index": 23,
+        "originalSize": [
+          774,
+          481
+        ],
+        "sourcePath": "ЭД/55.PNG"
+      },
+      {
+        "fullInput": {
+          "bytes": 70777,
+          "height": 500,
+          "path": "inputs/34-A.jpg",
+          "sha256": "129b4004e77fe63b43cf7a29d63b276c6de23f2009c5d896bad45cf5c5eb5e67",
+          "width": 750
+        },
+        "imageId": "f03b64891b7aff1c0a9f26af0bcc0ff00435fe463e2ed3f704b9198c31985e31",
+        "index": 34,
+        "originalSize": [
+          750,
+          500
+        ],
+        "sourcePath": "Запорная арматура/1396430378_7447321.jpg"
+      },
+      {
+        "fullInput": {
+          "bytes": 55910,
+          "height": 626,
+          "path": "inputs/35-A.jpg",
+          "sha256": "f777ee397cbd5047887159e5f3a5a71576a2530ef37e4a57526a52ccb79edbff",
+          "width": 313
+        },
+        "imageId": "a5a84a17726e30fba6243ff50b167319cde07db962f6f361e9530739d2219827",
+        "index": 35,
+        "originalSize": [
+          313,
+          626
+        ],
+        "sourcePath": "Запорная арматура/86.PNG"
+      },
+      {
+        "fullInput": {
+          "bytes": 23065,
+          "height": 341,
+          "path": "inputs/39-A.jpg",
+          "sha256": "8b7ee74da357366636bbe1b7a99909fcc2a2aa899e274bb7442472472a9c3b78",
+          "width": 512
+        },
+        "imageId": "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f",
+        "index": 39,
+        "originalSize": [
+          512,
+          341
+        ],
+        "sourcePath": "Запорная арматура/cca9d029-459e-5007-8f88-181843ed8665.jpg"
+      },
+      {
+        "fullInput": {
+          "bytes": 258016,
+          "height": 1170,
+          "path": "inputs/41-A.jpg",
+          "sha256": "9c94f6cc508093a0f8980229af4782b231624a099a3f4c39cda3c27a0a9487a4",
+          "width": 1280
+        },
+        "imageId": "ca55cf27a82b27cc77088b16c18b40cfc775db1adb7e39de6d8c8526765f8468",
+        "index": 41,
+        "originalSize": [
+          1312,
+          1199
+        ],
+        "sourcePath": "Запорная арматура/Безымянный.png"
+      },
+      {
+        "fullInput": {
+          "bytes": 66252,
+          "height": 600,
+          "path": "inputs/48-A.jpg",
+          "sha256": "d64be1f92fc9e5cdd3beb9c817b2918ef6d9d1583b97c03f76a4741bd9786b71",
+          "width": 800
+        },
+        "imageId": "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982",
+        "index": 48,
+        "originalSize": [
+          800,
+          600
+        ],
+        "sourcePath": "Турбопровод/Photo-9-Mechanically-Damaged-Insulation-on-Chilled-Water-Pipe.jpg"
+      }
+    ],
+    "inventorySha256": "55280047e459bf9d32549d0e05766eecc2518cad3d7691247db8159bcfdaa42f",
+    "limitations": [
+      "Small purposive panel, no expert accuracy estimate or production decision.",
+      "Crop selected by A may be wrong or omit the defect; no B when A abstains.",
+      "Crop reduces context. It does not add source detail; native minimum-size upscaling is interpolation.",
+      "No worker THW shape in the public API; record actual native grid-cell count and input tokens only.",
+      "Timings include queue and API overhead; no isolation, no warmup or latency stability claim."
+    ],
+    "model": "Qwen/Qwen3-VL-4B-Instruct",
+    "order": "For each fixed image: A full -> eligible B crop. One pending queued request, no POST retry.",
+    "panelOneBased": [
+      7,
+      8,
+      9,
+      12,
+      16,
+      22,
+      23,
+      34,
+      35,
+      39,
+      41,
+      48
+    ],
+    "pillowVersion": "12.3.0",
+    "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+    "schemaVersion": 1,
+    "scriptSha256": "5f0ba8c02aa39c3cf4b63ce43b9541b3e6b0e3e0de97ab4e033a0f079f50763f",
+    "settings": {
+      "jobTimeoutSeconds": 780,
+      "jpegQuality": 85,
+      "maxCropAreaExclusive": 0.85,
+      "maxEdge": 1280,
+      "minCropEdge": 64,
+      "paddingPerSide": 0.1,
+      "pollIntervalSeconds": 2,
+      "profile": "standard",
+      "upscale": false
+    },
+    "sourceHashes": {
+      "server/vision.py": "9d196405363c9b107f7c1e581dd9022059aa5e3aeea200fd7d69e983420917d1",
+      "server/vision_models.py": "fec444bf97cafc5a2fb68b1dbf65398c4fde49e0d2204cb12aab3ce1ece98fb7",
+      "vision_runtime/qwen_worker.py": "ca46bfd835fb9d12c7656b5e7d73840c8459d341f502ac091e7d8ef467ffa0d4",
+      "vision_runtime/worker.py": "e7f7e96059dc7fd372c5c6212ca8480173203192219e9af41076b9f4a7bcabf0"
+    },
+    "writes": "Temporary analysis API records only; never /api/inspections or /api/history."
+  },
+  "summary": {
+    "originalImages": 12,
+    "fullAnalyses": 12,
+    "cropAnalyses": 6,
+    "cropSkipped": 6,
+    "successfulQueuedAnalyses": 18,
+    "observedAPIErrors": 0,
+    "observedJSONContractErrors": 0,
+    "errorScope": "Counts cover errors surfaced by the queued public API; raw worker JSON is not exposed by this endpoint.",
+    "skipReasons": {
+      "crop_covers_almost_full_image": 6
+    },
+    "pairedImageIndices": [
+      7,
+      8,
+      12,
+      16,
+      39,
+      48
+    ],
+    "allFullAPITiming": {
+      "count": 12,
+      "medianSeconds": 8.093499999999999,
+      "minSeconds": 8.031,
+      "maxSeconds": 12.093,
+      "sumSeconds": 108.796
+    },
+    "pairedFullAPITiming": {
+      "count": 6,
+      "medianSeconds": 10.047,
+      "minSeconds": 8.031,
+      "maxSeconds": 10.078,
+      "sumSeconds": 56.328
+    },
+    "pairedCropAPITiming": {
+      "count": 6,
+      "medianSeconds": 9.055,
+      "minSeconds": 8.047,
+      "maxSeconds": 10.093,
+      "sumSeconds": 54.359
+    },
+    "pairedSumAPITiming": {
+      "count": 6,
+      "medianSeconds": 18.14,
+      "minSeconds": 16.094,
+      "maxSeconds": 20.125,
+      "sumSeconds": 110.68700000000001
+    },
+    "pairedFullWorkerTiming": {
+      "count": 6,
+      "medianSeconds": 8.171548999999999,
+      "minSeconds": 7.237317,
+      "maxSeconds": 9.536280000000001,
+      "sumSeconds": 49.599063
+    },
+    "pairedCropWorkerTiming": {
+      "count": 6,
+      "medianSeconds": 7.951577,
+      "minSeconds": 6.9336400000000005,
+      "maxSeconds": 9.251369,
+      "sumSeconds": 48.005013
+    },
+    "samePublicStatusAndFindingInPairs": 6,
+    "sourceResolutionRetention": {
+      "pairsWithAreaGainAboveOne": 1,
+      "pairsWithoutAdditionalRetainedSourceSamples": 5,
+      "maximumLinearGain": 1.25,
+      "maximumAreaGain": 1.5624999999999998
+    },
+    "nativeGridCellsByPair": [
+      {
+        "index": 7,
+        "A": 1824,
+        "B": 1472
+      },
+      {
+        "index": 8,
+        "A": 1176,
+        "B": 440
+      },
+      {
+        "index": 12,
+        "A": 936,
+        "B": 528
+      },
+      {
+        "index": 16,
+        "A": 3888,
+        "B": 3920
+      },
+      {
+        "index": 39,
+        "A": 704,
+        "B": 360
+      },
+      {
+        "index": 48,
+        "A": 1900,
+        "B": 1216
+      }
+    ]
+  },
+  "artifactVerification": {
+    "resultsSha256": "2c3ea404d2f6d3641f863c86657ac778997acf8e3b63624318e0a2edfd80dd3b",
+    "protocolSha256": "80e735e0c2dc6f6b10575fc9f4f935bb69e52dfad5f23c9c873981197c305970",
+    "sourceOriginalsVerified": 12,
+    "preparedJpegsVerified": 18,
+    "checks": [
+      {
+        "index": 7,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 2,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": true
+      },
+      {
+        "index": 8,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 2,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": true
+      },
+      {
+        "index": 9,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 1,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": false
+      },
+      {
+        "index": 12,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 2,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": true
+      },
+      {
+        "index": 16,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 2,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": true
+      },
+      {
+        "index": 22,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 1,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": false
+      },
+      {
+        "index": 23,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 1,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": false
+      },
+      {
+        "index": 34,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 1,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": false
+      },
+      {
+        "index": 35,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 1,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": false
+      },
+      {
+        "index": 39,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 2,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": true
+      },
+      {
+        "index": 41,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 1,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": false
+      },
+      {
+        "index": 48,
+        "sourceShaMatches": true,
+        "orientedSizeMatches": true,
+        "preparedJpegsVerified": 2,
+        "cropCoordinatesMatch": true,
+        "backMapVerified": true
+      }
+    ],
+    "jpegReencodingByteEquality": "Not tested locally: local Pillow13 differs from preparation12.3; stored SHA/bytes/dimensions verified."
+  },
+  "records": [
+    {
+      "index": 7,
+      "imageId": "c02b8a5466056c6b8e0f3890e6d496d6dafc05571271dc1400d7c293cff75118",
+      "sourcePath": "Насосные агрегаты/obsledovanie-hvs-gvs-2.jpg",
+      "originalSize": [
+        600,
+        761
+      ],
+      "fullInput": {
+        "bytes": 123785,
+        "height": 761,
+        "path": "inputs/07-A.jpg",
+        "sha256": "45bc98a2c20f05b52385ea77dc990b3fd3e5d218bfdaf82cb82ca0385bcaa8b9",
+        "width": 600
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.016,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.016,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 10.031,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 10.047,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 946,
+          "nativeGridCells": 1824,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.849,
+            "width": 0.69,
+            "x": 0.12,
+            "y": 0.118
+          },
+          "component": "Запорная арматура",
+          "durationSeconds": 8.187,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 1.545,
+            "generateMs": 7930.561,
+            "inputTokens": 946,
+            "outputTokens": 71,
+            "patches": 1824,
+            "preprocessMs": 151.491,
+            "totalMs": 8083.598
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Кран покрыт ржавчиной и грязью.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 0.8027332457293036,
+        "eligible": true,
+        "height": 736,
+        "pixels": [
+          30,
+          25,
+          528,
+          761
+        ],
+        "reason": null,
+        "width": 498
+      },
+      "B": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.031,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.047,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 8.047,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 8.047,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 858,
+          "nativeGridCells": 1472,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 1.0,
+            "width": 1.0,
+            "x": 0.0,
+            "y": 0.0
+          },
+          "component": "Запорная арматура",
+          "durationSeconds": 7.735,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.323,
+            "generateMs": 7694.203,
+            "inputTokens": 858,
+            "outputTokens": 69,
+            "patches": 1472,
+            "preprocessMs": 24.304,
+            "totalMs": 7718.83
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Кран покрыт ржавчиной и грязью.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "cropInput": {
+        "bytes": 104074,
+        "height": 736,
+        "path": "inputs/07-B.jpg",
+        "sha256": "2cf4f2bd19b2a8df0ff95b62e3e746061966af4ea8bacd9a30fb95af866a76af",
+        "width": 498
+      },
+      "mappedBBox": {
+        "height": 0.9671484888304862,
+        "width": 0.83,
+        "x": 0.05,
+        "y": 0.0328515111695138
+      },
+      "pixelMetrics": {
+        "belowNativeMinimumPixels": false,
+        "cropInputPixels": 366528,
+        "interpretation": "Ratios describe retained source samples, not new detail or accuracy. Native minimum-size upscaling is interpolation.",
+        "retainedContextAreaFraction": 0.8027332457293036,
+        "sourceResolutionRetentionAreaGain": 1.0,
+        "sourceResolutionRetentionGainX": 1.0,
+        "sourceResolutionRetentionGainY": 1.0
+      },
+      "twoPassElapsedSeconds": 18.094
+    },
+    {
+      "index": 8,
+      "imageId": "15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8",
+      "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-46-46.jpg",
+      "originalSize": [
+        666,
+        455
+      ],
+      "fullInput": {
+        "bytes": 81113,
+        "height": 455,
+        "path": "inputs/08-A.jpg",
+        "sha256": "2add977f10d52793d253c4180ebf4f048b61fbcf15b956918efe7272acf76364",
+        "width": 666
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.016,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.032,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 10.047,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 10.047,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 784,
+          "nativeGridCells": 1176,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.64,
+            "width": 0.39,
+            "x": 0.06,
+            "y": 0.248
+          },
+          "component": "Корпус насоса",
+          "durationSeconds": 8.516,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 1.033,
+            "generateMs": 8480.772,
+            "inputTokens": 784,
+            "outputTokens": 75,
+            "patches": 1176,
+            "preprocessMs": 19.267,
+            "totalMs": 8501.071
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Синий насос с ржавчиной и ручным вентилем.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 0.36254826254826256,
+        "eligible": true,
+        "height": 351,
+        "pixels": [
+          13,
+          83,
+          326,
+          434
+        ],
+        "reason": null,
+        "width": 313
+      },
+      "B": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.015,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.047,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 8.047,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 8.062,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 600,
+          "nativeGridCells": 440,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.932,
+            "width": 0.8,
+            "x": 0.092,
+            "y": 0.0
+          },
+          "component": "Корпус насоса",
+          "durationSeconds": 7.454,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.438,
+            "generateMs": 7412.401,
+            "inputTokens": 600,
+            "outputTokens": 69,
+            "patches": 440,
+            "preprocessMs": 14.936,
+            "totalMs": 7427.776
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Коррозия на корпусе насоса видна на поверхности.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "cropInput": {
+        "bytes": 36090,
+        "height": 351,
+        "path": "inputs/08-B.jpg",
+        "sha256": "4bf18db2bd36aa43dcc08b81dd810fd4d27f3ab39e6cb9a187caa9bb3d11e7b1",
+        "width": 313
+      },
+      "mappedBBox": {
+        "height": 0.7189714285714286,
+        "width": 0.375975975975976,
+        "x": 0.06275675675675675,
+        "y": 0.1824175824175824
+      },
+      "pixelMetrics": {
+        "belowNativeMinimumPixels": false,
+        "cropInputPixels": 109863,
+        "interpretation": "Ratios describe retained source samples, not new detail or accuracy. Native minimum-size upscaling is interpolation.",
+        "retainedContextAreaFraction": 0.36254826254826256,
+        "sourceResolutionRetentionAreaGain": 1.0,
+        "sourceResolutionRetentionGainX": 1.0,
+        "sourceResolutionRetentionGainY": 1.0
+      },
+      "twoPassElapsedSeconds": 18.109
+    },
+    {
+      "index": 9,
+      "imageId": "58333a366f2c532ef3ee231474678a434b96e6904340b0dee7e7ed7cf313f222",
+      "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-48-02.jpg",
+      "originalSize": [
+        960,
+        1280
+      ],
+      "fullInput": {
+        "bytes": 244073,
+        "height": 1280,
+        "path": "inputs/09-A.jpg",
+        "sha256": "49c2c0fe5489d6a43344b3f042ce0dce01bc9c55354b1deb605798a1552e79c1",
+        "width": 960
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.046,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.046,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 8.093,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 8.109,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 1462,
+          "nativeGridCells": 3888,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.85,
+            "width": 0.77,
+            "x": 0.157,
+            "y": 0.148
+          },
+          "component": "Клеммная коробка",
+          "durationSeconds": 7.782,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.329,
+            "generateMs": 7686.786,
+            "inputTokens": 1462,
+            "outputTokens": 74,
+            "patches": 3888,
+            "preprocessMs": 49.768,
+            "totalMs": 7736.882
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Коррозия на клеммах и проводах в терминале.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 0.86328125,
+        "eligible": false,
+        "height": 1200,
+        "pixels": [
+          76,
+          80,
+          960,
+          1280
+        ],
+        "reason": "crop_covers_almost_full_image",
+        "width": 884
+      },
+      "B": {
+        "reason": "crop_covers_almost_full_image",
+        "skipped": true
+      }
+    },
+    {
+      "index": 12,
+      "imageId": "66b2015378463cc783587aafc9f799167a90334deeaa1aa63262cb9a005ddb24",
+      "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-51-10.jpg",
+      "originalSize": [
+        413,
+        583
+      ],
+      "fullInput": {
+        "bytes": 30108,
+        "height": 583,
+        "path": "inputs/12-A.jpg",
+        "sha256": "da2df3386b233928a1158b6d1606d4ddd36815ab6c2ee7968b6b980bf9b831ef",
+        "width": 413
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.016,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.016,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 8.031,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 8.031,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 724,
+          "nativeGridCells": 936,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.585,
+            "width": 0.72,
+            "x": 0.12,
+            "y": 0.0
+          },
+          "component": "Трубопровод или фланец",
+          "durationSeconds": 7.234,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.463,
+            "generateMs": 7219.553,
+            "inputTokens": 724,
+            "outputTokens": 71,
+            "patches": 936,
+            "preprocessMs": 17.301,
+            "totalMs": 7237.317
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Ржавчина на соединении трубы и фитинга.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 0.5590520768007177,
+        "eligible": true,
+        "height": 376,
+        "pixels": [
+          19,
+          0,
+          377,
+          376
+        ],
+        "reason": null,
+        "width": 358
+      },
+      "B": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.016,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.016,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 8.047,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 8.063,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 622,
+          "nativeGridCells": 528,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.44,
+            "width": 0.45,
+            "x": 0.43,
+            "y": 0.44
+          },
+          "component": "Запорная арматура",
+          "durationSeconds": 6.937,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.371,
+            "generateMs": 6920.926,
+            "inputTokens": 622,
+            "outputTokens": 72,
+            "patches": 528,
+            "preprocessMs": 12.344,
+            "totalMs": 6933.64
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Коррозия на металлическом соединении клапана.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "cropInput": {
+        "bytes": 24330,
+        "height": 376,
+        "path": "inputs/12-B.jpg",
+        "sha256": "e09f0b188289741a3d51f51fb75da9c4670cddda2b2060b5eea8e3348cfbd2cd",
+        "width": 358
+      },
+      "mappedBBox": {
+        "height": 0.28377358490566035,
+        "width": 0.3900726392251816,
+        "x": 0.4187409200968523,
+        "y": 0.28377358490566035
+      },
+      "pixelMetrics": {
+        "belowNativeMinimumPixels": false,
+        "cropInputPixels": 134608,
+        "interpretation": "Ratios describe retained source samples, not new detail or accuracy. Native minimum-size upscaling is interpolation.",
+        "retainedContextAreaFraction": 0.5590520768007177,
+        "sourceResolutionRetentionAreaGain": 1.0,
+        "sourceResolutionRetentionGainX": 1.0,
+        "sourceResolutionRetentionGainY": 1.0
+      },
+      "twoPassElapsedSeconds": 16.094
+    },
+    {
+      "index": 16,
+      "imageId": "d317e2910bbebda76780ed9402787730e82ca4224cb4904e3f492033ab43cb82",
+      "sourcePath": "Насосные агрегаты/Безымянный.png",
+      "originalSize": [
+        1600,
+        1200
+      ],
+      "fullInput": {
+        "bytes": 149570,
+        "height": 960,
+        "path": "inputs/16-A.jpg",
+        "sha256": "7f8821eb6aecaab240d8802841e71b1903a1aa413ef9c08357b1da903648f48a",
+        "width": 1280
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.046,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.062,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 8.078,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 8.078,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 1462,
+          "nativeGridCells": 3888,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.64,
+            "width": 0.604,
+            "x": 0.134,
+            "y": 0.12
+          },
+          "component": "Клеммная коробка",
+          "durationSeconds": 8.0,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.249,
+            "generateMs": 7937.699,
+            "inputTokens": 1462,
+            "outputTokens": 71,
+            "patches": 3888,
+            "preprocessMs": 43.349,
+            "totalMs": 7981.297
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Коррозия на клеммах и проводах видна.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 0.557521875,
+        "eligible": true,
+        "height": 922,
+        "pixels": [
+          117,
+          67,
+          1278,
+          989
+        ],
+        "reason": null,
+        "width": 1161
+      },
+      "B": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.031,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.031,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 10.078,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 10.093,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 1470,
+          "nativeGridCells": 3920,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.826,
+            "width": 0.702,
+            "x": 0.198,
+            "y": 0.094
+          },
+          "component": "Клеммная коробка",
+          "durationSeconds": 8.219,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.353,
+            "generateMs": 8143.638,
+            "inputTokens": 1470,
+            "outputTokens": 73,
+            "patches": 3920,
+            "preprocessMs": 40.333,
+            "totalMs": 8184.324
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Коррозия на клеммах и изоляции проводов видна.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "cropInput": {
+        "bytes": 126220,
+        "height": 922,
+        "path": "inputs/16-B.jpg",
+        "sha256": "0515abf1a49ac7f6999bf7fd71b97754e803a4701bda0f7248e6fd88d2c28c77",
+        "width": 1161
+      },
+      "mappedBBox": {
+        "height": 0.6346433333333333,
+        "width": 0.50938875,
+        "x": 0.21679875000000004,
+        "y": 0.12805666666666668
+      },
+      "pixelMetrics": {
+        "belowNativeMinimumPixels": false,
+        "cropInputPixels": 1070442,
+        "interpretation": "Ratios describe retained source samples, not new detail or accuracy. Native minimum-size upscaling is interpolation.",
+        "retainedContextAreaFraction": 0.557521875,
+        "sourceResolutionRetentionAreaGain": 1.5624999999999998,
+        "sourceResolutionRetentionGainX": 1.25,
+        "sourceResolutionRetentionGainY": 1.25
+      },
+      "twoPassElapsedSeconds": 18.171
+    },
+    {
+      "index": 22,
+      "imageId": "e202239dadb60ce27119f4c8e8d8b1695e361dceaf67ae0ee1f1daeaf73c5ddc",
+      "sourcePath": "ЭД/3.PNG",
+      "originalSize": [
+        869,
+        625
+      ],
+      "fullInput": {
+        "bytes": 99250,
+        "height": 625,
+        "path": "inputs/22-A.jpg",
+        "sha256": "64a48ef8a4678b79c71736d871153008196e3ffe3f00919426f2d8b3cf0e0fe2",
+        "width": 869
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.031,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.031,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 8.046,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 8.062,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 1030,
+          "nativeGridCells": 2160,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 1.0,
+            "width": 0.913,
+            "x": 0.052,
+            "y": 0.0
+          },
+          "component": "Электродвигатель",
+          "durationSeconds": 7.328,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.39,
+            "generateMs": 7270.682,
+            "inputTokens": 1030,
+            "outputTokens": 70,
+            "patches": 2160,
+            "preprocessMs": 29.421,
+            "totalMs": 7300.494
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Мотор с ржавчиной на металлических элементах.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 1.0,
+        "eligible": false,
+        "height": 625,
+        "pixels": [
+          0,
+          0,
+          869,
+          625
+        ],
+        "reason": "crop_covers_almost_full_image",
+        "width": 869
+      },
+      "B": {
+        "reason": "crop_covers_almost_full_image",
+        "skipped": true
+      }
+    },
+    {
+      "index": 23,
+      "imageId": "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b",
+      "sourcePath": "ЭД/55.PNG",
+      "originalSize": [
+        774,
+        481
+      ],
+      "fullInput": {
+        "bytes": 70073,
+        "height": 481,
+        "path": "inputs/23-A.jpg",
+        "sha256": "a56c3e28a0879ff38813c79ecf6f120c3561729c1d08c4bea5eb61980c048d0a",
+        "width": 774
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.031,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.031,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 8.062,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 8.078,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 850,
+          "nativeGridCells": 1440,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 1.0,
+            "width": 1.0,
+            "x": 0.0,
+            "y": 0.0
+          },
+          "component": "Подшипниковый узел",
+          "durationSeconds": 6.531,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимые следы жидкости",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.409,
+            "generateMs": 6503.553,
+            "inputTokens": 850,
+            "outputTokens": 62,
+            "patches": 1440,
+            "preprocessMs": 17.758,
+            "totalMs": 6521.721
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Внутри подшипника виден влажный участок.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить источник влаги и герметичность. По фотографии нельзя определить состав жидкости и причину утечки.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 1.0,
+        "eligible": false,
+        "height": 481,
+        "pixels": [
+          0,
+          0,
+          774,
+          481
+        ],
+        "reason": "crop_covers_almost_full_image",
+        "width": 774
+      },
+      "B": {
+        "reason": "crop_covers_almost_full_image",
+        "skipped": true
+      }
+    },
+    {
+      "index": 34,
+      "imageId": "f03b64891b7aff1c0a9f26af0bcc0ff00435fe463e2ed3f704b9198c31985e31",
+      "sourcePath": "Запорная арматура/1396430378_7447321.jpg",
+      "originalSize": [
+        750,
+        500
+      ],
+      "fullInput": {
+        "bytes": 70777,
+        "height": 500,
+        "path": "inputs/34-A.jpg",
+        "sha256": "129b4004e77fe63b43cf7a29d63b276c6de23f2009c5d896bad45cf5c5eb5e67",
+        "width": 750
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.016,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.031,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 8.047,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 8.063,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 858,
+          "nativeGridCells": 1472,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.8,
+            "width": 1.0,
+            "x": 0.0,
+            "y": 0.0
+          },
+          "component": "Другой промышленный узел",
+          "durationSeconds": 7.047,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимое повреждение",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.34,
+            "generateMs": 7001.249,
+            "inputTokens": 858,
+            "outputTokens": 71,
+            "patches": 1472,
+            "preprocessMs": 18.726,
+            "totalMs": 7020.315
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Круглый корпус с трещиной и остатками крепежа.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 0.882,
+        "eligible": false,
+        "height": 441,
+        "pixels": [
+          0,
+          0,
+          750,
+          441
+        ],
+        "reason": "crop_covers_almost_full_image",
+        "width": 750
+      },
+      "B": {
+        "reason": "crop_covers_almost_full_image",
+        "skipped": true
+      }
+    },
+    {
+      "index": 35,
+      "imageId": "a5a84a17726e30fba6243ff50b167319cde07db962f6f361e9530739d2219827",
+      "sourcePath": "Запорная арматура/86.PNG",
+      "originalSize": [
+        313,
+        626
+      ],
+      "fullInput": {
+        "bytes": 55910,
+        "height": 626,
+        "path": "inputs/35-A.jpg",
+        "sha256": "f777ee397cbd5047887159e5f3a5a71576a2530ef37e4a57526a52ccb79edbff",
+        "width": 313
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.031,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.031,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 8.031,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 8.063,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 690,
+          "nativeGridCells": 800,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.85,
+            "width": 1.0,
+            "x": 0.0,
+            "y": 0.0
+          },
+          "component": "Запорная арматура",
+          "durationSeconds": 7.0,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.417,
+            "generateMs": 6973.228,
+            "inputTokens": 690,
+            "outputTokens": 70,
+            "patches": 800,
+            "preprocessMs": 12.971,
+            "totalMs": 6986.616
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Золотистый налет на внутренней поверхности клапана.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 0.9361022364217252,
+        "eligible": false,
+        "height": 586,
+        "pixels": [
+          0,
+          0,
+          313,
+          586
+        ],
+        "reason": "crop_covers_almost_full_image",
+        "width": 313
+      },
+      "B": {
+        "reason": "crop_covers_almost_full_image",
+        "skipped": true
+      }
+    },
+    {
+      "index": 39,
+      "imageId": "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f",
+      "sourcePath": "Запорная арматура/cca9d029-459e-5007-8f88-181843ed8665.jpg",
+      "originalSize": [
+        512,
+        341
+      ],
+      "fullInput": {
+        "bytes": 23065,
+        "height": 341,
+        "path": "inputs/39-A.jpg",
+        "sha256": "8b7ee74da357366636bbe1b7a99909fcc2a2aa899e274bb7442472472a9c3b78",
+        "width": 512
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.016,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.031,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 10.031,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 10.047,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 666,
+          "nativeGridCells": 704,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 0.667,
+            "width": 0.542,
+            "x": 0.138,
+            "y": 0.208
+          },
+          "component": "Запорная арматура",
+          "durationSeconds": 8.296,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимые следы жидкости",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.434,
+            "generateMs": 8246.581,
+            "inputTokens": 666,
+            "outputTokens": 70,
+            "patches": 704,
+            "preprocessMs": 12.485,
+            "totalMs": 8259.5
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Водяные капли стекают с клапана.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить источник влаги и герметичность. По фотографии нельзя определить состав жидкости и причину утечки.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 0.524170637829912,
+        "eligible": true,
+        "height": 274,
+        "pixels": [
+          42,
+          48,
+          376,
+          322
+        ],
+        "reason": null,
+        "width": 334
+      },
+      "B": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.016,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.031,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 10.047,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 10.047,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 580,
+          "nativeGridCells": 360,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 1.0,
+            "width": 1.0,
+            "x": 0.0,
+            "y": 0.0
+          },
+          "component": "Запорная арматура",
+          "durationSeconds": 8.5,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимые следы жидкости",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.453,
+            "generateMs": 8477.146,
+            "inputTokens": 580,
+            "outputTokens": 69,
+            "patches": 360,
+            "preprocessMs": 11.475,
+            "totalMs": 8489.074
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Вода стекает с клапана и трубопровода.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить источник влаги и герметичность. По фотографии нельзя определить состав жидкости и причину утечки.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "cropInput": {
+        "bytes": 16651,
+        "height": 274,
+        "path": "inputs/39-B.jpg",
+        "sha256": "20152b27cf6d09573b7378301cf9b8b82838badd5e9dad7f424437323a5a4387",
+        "width": 334
+      },
+      "mappedBBox": {
+        "height": 0.8035190615835777,
+        "width": 0.65234375,
+        "x": 0.08203125,
+        "y": 0.14076246334310852
+      },
+      "pixelMetrics": {
+        "belowNativeMinimumPixels": false,
+        "cropInputPixels": 91516,
+        "interpretation": "Ratios describe retained source samples, not new detail or accuracy. Native minimum-size upscaling is interpolation.",
+        "retainedContextAreaFraction": 0.524170637829912,
+        "sourceResolutionRetentionAreaGain": 1.0,
+        "sourceResolutionRetentionGainX": 1.0,
+        "sourceResolutionRetentionGainY": 1.0
+      },
+      "twoPassElapsedSeconds": 20.094
+    },
+    {
+      "index": 41,
+      "imageId": "ca55cf27a82b27cc77088b16c18b40cfc775db1adb7e39de6d8c8526765f8468",
+      "sourcePath": "Запорная арматура/Безымянный.png",
+      "originalSize": [
+        1312,
+        1199
+      ],
+      "fullInput": {
+        "bytes": 258016,
+        "height": 1170,
+        "path": "inputs/41-A.jpg",
+        "sha256": "9c94f6cc508093a0f8980229af4782b231624a099a3f4c39cda3c27a0a9487a4",
+        "width": 1280
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.062,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.062,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 12.093,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 12.093,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 1480,
+          "nativeGridCells": 3960,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 1.0,
+            "width": 0.896,
+            "x": 0.104,
+            "y": 0.0
+          },
+          "component": "Запорная арматура",
+          "durationSeconds": 10.36,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимая коррозия",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.487,
+            "generateMs": 10249.147,
+            "inputTokens": 1480,
+            "outputTokens": 73,
+            "patches": 3960,
+            "preprocessMs": 63.66,
+            "totalMs": 10313.293
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Ржавчина на старом металлическом клапане.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить состояние покрытия и степень повреждения поверхности по регламенту объекта.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 0.9862804878048781,
+        "eligible": false,
+        "height": 1199,
+        "pixels": [
+          18,
+          0,
+          1312,
+          1199
+        ],
+        "reason": "crop_covers_almost_full_image",
+        "width": 1294
+      },
+      "B": {
+        "reason": "crop_covers_almost_full_image",
+        "skipped": true
+      }
+    },
+    {
+      "index": 48,
+      "imageId": "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982",
+      "sourcePath": "Турбопровод/Photo-9-Mechanically-Damaged-Insulation-on-Chilled-Water-Pipe.jpg",
+      "originalSize": [
+        800,
+        600
+      ],
+      "fullInput": {
+        "bytes": 66252,
+        "height": 600,
+        "path": "inputs/48-A.jpg",
+        "sha256": "d64be1f92fc9e5cdd3beb9c817b2918ef6d9d1583b97c03f76a4741bd9786b71",
+        "width": 800
+      },
+      "A": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.047,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.047,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 10.078,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 10.078,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 965,
+          "nativeGridCells": 1900,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 1.0,
+            "width": 0.546,
+            "x": 0.242,
+            "y": 0.0
+          },
+          "component": "Трубопровод или фланец",
+          "durationSeconds": 9.547,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимое повреждение",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.379,
+            "generateMs": 9506.433,
+            "inputTokens": 965,
+            "outputTokens": 73,
+            "patches": 1900,
+            "preprocessMs": 29.467,
+            "totalMs": 9536.28
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Повреждение изоляции на трубе с видимым разрушением.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "crop": {
+        "areaFraction": 0.6575,
+        "eligible": true,
+        "height": 600,
+        "pixels": [
+          149,
+          0,
+          675,
+          600
+        ],
+        "reason": null,
+        "width": 526
+      },
+      "B": {
+        "success": true,
+        "submissionStatus": 202,
+        "queueFinalStatus": "succeeded",
+        "queueEvents": [
+          {
+            "elapsedSeconds": 0.015,
+            "position": 1,
+            "status": "queued"
+          },
+          {
+            "elapsedSeconds": 2.015,
+            "position": 0,
+            "status": "running"
+          },
+          {
+            "elapsedSeconds": 10.031,
+            "position": null,
+            "status": "succeeded"
+          }
+        ],
+        "elapsedSeconds": 10.047,
+        "nativeInput": {
+          "imageGridTHW": null,
+          "inputTokens": 794,
+          "nativeGridCells": 1216,
+          "reason": "The public API exposes the cell count, not the worker THW tensor."
+        },
+        "publicResult": {
+          "box": {
+            "height": 1.0,
+            "width": 0.8,
+            "x": 0.1,
+            "y": 0.0
+          },
+          "component": "Трубопровод или фланец",
+          "durationSeconds": 9.266,
+          "equipment": {
+            "id": "Серийный номер не подтверждён",
+            "name": "Оборудование на снимке"
+          },
+          "finding": "Видимое повреждение",
+          "media": {
+            "captureSource": "uploaded_photo",
+            "declaredBy": "client"
+          },
+          "metrics": {
+            "decodeMs": 0.252,
+            "generateMs": 9228.996,
+            "inputTokens": 794,
+            "outputTokens": 73,
+            "patches": 1216,
+            "preprocessMs": 22.121,
+            "totalMs": 9251.369
+          },
+          "model": "Qwen/Qwen3-VL-4B-Instruct",
+          "nextService": "По регламенту оборудования",
+          "observation": "Повреждение изоляции на трубе с видимым разрушением.",
+          "observationKind": "model",
+          "preliminary": true,
+          "profile": "standard",
+          "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+          "serviceLife": "Нужны паспорт и история узла",
+          "source": "local_vision",
+          "status": "defect"
+        },
+        "modelAndRevisionVerifiedAfter": true
+      },
+      "cropInput": {
+        "bytes": 61207,
+        "height": 600,
+        "path": "inputs/48-B.jpg",
+        "sha256": "6e3bf6231ce096d273140c5d609d448eadedbe37ed0e41f17f082bc03c567a93",
+        "width": 526
+      },
+      "mappedBBox": {
+        "height": 1.0,
+        "width": 0.526,
+        "x": 0.252,
+        "y": 0.0
+      },
+      "pixelMetrics": {
+        "belowNativeMinimumPixels": false,
+        "cropInputPixels": 315600,
+        "interpretation": "Ratios describe retained source samples, not new detail or accuracy. Native minimum-size upscaling is interpolation.",
+        "retainedContextAreaFraction": 0.6575,
+        "sourceResolutionRetentionAreaGain": 1.0,
+        "sourceResolutionRetentionGainX": 1.0,
+        "sourceResolutionRetentionGainY": 1.0
+      },
+      "twoPassElapsedSeconds": 20.125
+    }
+  ],
+  "interpretationLimits": [
+    "Quality and accuracy remain pending paired visual review. No production crop behavior was enabled.",
+    "All12 full-image calls and the6 eligible pairs are different populations; compare two-pass timing only with the paired6 full-image calls.",
+    "Elapsed times include queue/polling/API overhead and are one measurement per image. The sum excludes crop preparation and is not end-to-end UI latency.",
+    "Actual native grid-cell counts come from API metrics.patches. THW tensors and raw worker JSON are unavailable; no shape or hidden reasoning is inferred.",
+    "Source sample retention is not newly captured detail or proof of more accurate interpretation. Cropping removes surrounding context.",
+    "Six crops were skipped because padded boxes covered85% or more of the original; no manual target selection replaced the model box.",
+    "Prepared inputs are derived from EXIF-oriented originals. JPEG byte reproduction across Pillow/library versions was not claimed; original/input hashes, sizes and geometry were verified."
+  ],
+  "production": {
+    "modelChanged": false,
+    "serviceRestarted": false,
+    "cropFeatureEnabled": false,
+    "inspectionJournalRecordsCreated": 0,
+    "normalTemporaryAnalysisEvidenceCreated": 18,
+    "webHealthAfter": "ok"
+  },
+  "qualityReview": {
+    "status": "completed_after_masked_review_freeze",
+    "reviewer": "Independent AI visual comparison, not expert ground truth",
+    "frozenReviewSha256": "1a0723229efb305c58ba0ebfc00fa6d2db76a1cb336b88181896f942190ca477",
+    "frozenRulesSha256": "d3132b37df4a8c31becaca2786c64e02d7aee5c65762664d4a2725d8ded5e95e",
+    "maskKeySha256": "4159b563b5cafd04ef6561d21ccdd12f87a06902fd4afda50304299bcf6ce373",
+    "blindingLimit": "Aliases X/Y only; per-image framing can reveal crop, and earlier reference/model history was known. This is not perfect blinding.",
+    "pairCount": 6,
+    "cropOutcomes": {
+      "better": 0,
+      "worse": 2,
+      "tie": 4
+    },
+    "newSupportedVisibleEvidencePairs": 0,
+    "pairs": [
+      {
+        "index": 7,
+        "preferred": "tie",
+        "cropOutcome": "tie",
+        "reason": "Узел, коррозия и смысл текста одинаковы; новая полезная информация не появилась.",
+        "targetPreserved": true,
+        "relevantEvidencePreserved": true,
+        "newSupportedVisibleEvidence": false
+      },
+      {
+        "index": 8,
+        "preferred": "tie",
+        "cropOutcome": "tie",
+        "reason": "Оба ответа выбирают левый насос с видимыми локальными ржавыми зонами. Более краткая формулировка Y не является доказанным улучшением диагностики.",
+        "targetPreserved": true,
+        "relevantEvidencePreserved": true,
+        "newSupportedVisibleEvidence": false
+      },
+      {
+        "index": 12,
+        "preferred": "A",
+        "cropOutcome": "worse",
+        "reason": "Y корректнее называет видимый фитинг/трубное соединение. X добавляет неподтверждённый клапан. Оба сохраняют чрезмерно уверенную коррозию.",
+        "targetPreserved": true,
+        "relevantEvidencePreserved": true,
+        "newSupportedVisibleEvidence": false
+      },
+      {
+        "index": 16,
+        "preferred": "A",
+        "cropOutcome": "worse",
+        "reason": "X добавляет неподтверждённую коррозию изоляции; Y не содержит этой дополнительной ошибки. При этом оба ответа всё ещё необоснованно уверены в коррозии.",
+        "targetPreserved": true,
+        "relevantEvidencePreserved": true,
+        "newSupportedVisibleEvidence": false
+      },
+      {
+        "index": 39,
+        "preferred": "tie",
+        "cropOutcome": "tie",
+        "reason": "Оба правильно находят видимую жидкость на том же клапане; оба необоснованно называют её водой. Увеличение не добавляет нового установленного признака.",
+        "targetPreserved": true,
+        "relevantEvidencePreserved": true,
+        "newSupportedVisibleEvidence": false
+      },
+      {
+        "index": 48,
+        "preferred": "tie",
+        "cropOutcome": "tie",
+        "reason": "Повреждение изоляции и выбранный участок одинаково обоснованы, текст совпадает.",
+        "targetPreserved": true,
+        "relevantEvidencePreserved": true,
+        "newSupportedVisibleEvidence": false
+      }
+    ],
+    "expertAccuracyClaim": false,
+    "rootIndependentPairedReview": "Root separately reviewed the six paired images before reading the mask key; also preferred full views in images12/16, with four ties. Additional context loss in16: the cropped view omits a loose ring terminal visible in the original. The main selected region remains visible.",
+    "promotionDecision": "Keep the single-pass production default. Do not enable automatic crop-only second passes from this experiment.",
+    "nextHypothesis": "Retain the higher-resolution original and give the second pass both the overview and crop. This joint-image variant has NOT been tested here; evaluate on high-resolution wide scenes with small components and clean/ambiguous controls."
+  }
+}
