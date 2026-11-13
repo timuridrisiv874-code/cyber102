@@ -47,6 +47,32 @@ def measurements(rows, predictions, labels, threshold, iou):
     return {'classes': summary, 'flagged_controls': sorted(flagged_controls)}
 
 
+def localization_errors(rows, predictions, threshold=.25, iou=.5):
+    """Identify missed objects with an overlapping prediction of the wrong class or low score."""
+    errors = []
+    for frame in rows:
+        ranked = sorted(predictions[frame['file']], key=lambda item: -item['score'])
+        for expected in frame['objects']:
+            matching = [(prediction, overlap(prediction['xyxy'], expected['xyxy'])) for prediction in ranked]
+            aligned = [(prediction, score) for prediction, score in matching if score >= iou]
+            if any(prediction['class'] == expected['class'] and prediction['score'] >= threshold
+                   for prediction, _ in aligned):
+                continue
+            low_score = next(((prediction, score) for prediction, score in aligned
+                              if prediction['class'] == expected['class']), None)
+            candidate = low_score or next(iter(aligned), None)
+            error = {'file': frame['file'], 'scene': frame['scene'], 'expected': expected['class']}
+            if candidate:
+                prediction, score = candidate
+                error.update({'reason': 'low_score' if low_score else 'wrong_class',
+                              'predicted': prediction['class'], 'score': prediction['score'], 'iou': score})
+            else:
+                error.update({'reason': 'no_overlapping_box',
+                              'best_iou': max((score for _, score in matching), default=0)})
+            errors.append(error)
+    return errors
+
+
 def merge_boxes(predictions, iou=.5):
     kept = []
     for prediction in sorted(predictions, key=lambda item: -item['score']):
@@ -111,6 +137,7 @@ def main():
               'support_by_scene': dict(Counter(row['scene'] for row in rows)),
               'metrics': {f'{confidence:.2f}/{iou:.2f}': measurements(rows, predictions, sorted(labels), confidence, iou)
                           for confidence in (.05, .15, .25, .40) for iou in (.30, .50)},
+              'localization_errors_at_0.25/0.50': localization_errors(rows, predictions),
               'predictions': predictions}
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(args.output)
