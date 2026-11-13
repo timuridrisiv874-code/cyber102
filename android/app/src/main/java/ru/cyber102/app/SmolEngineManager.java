@@ -30,7 +30,7 @@ final class SmolEngineManager {
     interface Listener { void onEvent(JSONObject event); }
     private static final int MAX_IMAGE_BYTES = 1536 * 1024;
     private static final int MAX_IMAGE_BASE64 = 4 * ((MAX_IMAGE_BYTES + 2) / 3);
-    private static final String PROMPT = "Describe the main object and its visible surface condition. Do not guess details that are not visible.";
+    private static final String PROMPT = "In English, briefly name the industrial part and describe any visible damage or unusual marks. If unclear, say so. Do not guess causes.";
     private final Context context;
     private final Listener listener;
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -48,7 +48,7 @@ final class SmolEngineManager {
     private volatile String stateMessage = "Модель ещё не загружена";
     private volatile int progress;
     private volatile String revision = "";
-    private volatile String modelId = "SmolVLM";
+    private volatile String modelId = "VisionPsy-Nano-460M";
     private volatile long modelBytes;
     private volatile String modelFileName = "файл языковой модели из комплекта этой сборки";
     private volatile String projectorFileName = "файл визуального проектора из того же комплекта";
@@ -108,7 +108,7 @@ final class SmolEngineManager {
             Trace.beginSection("Cyber102.smol.prepare");
             try {
                 check(token);
-                if (!SmolNative.initialize()) throw new IOException("Не удалось загрузить движок SmolVLM. Требуется Android arm64-v8a.");
+                if (!SmolNative.initialize()) throw new IOException("Не удалось загрузить VisionPsy. Нужен Android ARM64 с поддержкой dot-product.");
                 long epoch = SmolNative.beginOperation();
                 check(token);
                 status("preparing", "Проверяем и подготавливаем модель на телефоне…", 0);
@@ -156,16 +156,16 @@ final class SmolEngineManager {
                 if (jpeg.length == 0 || jpeg.length > MAX_IMAGE_BYTES || jpeg.length < 3 || (jpeg[0] & 255) != 255 || (jpeg[1] & 255) != 216) throw new IOException("Ожидается JPEG-кадр.");
                 BitmapFactory.Options bounds = new BitmapFactory.Options(); bounds.inJustDecodeBounds = true;
                 BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length, bounds);
-                if (bounds.outWidth <= 0 || bounds.outHeight <= 0 || bounds.outWidth > 768 || bounds.outHeight > 768) throw new IOException("Размер офлайн-кадра должен быть не более 768 × 768.");
+                if (bounds.outWidth <= 0 || bounds.outHeight <= 0 || bounds.outWidth > 512 || bounds.outHeight > 512) throw new IOException("Размер офлайн-кадра должен быть не более 512 × 512.");
                 OfflineFrameQuality.check(jpeg);
                 check(token);
                 image = File.createTempFile("smol-frame-", ".jpg", context.getCacheDir());
                 try (FileOutputStream output = new FileOutputStream(image)) { output.write(jpeg); }
-                status("analyzing", "SmolVLM рассматривает кадр на телефоне…", 0);
+                status("analyzing", "VisionPsy рассматривает кадр на телефоне…", 0);
                 JSONObject result;
                 Trace.beginSection("Cyber102.smol.inference");
                 try {
-                    result = new JSONObject(SmolNative.analyze(image.getAbsolutePath(), PROMPT, 64, epoch));
+                    result = new JSONObject(SmolNative.analyze(image.getAbsolutePath(), PROMPT, 40, epoch));
                 } finally {
                     Trace.endSection();
                 }
@@ -220,7 +220,7 @@ final class SmolEngineManager {
     }
 
     private File modelFolder() throws IOException {
-        File folder = new File(context.getFilesDir(), "smolvlm");
+        File folder = new File(context.getFilesDir(), "visionpsy-nano");
         if (!folder.isDirectory() && !folder.mkdirs()) throw new IOException("Не удалось создать папку модели.");
         return folder;
     }
@@ -238,8 +238,7 @@ final class SmolEngineManager {
         }
         JSONObject metadata = new JSONObject(new String(data, StandardCharsets.UTF_8));
         String selectedModel = metadata.getString("modelId");
-        if (!"SmolVLM-256M-Instruct".equals(selectedModel) && !"SmolVLM-500M-Instruct".equals(selectedModel) &&
-                !"SmolVLM2-2.2B-Instruct".equals(selectedModel)) throw new IOException("Неизвестная офлайн-модель.");
+        if (!"VisionPsy-Nano-460M".equals(selectedModel)) throw new IOException("Неизвестная офлайн-модель.");
         String selectedRevision = metadata.getString("revision");
         if (!selectedRevision.matches("[A-Za-z0-9._-]{1,128}")) throw new IOException("Некорректная версия модели.");
         JSONArray rows = metadata.getJSONArray("files");
@@ -287,7 +286,7 @@ final class SmolEngineManager {
                 }
                 output.getFD().sync();
             }
-            if (total != model.size || !hex(digest.digest()).equals(model.sha256)) throw new IOException("Контрольная сумма файла не совпадает с проверенной версией SmolVLM.");
+            if (total != model.size || !hex(digest.digest()).equals(model.sha256)) throw new IOException("Контрольная сумма файла не совпадает с проверенной версией VisionPsy.");
             check(token);
             if (destination.exists() && !destination.delete()) throw new IOException("Не удалось заменить файл модели.");
             if (!temporary.renameTo(destination)) throw new IOException("Не удалось сохранить проверенный файл модели.");

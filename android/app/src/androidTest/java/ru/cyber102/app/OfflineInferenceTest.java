@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
@@ -93,16 +94,14 @@ public final class OfflineInferenceTest {
             js("window.networkProbe='pending'; fetch('https://example.com/cyber102-offline-probe').then(()=>networkProbe='leak',()=>networkProbe='blocked'); true");
             await("network isolation", "window.networkProbe === 'blocked'", 10000);
 
-            byte[] bytes;
-            try (InputStream input = instrumentation.getContext().getAssets().open("pump.jpg");
-                 ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[8192]; int count;
-                while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
-                bytes = output.toByteArray();
+            String videoSecond = InstrumentationRegistry.getArguments().getString("videoSecond");
+            supplyMedia(target, videoSecond != null);
+            if (videoSecond != null) {
+                double seconds = Double.parseDouble(videoSecond);
+                assertTrue(seconds >= 0 && seconds < 120);
+                js("document.getElementById('uploaded-video').currentTime=" + seconds + ";true");
+                await("video position decoded", "(()=>{const v=document.getElementById('uploaded-video');return !v.seeking && v.readyState>=2 && Math.abs(v.currentTime-" + seconds + ") < 0.05})()", 15000);
             }
-            String encoded = Base64.encodeToString(bytes, Base64.NO_WRAP);
-            js("(()=>{const b=atob(" + JSONObject.quote(encoded) + ");const a=Uint8Array.from(b,c=>c.charCodeAt(0));const dt=new DataTransfer();dt.items.add(new File([a],'pump.jpg',{type:'image/jpeg'}));const el=document.getElementById('media-file');el.files=dt.files;el.dispatchEvent(new Event('change',{bubbles:true}));return true;})()");
-            await("uploaded photo decoded", "!document.getElementById('check').disabled", 30000);
             if ("true".equals(InstrumentationRegistry.getArguments().getString("cancelOnly"))) {
                 long first = cancelActiveInference();
                 long second = cancelActiveInference();
@@ -123,6 +122,11 @@ public final class OfflineInferenceTest {
             JSONObject saved = new JSONArray(stringJs("localStorage.getItem('cyber102.offline.inspections.v1')")).getJSONObject(0);
             assertEquals("on_device", saved.getString("source"));
             assertEquals(observation, saved.getString("observation"));
+            if (videoSecond != null) {
+                JSONObject media = saved.getJSONObject("media");
+                assertEquals("uploaded_video", media.getString("captureSource"));
+                assertEquals(Double.parseDouble(videoSecond), media.getDouble("videoTimeSeconds"), 0.05);
+            }
             assertFalse(saved.has("image"));
             assertFalse(saved.has("base64"));
             js("document.getElementById('offline-result').scrollIntoView({block:'start',behavior:'instant'});true");
@@ -132,6 +136,11 @@ public final class OfflineInferenceTest {
             report.putString("stream", "\nREAL_OFFLINE_RESULT " + saved + "\nAPP_PSS_KIB " + Debug.getPss() + "\n");
             instrumentation.sendStatus(0, report);
 
+            if (videoSecond != null) {
+                assertEquals("Новый кадр", stringJs("document.getElementById('check-label').textContent"));
+                js("document.getElementById('check').click();true");
+                await("video preview restored", "!document.getElementById('uploaded-video').hidden && !document.getElementById('check').disabled", 15000);
+            }
             long cancelMs = cancelActiveInference();
             js("document.getElementById('check').click();true");
             await("warm inference after cancellation", "!document.getElementById('offline-result').hidden", 240000);
@@ -157,6 +166,29 @@ public final class OfflineInferenceTest {
                 assertTrue(restore.commit());
             }
         }
+    }
+
+    private void supplyMedia(Context target, boolean video) throws Exception {
+        String filename = InstrumentationRegistry.getArguments().getString("frameFile");
+        String extension = video ? "mp4" : "jpg";
+        assertTrue("Use a JPG or MP4 basename in target cache",
+                filename == null ? !video : filename.matches("[A-Za-z0-9_-]+\\." + extension));
+        String type = video ? "video/mp4" : "image/jpeg";
+        js("window.qaMediaParts=[];true");
+        try (InputStream input = filename == null
+                ? instrumentation.getContext().getAssets().open("pump.jpg")
+                : new FileInputStream(new File(target.getCacheDir(), filename))) {
+            byte[] buffer = new byte[96 * 1024];
+            int count;
+            while ((count = input.read(buffer)) != -1) {
+                String chunk = Base64.encodeToString(buffer, 0, count, Base64.NO_WRAP);
+                js("qaMediaParts.push(Uint8Array.from(atob(" + JSONObject.quote(chunk) + "),c=>c.charCodeAt(0)));true");
+            }
+        }
+        js("(()=>{const dt=new DataTransfer();dt.items.add(new File(window.qaMediaParts,'test-frame." + extension
+                + "',{type:'" + type + "'}));delete window.qaMediaParts;const el=document.getElementById('media-file');"
+                + "el.files=dt.files;el.dispatchEvent(new Event('change',{bubbles:true}));return true;})()");
+        await("uploaded media decoded", "!document.getElementById('check').disabled", 30000);
     }
 
     private long cancelActiveInference() throws Exception {
