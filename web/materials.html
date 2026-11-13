@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6f3">
+    <title>Материалы заказчика — Cyber102</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="checkpoint.css">
+    <link rel="stylesheet" href="materials.css">
+    <script src="materials.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="/"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
+        <nav aria-label="Разделы Cyber102">
+          <a class="nav-link" href="checkpoint.html">Диагностика</a> · <a class="nav-link" href="index.html">Камера</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page materials-page">
+      <header class="intro">
+        <h1>Материалы заказчика</h1>
+        <p>Фото оборудования, примеры измерений и ручная проверка диагностических связок.</p>
+        <nav class="section-nav" aria-label="Разделы материалов">
+          <a href="#photos">Фото</a>
+          <a href="#measurements">Измерения</a>
+          <a href="#manual">Проверка связок</a>
+        </nav>
+      </header>
+
+      <section class="panel" id="photos" aria-labelledby="photos-title">
+        <div class="panel-heading"><h2 id="photos-title">Фото оборудования</h2></div>
+        <div class="section-body">
+          <p id="catalog-status" class="message" role="status">Загружаем каталог…</p>
+          <div class="catalog-layout" id="catalog" hidden>
+            <div>
+              <label class="field category-field" for="category">Категория<select id="category"></select></label>
+              <div class="photo-grid" id="photo-grid"></div>
+              <button type="button" class="button secondary" id="more-photos" hidden>Показать ещё</button>
+            </div>
+            <section class="photo-detail" id="photo-detail" aria-labelledby="photo-title" hidden>
+              <h3 id="photo-title" tabindex="-1"></h3>
+              <p class="material-note" id="photo-source"></p>
+              <p class="material-note" id="photo-aliases" hidden></p>
+              <div class="analysis-image">
+                <img id="selected-image" alt="">
+                <div id="photo-box" aria-hidden="true" hidden></div>
+              </div>
+              <button type="button" id="analyze-photo" class="button primary" disabled>Проверить фото</button>
+              <p class="message" id="photo-status" role="status"></p>
+              <div id="photo-result" hidden></div>
+            </section>
+          </div>
+          <details class="material-details" id="source-documents" hidden>
+            <summary>Документы к материалам</summary>
+            <div id="document-list"></div>
+          </details>
+        </div>
+      </section>
+
+      <section class="panel" id="measurements" aria-labelledby="measurements-title">
+        <div class="panel-heading"><h2 id="measurements-title">Примеры измерений</h2></div>
+        <div class="section-body">
+          <p id="sensor-note" class="material-note"></p>
+          <p class="message" id="sensor-status" role="status">Загружаем измерения…</p>
+          <div class="measurement-grid" id="measurement-grid"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="manual" aria-labelledby="manual-title">
+        <div class="panel-heading"><h2 id="manual-title">Проверка связок</h2></div>
+        <div class="section-body">
+          <p class="material-note">Демонстрационный профиль насоса P-102. Введите подтверждённые признаки вручную. Значения из галереи и таблиц не подставляются.</p>
+          <p class="message" id="rules-status" role="status">Загружаем правила…</p>
+          <form id="manual-form" hidden>
+            <p class="material-note">Раскройте группу и заполните известные признаки.</p>
+            <div id="rule-fields"></div>
+            <button type="submit" class="button primary" id="run-rules">Проверить связки</button>
+          </form>
+          <p class="message" id="diagnosis-status" role="status"></p>
+          <div id="manual-findings"></div>
+          <section id="rule-coverage" aria-labelledby="coverage-title" hidden>
+            <h3 id="coverage-title">Достаточность входов</h3>
+            <p class="material-note">Показано, для каких связок заполнены необходимые поля. Результат зависит от их значений.</p>
+            <div class="coverage-grid" id="coverage-list"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

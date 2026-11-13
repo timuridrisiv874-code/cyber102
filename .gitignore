@@ -14,3 +14,14 @@ __pycache__/
 .venv-internvl/
 /models/
 /runtime-llama/
+
+# Supplied case originals and previews stay on the team server, outside source control.
+/data/customer/raw/
+/data/customer/previews/
+/Вибрация/
+/Температура/
+/Насосные агрегаты/
+/Запорная арматура/
+/Турбопровод/
+/ЭД/
+/Типы дефектов промышленного оборудования.docx

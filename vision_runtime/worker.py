@@ -18,7 +18,7 @@ MAX_IMAGE_BYTES = 3 * 1024 * 1024
 MAX_BODY = 4 * ((MAX_IMAGE_BYTES + 2) // 3) + 1024
 PROMPT = '''Inspect this photograph for directly visible industrial equipment.
 Return one JSON object with exactly four keys and actual values, not a JSON Schema.
-component: choose pump, motor, coupling, pipe, bearing, or none.
+component: choose pump, motor, coupling, pipe, bearing, valve, terminal, or none.
 condition: choose corrosion, wet_patch, visible_damage, no_visible_defect, or uncertain.
 box: four integers [left, top, right, bottom] covering ONE visible component,
 on a normalized 0 to 1000 coordinate grid, not pixel coordinates.

@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-13",
+  "scope": "Customer examples import, HTTP APIs, 12 diagnostic rules and web UI. Not accuracy or physical phone acceptance.",
+  "rawFiles": 58,
+  "imagePreviews": 53,
+  "sensorRows": 500,
+  "unitTestsMacOS": 79,
+  "schemaSources": "customer DOCX descriptions, preserved source labels",
+  "browserLocalMockAnalysis": [
+    "Chromium",
+    "WebKit mobile profile"
+  ],
+  "browserDeployedRealGpu": [
+    {
+      "engine": "chromium",
+      "realHttps": true,
+      "realGpu": true,
+      "analysisStatus": "defect",
+      "model": "OpenGVLab/InternVL3-2B-hf",
+      "seconds": 4.9,
+      "manualGuardFinding": true
+    },
+    {
+      "engine": "webkit",
+      "realHttps": true,
+      "realGpu": true,
+      "analysisStatus": "defect",
+      "model": "OpenGVLab/InternVL3-2B-hf",
+      "seconds": 5.1,
+      "manualGuardFinding": true
+    }
+  ],
+  "modelRun": {
+    "requests": 53,
+    "valid": 52,
+    "errors": 1,
+    "statuses": {
+      "defect": 50,
+      "clear": 0,
+      "unusable": 2
+    },
+    "medianSeconds": 4.1015
+  },
+  "notVerified": [
+    "Expert defect labels and bounding boxes",
+    "Physical asset identity linking photos and measurements",
+    "Physical iPhone/Android camera permissions",
+    "Factory deployment acceptance"
+  ],
+  "unitTestsWindows": 79,
+  "rawFilesVerifiedOnServer": 58,
+  "previewsVerifiedOnServer": 53,
+  "localMarkdownLinksChecked": 156
+}

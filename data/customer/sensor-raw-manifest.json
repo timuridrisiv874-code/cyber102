@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "source": "customer_provided",
+  "files": [
+    {
+      "id": "vibration_data",
+      "file": "Вибрация/БД значений (вибрация).xlsx",
+      "rawPath": "raw/Вибрация/БД значений (вибрация).xlsx",
+      "sha256": "a744dbaa8780bfac7c650e3e82449e6e844a6b73984a3a0625aecf7073a8e525",
+      "bytes": 24161
+    },
+    {
+      "id": "temperature_data",
+      "file": "Температура/БД значений (температура).xlsx",
+      "rawPath": "raw/Температура/БД значений (температура).xlsx",
+      "sha256": "6152e172292429995640b7d148892cf4d89b61d2a04b949671aca6079589de7f",
+      "bytes": 19994
+    },
+    {
+      "id": "vibration_description",
+      "file": "Вибрация/Описание БД (вибрация).docx",
+      "rawPath": "raw/Вибрация/Описание БД (вибрация).docx",
+      "sha256": "6e795a63f6b7b201c9455d2173e840f399c64037da264bf123f04b5ee3fa4531",
+      "bytes": 16069
+    },
+    {
+      "id": "temperature_description",
+      "file": "Температура/Описание БД (температура).docx",
+      "rawPath": "raw/Температура/Описание БД (температура).docx",
+      "sha256": "3ba8750a71da6e1a96037530bdc920d9ad0ca2c971f984560db693819a962c72",
+      "bytes": 16221
+    }
+  ]
+}

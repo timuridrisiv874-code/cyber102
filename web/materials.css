@@ -1,0 +1,63 @@
+.materials-page { display: grid; gap: 20px; }
+.materials-page .intro { margin-bottom: 0; }
+.materials-page > section { scroll-margin-top: 12px; }
+.section-nav { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 14px; }
+.section-nav a, .material-details summary { color: var(--accent); font-weight: 700; }
+.material-note { color: var(--muted); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.catalog-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; margin-top: 12px; }
+.category-field { max-width: 340px; margin-bottom: 10px; }
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 115px), 1fr)); gap: 8px; }
+.photo-option { display: grid; gap: 6px; align-content: start; padding: 5px; border: 1px solid var(--line); border-radius: 8px; color: inherit; background: #fff; cursor: pointer; text-align: left; min-width: 0; }
+.photo-option[aria-pressed="true"] { border-color: #387d5b; box-shadow: 0 0 0 1px #387d5b; }
+.photo-option img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px; background: #edf4ed; }
+.photo-option span { font-size: 12px; line-height: 1.3; overflow-wrap: anywhere; }
+#more-photos { margin-top: 10px; }
+.photo-detail { display: grid; gap: 8px; justify-items: start; align-content: start; min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #f7f9f6; }
+.photo-detail h3 { font-size: 16px; overflow-wrap: anywhere; }
+.analysis-image { position: relative; justify-self: center; max-width: 100%; line-height: 0; overflow: hidden; border-radius: 6px; }
+.analysis-image img { display: block; max-width: 100%; max-height: 470px; height: auto; width: auto; }
+#photo-box { position: absolute; border: 2px solid #ffbe67; border-radius: 4px; background: #ffbe6726; box-shadow: 0 0 0 1px #33271b; }
+#photo-box[data-status="clear"] { border-color: #a3ebae; background: #a3ebae26; }
+.photo-detail .message { margin-top: 0; }
+#photo-result { width: 100%; }
+#photo-result p { margin-top: 5px; }
+.material-details { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
+.material-details summary { cursor: pointer; line-height: 1.4; overflow-wrap: anywhere; }
+.material-details h4 { margin-top: 10px; }
+.material-details p { margin-top: 5px; }
+.measurement-grid, .coverage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 12px; }
+.measurement-card { min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 10px; }
+.measurement-card h3 { margin-bottom: 8px; }
+.measurement-card .field { margin-top: 8px; }
+.sensor-thresholds { margin: 8px 0; padding-left: 20px; }
+.sensor-chart { display: block; width: 100%; height: auto; margin-top: 12px; color: var(--muted); overflow: visible; }
+.sensor-chart text { fill: currentColor; font-size: 12px; }
+.sensor-chart .grid-line { stroke: var(--line); }
+.sensor-chart .trend-line { fill: none; stroke: #237454; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.sensor-chart .trend-point { fill: #237454; }
+.sensor-table-wrap { overflow-x: auto; }
+.sensor-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.sensor-table caption { text-align: left; padding-block: 8px; color: var(--muted); }
+.sensor-table th, .sensor-table td { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--line); }
+.sensor-table th { background: #edf4ed; }
+.sensor-table tr[data-level="warning"] { background: #fff2dc; }
+.sensor-table tr[data-level="alarm"] { background: #ffe8e6; }
+#rule-fields .material-details:first-child { margin-top: 8px; }
+.rule-fields-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 10px; margin-top: 10px; }
+.rule-fields-grid .field { align-content: space-between; }
+.materials-page .field select { height: 49px; }
+#run-rules { margin-top: 12px; }
+#manual-findings { margin-top: 8px; }
+#rule-coverage { margin-top: 14px; }
+#rule-coverage h3 { margin-bottom: 4px; }
+.coverage-card { margin: 0; }
+.coverage-card[data-covered="true"] { border-color: #77a88b; }
+.coverage-state { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.coverage-card[data-covered="true"] .coverage-state { color: var(--accent); }
+.coverage-card ul { margin: 8px 0 0; padding-left: 18px; }
+
+@media (max-width: 720px) {
+  .materials-page { gap: 14px; }
+  .catalog-layout { display: flex; flex-direction: column-reverse; gap: 12px; }
+  .photo-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 95px), 1fr)); }
+}

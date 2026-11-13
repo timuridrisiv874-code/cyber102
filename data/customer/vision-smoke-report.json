@@ -1,0 +1,1554 @@
+{
+  "startedAt": "2026-11-13T10:48:45.860470+00:00",
+  "model": "OpenGVLab/InternVL3-2B-hf",
+  "revision": "cb57a075cb75a2e6d1b668b128d48bb00ae321d2",
+  "promptSha256": "9766a3f1666360e984ae203266620df7dd2e5cd6f5231f0d4d7415a305876816",
+  "scope": "Functional inference on customer examples without expert defect labels. Valid JSON is not accuracy.",
+  "summary": {
+    "requests": 53,
+    "valid": 52,
+    "errors": 1,
+    "statuses": {
+      "defect": 50,
+      "clear": 0,
+      "unusable": 2
+    },
+    "medianSeconds": 4.1015
+  },
+  "records": [
+    {
+      "imageId": "3507af9c911f7050e8e37c8b2daf2d4d3d71a167555dcddd3fb9e85e5e1e1d71",
+      "sourcePath": "Насосные агрегаты/16c811b0db124c77b276a1a06bc1d3fb.png",
+      "previewSha256": "1eb02e7815864583a91b20c1eb8bc400277559a6c6379f4b9ca6c768ccf79368",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Клеммная коробка",
+        "finding": "Возможное видимое повреждение",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+        "observation": "Термопроводник поврежден, коррозия.",
+        "durationSeconds": 5.4
+      },
+      "seconds": 5.406
+    },
+    {
+      "imageId": "567fa79a755b5934a5b4d32654818b4ba7bb91930f4512bcc3dbddae183677cc",
+      "sourcePath": "Насосные агрегаты/2c510abd88b648efb8841d297d432aee.png",
+      "previewSha256": "76a366198fb39e20faca92ea2f7a107e04cc058ff2505aeba39e83bc21bda913",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Электродвигатель",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.15,
+          "width": 0.4,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Видимая коррозия на моторе.",
+        "durationSeconds": 4.2
+      },
+      "seconds": 4.234
+    },
+    {
+      "imageId": "5eb24913f1ef45f2b4584288d5545ce3800aeea121626de4f05d856cedd0abfc",
+      "sourcePath": "Насосные агрегаты/4.jpg",
+      "previewSha256": "a34047baf99533949f0520490b1f633cc547453db6e3b347da3e0535807b5799",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Подшипниковый узел",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.6,
+          "height": 0.6
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible corrosion around the bearing.",
+        "durationSeconds": 3.8
+      },
+      "seconds": 3.75
+    },
+    {
+      "imageId": "6a9d2157b9a15b96874dc136550e292b15d5ebf223fcd94e907fff57c1d92689",
+      "sourcePath": "Насосные агрегаты/60cb39e72d7e4bc38d47e945b66900f8.png",
+      "previewSha256": "77d55c47805a8f7b16684f581a62500232fe651461422005fc3b95840b57040a",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.15,
+          "y": 0.1,
+          "width": 0.45,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Слой коррозии на корпусе пускового насоса.",
+        "durationSeconds": 4.6
+      },
+      "seconds": 4.578
+    },
+    {
+      "imageId": "2980cdb77858b89ea26519e0ffa1f1c5376baeda1a716e14deac1a242d169f6d",
+      "sourcePath": "Насосные агрегаты/6bd1015378aa4382aedc45fe4b7adda4.png",
+      "previewSha256": "4612eec3c9ecaa57248a72dcf2e1867790fba672969f1cd867733b1f2981ce71",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.4
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Запорная штука с коррозией",
+        "durationSeconds": 4.3
+      },
+      "seconds": 4.266
+    },
+    {
+      "imageId": "d91fbbc53316c320e36a29f55de80836e5acc06b538539421e74a1910ac65676",
+      "sourcePath": "Насосные агрегаты/kavitacija2.jpg",
+      "previewSha256": "530d19a4b3aec3a25aed44daf205873dfcf67d55f87a84712ab376adfbe68a8e",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Пластинка покрыта коррозией и повреждена.",
+        "durationSeconds": 4.6
+      },
+      "seconds": 4.61
+    },
+    {
+      "imageId": "c02b8a5466056c6b8e0f3890e6d496d6dafc05571271dc1400d7c293cff75118",
+      "sourcePath": "Насосные агрегаты/obsledovanie-hvs-gvs-2.jpg",
+      "previewSha256": "45bc98a2c20f05b52385ea77dc990b3fd3e5d218bfdaf82cb82ca0385bcaa8b9",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Запорная арматура",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.5,
+          "height": 0.8
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Замок изнашено и покрыто ржавчиной.",
+        "durationSeconds": 4.6
+      },
+      "seconds": 4.609
+    },
+    {
+      "imageId": "15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8",
+      "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-46-46.jpg",
+      "previewSha256": "2add977f10d52793d253c4180ebf4f048b61fbcf15b956918efe7272acf76364",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.3,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Помповая установка с видимым коррозионным повреждением.",
+        "durationSeconds": 4.8
+      },
+      "seconds": 4.781
+    },
+    {
+      "imageId": "58333a366f2c532ef3ee231474678a434b96e6904340b0dee7e7ed7cf313f222",
+      "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-48-02.jpg",
+      "previewSha256": "49c2c0fe5489d6a43344b3f042ce0dce01bc9c55354b1deb605798a1552e79c1",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Клеммная коробка",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.15,
+          "y": 0.1,
+          "width": 0.45,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Термопроводник с коррозией и грязью.",
+        "durationSeconds": 5.1
+      },
+      "seconds": 5.094
+    },
+    {
+      "imageId": "e27eedbc8c46298594a43c944da867ac52064ca40994be7689b3887cdc64ad05",
+      "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-48-48.jpg",
+      "previewSha256": "a86985856601cd9b23e02be5d4ed447ec5dfd16a1db9e2a63af89fb3dcd999f3",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Клеммная коробка",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.2,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible corrosion on terminal connections.",
+        "durationSeconds": 3.8
+      },
+      "seconds": 3.828
+    },
+    {
+      "imageId": "64046245895bb5429b2975970cd70cbde7546682f28818eaf7c6515b610ebac2",
+      "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-51-10 (2).jpg",
+      "previewSha256": "8eb82977b4088081c456e5c867c303a56c3a66117ee30a83ff627cca1184148f",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the coupling.",
+        "durationSeconds": 3.6
+      },
+      "seconds": 3.594
+    },
+    {
+      "imageId": "66b2015378463cc783587aafc9f799167a90334deeaa1aa63262cb9a005ddb24",
+      "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-51-10.jpg",
+      "previewSha256": "da2df3386b233928a1158b6d1606d4ddd36815ab6c2ee7968b6b980bf9b831ef",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.4
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the coupling.",
+        "durationSeconds": 4.0
+      },
+      "seconds": 3.984
+    },
+    {
+      "imageId": "0673344a7722d1e33ffeec7144546f0ef4521ddad7f9c0f1d83dc0c96b3e33ce",
+      "sourcePath": "Насосные агрегаты/photo_2026-11-13_12-53-12.jpg",
+      "previewSha256": "7cf316301298b0c5bd9deee4748addf9daa5878d2f46553ef0f99a7d57b4d903",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Электродвигатель",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.15,
+          "width": 0.4,
+          "height": 0.35
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the motor casing.",
+        "durationSeconds": 3.6
+      },
+      "seconds": 3.61
+    },
+    {
+      "imageId": "e021f7ab1445594ca932f677caaeb0d6bce8ff480cac87b8c25c94c6247e5c12",
+      "sourcePath": "Насосные агрегаты/silnaja-korrozija-1-450x338.jpg",
+      "previewSha256": "4f57829c2e179facfe4e623f0d9d7438c2921b2b34867421cc647ebe99369b5e",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Трубопровод или фланец",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.4
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Pipe shows visible rust and corrosion.",
+        "durationSeconds": 3.8
+      },
+      "seconds": 3.844
+    },
+    {
+      "imageId": "a7c7393da86cd60a9c883c8372f4b42c6fbb11c647f7f1a5694fc0c5ae03314f",
+      "sourcePath": "Насосные агрегаты/td_010_02.png",
+      "previewSha256": "9b716a561decec61d74e5d776e86905e812126a2b0cc48462ed89bee38528a72",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Электродвигатель",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Мотор имеет видимые коррозионные повреждения.",
+        "durationSeconds": 4.4
+      },
+      "seconds": 4.39
+    },
+    {
+      "imageId": "d317e2910bbebda76780ed9402787730e82ca4224cb4904e3f492033ab43cb82",
+      "sourcePath": "Насосные агрегаты/Безымянный.png",
+      "previewSha256": "dd881361cc26fe695eb924de4295207d8036000677458776cb5b0a9ff730d80f",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Клеммная коробка",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.15,
+          "width": 0.2,
+          "height": 0.25
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible corrosion on the terminal block.",
+        "durationSeconds": 4.2
+      },
+      "seconds": 4.187
+    },
+    {
+      "imageId": "dc49dd254b4cb1b86cd9d3d142afce15d2d028d5ef72c09bac000fa32325ef02",
+      "sourcePath": "Насосные агрегаты/Сниимок.PNG",
+      "previewSha256": "f3afa5db328bee4e8c5ce971463c7df593971b47204b21fb1d4c417255e3f587",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Электродвигатель",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.3,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the motor casing.",
+        "durationSeconds": 4.1
+      },
+      "seconds": 4.062
+    },
+    {
+      "imageId": "de8ebcd5f6a66ddff79d2d8946caf74438cc3f2208da67f6ea25a1ade10c6b22",
+      "sourcePath": "Насосные агрегаты/Снимок.PNG",
+      "previewSha256": "625709e2c56bb71444f8af0af81490d673a772bcaf2e25e4aaf2c56802cc3d06",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.5,
+          "height": 0.4
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the coupling.",
+        "durationSeconds": 3.7
+      },
+      "seconds": 3.688
+    },
+    {
+      "imageId": "e6a09635a6c429e76a17f380d62d613d8855d1b75ff1ccf0dadad67b0ceb13b1",
+      "sourcePath": "Насосные агрегаты/Снимок1.PNG",
+      "previewSha256": "d5288fbf8c102edf83148eee5746b3cc5a3c66994e4905d3452099766a79186e",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.2,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the coupling.",
+        "durationSeconds": 3.6
+      },
+      "seconds": 3.625
+    },
+    {
+      "imageId": "ce78c2426a2f2fff425ffdbbb5ec2835f4537236149f47b9343128cc042cb81f",
+      "sourcePath": "Насосные агрегаты/насос.jpg",
+      "previewSha256": "9a9b2f7634cbb2301e72978c48aabd999e70fe2aa93ac4413d5028c81a0be090",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Электродвигатель",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the motor casing.",
+        "durationSeconds": 3.8
+      },
+      "seconds": 3.828
+    },
+    {
+      "imageId": "c7505d376d4fb0618aea1a79b1e779ee84f2a3574875d151aa6ad09a4c0ba5d9",
+      "sourcePath": "ЭД/1.PNG",
+      "previewSha256": "ba1521cb570ef39e880a99e929a5e1ad9149a67d802cc4fb123d3cb14fb4b762",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.2,
+          "height": 0.2
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "коррозия на корпусе",
+        "durationSeconds": 3.7
+      },
+      "seconds": 3.656
+    },
+    {
+      "imageId": "e202239dadb60ce27119f4c8e8d8b1695e361dceaf67ae0ee1f1daeaf73c5ddc",
+      "sourcePath": "ЭД/3.PNG",
+      "previewSha256": "64a48ef8a4678b79c71736d871153008196e3ffe3f00919426f2d8b3cf0e0fe2",
+      "expertLabel": null,
+      "result": {
+        "status": "unusable",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "durationSeconds": 4.2
+      },
+      "seconds": 4.172
+    },
+    {
+      "imageId": "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b",
+      "sourcePath": "ЭД/55.PNG",
+      "previewSha256": "a56c3e28a0879ff38813c79ecf6f120c3561729c1d08c4bea5eb61980c048d0a",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible corrosion on the pump's surface.",
+        "durationSeconds": 4.0
+      },
+      "seconds": 3.953
+    },
+    {
+      "imageId": "36d5f3bf309975cafdcd38aaaac13ffca39378c11357706405d801f60162343c",
+      "sourcePath": "ЭД/65d7bec338d641b8ab2a8718af266a74.png",
+      "previewSha256": "7c00b67d85208b8f637a653bd77d940c25cfc06a757937ea662cf6b988197ee3",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Электродвигатель",
+        "finding": "Возможное видимое повреждение",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+        "observation": "Motor has visible damage with broken cooling fins.",
+        "durationSeconds": 4.1
+      },
+      "seconds": 4.14
+    },
+    {
+      "imageId": "521e3d591fb0169c06dc672cea4cdccb052186d98651f4c7a958a969785ad2d9",
+      "sourcePath": "ЭД/66.PNG",
+      "previewSha256": "80fffb5ca7c24151250cfda1c461d67d152ff7d4ded593267ae20ea6942d3b2f",
+      "expertLabel": null,
+      "error": "Локальная модель не ответила. Повторите кадр позже.",
+      "seconds": 4.75
+    },
+    {
+      "imageId": "2683c1cf1fd29b764d3a8ee86d9461cce6b8659c91beb98aae8b43c85f196247",
+      "sourcePath": "ЭД/8.PNG",
+      "previewSha256": "a12e80d6399c2db269e34147b23a2191b343cbab42809618989e8cb895448d4c",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможное видимое повреждение",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.5,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+        "observation": "Видимая дефектность в виде царапин на корпусе.",
+        "durationSeconds": 4.6
+      },
+      "seconds": 4.578
+    },
+    {
+      "imageId": "c9aaaba9412ed0cba57625bd00f46427a9258f6c8c6090132bdd53a35c28624b",
+      "sourcePath": "ЭД/81316b33970247cdbc980ceccd88cb9a.png",
+      "previewSha256": "ae40cce7246720b4a5f2d79e9f94a2d2c24dbb440f1384a4c65eb8b3b81a3999",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Электродвигатель",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the motor's central bearing area.",
+        "durationSeconds": 4.2
+      },
+      "seconds": 4.203
+    },
+    {
+      "imageId": "3f05ed43177f0d16004e70fe0fa1550d38db6c9cbde6f2aff2b6c1972299e2cd",
+      "sourcePath": "ЭД/IMG_20261113_142620.jpg",
+      "previewSha256": "53a6731be7715e3af4dbb277a9007c853f3e1bd20f0d1a2c6807244a99311744",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Запорная арматура",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.3,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Проводник сильно коррозиционен.",
+        "durationSeconds": 4.2
+      },
+      "seconds": 4.25
+    },
+    {
+      "imageId": "25f2b4b6d8ad6e9140c49f01d644fadb7231b54fc97fba2146dc53d843964a23",
+      "sourcePath": "ЭД/Снимок.PNG",
+      "previewSha256": "d9179600979e1297c504c87d93526a29a8b88c7e62a1a6af00a750d0d08b522f",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможное видимое повреждение",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+        "observation": "Признаки коррозии на кольце.",
+        "durationSeconds": 4.2
+      },
+      "seconds": 4.172
+    },
+    {
+      "imageId": "36d5ae35ece35071a773ab9c641cba87c4c57c73ac84a9a2b2318bb4dcc8dfdd",
+      "sourcePath": "ЭД/эд.PNG",
+      "previewSha256": "56127d235e7435f0dfa4e6fbfcdc9ae4fd5a743547479247aa701dc4b389c4f4",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Электродвигатель",
+        "finding": "Возможное видимое повреждение",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+        "observation": "Visible damage in the motor's winding.",
+        "durationSeconds": 3.9
+      },
+      "seconds": 3.938
+    },
+    {
+      "imageId": "6bffa98c3910c7bd5533abd75bef648d17c526477111724168f852a34cc9a5a0",
+      "sourcePath": "ЭД/эдд.PNG",
+      "previewSha256": "606f59f22b4335d90bad3583cff1038b93f175005ad5e6a438c983940e7232bd",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.15,
+          "y": 0.1,
+          "width": 0.25,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible corrosion on the pump casing.",
+        "durationSeconds": 3.9
+      },
+      "seconds": 3.937
+    },
+    {
+      "imageId": "ee496a66f06fb3836f751c6c7a660b3ce81bd67819752825b73c1a6e513576b9",
+      "sourcePath": "Запорная арматура/0831c2a9-3a2b-5bf7-b70f-05f1d51f5cdb (1).jpg",
+      "previewSha256": "ad45342d8d9c9225f2856b950886d5dd38c77b4ab3a1c976f80efdb97981ed54",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Запорная арматура",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.2,
+          "width": 0.3,
+          "height": 0.2
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Залитая ржавчина на ведущем штуцере.",
+        "durationSeconds": 4.8
+      },
+      "seconds": 4.812
+    },
+    {
+      "imageId": "698a93dc21154d7c11debe06742364f542d72d5f1c89c7828ebe50c3e9fcf952",
+      "sourcePath": "Запорная арматура/0831c2a9-3a2b-5bf7-b70f-05f1d51f5cdb.jpg",
+      "previewSha256": "72bf568070640f910794e69e382e8cbab30e178ef79e07f3183252428d90e006",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Запорная арматура",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.3,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Замок на трубе имеет видимые коррозионные пятна.",
+        "durationSeconds": 4.8
+      },
+      "seconds": 4.797
+    },
+    {
+      "imageId": "f03b64891b7aff1c0a9f26af0bcc0ff00435fe463e2ed3f704b9198c31985e31",
+      "sourcePath": "Запорная арматура/1396430378_7447321.jpg",
+      "previewSha256": "129b4004e77fe63b43cf7a29d63b276c6de23f2009c5d896bad45cf5c5eb5e67",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможное видимое повреждение",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.5,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+        "observation": "Visible damage on the coupling surface.",
+        "durationSeconds": 3.8
+      },
+      "seconds": 3.812
+    },
+    {
+      "imageId": "a5a84a17726e30fba6243ff50b167319cde07db962f6f361e9530739d2219827",
+      "sourcePath": "Запорная арматура/86.PNG",
+      "previewSha256": "f777ee397cbd5047887159e5f3a5a71576a2530ef37e4a57526a52ccb79edbff",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Запорная арматура",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Замок покрыт коррозией.",
+        "durationSeconds": 4.0
+      },
+      "seconds": 4.0
+    },
+    {
+      "imageId": "1f024f723634d16ae7b7cabb234cb61d7e0b641a56b7843df0552846b6768d18",
+      "sourcePath": "Запорная арматура/IMG_20160324_100411.jpg",
+      "previewSha256": "432dba4b68668520a048e69cfed7e55145cb54915cff2eb3e0b62d99e591ac14",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.4
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Патрубок покрыт коррозией.",
+        "durationSeconds": 4.2
+      },
+      "seconds": 4.187
+    },
+    {
+      "imageId": "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f",
+      "sourcePath": "Запорная арматура/IMG_20261113_142550.jpg",
+      "previewSha256": "e25e258fca585e7037603e995cc6122eb58369b9ecf6e91c82cf4cad23c52949",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.4
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the coupling.",
+        "durationSeconds": 3.8
+      },
+      "seconds": 3.75
+    },
+    {
+      "imageId": "14cd271abc37ba4490131b9c763a8956dc5ae388cc5d5585906b3235d1bee744",
+      "sourcePath": "Запорная арматура/IMG_20261113_142555.jpg",
+      "previewSha256": "1d32821c5ea11c6563e7be22004392622bcfee077b72dde26791877ea8a4c229",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the coupling.",
+        "durationSeconds": 3.6
+      },
+      "seconds": 3.594
+    },
+    {
+      "imageId": "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f",
+      "sourcePath": "Запорная арматура/cca9d029-459e-5007-8f88-181843ed8665.jpg",
+      "previewSha256": "8b7ee74da357366636bbe1b7a99909fcc2a2aa899e274bb7442472472a9c3b78",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Запорная арматура",
+        "finding": "Возможные следы жидкости",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.3,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить источник влаги и герметичность. По фотографии нельзя определить состав жидкости и причину утечки.",
+        "observation": "Видимое протечка воды из вала.",
+        "durationSeconds": 4.3
+      },
+      "seconds": 4.343
+    },
+    {
+      "imageId": "53f50d385dcbcd4b347fcf87d3bc6bd0183fcf6cbd095f892597e6959586c5e7",
+      "sourcePath": "Запорная арматура/i.jpg",
+      "previewSha256": "5418813557211bc74dcaf19650bd667eb00315aad59b8effbc72d5aa9bca89b4",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.4
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Очевидная коррозия на креплении.",
+        "durationSeconds": 4.6
+      },
+      "seconds": 4.641
+    },
+    {
+      "imageId": "ca55cf27a82b27cc77088b16c18b40cfc775db1adb7e39de6d8c8526765f8468",
+      "sourcePath": "Запорная арматура/Безымянный.png",
+      "previewSha256": "f84ff3ad419c8fda64c8e8931342dbc431dea6c4479a2cc38066e011595ba9fd",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.4
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible corrosion on the coupling.",
+        "durationSeconds": 4.2
+      },
+      "seconds": 4.234
+    },
+    {
+      "imageId": "1295467678396b402d263c96f506508b9c097d4b8e3533e1fbdc4a573257611b",
+      "sourcePath": "Турбопровод/1corrsia.jpg",
+      "previewSha256": "33ae3b9591940f01893960e9c9459a3fe5148c1b0ac78458b56d369d38631d4c",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the coupling.",
+        "durationSeconds": 3.7
+      },
+      "seconds": 3.718
+    },
+    {
+      "imageId": "50ad685c58570cf8e12ff2eda16394eaafe4da1fb42586bbed3b856bf83722be",
+      "sourcePath": "Турбопровод/354c86b2f75e35fdf90ce044cf02d997-big.jpg",
+      "previewSha256": "6861b747b27c363d21096b63bccc18f9fd4602f922da7b60cdb063e8c4ab441b",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Трубопровод или фланец",
+        "finding": "Возможное видимое повреждение",
+        "box": {
+          "x": 0.3,
+          "y": 0.2,
+          "width": 0.3,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+        "observation": "Visible crack in the pipe surface.",
+        "durationSeconds": 3.8
+      },
+      "seconds": 3.828
+    },
+    {
+      "imageId": "f633d086f1c156f112d37b1c1625bbbf98b2f826d75112859db83077e3b372f8",
+      "sourcePath": "Турбопровод/IMG_20261113_143107.jpg",
+      "previewSha256": "1cf64ea01c8a7ba6add2f2a4d6410ccc655cbe5a49f4fbbd156f57c4255bdc07",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Трубопровод или фланец",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 0.999,
+          "height": 0.999
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the pipe surface.",
+        "durationSeconds": 3.6
+      },
+      "seconds": 3.625
+    },
+    {
+      "imageId": "8ceb225d07663c1463ca7ca4e3ab27da2b155b00ec54abfc2765ea607e0d1826",
+      "sourcePath": "Турбопровод/IMG_20261113_143112.jpg",
+      "previewSha256": "a0ac0723a3f7693c9e67c5c5360df82326e878ee7515368c691ec1e3b735b79f",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Трубопровод или фланец",
+        "finding": "Возможное видимое повреждение",
+        "box": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 0.999,
+          "height": 0.75
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+        "observation": "Visible crack on the pipe surface.",
+        "durationSeconds": 3.5
+      },
+      "seconds": 3.469
+    },
+    {
+      "imageId": "3701f10352453cc4d80e7a4105f63be05075ad4588737a3c201f0bcf757fc2fd",
+      "sourcePath": "Турбопровод/IMG_20261113_143116.jpg",
+      "previewSha256": "61f484cc24bdf3f2fe7a4a80130365c5eb6a34b310626c62ae16dea5b7732ff5",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Трубопровод или фланец",
+        "finding": "Возможное видимое повреждение",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+        "observation": "Pipe has a visible crack with rust and damage.",
+        "durationSeconds": 4.0
+      },
+      "seconds": 4.016
+    },
+    {
+      "imageId": "ada68e97fe73013b6a1cc0d63056c41575bb647233320c12621b3a595521eebe",
+      "sourcePath": "Турбопровод/IMG_20261113_143119.jpg",
+      "previewSha256": "751bb4b322916766c8fd44b66159fcbbc039202330feeaed0b01de9f7cbbc83b",
+      "expertLabel": null,
+      "result": {
+        "status": "unusable",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "durationSeconds": 4.6
+      },
+      "seconds": 4.609
+    },
+    {
+      "imageId": "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982",
+      "sourcePath": "Турбопровод/Photo-9-Mechanically-Damaged-Insulation-on-Chilled-Water-Pipe.jpg",
+      "previewSha256": "d64be1f92fc9e5cdd3beb9c817b2918ef6d9d1583b97c03f76a4741bd9786b71",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Трубопровод или фланец",
+        "finding": "Возможное видимое повреждение",
+        "box": {
+          "x": 0.2,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.4
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Проверить повреждённую зону на месте. Решение об эксплуатации принимает ответственный специалист.",
+        "observation": "Visible damage on the pipe surface.",
+        "durationSeconds": 4.1
+      },
+      "seconds": 4.063
+    },
+    {
+      "imageId": "594db51115e3091c6c07a6a73483632c9a7d14b8a1116896603c6cc780e16320",
+      "sourcePath": "Турбопровод/korroziya.png",
+      "previewSha256": "0f9c5d557c3c272987ba45c3797e072a26f86f5faa9658d067f8cee5d43e8846",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Трубопровод или фланец",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 0.999,
+          "height": 0.714
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Очевидно коррозия на трубе.",
+        "durationSeconds": 4.2
+      },
+      "seconds": 4.234
+    },
+    {
+      "imageId": "d21be26baae4080bcc20937084c493f4386885a6d6e66e93665ad447fdba6132",
+      "sourcePath": "Турбопровод/stock-photo-corroded-flanged-joint-with-peeling-paint-and-oxidation-2738414417.jpg",
+      "previewSha256": "4cee008a85d01b43f8b53d1bca9f56cf0ec467514268321d6c9fa856b49d546a",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Муфта или кожух",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.15,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Очевидно, что кольцо коррозии на креплении.",
+        "durationSeconds": 4.8
+      },
+      "seconds": 4.828
+    },
+    {
+      "imageId": "2dd70a93993526adc47fc6f31a4d9c68361b9dc18ed1fc390aa8531ddd8fe903",
+      "sourcePath": "Турбопровод/stock-photo-corroded-industrial-water-pump-flange-joint-covered-in-heavy-mineral-salt-2840981719.jpg",
+      "previewSha256": "9881da28946730d67415128c15f28d3b7daf0987a25a6405bc862e9083b9105e",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.8
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Помпа с видимым коррозионным повреждением.",
+        "durationSeconds": 4.9
+      },
+      "seconds": 4.937
+    },
+    {
+      "imageId": "6405f1312aad622a865b4ca06479e48cd8d6a1efb8761cd60bae4cf6f16df691",
+      "sourcePath": "Турбопровод/stock-photo-rusty-industrial-pipe-and-flange-connection-this-rusty-industrial-pipe-and-flange-connection-2733059369.jpg",
+      "previewSha256": "501fd4c34df8bc70dbfca970160d3c4da9835a4edeb5a792e2ddcc97c6c35f9d",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Трубопровод или фланец",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.4
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Pipe shows visible rust and corrosion.",
+        "durationSeconds": 3.8
+      },
+      "seconds": 3.828
+    },
+    {
+      "imageId": "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1",
+      "sourcePath": "Турбопровод/unnamed.jpg",
+      "previewSha256": "2d9aa861e497dc452fd30bb8123461ca8f744bee6e16ae5beaa4c6ac336aa372",
+      "expertLabel": null,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Трубопровод или фланец",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.7
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Visible rust on the pipe surface.",
+        "durationSeconds": 3.9
+      },
+      "seconds": 3.875
+    }
+  ]
+}

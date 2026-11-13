@@ -86,7 +86,9 @@ class BoundedHTTPServer(ThreadingHTTPServer):
 
 
 class Handler(SimpleHTTPRequestHandler):
-    def __init__(self, *args, database, public_url, vision_enabled=False, vision_backend='ollama', **kwargs):
+    def __init__(self, *args, database, public_url, vision_enabled=False, vision_backend='ollama', customer_root=None, **kwargs):
+        from server import customer
+        self.customer_root = customer_root or customer.ROOT
         self.database = database
         self.public_url = public_url
         self.vision_enabled = vision_enabled
@@ -125,6 +127,23 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         target = urlsplit(self.path)
+        if target.path.startswith('/api/customer/'):
+            from server import customer
+            try:
+                endpoint = target.path.removeprefix('/api/customer/')
+                if endpoint in ('materials', 'sensors', 'sensor-import-report'):
+                    self.send_json(customer.load(endpoint, self.customer_root))
+                elif endpoint == 'rules':
+                    self.send_json(customer.rules())
+                elif endpoint.startswith('images/'):
+                    self.send_body(customer.image(endpoint.removeprefix('images/'), self.customer_root), 'image/jpeg')
+                else:
+                    self.error(HTTPStatus.NOT_FOUND, 'Материал не найден.')
+            except FileNotFoundError:
+                self.error(HTTPStatus.NOT_FOUND, 'Материал не импортирован или недоступен.')
+            except (ValueError, KeyError, OSError):
+                self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Материалы временно недоступны.')
+            return
         if target.path == '/':
             query = f'?{target.query}' if target.query else ''
             self.send_response(HTTPStatus.FOUND)
