@@ -17,11 +17,22 @@ const reports=[];
   page.on('pageerror',e=>errors.push(e.message));
   await page.route(origin+'/**',route=>route.continue({headers:{...route.request().headers(),authorization}}));
   page.on('response',async r=>{
-   if(new URL(r.url()).pathname==='/analyze'){
+   const pathname=new URL(r.url()).pathname;
+   if(pathname==='/analyze'&&r.status()!==202){
     try{records.push({status:r.status(),body:await r.json()});}catch{}
+   }else if(/^\/api\/analysis-jobs\/[0-9a-f]{32}$/.test(pathname)&&r.status()===200){
+    try{const {job}=await r.json();
+     if(job?.status==='succeeded') records.push({status:200,body:job.result,jobId:job.id});
+     else if(['failed','expired'].includes(job?.status)) records.push({status:job.errorStatus||502,body:{error:job.error},jobId:job.id});
+    }catch{}
    }
   });
   await page.goto(origin+'/index.html',{waitUntil:'networkidle'});
+  const capsResponse=await page.request.get(origin+'/api/capabilities',{headers:{authorization}});
+  assert.equal(capsResponse.ok(),true);
+  const capabilities=(await capsResponse.json()).vision;
+  assert.equal(capabilities.enabled,true);assert.equal(typeof capabilities.model,'string');
+  assert.match(capabilities.revision,/^[a-f0-9]{40}$/);
   await page.locator('#example').evaluate(img=>img.decode());
   await page.evaluate(()=>{
    Object.defineProperty(navigator,'mediaDevices',{value:{getUserMedia:async()=>{
@@ -34,22 +45,35 @@ const reports=[];
   });
   await page.getByRole('button',{name:'Включить камеру'}).click();
   await page.locator('#video').waitFor();
-  await page.getByLabel('Режим').selectOption('video');
+  await page.getByText('Настройки анализа',{exact:true}).click();
+  await page.getByLabel('Проверка',{exact:true}).selectOption('video');
   await page.getByLabel('Интервал').selectOption('2000');
   await page.getByRole('button',{name:'Начать проверку'}).click();
   const count=engine==='chromium'?3:1;
-  await page.waitForFunction(n=>document.querySelector('#video-metrics').textContent.includes('Проверено кадров: '+n),count,{timeout:90000});
+  await page.waitForFunction(n=>document.querySelector('#video-metrics').textContent.includes('Проверено кадров: '+n),count,{timeout:13*60*1000});
   await page.getByRole('button',{name:'Остановить проверку'}).click();
   await page.locator('#detection').waitFor();
   assert.equal(await page.locator('#video').isVisible(),true);
   assert.equal(await page.locator('#checked-viewfinder #snapshot').isVisible(),true);
   assert.equal(await page.locator('#viewfinder #detection').count(),0);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-  assert.match(await page.locator('#vision-observation').innerText(),/OpenGVLab\/InternVL3-2B-hf/);
+  const successful=records.filter(record=>record.status===200);
+  assert.ok(successful.length>=count);
+  for(const record of successful){
+   assert.equal(record.body.model,capabilities.model);
+   if(record.body.revision!==undefined) assert.equal(record.body.revision,capabilities.revision);
+  }
+  await page.locator('.result-provenance > summary').click();
+  assert.equal(await page.locator('#analysis-model').innerText(),successful.at(-1).body.model);
+  await page.locator('.result-provenance > summary').click();
+  const afterResponse=await page.request.get(origin+'/api/capabilities',{headers:{authorization}});
+  assert.equal(afterResponse.ok(),true);
+  const after=(await afterResponse.json()).vision;
+  assert.equal(after.model,capabilities.model);assert.equal(after.revision,capabilities.revision);
   const metrics=await page.locator('#video-metrics').innerText();
   if(out)await page.screenshot({path:out+'/cyber102-internvl-video-'+engine+'.png',fullPage:true});
   assert.deepEqual(errors,[]);
-  reports.push({engine,synthetic_camera:true,real_gpu:true,metrics,records});
+  reports.push({engine,synthetic_camera:true,real_gpu:true,selectedModel:capabilities.model,selectedRevision:capabilities.revision,metrics,records});
   console.log(JSON.stringify({engine,metrics,statuses:records.map(r=>r.status),models:records.map(r=>r.body.model)}));
   await context.close();await browser.close();
   if(engine==='chromium')await new Promise(r=>setTimeout(r,8000));

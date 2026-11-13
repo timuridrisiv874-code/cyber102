@@ -1,0 +1,1191 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-11-13T19:17:04.492018+00:00",
+  "purpose": "Exploratory choice for the current web inspection prototype; not field acceptance.",
+  "selectedModelKey": "qwen3_vl_4b",
+  "selectionReason": "Better grounded component/condition/region and usable Russian in the fixed visual review; the observed latency and memory increase fits the available RTX 3090 Ti. Photo, fast and eight-frame HTTP contracts passed. Video localization remains provisional.",
+  "protocol": {
+    "profile": "standard",
+    "precision": "bfloat16",
+    "attention": "sdpa",
+    "doSample": false,
+    "maxNewTokens": 180,
+    "maxTimeSeconds": 85,
+    "warmupRequests": 1,
+    "GPUIsolation": "caller must stop competing GPU workloads",
+    "nativeBudgetNote": "InternVL tiles and Qwen grid cells are not equivalent units; approximately matched pixel budgets, actual input shapes and tokens recorded.",
+    "cudaVisibleDevices": null,
+    "nvidiaSmiIndex": "0"
+  },
+  "dataset": {
+    "count": 53,
+    "externalCount": 31,
+    "otherCount": 22,
+    "manifestSha256": "463cb1f51f34d766425c16a973a078ba252f15bc1aa93bd11938434f91b9c5f9",
+    "allPreviewBytesRgbHashesDimensionsMatched": true,
+    "referenceSha256": "137614745426634c749580fc5223dd13065707e2187ae79116f9ec6931f46b1e",
+    "referenceFrozenBeforeReviewerSawPerImageOutputs": true,
+    "referenceExpertGroundTruth": false,
+    "referencePositiveCount": 47,
+    "ambiguousCount": 6,
+    "confidentWholeImageNegativeCount": 0,
+    "qwenWatermarkCount": 5,
+    "qwenWatermarkIndices": [
+      1,
+      2,
+      4,
+      24,
+      27
+    ]
+  },
+  "shared": {
+    "systemPromptSha256": "5837df0fcc68beb8d9a61114ba7cc0751a683e3cd92fba96b931a87b4957ae58",
+    "promptSha256": "2ddf0b5704592f577a5f6dcae11ac7aed746d34ba9c8b02b03fade45fc411b75",
+    "versions": {
+      "torch": "2.8.0+cu128",
+      "transformers": "4.57.1",
+      "Pillow": "12.3.0",
+      "accelerate": "1.10.1"
+    },
+    "plan": {
+      "seed": 42,
+      "primaryOrder": [
+        "521e3d591fb0169c06dc672cea4cdccb052186d98651f4c7a958a969785ad2d9",
+        "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982",
+        "3507af9c911f7050e8e37c8b2daf2d4d3d71a167555dcddd3fb9e85e5e1e1d71",
+        "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f",
+        "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b",
+        "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1",
+        "0673344a7722d1e33ffeec7144546f0ef4521ddad7f9c0f1d83dc0c96b3e33ce",
+        "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f",
+        "3f05ed43177f0d16004e70fe0fa1550d38db6c9cbde6f2aff2b6c1972299e2cd",
+        "f633d086f1c156f112d37b1c1625bbbf98b2f826d75112859db83077e3b372f8",
+        "66b2015378463cc783587aafc9f799167a90334deeaa1aa63262cb9a005ddb24",
+        "53f50d385dcbcd4b347fcf87d3bc6bd0183fcf6cbd095f892597e6959586c5e7",
+        "25f2b4b6d8ad6e9140c49f01d644fadb7231b54fc97fba2146dc53d843964a23",
+        "6405f1312aad622a865b4ca06479e48cd8d6a1efb8761cd60bae4cf6f16df691",
+        "64046245895bb5429b2975970cd70cbde7546682f28818eaf7c6515b610ebac2",
+        "1f024f723634d16ae7b7cabb234cb61d7e0b641a56b7843df0552846b6768d18",
+        "e202239dadb60ce27119f4c8e8d8b1695e361dceaf67ae0ee1f1daeaf73c5ddc",
+        "d21be26baae4080bcc20937084c493f4386885a6d6e66e93665ad447fdba6132",
+        "de8ebcd5f6a66ddff79d2d8946caf74438cc3f2208da67f6ea25a1ade10c6b22",
+        "ca55cf27a82b27cc77088b16c18b40cfc775db1adb7e39de6d8c8526765f8468",
+        "36d5f3bf309975cafdcd38aaaac13ffca39378c11357706405d801f60162343c",
+        "8ceb225d07663c1463ca7ca4e3ab27da2b155b00ec54abfc2765ea607e0d1826",
+        "2980cdb77858b89ea26519e0ffa1f1c5376baeda1a716e14deac1a242d169f6d",
+        "14cd271abc37ba4490131b9c763a8956dc5ae388cc5d5585906b3235d1bee744",
+        "c9aaaba9412ed0cba57625bd00f46427a9258f6c8c6090132bdd53a35c28624b",
+        "50ad685c58570cf8e12ff2eda16394eaafe4da1fb42586bbed3b856bf83722be",
+        "c02b8a5466056c6b8e0f3890e6d496d6dafc05571271dc1400d7c293cff75118",
+        "ee496a66f06fb3836f751c6c7a660b3ce81bd67819752825b73c1a6e513576b9",
+        "c7505d376d4fb0618aea1a79b1e779ee84f2a3574875d151aa6ad09a4c0ba5d9",
+        "3701f10352453cc4d80e7a4105f63be05075ad4588737a3c201f0bcf757fc2fd",
+        "15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8",
+        "a5a84a17726e30fba6243ff50b167319cde07db962f6f361e9530739d2219827",
+        "2683c1cf1fd29b764d3a8ee86d9461cce6b8659c91beb98aae8b43c85f196247",
+        "1295467678396b402d263c96f506508b9c097d4b8e3533e1fbdc4a573257611b",
+        "a7c7393da86cd60a9c883c8372f4b42c6fbb11c647f7f1a5694fc0c5ae03314f",
+        "698a93dc21154d7c11debe06742364f542d72d5f1c89c7828ebe50c3e9fcf952",
+        "6bffa98c3910c7bd5533abd75bef648d17c526477111724168f852a34cc9a5a0",
+        "ada68e97fe73013b6a1cc0d63056c41575bb647233320c12621b3a595521eebe",
+        "e021f7ab1445594ca932f677caaeb0d6bce8ff480cac87b8c25c94c6247e5c12",
+        "f03b64891b7aff1c0a9f26af0bcc0ff00435fe463e2ed3f704b9198c31985e31",
+        "36d5ae35ece35071a773ab9c641cba87c4c57c73ac84a9a2b2318bb4dcc8dfdd",
+        "2dd70a93993526adc47fc6f31a4d9c68361b9dc18ed1fc390aa8531ddd8fe903",
+        "ce78c2426a2f2fff425ffdbbb5ec2835f4537236149f47b9343128cc042cb81f",
+        "594db51115e3091c6c07a6a73483632c9a7d14b8a1116896603c6cc780e16320",
+        "5eb24913f1ef45f2b4584288d5545ce3800aeea121626de4f05d856cedd0abfc",
+        "e27eedbc8c46298594a43c944da867ac52064ca40994be7689b3887cdc64ad05",
+        "dc49dd254b4cb1b86cd9d3d142afce15d2d028d5ef72c09bac000fa32325ef02",
+        "d317e2910bbebda76780ed9402787730e82ca4224cb4904e3f492033ab43cb82",
+        "6a9d2157b9a15b96874dc136550e292b15d5ebf223fcd94e907fff57c1d92689",
+        "567fa79a755b5934a5b4d32654818b4ba7bb91930f4512bcc3dbddae183677cc",
+        "d91fbbc53316c320e36a29f55de80836e5acc06b538539421e74a1910ac65676",
+        "58333a366f2c532ef3ee231474678a434b96e6904340b0dee7e7ed7cf313f222",
+        "e6a09635a6c429e76a17f380d62d613d8855d1b75ff1ccf0dadad67b0ceb13b1"
+      ],
+      "repeatIds": [
+        "521e3d591fb0169c06dc672cea4cdccb052186d98651f4c7a958a969785ad2d9",
+        "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982",
+        "3507af9c911f7050e8e37c8b2daf2d4d3d71a167555dcddd3fb9e85e5e1e1d71",
+        "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f",
+        "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b",
+        "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1",
+        "0673344a7722d1e33ffeec7144546f0ef4521ddad7f9c0f1d83dc0c96b3e33ce",
+        "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f"
+      ],
+      "repeatRounds": 3,
+      "requests": [
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "521e3d591fb0169c06dc672cea4cdccb052186d98651f4c7a958a969785ad2d9"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "3507af9c911f7050e8e37c8b2daf2d4d3d71a167555dcddd3fb9e85e5e1e1d71"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "0673344a7722d1e33ffeec7144546f0ef4521ddad7f9c0f1d83dc0c96b3e33ce"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "3f05ed43177f0d16004e70fe0fa1550d38db6c9cbde6f2aff2b6c1972299e2cd"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "f633d086f1c156f112d37b1c1625bbbf98b2f826d75112859db83077e3b372f8"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "66b2015378463cc783587aafc9f799167a90334deeaa1aa63262cb9a005ddb24"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "53f50d385dcbcd4b347fcf87d3bc6bd0183fcf6cbd095f892597e6959586c5e7"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "25f2b4b6d8ad6e9140c49f01d644fadb7231b54fc97fba2146dc53d843964a23"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "6405f1312aad622a865b4ca06479e48cd8d6a1efb8761cd60bae4cf6f16df691"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "64046245895bb5429b2975970cd70cbde7546682f28818eaf7c6515b610ebac2"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "1f024f723634d16ae7b7cabb234cb61d7e0b641a56b7843df0552846b6768d18"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "e202239dadb60ce27119f4c8e8d8b1695e361dceaf67ae0ee1f1daeaf73c5ddc"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "d21be26baae4080bcc20937084c493f4386885a6d6e66e93665ad447fdba6132"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "de8ebcd5f6a66ddff79d2d8946caf74438cc3f2208da67f6ea25a1ade10c6b22"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "ca55cf27a82b27cc77088b16c18b40cfc775db1adb7e39de6d8c8526765f8468"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "36d5f3bf309975cafdcd38aaaac13ffca39378c11357706405d801f60162343c"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "8ceb225d07663c1463ca7ca4e3ab27da2b155b00ec54abfc2765ea607e0d1826"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "2980cdb77858b89ea26519e0ffa1f1c5376baeda1a716e14deac1a242d169f6d"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "14cd271abc37ba4490131b9c763a8956dc5ae388cc5d5585906b3235d1bee744"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "c9aaaba9412ed0cba57625bd00f46427a9258f6c8c6090132bdd53a35c28624b"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "50ad685c58570cf8e12ff2eda16394eaafe4da1fb42586bbed3b856bf83722be"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "c02b8a5466056c6b8e0f3890e6d496d6dafc05571271dc1400d7c293cff75118"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "ee496a66f06fb3836f751c6c7a660b3ce81bd67819752825b73c1a6e513576b9"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "c7505d376d4fb0618aea1a79b1e779ee84f2a3574875d151aa6ad09a4c0ba5d9"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "3701f10352453cc4d80e7a4105f63be05075ad4588737a3c201f0bcf757fc2fd"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "a5a84a17726e30fba6243ff50b167319cde07db962f6f361e9530739d2219827"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "2683c1cf1fd29b764d3a8ee86d9461cce6b8659c91beb98aae8b43c85f196247"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "1295467678396b402d263c96f506508b9c097d4b8e3533e1fbdc4a573257611b"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "a7c7393da86cd60a9c883c8372f4b42c6fbb11c647f7f1a5694fc0c5ae03314f"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "698a93dc21154d7c11debe06742364f542d72d5f1c89c7828ebe50c3e9fcf952"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "6bffa98c3910c7bd5533abd75bef648d17c526477111724168f852a34cc9a5a0"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "ada68e97fe73013b6a1cc0d63056c41575bb647233320c12621b3a595521eebe"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "e021f7ab1445594ca932f677caaeb0d6bce8ff480cac87b8c25c94c6247e5c12"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "f03b64891b7aff1c0a9f26af0bcc0ff00435fe463e2ed3f704b9198c31985e31"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "36d5ae35ece35071a773ab9c641cba87c4c57c73ac84a9a2b2318bb4dcc8dfdd"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "2dd70a93993526adc47fc6f31a4d9c68361b9dc18ed1fc390aa8531ddd8fe903"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "ce78c2426a2f2fff425ffdbbb5ec2835f4537236149f47b9343128cc042cb81f"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "594db51115e3091c6c07a6a73483632c9a7d14b8a1116896603c6cc780e16320"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "5eb24913f1ef45f2b4584288d5545ce3800aeea121626de4f05d856cedd0abfc"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "e27eedbc8c46298594a43c944da867ac52064ca40994be7689b3887cdc64ad05"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "dc49dd254b4cb1b86cd9d3d142afce15d2d028d5ef72c09bac000fa32325ef02"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "d317e2910bbebda76780ed9402787730e82ca4224cb4904e3f492033ab43cb82"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "6a9d2157b9a15b96874dc136550e292b15d5ebf223fcd94e907fff57c1d92689"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "567fa79a755b5934a5b4d32654818b4ba7bb91930f4512bcc3dbddae183677cc"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "d91fbbc53316c320e36a29f55de80836e5acc06b538539421e74a1910ac65676"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "58333a366f2c532ef3ee231474678a434b96e6904340b0dee7e7ed7cf313f222"
+        },
+        {
+          "phase": "primary",
+          "round": 0,
+          "imageId": "e6a09635a6c429e76a17f380d62d613d8855d1b75ff1ccf0dadad67b0ceb13b1"
+        },
+        {
+          "phase": "repeat",
+          "round": 1,
+          "imageId": "521e3d591fb0169c06dc672cea4cdccb052186d98651f4c7a958a969785ad2d9"
+        },
+        {
+          "phase": "repeat",
+          "round": 1,
+          "imageId": "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982"
+        },
+        {
+          "phase": "repeat",
+          "round": 1,
+          "imageId": "3507af9c911f7050e8e37c8b2daf2d4d3d71a167555dcddd3fb9e85e5e1e1d71"
+        },
+        {
+          "phase": "repeat",
+          "round": 1,
+          "imageId": "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f"
+        },
+        {
+          "phase": "repeat",
+          "round": 1,
+          "imageId": "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b"
+        },
+        {
+          "phase": "repeat",
+          "round": 1,
+          "imageId": "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1"
+        },
+        {
+          "phase": "repeat",
+          "round": 1,
+          "imageId": "0673344a7722d1e33ffeec7144546f0ef4521ddad7f9c0f1d83dc0c96b3e33ce"
+        },
+        {
+          "phase": "repeat",
+          "round": 1,
+          "imageId": "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f"
+        },
+        {
+          "phase": "repeat",
+          "round": 2,
+          "imageId": "521e3d591fb0169c06dc672cea4cdccb052186d98651f4c7a958a969785ad2d9"
+        },
+        {
+          "phase": "repeat",
+          "round": 2,
+          "imageId": "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982"
+        },
+        {
+          "phase": "repeat",
+          "round": 2,
+          "imageId": "3507af9c911f7050e8e37c8b2daf2d4d3d71a167555dcddd3fb9e85e5e1e1d71"
+        },
+        {
+          "phase": "repeat",
+          "round": 2,
+          "imageId": "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f"
+        },
+        {
+          "phase": "repeat",
+          "round": 2,
+          "imageId": "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b"
+        },
+        {
+          "phase": "repeat",
+          "round": 2,
+          "imageId": "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1"
+        },
+        {
+          "phase": "repeat",
+          "round": 2,
+          "imageId": "0673344a7722d1e33ffeec7144546f0ef4521ddad7f9c0f1d83dc0c96b3e33ce"
+        },
+        {
+          "phase": "repeat",
+          "round": 2,
+          "imageId": "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f"
+        },
+        {
+          "phase": "repeat",
+          "round": 3,
+          "imageId": "521e3d591fb0169c06dc672cea4cdccb052186d98651f4c7a958a969785ad2d9"
+        },
+        {
+          "phase": "repeat",
+          "round": 3,
+          "imageId": "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982"
+        },
+        {
+          "phase": "repeat",
+          "round": 3,
+          "imageId": "3507af9c911f7050e8e37c8b2daf2d4d3d71a167555dcddd3fb9e85e5e1e1d71"
+        },
+        {
+          "phase": "repeat",
+          "round": 3,
+          "imageId": "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f"
+        },
+        {
+          "phase": "repeat",
+          "round": 3,
+          "imageId": "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b"
+        },
+        {
+          "phase": "repeat",
+          "round": 3,
+          "imageId": "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1"
+        },
+        {
+          "phase": "repeat",
+          "round": 3,
+          "imageId": "0673344a7722d1e33ffeec7144546f0ef4521ddad7f9c0f1d83dc0c96b3e33ce"
+        },
+        {
+          "phase": "repeat",
+          "round": 3,
+          "imageId": "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f"
+        }
+      ],
+      "planSha256": "4d1f21bd511344b6a952b77a6ca2dcc19bdfeae1fd73cdfae8df942f81d8b311"
+    },
+    "device": "NVIDIA GeForce RTX 3090 Ti"
+  },
+  "qualityPolicy": {
+    "reviewer": "AI visual review of every output with an overlaid box; model names masked as R/S. Not perfectly blinded across the prior conversation. Root spot-checked images 1–8 and 33–36.",
+    "visualCardGrounded": "Component enum, condition enum and region all judged grounded. Box usability is qualitative, not IoU or segmentation precision.",
+    "overallGrounded": "Visual card plus readable Russian and no unsupported statements. Strict interface usability gate, not conventional classification accuracy.",
+    "unknown": "Ambiguous judgments remain null and are not silently counted as correct.",
+    "sameCriterionForBoth": true
+  },
+  "memoryPolicy": {
+    "torchPeak": "Largest per-request CUDA allocator peak over all 77 requests, model already loaded.",
+    "devicePeak": "Whole GPU sampled with nvidia-smi, a 200 ms polling delay plus command overhead; median actual interval about 328 ms. Includes Windows desktop and driver allocations; brief spikes may be missed.",
+    "baselineDeviceMiB": {
+      "internvl": 1099.0,
+      "qwen": 1099.0
+    },
+    "systemRamComparisonAvailable": false,
+    "note": "WDDM per-process memory was unavailable. Windows desktop remained active; one inference model ran at a time."
+  },
+  "models": {
+    "internvl": {
+      "model": "OpenGVLab/InternVL3_5-2B-HF",
+      "revision": "3f301ffcf3dcbb47893afae6650ea3e78d96fb6d",
+      "workerSha256": "e7f7e96059dc7fd372c5c6212ca8480173203192219e9af41076b9f4a7bcabf0",
+      "nativeProcessorBudget": {
+        "cropToPatches": true,
+        "maxPatchesExcludingThumbnail": 4,
+        "patchUnit": "448x448 InternVL image tile, optional thumbnail counted in actual input"
+      },
+      "modelLoadSeconds": 11.062000000150874,
+      "timing": {
+        "primary": {
+          "requests": 53,
+          "valid": 53,
+          "failures": 0,
+          "latencyAll": {
+            "count": 53,
+            "p50Seconds": 5.578,
+            "p95Seconds": 6.2968,
+            "totalSeconds": 298.73199999999986
+          },
+          "latencyValidOnly": {
+            "count": 53,
+            "p50Seconds": 5.578,
+            "p95Seconds": 6.2968,
+            "totalSeconds": 298.73199999999986
+          },
+          "conditions": {
+            "visible_damage": 19,
+            "corrosion": 33,
+            "no_visible_defect": 1
+          }
+        },
+        "externalPrimary": {
+          "requests": 31,
+          "valid": 31,
+          "failures": 0,
+          "latencyAll": {
+            "count": 31,
+            "p50Seconds": 5.515,
+            "p95Seconds": 6.492,
+            "totalSeconds": 175.078
+          },
+          "latencyValidOnly": {
+            "count": 31,
+            "p50Seconds": 5.515,
+            "p95Seconds": 6.492,
+            "totalSeconds": 175.078
+          },
+          "conditions": {
+            "visible_damage": 9,
+            "corrosion": 22
+          }
+        },
+        "repeats": {
+          "requests": 24,
+          "valid": 24,
+          "failures": 0,
+          "latencyAll": {
+            "count": 24,
+            "p50Seconds": 5.515000000000001,
+            "p95Seconds": 6.297,
+            "totalSeconds": 133.858
+          },
+          "latencyValidOnly": {
+            "count": 24,
+            "p50Seconds": 5.515000000000001,
+            "p95Seconds": 6.297,
+            "totalSeconds": 133.858
+          },
+          "conditions": {
+            "visible_damage": 12,
+            "corrosion": 12
+          }
+        },
+        "repeatAgreement": [
+          {
+            "imageId": "521e3d591fb0169c06dc672cea4cdccb052186d98651f4c7a958a969785ad2d9",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "3507af9c911f7050e8e37c8b2daf2d4d3d71a167555dcddd3fb9e85e5e1e1d71",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "0673344a7722d1e33ffeec7144546f0ef4521ddad7f9c0f1d83dc0c96b3e33ce",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          }
+        ],
+        "interpretation": "Agreement is repeatability, valid JSON is format compliance; neither measures correctness."
+      },
+      "memory": {
+        "peakAllocatedBytes": 5490011648,
+        "peakReservedBytes": 5551161344,
+        "sampledDevicePeakMiB": 6686.0
+      },
+      "quality": {
+        "all": {
+          "n": 53,
+          "component_grounded": {
+            "true": 31,
+            "false": 22,
+            "null": 0
+          },
+          "condition_grounded": {
+            "true": 40,
+            "false": 3,
+            "null": 10
+          },
+          "box_usable": {
+            "true": 28,
+            "false": 24,
+            "null": 1
+          },
+          "overall_grounded": {
+            "true": 1,
+            "false": 51,
+            "null": 1
+          },
+          "visualCardGrounded": 17,
+          "russianUsable": 17,
+          "languageMixed": 31,
+          "unsupportedClaimCount": 23,
+          "referencePositive": 47,
+          "obviousAnomalyFound": 16
+        },
+        "external": {
+          "n": 31,
+          "component_grounded": {
+            "true": 20,
+            "false": 11,
+            "null": 0
+          },
+          "condition_grounded": {
+            "true": 26,
+            "false": 2,
+            "null": 3
+          },
+          "box_usable": {
+            "true": 17,
+            "false": 13,
+            "null": 1
+          },
+          "overall_grounded": {
+            "true": 1,
+            "false": 30,
+            "null": 0
+          },
+          "visualCardGrounded": 13,
+          "russianUsable": 10,
+          "languageMixed": 19,
+          "unsupportedClaimCount": 14,
+          "referencePositive": 29,
+          "obviousAnomalyFound": 13
+        },
+        "other": {
+          "n": 22,
+          "component_grounded": {
+            "true": 11,
+            "false": 11,
+            "null": 0
+          },
+          "condition_grounded": {
+            "true": 14,
+            "false": 1,
+            "null": 7
+          },
+          "box_usable": {
+            "true": 11,
+            "false": 11,
+            "null": 0
+          },
+          "overall_grounded": {
+            "true": 0,
+            "false": 21,
+            "null": 1
+          },
+          "visualCardGrounded": 4,
+          "russianUsable": 7,
+          "languageMixed": 12,
+          "unsupportedClaimCount": 9,
+          "referencePositive": 18,
+          "obviousAnomalyFound": 3
+        },
+        "withoutQwenWatermark": {
+          "n": 48,
+          "component_grounded": {
+            "true": 29,
+            "false": 19,
+            "null": 0
+          },
+          "condition_grounded": {
+            "true": 36,
+            "false": 2,
+            "null": 10
+          },
+          "box_usable": {
+            "true": 26,
+            "false": 21,
+            "null": 1
+          },
+          "overall_grounded": {
+            "true": 1,
+            "false": 46,
+            "null": 1
+          },
+          "visualCardGrounded": 17,
+          "russianUsable": 15,
+          "languageMixed": 29,
+          "unsupportedClaimCount": 21,
+          "referencePositive": 42,
+          "obviousAnomalyFound": 16
+        }
+      },
+      "artifactsSha256": {
+        "report": "425f0d21976476cee2a113a50d3b6170f6b6ceec3f0cec48dcaffca15b3d6c74",
+        "records": "cf4d02620d1f47cf42d480fb64adbf25807d6c1a0889bb75a44edaf4b5e170e5",
+        "review": "e9807694fa7ea37a462fdda6e06e7df079c9f5c4fe3f31392977d0f2fc4e7923"
+      }
+    },
+    "qwen": {
+      "model": "Qwen/Qwen3-VL-4B-Instruct",
+      "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+      "workerSha256": "ca46bfd835fb9d12c7656b5e7d73840c8459d341f502ac091e7d8ef467ffa0d4",
+      "nativeProcessorBudget": {
+        "minPixels": 65536,
+        "maxPixels": 1048576,
+        "patchUnit": "native Qwen vision grid cells; see imageGridTHW and pixel_valuesShape"
+      },
+      "modelLoadSeconds": 13.547000000020489,
+      "timing": {
+        "primary": {
+          "requests": 53,
+          "valid": 53,
+          "failures": 0,
+          "latencyAll": {
+            "count": 53,
+            "p50Seconds": 7.531,
+            "p95Seconds": 8.129000000000001,
+            "totalSeconds": 395.59299999999996
+          },
+          "latencyValidOnly": {
+            "count": 53,
+            "p50Seconds": 7.531,
+            "p95Seconds": 8.129000000000001,
+            "totalSeconds": 395.59299999999996
+          },
+          "conditions": {
+            "corrosion": 35,
+            "visible_damage": 15,
+            "wet_patch": 3
+          }
+        },
+        "externalPrimary": {
+          "requests": 31,
+          "valid": 31,
+          "failures": 0,
+          "latencyAll": {
+            "count": 31,
+            "p50Seconds": 7.515,
+            "p95Seconds": 8.288499999999999,
+            "totalSeconds": 232.871
+          },
+          "latencyValidOnly": {
+            "count": 31,
+            "p50Seconds": 7.515,
+            "p95Seconds": 8.288499999999999,
+            "totalSeconds": 232.871
+          },
+          "conditions": {
+            "visible_damage": 7,
+            "corrosion": 23,
+            "wet_patch": 1
+          }
+        },
+        "repeats": {
+          "requests": 24,
+          "valid": 24,
+          "failures": 0,
+          "latencyAll": {
+            "count": 24,
+            "p50Seconds": 7.4455,
+            "p95Seconds": 8.2538,
+            "totalSeconds": 180.19
+          },
+          "latencyValidOnly": {
+            "count": 24,
+            "p50Seconds": 7.4455,
+            "p95Seconds": 8.2538,
+            "totalSeconds": 180.19
+          },
+          "conditions": {
+            "corrosion": 12,
+            "visible_damage": 6,
+            "wet_patch": 6
+          }
+        },
+        "repeatAgreement": [
+          {
+            "imageId": "521e3d591fb0169c06dc672cea4cdccb052186d98651f4c7a958a969785ad2d9",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "3507af9c911f7050e8e37c8b2daf2d4d3d71a167555dcddd3fb9e85e5e1e1d71",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "e42ed4736db10d26665522ddd3cf17adbfc325e6fcfe1e4ffe521a6f3556e93b",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "0673344a7722d1e33ffeec7144546f0ef4521ddad7f9c0f1d83dc0c96b3e33ce",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          },
+          {
+            "imageId": "7af2112188e57a84ed661e7db14fccef83e36ff9c26c6e2ad0621603f98c3c5f",
+            "runs": 4,
+            "valid": 4,
+            "exactMatchingPairs": 6,
+            "totalPairsIncludingFailures": 6,
+            "allValidAndExactMatch": true,
+            "allValidAndSameLabels": true
+          }
+        ],
+        "interpretation": "Agreement is repeatability, valid JSON is format compliance; neither measures correctness."
+      },
+      "memory": {
+        "peakAllocatedBytes": 10025878016,
+        "peakReservedBytes": 11425284096,
+        "sampledDevicePeakMiB": 12300.0
+      },
+      "quality": {
+        "all": {
+          "n": 53,
+          "component_grounded": {
+            "true": 48,
+            "false": 3,
+            "null": 2
+          },
+          "condition_grounded": {
+            "true": 39,
+            "false": 1,
+            "null": 13
+          },
+          "box_usable": {
+            "true": 53,
+            "false": 0,
+            "null": 0
+          },
+          "overall_grounded": {
+            "true": 29,
+            "false": 16,
+            "null": 8
+          },
+          "visualCardGrounded": 38,
+          "russianUsable": 51,
+          "languageMixed": 1,
+          "unsupportedClaimCount": 11,
+          "referencePositive": 47,
+          "obviousAnomalyFound": 38
+        },
+        "external": {
+          "n": 31,
+          "component_grounded": {
+            "true": 28,
+            "false": 3,
+            "null": 0
+          },
+          "condition_grounded": {
+            "true": 28,
+            "false": 0,
+            "null": 3
+          },
+          "box_usable": {
+            "true": 31,
+            "false": 0,
+            "null": 0
+          },
+          "overall_grounded": {
+            "true": 23,
+            "false": 7,
+            "null": 1
+          },
+          "visualCardGrounded": 27,
+          "russianUsable": 30,
+          "languageMixed": 1,
+          "unsupportedClaimCount": 4,
+          "referencePositive": 29,
+          "obviousAnomalyFound": 27
+        },
+        "other": {
+          "n": 22,
+          "component_grounded": {
+            "true": 20,
+            "false": 0,
+            "null": 2
+          },
+          "condition_grounded": {
+            "true": 11,
+            "false": 1,
+            "null": 10
+          },
+          "box_usable": {
+            "true": 22,
+            "false": 0,
+            "null": 0
+          },
+          "overall_grounded": {
+            "true": 6,
+            "false": 9,
+            "null": 7
+          },
+          "visualCardGrounded": 11,
+          "russianUsable": 21,
+          "languageMixed": 0,
+          "unsupportedClaimCount": 7,
+          "referencePositive": 18,
+          "obviousAnomalyFound": 11
+        },
+        "withoutQwenWatermark": {
+          "n": 48,
+          "component_grounded": {
+            "true": 43,
+            "false": 3,
+            "null": 2
+          },
+          "condition_grounded": {
+            "true": 34,
+            "false": 1,
+            "null": 13
+          },
+          "box_usable": {
+            "true": 48,
+            "false": 0,
+            "null": 0
+          },
+          "overall_grounded": {
+            "true": 28,
+            "false": 12,
+            "null": 8
+          },
+          "visualCardGrounded": 33,
+          "russianUsable": 48,
+          "languageMixed": 0,
+          "unsupportedClaimCount": 9,
+          "referencePositive": 42,
+          "obviousAnomalyFound": 33
+        }
+      },
+      "artifactsSha256": {
+        "report": "6a904b6f17af46c3138e04a88a6bf6953defa46706fc5b3b3d353f3921344331",
+        "records": "a4563888abbd7b75cdcc4afc4be74b149bf3d2f8b29aa21cb6c0ad5dfa88d2ad",
+        "review": "cad821c8c50968c0a35e9714110a7df16e41a9849fa6444ad29ee6a1a218e93b"
+      }
+    }
+  },
+  "limitations": [
+    "Small curated organizer collection, with collages, watermarks, apparently generated images and related scenes.",
+    "No expert defect labels or precise reference boxes; no specificity/false-positive estimate without clear negatives.",
+    "Same prompts and generation cap, native image preprocessing differs; no model-specific prompt tuning.",
+    "Sequential fresh-process runs on one machine, not an alternating randomized hardware trial.",
+    "Repeat agreement measures reproducibility, not correctness. The 8-image repeated panel is small.",
+    "Eight different photos used for video compatibility are a synthetic sequence, not real motion footage.",
+    "Qwen video smoke returned identical broad boxes for all eight inputs; precise AR localization is not established."
+  ],
+  "qwenCompatibility": {
+    "pass": true,
+    "offlineChecks": {
+      "externalDnsBlocked": true,
+      "externalConnectBlocked": true
+    },
+    "reportSha256": "088448457ea23e4a05ebdc2c3a62dd5998d7ee5820640b7d6ee8119eb9544721",
+    "requests": [
+      {
+        "name": "standard_photo",
+        "pass": true,
+        "wallSeconds": 7.968,
+        "metrics": {
+          "preprocessMs": 24.091,
+          "generateMs": 7876.236,
+          "decodeMs": 0.498,
+          "totalMs": 7900.825,
+          "inputTokens": 1030,
+          "outputTokens": 69,
+          "patches": 2160
+        },
+        "torchMemoryMiB": {
+          "allocatedBeforeMiB": 8519.605,
+          "allocatedAfterMiB": 8534.085,
+          "reservedAfterMiB": 9240.0,
+          "peakAllocatedMiB": 9087.753,
+          "peakReservedMiB": 9240.0
+        },
+        "gpuMemory": {
+          "samples": 24,
+          "peakDeviceUsedMiB": 10633.0,
+          "peakProcessUsedMiB": null
+        },
+        "hitOutputTokenCap": false
+      },
+      {
+        "name": "fast_photo",
+        "pass": true,
+        "wallSeconds": 4.844,
+        "metrics": {
+          "preprocessMs": 27.482,
+          "generateMs": 4810.754,
+          "decodeMs": 0.244,
+          "totalMs": 4838.48,
+          "inputTokens": 1014,
+          "outputTokens": 47,
+          "patches": 2160
+        },
+        "torchMemoryMiB": {
+          "allocatedBeforeMiB": 8527.731,
+          "allocatedAfterMiB": 8534.083,
+          "reservedAfterMiB": 9240.0,
+          "peakAllocatedMiB": 9091.904,
+          "peakReservedMiB": 9240.0
+        },
+        "gpuMemory": {
+          "samples": 15,
+          "peakDeviceUsedMiB": 10633.0,
+          "peakProcessUsedMiB": null
+        },
+        "hitOutputTokenCap": false
+      },
+      {
+        "name": "synthetic_sequence_8_photos",
+        "pass": true,
+        "wallSeconds": 57.078,
+        "metrics": {
+          "preprocessMs": 155.056,
+          "generateMs": 56856.63,
+          "decodeMs": 0.838,
+          "totalMs": 57012.523,
+          "inputTokens": 4026,
+          "outputTokens": 565,
+          "patches": 13216,
+          "frames": 8
+        },
+        "torchMemoryMiB": {
+          "allocatedBeforeMiB": 8527.731,
+          "allocatedAfterMiB": 8566.547,
+          "reservedAfterMiB": 14542.0,
+          "peakAllocatedMiB": 14088.72,
+          "peakReservedMiB": 14542.0
+        },
+        "gpuMemory": {
+          "samples": 177,
+          "peakDeviceUsedMiB": 15935.0,
+          "peakProcessUsedMiB": null
+        },
+        "hitOutputTokenCap": false
+      }
+    ]
+  }
+}

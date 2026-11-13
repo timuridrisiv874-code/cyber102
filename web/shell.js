@@ -1,6 +1,7 @@
 /* Shared navigation and selected-equipment context for the web workspace. */
 (() => {
   'use strict';
+  if (window.CyberOffline?.enabled) return;
   const active = document.getElementById('active-equipment');
   const inspection = document.getElementById('inspection-serial');
   const lookup = document.getElementById('serial');
@@ -12,7 +13,7 @@
 
   function updateContext(value) {
     serial = value.trim();
-    if (selected) selected.textContent = serial === 'P-102' ? 'P-102 · демонстрация' : serial ? `Оборудование · ${serial}` : 'Оборудование не выбрано';
+    if (selected) selected.textContent = serial === 'P-102' ? 'Демо · P-102' : serial ? serial : 'Оборудование не выбрано';
     if (hint) hint.textContent = serial === 'P-102' ? 'Демонстрационные данные. Сверьте номер агрегата.' : 'Сверьте номер с табличкой перед осмотром.';
     for (const link of document.querySelectorAll('a[href]')) {
       const href = link.getAttribute('href');

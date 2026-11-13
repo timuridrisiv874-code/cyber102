@@ -64,8 +64,13 @@ async function run(browser, options, name) {
   page.on('request', request => {if(request.url().includes('/api/telemetry/snapshot?')) snapshots.push(request.url());});
   try {
     await loadAfterPageRestore(page, '/documents.html', ['/api/customer/documents', '/api/customer/equipment-passports'],
-      page.getByText(/Загружено 22 документов/));
+      page.locator('#equipment-grid .workspace-card').first());
     assert.equal(await page.locator('.document-item').count() >= 22, true);
+    const equipmentSource = page.locator('#equipment-grid').locator('..').getByText('О данных', {exact:true});
+    await equipmentSource.click();
+    await page.getByText(/Примеры измерений не привязаны к этим агрегатам/).waitFor();
+    assert.ok((await page.locator('#passport-limitations').textContent()).trim());
+    await equipmentSource.click();
     const kind = page.getByLabel('Тип оборудования');
     const equipment = page.locator('#equipment-grid .workspace-card');
     assert.equal(await kind.inputValue(), 'pump');
@@ -96,30 +101,36 @@ async function run(browser, options, name) {
     if (screenshotDir) await page.screenshot({path:path.join(screenshotDir,`documents-${name}.png`)});
 
     await loadAfterPageRestore(page, '/telemetry.html', ['/api/telemetry/catalog'],
-      page.getByText('Строка 1 из 500 · эмулятор', {exact:true}));
+      page.getByText('Запись 1 из 500', {exact:true}));
     assert.equal(await page.locator('#telemetry-channels .workspace-card').count(),6);
+    await page.locator('#source-title').click();
+    await page.getByText(/Часовой пояс записей не указан/).waitFor();
+    await page.getByText('Происхождение текущей строки', {exact:true}).click();
+    await page.locator('#replay-provenance').waitFor();
+    assert.equal(JSON.parse(await page.locator('#replay-provenance').textContent()).source, 'customer_replay');
+    await page.locator('#source-title').click();
     assert.equal(await page.getByText('Порог не задан', {exact:true}).count(),1);
-    await page.getByRole('button',{name:'Следующая строка'}).click();
-    await page.getByText('Строка 2 из 500 · эмулятор', {exact:true}).waitFor();
+    await page.getByRole('button',{name:'Следующая запись'}).click();
+    await page.getByText('Запись 2 из 500', {exact:true}).waitFor();
     async function seek(value) {await page.locator('#replay-position').evaluate((el,v) => {el.value=String(v);el.dispatchEvent(new Event('input',{bubbles:true}));}, value);}
     await seek(402);
-    await page.getByText('Строка 403 из 500 · эмулятор',{exact:true}).waitFor();
-    await page.getByText(/Метка в исходной таблице отличается/).waitFor();
+    await page.getByText('Запись 403 из 500',{exact:true}).waitFor();
+    await page.getByText(/Исходная метка и оценка по порогам расходятся/).waitFor();
     if (screenshotDir) await page.screenshot({path:path.join(screenshotDir,`telemetry-${name}.png`)});
     await seek(499);
-    await page.getByText('Строка 500 из 500 · эмулятор',{exact:true}).waitFor();
-    assert.equal(await page.getByRole('button',{name:'Следующая строка'}).isDisabled(),true);
-    await page.getByLabel('Интервал показа строки').selectOption('1000');
+    await page.getByText('Запись 500 из 500',{exact:true}).waitFor();
+    assert.equal(await page.getByRole('button',{name:'Следующая запись'}).isDisabled(),true);
+    await page.getByLabel('Интервал').selectOption('1000');
     await page.getByRole('button',{name:'Воспроизвести',exact:true}).click();
-    await page.getByText('Строка 1 из 500 · эмулятор',{exact:true}).waitFor();
-    await page.getByText('Строка 2 из 500 · эмулятор',{exact:true}).waitFor();
+    await page.getByText('Запись 1 из 500',{exact:true}).waitFor();
+    await page.getByText('Запись 2 из 500',{exact:true}).waitFor();
     await page.getByRole('button',{name:'Пауза',exact:true}).click();
     const paused = snapshots.length;
     await hold(1250);
     assert.equal(snapshots.length,paused);
     await page.route('**/api/telemetry/snapshot?index=400', async route => {await hold(700);try {await route.fallback();}catch {}});
     await seek(400); await seek(401);
-    await page.getByText('Строка 402 из 500 · эмулятор',{exact:true}).waitFor();
+    await page.getByText('Запись 402 из 500',{exact:true}).waitFor();
     await hold(850);
     assert.equal(await page.locator('#replay-position').inputValue(),'401');
     const pendingSeek = request => new URL(request.url()).searchParams.get('index') === '400';
@@ -129,15 +140,15 @@ async function run(browser, options, name) {
     await canceledSeek;
     await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
     assert.equal(await page.locator('#replay-position').inputValue(), '401');
-    await page.getByText('Строка 402 из 500 · пауза', { exact: true }).waitFor();
+    await page.getByText('Запись 402 из 500 · пауза', { exact: true }).waitFor();
     await page.route('**/api/telemetry/snapshot?index=3', route => route.fulfill({status:503,json:{error:'Тест: источник недоступен'}}));
     await seek(3);
     await page.getByText('Тест: источник недоступен',{exact:true}).waitFor();
     assert.equal(await page.locator('#telemetry-channels .workspace-card').count(),0);
     await page.getByRole('button',{name:'В начало'}).click();
-    await page.getByText('Строка 1 из 500 · эмулятор',{exact:true}).waitFor();
+    await page.getByText('Запись 1 из 500',{exact:true}).waitFor();
     await page.getByRole('button',{name:'Воспроизвести',exact:true}).click();
-    await page.getByText('Строка 2 из 500 · эмулятор',{exact:true}).waitFor();
+    await page.getByText('Запись 2 из 500',{exact:true}).waitFor();
     await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
     const stopped = snapshots.length;
     await hold(1250);

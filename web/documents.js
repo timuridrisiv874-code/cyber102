@@ -77,7 +77,7 @@
     const query = $('document-search').value.trim().toLocaleLowerCase('ru-RU');
     const matches = documents.map(document => ({document, pages: (document.pages || []).filter(page => query && page.text?.toLocaleLowerCase('ru-RU').includes(query))}))
       .filter(({document, pages}) => !query || `${document.title} ${document.filename}`.toLocaleLowerCase('ru-RU').includes(query) || pages.length);
-    $('document-results').textContent = query ? `Найдено документов: ${matches.length} из ${documents.length}` : `Документов: ${documents.length}. Оригиналы доступны на сервере команды.`;
+    $('document-results').textContent = query ? `Найдено документов: ${matches.length} из ${documents.length}` : `${documents.length} документов`;
     $('document-list').replaceChildren();
     for (const {document, pages} of matches) {
       const article = node('article', null, 'document-item');
@@ -129,7 +129,8 @@
     renderEquipment(passports || {}); renderDocuments();
     $('document-count').textContent = `${documents.length} PDF`;
     const problems = [!catalog && 'Библиотека временно недоступна.', !passports && 'Паспортные записи временно недоступны.'].filter(Boolean);
-    $('documents-status').textContent = `Загружено ${documents.length} документов · ${equipment.length} паспортных записей. ${problems.join(' ')}`.trim();
+    $('documents-status').textContent = problems.join(' ');
+    $('documents-status').dataset.error = String(Boolean(problems.length));
     loaded = true;
   }).catch(error => {
     if (current !== generation) return;

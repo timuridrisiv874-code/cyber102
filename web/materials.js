@@ -16,8 +16,9 @@ function message(id, text = '', error = false) {
   node.dataset.error = String(error);
 }
 
-async function api(path, options) {
-  const response = await fetch(path, { cache: 'no-store', ...options });
+async function api(path, options, onProgress) {
+  const request = path === '/analyze' && window.CyberAnalysisJobs ? window.CyberAnalysisJobs.request : fetch;
+  const response = await request(path, { cache: 'no-store', ...options }, onProgress);
   const data = await response.json().catch(() => null);
   if (!response.ok || !data) throw new Error(data?.error || `Ошибка загрузки (${response.status}).`);
   return data;
@@ -43,6 +44,7 @@ function resetPhoto() {
   photoAnalysis = null;
   selectedPhoto = null;
   analyzePhoto.disabled = true;
+  byId('photo-cancel').hidden = true;
   selectedImage.removeAttribute('src');
   byId('photo-detail').hidden = true;
   photoResult.hidden = photoBox.hidden = true;
@@ -53,7 +55,7 @@ function selectPhoto(photo) {
   resetPhoto();
   selectedPhoto = photo;
   byId('photo-title').textContent = photo.filename;
-  byId('photo-source').textContent = `${photo.categoryTitle} · Фото предоставлено заказчиком · Экспертной метки дефекта нет`;
+  byId('photo-source').textContent = `${photo.categoryTitle} · Фото организаторов`;
   const scope = photo.inspectionScope;
   const scopeTitle = scopeTitles.get(scope?.id) ?? 'Контекст не установлен';
   byId('photo-scope').textContent = [scopeTitle, scope?.note].filter(Boolean).join('. ');
@@ -132,7 +134,8 @@ async function loadCatalog() {
     renderPhotos();
     renderDocuments(data.documents);
     const counts = `Уникальных фото: ${photos.length}. Файлов в подборке: ${data.summary.files}.`;
-    message('catalog-status', [counts, data.notice].filter(Boolean).join(' '));
+    message('catalog-status');
+    byId('catalog-provenance').textContent = [counts, data.notice].filter(Boolean).join(' ');
   } catch (error) {
     message('catalog-status', `Не удалось загрузить каталог. ${error.message}`, true);
   }
@@ -141,7 +144,7 @@ async function loadCatalog() {
 function showPhotoResult(data) {
   if (!['clear', 'defect', 'unusable', 'no_marker'].includes(data.status)) throw new Error('Неизвестный ответ анализа.');
   if (data.status === 'unusable' || data.status === 'no_marker') {
-    message('photo-status', `Не удалось оценить узел.${data.model ? ` Модель: ${data.model}.` : ''}`);
+    message('photo-status', 'Не удалось оценить узел. Выберите более чёткое фото.');
     return;
   }
   const badge = element('span', data.finding, 'finding');
@@ -149,7 +152,7 @@ function showPhotoResult(data) {
   photoResult.replaceChildren(
     badge,
     element('h3', data.component),
-    element('p', [data.model, data.observation].filter(Boolean).join(' · '), 'material-note'),
+    element('p', data.observation || '', 'material-note'),
     element('p', data.recommendation, 'material-note'),
   );
   photoResult.hidden = false;
@@ -160,7 +163,10 @@ function showPhotoResult(data) {
     photoBox.dataset.status = data.status;
     photoBox.hidden = false;
   }
-  message('photo-status', 'Предварительная оценка фотографии.');
+  message('photo-status', 'Предварительная оценка');
+  const modelDetails = element('details', undefined, 'data-note');
+  modelDetails.append(element('summary', 'О результате'), element('p', `${data.model || 'Модель не указана'}. Наблюдение требует подтверждения инженером.`, 'material-note'));
+  photoResult.append(modelDetails);
 }
 
 function changePhotoFilter() {
@@ -185,12 +191,19 @@ selectedImage.addEventListener('error', () => {
   message('photo-status', 'Не удалось открыть фотографию.', true);
 });
 
+byId('photo-cancel').addEventListener('click', () => {
+  const current = photoAnalysis; photoAnalysis = null; current?.abort();
+  byId('photo-cancel').hidden = true; analyzePhoto.disabled = !selectedPhoto;
+  message('photo-status', 'Анализ отменён.');
+});
+
 analyzePhoto.addEventListener('click', async () => {
   if (!selectedPhoto || photoAnalysis) return;
   const controller = new AbortController();
   photoAnalysis = controller;
-  const timeout = setTimeout(() => controller.abort(), 120_000);
+  const timeout = setTimeout(() => controller.abort(), 13 * 60 * 1000);
   analyzePhoto.disabled = true;
+  byId('photo-cancel').hidden = false;
   photoResult.hidden = photoBox.hidden = true;
   message('photo-status', 'Модель проверяет фотографию…');
   try {
@@ -198,7 +211,9 @@ analyzePhoto.addEventListener('click', async () => {
     if (!response.ok) throw new Error('Не удалось загрузить изображение для анализа.');
     const body = new FormData();
     body.append('file', await response.blob(), 'frame.jpg');
-    const result = await api('/analyze', { method: 'POST', body, signal: controller.signal });
+    const result = await api('/analyze', { method: 'POST', body, signal: controller.signal }, value => {
+      if (photoAnalysis === controller && !controller.signal.aborted) message('photo-status', value);
+    });
     if (photoAnalysis === controller) showPhotoResult(result);
   } catch (error) {
     if (photoAnalysis !== controller) return;
@@ -208,6 +223,7 @@ analyzePhoto.addEventListener('click', async () => {
     if (photoAnalysis === controller) {
       photoAnalysis = null;
       analyzePhoto.disabled = false;
+      byId('photo-cancel').hidden = true;
     }
   }
 });
@@ -335,12 +351,13 @@ function measurementCard(data, group, { title, channels }) {
     tableContent.replaceChildren(readingsTable(data.rows, group, channel, field, unit));
   };
   picker.addEventListener('change', showChannel);
-  card.append(element('h3', title),
-    element('p', source ? `Источник: ${source.file} · лист «${source.sheet}»` : 'Источник ряда не указан.', 'material-note'),
-    thresholdList,
-    element('p', doc ? `Пороги из «${doc.file}».` : 'Источник порогов не указан.', 'material-note'),
-    element('p', `Расхождений меток XLSX и расчёта по описанным порогам: ${discrepancies}.`, 'material-note'),
-    pickerLabel, chartContent, tableDetails);
+  const sourceDetails = element('details', undefined, 'data-note');
+  sourceDetails.append(element('summary', 'Источник и пороги'),
+    element('p', source ? `${source.file} · лист «${source.sheet}»` : 'Источник ряда не указан.', 'material-note'), thresholdList,
+    element('p', doc ? `Пороги из «${doc.file}».` : 'Источник порогов не указан.', 'material-note'));
+  card.append(element('h3', title), pickerLabel, chartContent);
+  if (discrepancies) card.append(element('p', `Расхождения исходных меток и оценки: ${discrepancies}`, 'material-note'));
+  card.append(sourceDetails, tableDetails);
   showChannel();
   return card;
 }
@@ -351,7 +368,8 @@ async function loadSensors() {
     const { dataset, summary } = data;
     byId('sensor-note').textContent = [dataset.relationshipNote,
       'Часовой пояс не указан. Ток, давление, КПД и наработка отсутствуют.'].filter(Boolean).join(' ');
-    message('sensor-status', `${summary.rowCount} строк · ${time(summary.firstTimestamp)} — ${time(summary.lastTimestamp)} · шаг ${dataset.intervalHours} ч. ${summary.futureDatedRows} строк позднее ${summary.asOfLocalDate}.`);
+    message('sensor-status', `${summary.rowCount} записей · шаг ${dataset.intervalHours} ч · без привязки к оборудованию`);
+    byId('sensor-provenance').textContent = `${time(summary.firstTimestamp)} — ${time(summary.lastTimestamp)}. ${summary.futureDatedRows} записей позднее ${summary.asOfLocalDate}.`;
     byId('measurement-grid').replaceChildren(...Object.entries(sensorGroups).map(([id, group]) => measurementCard(data, id, group)));
   } catch (error) {
     message('sensor-status', `Не удалось загрузить измерения. ${error.message}`, true);
@@ -454,7 +472,7 @@ function coverageCards(inputs) {
       return element('li', `${names.join(' + ')}. ${summary}`);
     }));
   });
-  byId('coverage-title').textContent = `Достаточность входов (${ready} из ${rulesMetadata.rules.length})`;
+  byId('coverage-title').textContent = `Полнота данных (${ready} из ${rulesMetadata.rules.length})`;
 }
 
 async function loadRules() {
@@ -536,6 +554,7 @@ window.addEventListener('pagehide', () => {
     photoAnalysis.abort();
     photoAnalysis = null;
     analyzePhoto.disabled = false;
+    byId('photo-cancel').hidden = true;
     message('photo-status');
   }
   if (diagnosis) {

@@ -25,7 +25,7 @@ const server = http.createServer((req, res) => {
     qrAvailable: false, scenarios: [{id: 'coupling_guard', label: 'Кожух муфты'}]});
   if (pathname === '/api/history') return json({records});
   const files = {'/checkpoint.html': 'text/html', '/checkpoint.js': 'application/javascript',
-    '/styles.css': 'text/css', '/checkpoint.css': 'text/css'};
+    '/styles.css': 'text/css', '/checkpoint.css': 'text/css', '/workspace.css': 'text/css', '/shell.js': 'application/javascript'};
   if (files[pathname] && fs.existsSync(path.join(root, 'web', pathname))) {
     res.writeHead(200, {'Content-Type': files[pathname]}); res.end(fs.readFileSync(path.join(root, 'web', pathname))); return;
   }
@@ -50,14 +50,17 @@ const server = http.createServer((req, res) => {
         assert.equal(await entries.count(), 3);
         const demoCamera = await entries.nth(0).textContent();
         assert.match(demoCamera, /Осмотр с камеры/);
-        assert.match(demoCamera, /демонстрационный сценарий «Кожух муфты»/);
-        assert.match(demoCamera, /не текущие показания/);
+        assert.match(demoCamera, /Показания: демо · Кожух муфты/);
+        await entries.nth(0).getByText('Данные осмотра', {exact:true}).click();
+        assert.match(await entries.nth(0).locator('details').innerText(), /LocalModel/);
+        assert.match(await entries.nth(0).locator('details').innerText(), /Оборудование выбрано инженером/);
+        await entries.nth(0).getByText('Данные осмотра', {exact:true}).click();
         assert.match(demoCamera, /Визуальные признаки инженером не оценены/);
         assert.match(demoCamera, /Неоценённые признаки не считаются нормой/);
         assert.equal(await entries.nth(0).locator('a').getAttribute('href'), `/api/analyses/${evidenceId}/image`);
         assert.equal(await page.locator('#unsafe').count(), 0);
         const noSensors = await entries.nth(1).textContent();
-        assert.match(noSensors, /Телеметрия: отсутствует/);
+        assert.match(noSensors, /Показаний нет — оценка ограничена/);
         assert.match(noSensors, /Проблема с защитным кожухом: Да/);
         assert.doesNotMatch(noSensors, /Влага в зоне уплотнения: Нет/);
         assert.match(await entries.nth(2).textContent(), /Сохранённый демонстрационный сценарий/);

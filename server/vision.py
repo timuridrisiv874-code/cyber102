@@ -10,6 +10,7 @@ from http.client import HTTPException
 from io import BytesIO
 from urllib.error import URLError, HTTPError
 from urllib.request import Request, ProxyHandler, HTTPRedirectHandler, build_opener
+from .vision_models import model_spec
 
 MODEL = 'qwen3-vl:8b'
 ENDPOINT = 'http://127.0.0.1:11435/api/chat'
@@ -219,9 +220,11 @@ def analyze(image, backend='ollama', profile='standard'):
                     if isinstance(failure, dict) and (failure.get('code') == 'vision_busy' or failure.get('error') == 'Local GPU is busy'):
                         raise VisionBusy('Модель занята другим кадром. Повторите через несколько секунд.') from error
                 raise
-            if envelope.get('model') != INTERNVL_MODEL:
-                raise ValueError('Unexpected InternVL model')
-            result = result_from_observation(envelope['observation'], model=INTERNVL_MODEL)
+            expected = model_spec()
+            if (envelope.get('model') != expected.model_id
+                    or ('revision' in envelope and envelope['revision'] != expected.revision)):
+                raise ValueError('Unexpected local VLM model or revision')
+            result = result_from_observation(envelope['observation'], model=expected.model_id)
             if 'profile' in envelope:
                 if envelope['profile'] != profile:
                     raise ValueError('Unexpected model profile')

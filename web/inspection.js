@@ -20,7 +20,10 @@
     // Only a typed busy response can be retried. Keep the same captured frame;
     // never overlap requests or silently retry failed inference/network errors.
     for (let attempt = 0; ; attempt += 1) {
-      const response = await fetch(endpoint, options);
+      const response = window.CyberAnalysisJobs
+        ? await window.CyberAnalysisJobs.request(endpoint, options, onBusy) : await fetch(endpoint, options);
+      // A queued failure belongs to one idempotent job and must not resubmit it.
+      if (response.analysisQueued) return response;
       if (response.status !== 503 || attempt >= 3) return response;
       const error = await response.clone().json().catch(() => ({}));
       if (error.code !== 'vision_busy') return response;
@@ -72,7 +75,7 @@
   componentRow.className = 'demo-options';
   const componentLabel = document.createElement('label');
   componentLabel.htmlFor = 'inspection-component';
-  componentLabel.textContent = 'Узел для паспортной рекомендации';
+  componentLabel.textContent = 'Узел';
   const component = document.createElement('select');
   component.id = componentLabel.htmlFor;
   component.append(new Option('Насос', 'pump'));
@@ -137,9 +140,9 @@
     manual.hidden = selected !== 'manual';
     manual.querySelectorAll('input, select').forEach((input) => { input.disabled = manual.hidden; });
     byId('inspection-source').textContent = selected === 'manual' ?
-      'Показания введены оператором для выбранного серийного номера. Это не автоматическое подключение датчиков.' : selected ?
-      'Демонстрационные показания: эмулятор, не реальные датчики этого кадра. Визуальные признаки сценария не используются.' :
-      'Данные датчиков не подключены. Неизвестные параметры не считаются нормой.';
+      'Показания введены вручную.' : selected ?
+      'Демо: показания не относятся к этому кадру.' :
+      'Без показаний. Неизвестные параметры не считаются нормой.';
     byId('inspection-history').href = `/checkpoint.html?${new URLSearchParams({ serial: serial.value.trim() })}`;
   }
 
@@ -195,7 +198,7 @@
       if (referenceData?.availableComponents?.length) {
         component.replaceChildren(...referenceData.availableComponents.map((item) => new Option(item.label, item.key)));
       }
-      setMessage(`Оборудование: ${data.passport.model || requested}. Источник датчиков выберите отдельно.`);
+      setMessage(`Оборудование: ${data.passport.model || requested}`);
     } catch (error) {
       if (load === serialLoad) setMessage(error.message, true);
     } finally {
@@ -427,7 +430,7 @@
         for (const select of confirms.querySelectorAll('select')) select.value = '';
         gauge.value = note.value = '';
         if (valid) {
-          byId('inspection-frame').textContent = `Привязан последний проверенный кадр. Анализ: ${result.analysisId}.`;
+          byId('inspection-frame').textContent = 'Сохранится последний проверенный кадр.';
           if (!serialReady) loadSerial();
         }
       }

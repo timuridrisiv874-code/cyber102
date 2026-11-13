@@ -7,6 +7,8 @@
   <title>Осмотр оборудования — Cyber102</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="workspace.css">
+  <script src="offline.js" defer></script>
+  <script src="analysis-jobs.js" defer></script>
   <script src="inspection.js" defer></script>
   <script src="media.js" defer></script>
   <script src="video-review.js" defer></script>
@@ -19,26 +21,26 @@
     <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
     <p class="brand-caption">Инженерный контроль</p>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" aria-current="page" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nav-label-wide">Оборудование</span><span class="nav-label-short">Объекты</span></a><a href="checkpoint.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="materials.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M8 13h8m-8 4h5"/></svg><span>Материалы</span></a><a href="telemetry.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
-    <div class="sidebar-foot"><strong>Осмотр оборудования</strong>Предварительный осмотр<br>Решение принимает инженер</div>
+    <div class="sidebar-foot"><span class="sidebar-foot-mark" aria-hidden="true"></span>Визуальная диагностика</div>
   </aside>
-  <header class="topbar"><div class="topbar-inner"><div class="topbar-location"><span class="workspace-name">Cyber102</span><span class="divider">/</span><strong>Осмотр</strong></div><span class="mode"><i aria-hidden="true"></i><span id="mode">Выберите кадр</span></span></div></header>
+  <p class="sr-only" id="mode" role="status">Готово к осмотру</p>
   <main class="page" id="main-content" data-analysis-endpoint="/analyze">
     <header class="intro">
-      <div class="page-heading-group"><div class="eyebrow">Рабочее место инженера</div><h1>Осмотр оборудования</h1><p>Осмотр внешних узлов с фотофиксацией и историей проверок</p></div>
-      <a class="button secondary" id="inspection-journal-link" href="checkpoint.html">Журнал осмотров ↗</a>
+      <div class="page-heading-group"><h1>Осмотр оборудования</h1><p>Найдите видимые дефекты. Зафиксируйте результат.</p></div>
+      <a class="button secondary" id="inspection-journal-link" href="checkpoint.html">Открыть журнал ↗</a>
     </header>
 
     <section class="active-equipment-bar" aria-label="Оборудование текущего осмотра">
       <div class="field"><label for="active-equipment">Серийный номер</label><input id="active-equipment" value="P-102" list="inspection-equipment-options" maxlength="128" autocomplete="off" autocapitalize="characters"></div>
-      <div class="equipment-context"><strong id="shell-selected-equipment">P-102 · демонстрация</strong><p id="shell-equipment-hint">Сверьте номер с табличкой</p></div>
-      <a href="documents.html">Открыть паспорта ↗</a>
+      <div class="equipment-context"><strong id="shell-selected-equipment">P-102 · демонстрация</strong><p id="shell-equipment-hint" class="sr-only">Сверьте номер с табличкой</p></div>
+      <a href="documents.html">Паспорта ↗</a>
     </section>
 
     <div class="workspace">
       <section class="capture panel" aria-labelledby="capture-title">
-        <div class="panel-heading"><h2 id="capture-title"><span class="section-number" aria-hidden="true">01</span>Кадр осмотра</h2><span class="source" id="source"><i aria-hidden="true"></i><span id="source-text">Выберите источник</span></span></div>
+        <div class="panel-heading"><h2 id="capture-title">Кадр осмотра</h2><span class="source" id="source"><i aria-hidden="true"></i><span id="source-text">Выберите источник</span></span></div>
         <div class="viewfinder" id="viewfinder">
-          <div class="camera-idle" id="camera-idle"><span class="camera-idle-mark" aria-hidden="true"><i class="camera-icon"></i></span><strong>Готово к осмотру</strong><p>Включите камеру или выберите фото и видео с устройства.</p></div>
+          <div class="camera-idle" id="camera-idle"><span class="idle-source">Пример оборудования</span><div class="idle-caption"><span class="camera-idle-mark" aria-hidden="true"><i class="camera-icon"></i></span><strong>Начните с кадра</strong><p>Откройте камеру или загрузите файл</p></div></div>
           <img id="example" src="demo-pump.jpg" alt="Демонстрационный кадр промышленного насоса" decoding="async" hidden>
           <video id="video" aria-label="Изображение с камеры" muted autoplay playsinline hidden></video>
           <img id="uploaded-image" alt="Выбранное фото оборудования" hidden>
@@ -51,26 +53,29 @@
           <div class="actions">
             <button class="button primary" id="check" type="button" disabled><i class="scan-icon" aria-hidden="true"></i><span id="check-label">Проверить кадр</span></button>
             <button class="button primary" id="video-toggle" type="button" hidden><i class="scan-icon" aria-hidden="true"></i><span id="video-toggle-label">Начать проверку</span></button>
+            <button class="button secondary" id="analysis-cancel" type="button" hidden>Отмена</button>
             <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Включить камеру</span></button>
           </div>
           <div class="media-picker">
-            <div class="field"><label for="media-file">Или загрузите фото / видео</label><input id="media-file" type="file" accept="image/*,video/*" aria-describedby="media-help"></div>
+            <div class="field"><label for="media-file">Фото или видео</label><input id="media-file" type="file" accept="image/*,video/*" aria-describedby="media-help"></div>
             <button id="media-clear" class="button secondary" type="button" hidden>Убрать файл</button>
           </div>
-          <p class="video-help" id="media-help">Фото до 20 МБ · видео до 150 МБ и 2 минут. На анализ отправляются отдельные кадры.</p>
+          <p class="video-help" id="media-help">Фото до 20 МБ · видео до 150 МБ, 2 минут</p>
           <p class="message" id="message" role="status"></p>
           <p class="video-metrics" id="media-progress" role="status" hidden></p>
 
+          <div id="video-review-home">
           <section class="video-review-panel" id="video-review-panel" aria-labelledby="video-review-title" hidden>
             <h3 id="video-review-title">Обзор видео</h3>
-            <p class="video-help">Ключевые кадры и наблюдения по ролику в одной сводке.</p>
+
             <div class="actions"><button type="button" class="button primary" id="video-review-run" disabled>Разобрать всё видео</button><button type="button" class="button secondary" id="video-review-cancel" hidden>Отменить</button></div>
             <p class="message" id="video-review-status" role="status" aria-live="polite"></p>
             <div id="video-review-results" hidden></div>
           </section>
+          </div>
 
           <details class="capture-settings">
-            <summary>Режим анализа</summary>
+            <summary>Настройки анализа</summary>
             <div class="camera-options" id="camera-options" hidden>
               <label for="camera-mode" id="camera-mode-label">Проверка</label>
               <select id="camera-mode"><option value="single">Один кадр</option><option value="video">Видеопроверка</option></select>
@@ -80,33 +85,32 @@
               <select id="frame-interval" hidden><option value="2000">2 секунды</option><option value="5000" selected>5 секунд</option><option value="10000">10 секунд</option></select>
             </div>
             <p class="video-help" id="video-help" hidden>Проверяем отдельные кадры. Рамка относится к последнему проверенному кадру.</p>
-            <p class="video-help" id="profile-help">Подробный режим — основной. Быстрый возвращает краткий ответ по видимому признаку.</p>
+            <p class="video-help" id="profile-help">Быстрый режим возвращает короткое наблюдение.</p>
 
             <p class="video-metrics" id="analysis-timing" hidden></p><p class="video-metrics" id="video-metrics" hidden></p>
           </details>
           <details class="capture-settings demo-examples" id="demo-options">
-            <summary>Тестовые примеры</summary>
+            <summary>Посмотреть демо</summary>
             <div class="demo-options"><label for="demo-scenario">Сценарий</label><select id="demo-scenario"><option value="defect" data-image="demo-pump.jpg" data-response="mock-analysis.json">Признаки коррозии</option><option value="clear" data-image="demo-pump-clean.jpg" data-response="mock-analysis-clear.json">Чистый узел</option><option value="no_marker" data-image="demo-pump.jpg" data-response="mock-analysis-no-marker.json">Кадр без метки</option></select></div>
-            <button type="button" class="button secondary" id="show-example">Открыть тестовый пример</button>
-            <p class="video-help">Встроенные ответы для знакомства с интерфейсом. Это не результат текущего анализа модели.</p>
+            <button type="button" class="button secondary" id="show-example">Открыть пример</button>
+            <p class="video-help">Демонстрация с заранее подготовленным ответом.</p>
           </details>
         </div>
       </section>
 
       <section class="result panel" id="result" aria-labelledby="result-title">
-        <div class="panel-heading"><h2 id="result-title" tabindex="-1"><span class="section-number" aria-hidden="true">02</span>Наблюдение и действия</h2></div>
+        <div class="panel-heading"><h2 id="result-title" tabindex="-1">Результат осмотра</h2></div>
         <div class="checked-frame" id="checked-frame" hidden><p class="source">Последний проверенный кадр</p><div class="viewfinder checked-viewfinder" id="checked-viewfinder"></div></div>
         <div class="empty" id="empty">
-          <div class="empty-icon" aria-hidden="true"><i></i></div><h3 id="empty-title">Результат появится здесь</h3><p id="empty-text">Модель выделит доступный для осмотра узел и предложит следующий шаг.</p>
-          <ol class="empty-steps"><li>Снимите узел при хорошем освещении</li><li>Проверьте наблюдение модели</li><li>Добавьте замечание в историю</li></ol>
+          <div class="empty-icon" aria-hidden="true"><i></i></div><h3 id="empty-title">Ожидает кадр</h3><p id="empty-text">Добавьте фото или видео для проверки.</p>
         </div>
         <div class="details" id="details" hidden>
-          <span class="finding" id="finding"></span><h3 id="equipment"></h3><p class="equipment-id" id="equipment-id"></p><p class="equipment-id" id="capture-provenance" hidden></p><p class="equipment-id" id="vision-observation" hidden></p>
+          <span class="finding" id="finding"></span><h3 id="equipment"></h3><p class="observation-text" id="vision-observation" hidden></p><details class="workspace-details result-provenance"><summary>О данных</summary><p class="equipment-id" id="equipment-id"></p><p class="equipment-id" id="capture-provenance" hidden></p><p class="equipment-id" id="analysis-model"></p></details>
           <dl class="facts"><div><dt>Узел</dt><dd id="component"></dd></div><div><dt>Нормативный срок службы</dt><dd id="service-life"></dd></div><div><dt>Обслуживание</dt><dd id="next-service"></dd></div></dl>
           <div class="recommendation"><h4>Следующий шаг</h4><p id="recommendation"></p></div>
         </div>
         <section class="details" id="inspection-workflow" aria-labelledby="inspection-title" hidden>
-          <h3 id="inspection-title">Зафиксировать осмотр</h3><p class="equipment-id">Подтвердите наблюдения и привяжите показания, если они есть.</p><p class="equipment-id" id="inspection-frame"></p><p class="message" id="inspection-paused" hidden>Остановите видеопроверку, чтобы подтвердить и сохранить последний кадр.</p>
+          <h3 id="inspection-title">Зафиксировать осмотр</h3><p class="equipment-id" id="inspection-frame"></p><p class="message" id="inspection-paused" hidden>Остановите видеопроверку, чтобы подтвердить и сохранить последний кадр.</p>
           <form id="inspection-form">
             <fieldset id="inspection-fields"><legend>Оборудование и показания</legend>
               <p><label for="inspection-serial">Серийный номер</label><input id="inspection-serial" value="P-102" maxlength="128" autocomplete="off" required></p>
@@ -122,7 +126,7 @@
         </section>
       </section>
     </div>
-    <details class="inspection-boundary"><summary>Предварительный осмотр · что учитывает система</summary><p>Модель оценивает доступные внешние признаки. Скрытые неисправности по изображению корпуса не определяются. Отсутствие видимого дефекта не подтверждает исправность.</p><p>Кадр, паспорт и показания датчиков — отдельные источники. Привязку к агрегату и наблюдения подтверждает инженер. При недостатке данных остаточный ресурс не рассчитывается.</p></details>
+    <details class="inspection-boundary"><summary>О данных и границах осмотра</summary><p>Модель оценивает доступные внешние признаки. Скрытые неисправности по изображению корпуса не определяются. Отсутствие видимого дефекта не подтверждает исправность.</p><p>Кадр, паспорт и показания датчиков — отдельные источники. Привязку к агрегату и наблюдения подтверждает инженер. При недостатке данных остаточный ресурс не рассчитывается.</p></details>
   </main>
 </body>
 </html>

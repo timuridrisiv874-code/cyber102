@@ -132,14 +132,17 @@ async function run(browser, name, options, mock) {
   try {
     await page.goto(`http://127.0.0.1:${mock.server.address().port}/index.html`);
     await installTestCamera(page);
+    await page.locator('#demo-options > summary').click();
+    await page.locator('#show-example').click();
     await check.click();
     await page.locator('#viewfinder #detection').waitFor();
     assert.equal(frameCount(), 0, 'Demo example must use its local JSON fixture');
-    assert.equal(await page.locator('#mode').innerText(), 'Тестовый режим');
+    assert.equal(await page.locator('#mode').textContent(), 'Тестовый пример');
 
     await cameraOn.click();
     await video.waitFor();
-    await page.getByLabel('Режим').selectOption('video');
+    await page.getByText('Настройки анализа', {exact:true}).click();
+    await page.getByLabel('Проверка', {exact:true}).selectOption('video');
     const interval = page.getByLabel('Интервал');
     assert.equal(await interval.inputValue(), '5000');
     await interval.selectOption('2000');
@@ -155,7 +158,10 @@ async function run(browser, name, options, mock) {
     await marker.waitFor();
     assert.equal(await video.isVisible(), true);
     assert.equal(await page.locator('#viewfinder #detection').count(), 0);
-    await page.getByText(`Предварительный осмотр · ${model}: Проверка контура`, { exact: true }).waitFor();
+    await page.locator('#vision-observation').getByText('Проверка контура', {exact:true}).waitFor();
+    await page.locator('.result-provenance > summary').click();
+    assert.equal(await page.locator('#analysis-model').innerText(), model);
+    await page.locator('.result-provenance > summary').click();
     const firstImage = await snapshot.evaluate(canvas => canvas.toDataURL());
     const second = await next;
     assert.equal(await snapshot.evaluate(canvas => canvas.toDataURL()), firstImage, 'Pending frame must not replace the last result');
@@ -195,7 +201,8 @@ async function run(browser, name, options, mock) {
     assert.equal(await video.isVisible(), false);
     await page.getByRole('button', { name: 'Новый кадр' }).click();
     await video.waitFor();
-    await page.getByLabel('Режим').selectOption('video');
+    await page.getByText('Настройки анализа', {exact:true}).click();
+    await page.getByLabel('Проверка', {exact:true}).selectOption('video');
     const unavailable = await startFrame(start);
     unavailable.reply(503, { error: 'Локальная модель занята.' });
     await page.getByText('Локальная модель занята.').waitFor();

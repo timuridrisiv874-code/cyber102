@@ -1,10 +1,11 @@
 import argparse
+import hashlib
 import json
 import re
 import sqlite3
 import threading
 from contextlib import closing
-from functools import partial
+from functools import partial, wraps
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO
@@ -14,7 +15,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 from .demo_data import PASSPORT, SCENARIOS
 from . import history
 from . import vision
-from . import inspections, customer, recommendations, assessment, video_review
+from . import inspections, customer, recommendations, assessment, video_review, analysis_queue
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -26,6 +27,38 @@ def connect(database):
     connection = sqlite3.connect(database, timeout=10)
     connection.execute('PRAGMA foreign_keys = ON')
     return connection
+
+
+def analyze_photo_job(payload):
+    return {**vision.analyze(payload['image'], backend=payload['backend'], profile=payload['profile']),
+            'media': payload['media']}
+
+
+def save_photo_job(payload, result):
+    if result.get('status') in ('defect', 'clear'):
+        with closing(connect(payload['database'])) as connection, connection:
+            return {**result, **inspections.store_analysis(connection, payload['image'], result)}
+    return result
+
+
+def analyze_video_job(payload):
+    return video_review._analyze_prepared(payload)
+
+
+def bounded_analysis_upload(method):
+    @wraps(method)
+    def bounded(self):
+        if not self.server.analysis_upload_slots.acquire(blocking=False):
+            self.close_connection = True
+            self.send_json({'error': 'Сервер принимает другие изображения. Повторите через несколько секунд.',
+                            'code': 'analysis_upload_busy', 'retryAfterSeconds': 2}, 503,
+                           headers={'Retry-After': '2'})
+            return
+        try:
+            return method(self)
+        finally:
+            self.server.analysis_upload_slots.release()
+    return bounded
 
 
 def initialize(database, customer_root=None):
@@ -77,7 +110,14 @@ class BoundedHTTPServer(ThreadingHTTPServer):
 
     def __init__(self, *args, **kwargs):
         self.slots = threading.BoundedSemaphore(24)
+        self.analysis_upload_slots = threading.BoundedSemaphore(2)
         super().__init__(*args, **kwargs)
+        self.analysis_queue = analysis_queue.AnalysisQueue()
+
+    def server_close(self):
+        if hasattr(self, 'analysis_queue'):
+            self.analysis_queue.close()
+        super().server_close()
 
     def process_request(self, request, client_address):
         if not self.slots.acquire(blocking=False):
@@ -193,6 +233,9 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         target = urlsplit(self.path)
+        if target.path.startswith('/api/analysis-jobs/'):
+            self.analysis_job(target.path)
+            return
         if target.path in ('/api/equipment', '/api/recommendations'):
             try:
                 parameters = parse_qs(target.query)
@@ -289,8 +332,10 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_json({'status': 'ok', 'source': 'demo'})
             elif target.path == '/api/capabilities':
                 self.send_json({'vision': {'enabled': self.vision_enabled, 'backend': self.vision_backend,
-                    'model': vision.INTERNVL_MODEL if self.vision_backend == 'internvl3' else None,
+                    'model': vision.model_spec().model_id if self.vision_backend == 'internvl3' else None,
+                    'revision': vision.model_spec().revision if self.vision_backend == 'internvl3' else None,
                     'videoReview': self.vision_enabled and self.vision_backend == 'internvl3',
+                    'queue': self.server.analysis_queue.capabilities(self.vision_enabled),
                     'profiles': list(vision.PROFILES) if self.vision_backend == 'internvl3' else ['standard']},
                     'media': {'maxPhotoBytes': 20 * 1024 * 1024, 'maxVideoBytes': 150 * 1024 * 1024,
                               'maxVideoSeconds': 120, 'maxSampledFrames': 20, 'maxReviewFrames': 8}})
@@ -309,13 +354,17 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         route = urlsplit(self.path).path
-        if route not in ('/api/diagnose', '/api/history', '/analyze', '/api/video-review', '/api/inspections', '/api/inspections/preview'):
+        job_route = route.startswith('/api/analysis-jobs/')
+        if not job_route and route not in ('/api/diagnose', '/api/history', '/analyze', '/api/video-review', '/api/inspections', '/api/inspections/preview'):
             self.error(HTTPStatus.NOT_FOUND, 'Маршрут не найден.')
             return
         origins = self.headers.get_all('Origin', [])
         if origins and (len(origins) != 1 or not origins[0] or
                         origins[0] not in (self.public_url, f'http://{self.headers.get("Host")}')):
             self.error(HTTPStatus.FORBIDDEN, 'Запрос разрешён только с адреса приложения.')
+            return
+        if job_route:
+            self.analysis_job(route, cancel=True)
             return
         if route == '/analyze':
             self.analyze_frame()
@@ -397,6 +446,65 @@ class Handler(SimpleHTTPRequestHandler):
         except ValueError as error:
             self.error(HTTPStatus.BAD_REQUEST, str(error))
 
+    def analysis_tokens(self, request=False):
+        names = ('X-Analysis-Client', 'X-Analysis-Request') if request else ('X-Analysis-Client',)
+        values = []
+        for name in names:
+            headers = self.headers.get_all(name, [])
+            if len(headers) != 1:
+                raise ValueError('Нужны идентификаторы сессии и запроса анализа.')
+            values.append(analysis_queue.token(headers[0]))
+        return values
+
+    def wants_async(self):
+        values = self.headers.get_all('Prefer', [])
+        if len(values) > 1:
+            raise ValueError('Повторный заголовок Prefer недопустим.')
+        return any(part.strip().lower() == 'respond-async' for part in ','.join(values).split(','))
+
+    def queue_error(self, error):
+        if isinstance(error, analysis_queue.QueueFull):
+            self.send_json({'error': 'Очередь заполнена. Повторите через несколько секунд.',
+                            'code': 'analysis_queue_full', 'retryAfterSeconds': 2}, 503,
+                           headers={'Retry-After': '2'})
+        elif isinstance(error, analysis_queue.RequestConflict):
+            self.send_json({'error': 'Этот идентификатор уже использован для другого анализа.',
+                            'code': 'analysis_request_conflict'}, 409)
+        elif isinstance(error, analysis_queue.JobNotFound):
+            self.error(404, 'Задание не найдено или срок его хранения истёк.')
+
+    def analysis_job(self, route, *, cancel=False):
+        try:
+            client, = self.analysis_tokens()
+            by_request = re.fullmatch(r'/api/analysis-jobs/by-request/([^/]+)/cancel', route) if cancel else None
+            match = re.fullmatch(r'/api/analysis-jobs/([0-9a-f]{32})' + ('/cancel' if cancel else ''), route)
+            if cancel:
+                lengths = self.headers.get_all('Content-Length', [])
+                if self.headers.get_all('Transfer-Encoding') or len(lengths) > 1 or (lengths and lengths != ['0']):
+                    raise ValueError('Отмена анализа не принимает тело запроса.')
+            if by_request:
+                job = self.server.analysis_queue.cancel_request(by_request[1], client)
+            elif match:
+                method = self.server.analysis_queue.cancel if cancel else self.server.analysis_queue.get
+                job = method(match[1], client)
+            else:
+                raise analysis_queue.JobNotFound()
+            self.send_json({'job': job})
+        except ValueError as error:
+            self.error(400, str(error))
+        except (analysis_queue.QueueFull, analysis_queue.JobNotFound) as error:
+            self.queue_error(error)
+
+    def enqueue_analysis(self, kind, payload, canonical, run, finalize=None):
+        client, request = self.analysis_tokens(request=True)
+        digest = hashlib.sha256(kind.encode() + b'\0' + canonical).hexdigest()
+        job = self.server.analysis_queue.submit(client, request, digest, kind, payload,
+                                               len(canonical), run, finalize)
+        self.send_json({'job': job}, HTTPStatus.ACCEPTED,
+                       headers={'Location': '/api/analysis-jobs/' + job['id'],
+                                'Preference-Applied': 'respond-async', 'Retry-After': '2'})
+
+    @bounded_analysis_upload
     def analyze_frame(self):
         if not self.vision_enabled:
             self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Локальное зрение не включено на этом сервере.')
@@ -406,6 +514,9 @@ class Handler(SimpleHTTPRequestHandler):
             self.error(HTTPStatus.BAD_REQUEST, 'Укажите одну длину тела запроса в Content-Length.')
             return
         try:
+            asynchronous = self.wants_async()
+            if asynchronous:
+                self.analysis_tokens(request=True)
             length_header = lengths[0].strip()
             if not length_header.isascii() or not length_header.isdecimal():
                 raise ValueError('Некорректное значение Content-Length.')
@@ -417,14 +528,23 @@ class Handler(SimpleHTTPRequestHandler):
             if len(body) != length:
                 raise ValueError('Тело запроса с кадром получено не полностью.')
             image, profile, media = vision.extract_request(self.headers.get('Content-Type', ''), body, include_metadata=True)
-            result = {**vision.analyze(image, backend=self.vision_backend, profile=profile), 'media': media}
-            if result.get('status') in ('defect', 'clear'):
-                with closing(connect(self.database)) as connection, connection:
-                    result = {**result, **inspections.store_analysis(connection, image, result)}
+            if profile not in vision.PROFILES or (self.vision_backend != 'internvl3' and profile != 'standard'):
+                raise ValueError('Выбранный режим не поддерживается моделью.')
+            payload = {'image': image, 'backend': self.vision_backend, 'profile': profile,
+                       'media': media, 'database': self.database}
+            if asynchronous:
+                canonical = json.dumps({'backend': self.vision_backend, 'profile': profile, 'media': media},
+                                       sort_keys=True).encode() + b'\0' + image
+                self.enqueue_analysis('photo', payload, canonical, analyze_photo_job, save_photo_job)
+                return
+            with self.server.analysis_queue.legacy():
+                result = save_photo_job(payload, analyze_photo_job(payload))
         except TimeoutError:
             self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить кадр за отведённое время.')
         except ValueError as error:
             self.error(HTTPStatus.BAD_REQUEST, str(error))
+        except (analysis_queue.QueueFull, analysis_queue.RequestConflict) as error:
+            self.queue_error(error)
         except vision.VisionBusy as error:
             self.send_json({'error': str(error), 'code': 'vision_busy', 'retryAfterSeconds': 2},
                            HTTPStatus.SERVICE_UNAVAILABLE, headers={'Retry-After': '2'})
@@ -435,6 +555,7 @@ class Handler(SimpleHTTPRequestHandler):
         else:
             self.send_json(result)
 
+    @bounded_analysis_upload
     def analyze_video(self):
         if not self.vision_enabled or self.vision_backend != 'internvl3':
             self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Совместный анализ видео недоступен на этом сервере.')
@@ -447,6 +568,9 @@ class Handler(SimpleHTTPRequestHandler):
             self.error(HTTPStatus.BAD_REQUEST, 'Укажите одну длину тела запроса в Content-Length.')
             return
         try:
+            asynchronous = self.wants_async()
+            if asynchronous:
+                self.analysis_tokens(request=True)
             length_header = lengths[0].strip()
             if not length_header.isascii() or not length_header.isdecimal():
                 raise ValueError('Некорректное значение Content-Length.')
@@ -457,11 +581,19 @@ class Handler(SimpleHTTPRequestHandler):
             body = self.rfile.read(length)
             if len(body) != length:
                 raise ValueError('Кадры получены не полностью. Повторите отправку.')
-            result = video_review.analyze_request(self.headers.get('Content-Type', ''), body)
+            if asynchronous:
+                payload = video_review.prepare_request(video_review.strict_json(body))
+                canonical = json.dumps(payload, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()
+                self.enqueue_analysis('video', payload, canonical, analyze_video_job)
+                return
+            with self.server.analysis_queue.legacy():
+                result = video_review.analyze_request(self.headers.get('Content-Type', ''), body)
         except TimeoutError:
             self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить кадры за отведённое время.')
-        except (ValueError, UnicodeError) as error:
+        except (ValueError, UnicodeError, RecursionError) as error:
             self.error(HTTPStatus.BAD_REQUEST, str(error))
+        except (analysis_queue.QueueFull, analysis_queue.RequestConflict) as error:
+            self.queue_error(error)
         except vision.VisionBusy as error:
             self.send_json({'error': str(error), 'code': 'vision_busy', 'retryAfterSeconds': 2},
                            HTTPStatus.SERVICE_UNAVAILABLE, headers={'Retry-After': '2'})

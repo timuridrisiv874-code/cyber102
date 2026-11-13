@@ -90,7 +90,8 @@ try {
     $visionReady = $false
     if ($visionBackend -ceq 'internvl3') {
         $visionHealth = Invoke-RestMethod 'http://127.0.0.1:11436/health' -TimeoutSec 3
-        $visionReady = $visionHealth.status -ceq 'ok' -and $visionHealth.model -ceq 'OpenGVLab/InternVL3_5-2B-HF' -and $visionHealth.revision -ceq '3f301ffcf3dcbb47893afae6650ea3e78d96fb6d'
+        $capabilities = Invoke-RestMethod 'http://127.0.0.1:8102/api/capabilities' -TimeoutSec 3
+        $visionReady = $visionHealth.status -ceq 'ok' -and $visionHealth.model -ceq $capabilities.vision.model -and $visionHealth.revision -ceq $capabilities.vision.revision
     } elseif ($visionBackend -ceq 'ollama') {
         $visionHealth = Invoke-RestMethod 'http://127.0.0.1:11435/api/tags' -TimeoutSec 3
         $visionReady = @($visionHealth.models | Where-Object { $_.model -ceq 'qwen3-vl:8b' -or $_.name -ceq 'qwen3-vl:8b' }).Count -gt 0

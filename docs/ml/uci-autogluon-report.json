@@ -1,0 +1,2446 @@
+{
+  "schemaVersion": 1,
+  "completed": true,
+  "startedAt": "2026-11-13T18:40:31.401157+00:00",
+  "purpose": "Controlled laboratory internal pump leakage, not field validation",
+  "runtimeReady": false,
+  "datasetDOI": "10.24432/C5CW21",
+  "license": "CC BY 4.0",
+  "archiveSha256": "24128aad2ee45eea7e6b63ebbd9992cdf25d0483a2cebefbfc13bc69079af1f2",
+  "scriptSha256": "4caad7f2a477774b10e0767ba655ee148532896e50e714e4ec618c5369bcd2b5",
+  "label": "profile.txt column 3: 0=no leakage, 1=weak, 2=severe",
+  "split": {
+    "train": {
+      "cycles": 1323,
+      "first_cycle": 1,
+      "last_cycle": 1323,
+      "class_counts": {
+        "0": 749,
+        "1": 287,
+        "2": 287
+      }
+    },
+    "validation": {
+      "cycles": 441,
+      "first_cycle": 1324,
+      "last_cycle": 1764,
+      "class_counts": {
+        "0": 277,
+        "1": 82,
+        "2": 82
+      }
+    },
+    "test": {
+      "cycles": 441,
+      "first_cycle": 1765,
+      "last_cycle": 2205,
+      "class_counts": {
+        "0": 195,
+        "1": 123,
+        "2": 123
+      }
+    }
+  },
+  "testReuse": "Same final 441 cycles as the published historical CatBoost benchmark; not a new blind holdout. No selection or parameter changes using this test.",
+  "features": {
+    "baseline": [
+      "PS1_mean",
+      "PS1_std",
+      "PS1_min",
+      "PS1_max",
+      "PS1_q05",
+      "PS1_median",
+      "PS1_q95",
+      "PS1_last_first_5s_mean_diff",
+      "PS2_mean",
+      "PS2_std",
+      "PS2_min",
+      "PS2_max",
+      "PS2_q05",
+      "PS2_median",
+      "PS2_q95",
+      "PS2_last_first_5s_mean_diff",
+      "PS3_mean",
+      "PS3_std",
+      "PS3_min",
+      "PS3_max",
+      "PS3_q05",
+      "PS3_median",
+      "PS3_q95",
+      "PS3_last_first_5s_mean_diff",
+      "PS4_mean",
+      "PS4_std",
+      "PS4_min",
+      "PS4_max",
+      "PS4_q05",
+      "PS4_median",
+      "PS4_q95",
+      "PS4_last_first_5s_mean_diff",
+      "PS5_mean",
+      "PS5_std",
+      "PS5_min",
+      "PS5_max",
+      "PS5_q05",
+      "PS5_median",
+      "PS5_q95",
+      "PS5_last_first_5s_mean_diff",
+      "PS6_mean",
+      "PS6_std",
+      "PS6_min",
+      "PS6_max",
+      "PS6_q05",
+      "PS6_median",
+      "PS6_q95",
+      "PS6_last_first_5s_mean_diff",
+      "EPS1_mean",
+      "EPS1_std",
+      "EPS1_min",
+      "EPS1_max",
+      "EPS1_q05",
+      "EPS1_median",
+      "EPS1_q95",
+      "EPS1_last_first_5s_mean_diff",
+      "FS1_mean",
+      "FS1_std",
+      "FS1_min",
+      "FS1_max",
+      "FS1_q05",
+      "FS1_median",
+      "FS1_q95",
+      "FS1_last_first_5s_mean_diff",
+      "FS2_mean",
+      "FS2_std",
+      "FS2_min",
+      "FS2_max",
+      "FS2_q05",
+      "FS2_median",
+      "FS2_q95",
+      "FS2_last_first_5s_mean_diff",
+      "TS1_mean",
+      "TS1_std",
+      "TS1_min",
+      "TS1_max",
+      "TS1_q05",
+      "TS1_median",
+      "TS1_q95",
+      "TS1_last_first_5s_mean_diff",
+      "TS2_mean",
+      "TS2_std",
+      "TS2_min",
+      "TS2_max",
+      "TS2_q05",
+      "TS2_median",
+      "TS2_q95",
+      "TS2_last_first_5s_mean_diff",
+      "TS3_mean",
+      "TS3_std",
+      "TS3_min",
+      "TS3_max",
+      "TS3_q05",
+      "TS3_median",
+      "TS3_q95",
+      "TS3_last_first_5s_mean_diff",
+      "TS4_mean",
+      "TS4_std",
+      "TS4_min",
+      "TS4_max",
+      "TS4_q05",
+      "TS4_median",
+      "TS4_q95",
+      "TS4_last_first_5s_mean_diff",
+      "VS1_mean",
+      "VS1_std",
+      "VS1_min",
+      "VS1_max",
+      "VS1_q05",
+      "VS1_median",
+      "VS1_q95",
+      "VS1_last_first_5s_mean_diff"
+    ],
+    "enhanced": [
+      "PS1_mean",
+      "PS1_std",
+      "PS1_min",
+      "PS1_max",
+      "PS1_q05",
+      "PS1_median",
+      "PS1_q95",
+      "PS1_last_first_5s_mean_diff",
+      "PS2_mean",
+      "PS2_std",
+      "PS2_min",
+      "PS2_max",
+      "PS2_q05",
+      "PS2_median",
+      "PS2_q95",
+      "PS2_last_first_5s_mean_diff",
+      "PS3_mean",
+      "PS3_std",
+      "PS3_min",
+      "PS3_max",
+      "PS3_q05",
+      "PS3_median",
+      "PS3_q95",
+      "PS3_last_first_5s_mean_diff",
+      "PS4_mean",
+      "PS4_std",
+      "PS4_min",
+      "PS4_max",
+      "PS4_q05",
+      "PS4_median",
+      "PS4_q95",
+      "PS4_last_first_5s_mean_diff",
+      "PS5_mean",
+      "PS5_std",
+      "PS5_min",
+      "PS5_max",
+      "PS5_q05",
+      "PS5_median",
+      "PS5_q95",
+      "PS5_last_first_5s_mean_diff",
+      "PS6_mean",
+      "PS6_std",
+      "PS6_min",
+      "PS6_max",
+      "PS6_q05",
+      "PS6_median",
+      "PS6_q95",
+      "PS6_last_first_5s_mean_diff",
+      "EPS1_mean",
+      "EPS1_std",
+      "EPS1_min",
+      "EPS1_max",
+      "EPS1_q05",
+      "EPS1_median",
+      "EPS1_q95",
+      "EPS1_last_first_5s_mean_diff",
+      "FS1_mean",
+      "FS1_std",
+      "FS1_min",
+      "FS1_max",
+      "FS1_q05",
+      "FS1_median",
+      "FS1_q95",
+      "FS1_last_first_5s_mean_diff",
+      "FS2_mean",
+      "FS2_std",
+      "FS2_min",
+      "FS2_max",
+      "FS2_q05",
+      "FS2_median",
+      "FS2_q95",
+      "FS2_last_first_5s_mean_diff",
+      "TS1_mean",
+      "TS1_std",
+      "TS1_min",
+      "TS1_max",
+      "TS1_q05",
+      "TS1_median",
+      "TS1_q95",
+      "TS1_last_first_5s_mean_diff",
+      "TS2_mean",
+      "TS2_std",
+      "TS2_min",
+      "TS2_max",
+      "TS2_q05",
+      "TS2_median",
+      "TS2_q95",
+      "TS2_last_first_5s_mean_diff",
+      "TS3_mean",
+      "TS3_std",
+      "TS3_min",
+      "TS3_max",
+      "TS3_q05",
+      "TS3_median",
+      "TS3_q95",
+      "TS3_last_first_5s_mean_diff",
+      "TS4_mean",
+      "TS4_std",
+      "TS4_min",
+      "TS4_max",
+      "TS4_q05",
+      "TS4_median",
+      "TS4_q95",
+      "TS4_last_first_5s_mean_diff",
+      "VS1_mean",
+      "VS1_std",
+      "VS1_min",
+      "VS1_max",
+      "VS1_q05",
+      "VS1_median",
+      "VS1_q95",
+      "VS1_last_first_5s_mean_diff",
+      "PS1_rms",
+      "PS1_peak_to_peak",
+      "PS1_iqr",
+      "PS1_mad",
+      "PS1_skewness",
+      "PS1_excess_kurtosis",
+      "PS1_mean_absolute_difference",
+      "PS1_slope_per_second",
+      "PS1_lag1_correlation",
+      "PS1_first20s_mean",
+      "PS1_first20s_std",
+      "PS1_middle20s_mean",
+      "PS1_middle20s_std",
+      "PS1_last20s_mean",
+      "PS1_last20s_std",
+      "PS2_rms",
+      "PS2_peak_to_peak",
+      "PS2_iqr",
+      "PS2_mad",
+      "PS2_skewness",
+      "PS2_excess_kurtosis",
+      "PS2_mean_absolute_difference",
+      "PS2_slope_per_second",
+      "PS2_lag1_correlation",
+      "PS2_first20s_mean",
+      "PS2_first20s_std",
+      "PS2_middle20s_mean",
+      "PS2_middle20s_std",
+      "PS2_last20s_mean",
+      "PS2_last20s_std",
+      "PS3_rms",
+      "PS3_peak_to_peak",
+      "PS3_iqr",
+      "PS3_mad",
+      "PS3_skewness",
+      "PS3_excess_kurtosis",
+      "PS3_mean_absolute_difference",
+      "PS3_slope_per_second",
+      "PS3_lag1_correlation",
+      "PS3_first20s_mean",
+      "PS3_first20s_std",
+      "PS3_middle20s_mean",
+      "PS3_middle20s_std",
+      "PS3_last20s_mean",
+      "PS3_last20s_std",
+      "PS4_rms",
+      "PS4_peak_to_peak",
+      "PS4_iqr",
+      "PS4_mad",
+      "PS4_skewness",
+      "PS4_excess_kurtosis",
+      "PS4_mean_absolute_difference",
+      "PS4_slope_per_second",
+      "PS4_lag1_correlation",
+      "PS4_first20s_mean",
+      "PS4_first20s_std",
+      "PS4_middle20s_mean",
+      "PS4_middle20s_std",
+      "PS4_last20s_mean",
+      "PS4_last20s_std",
+      "PS5_rms",
+      "PS5_peak_to_peak",
+      "PS5_iqr",
+      "PS5_mad",
+      "PS5_skewness",
+      "PS5_excess_kurtosis",
+      "PS5_mean_absolute_difference",
+      "PS5_slope_per_second",
+      "PS5_lag1_correlation",
+      "PS5_first20s_mean",
+      "PS5_first20s_std",
+      "PS5_middle20s_mean",
+      "PS5_middle20s_std",
+      "PS5_last20s_mean",
+      "PS5_last20s_std",
+      "PS6_rms",
+      "PS6_peak_to_peak",
+      "PS6_iqr",
+      "PS6_mad",
+      "PS6_skewness",
+      "PS6_excess_kurtosis",
+      "PS6_mean_absolute_difference",
+      "PS6_slope_per_second",
+      "PS6_lag1_correlation",
+      "PS6_first20s_mean",
+      "PS6_first20s_std",
+      "PS6_middle20s_mean",
+      "PS6_middle20s_std",
+      "PS6_last20s_mean",
+      "PS6_last20s_std",
+      "EPS1_rms",
+      "EPS1_peak_to_peak",
+      "EPS1_iqr",
+      "EPS1_mad",
+      "EPS1_skewness",
+      "EPS1_excess_kurtosis",
+      "EPS1_mean_absolute_difference",
+      "EPS1_slope_per_second",
+      "EPS1_lag1_correlation",
+      "EPS1_first20s_mean",
+      "EPS1_first20s_std",
+      "EPS1_middle20s_mean",
+      "EPS1_middle20s_std",
+      "EPS1_last20s_mean",
+      "EPS1_last20s_std",
+      "FS1_rms",
+      "FS1_peak_to_peak",
+      "FS1_iqr",
+      "FS1_mad",
+      "FS1_skewness",
+      "FS1_excess_kurtosis",
+      "FS1_mean_absolute_difference",
+      "FS1_slope_per_second",
+      "FS1_lag1_correlation",
+      "FS1_first20s_mean",
+      "FS1_first20s_std",
+      "FS1_middle20s_mean",
+      "FS1_middle20s_std",
+      "FS1_last20s_mean",
+      "FS1_last20s_std",
+      "FS2_rms",
+      "FS2_peak_to_peak",
+      "FS2_iqr",
+      "FS2_mad",
+      "FS2_skewness",
+      "FS2_excess_kurtosis",
+      "FS2_mean_absolute_difference",
+      "FS2_slope_per_second",
+      "FS2_lag1_correlation",
+      "FS2_first20s_mean",
+      "FS2_first20s_std",
+      "FS2_middle20s_mean",
+      "FS2_middle20s_std",
+      "FS2_last20s_mean",
+      "FS2_last20s_std",
+      "TS1_rms",
+      "TS1_peak_to_peak",
+      "TS1_iqr",
+      "TS1_mad",
+      "TS1_skewness",
+      "TS1_excess_kurtosis",
+      "TS1_mean_absolute_difference",
+      "TS1_slope_per_second",
+      "TS1_lag1_correlation",
+      "TS1_first20s_mean",
+      "TS1_first20s_std",
+      "TS1_middle20s_mean",
+      "TS1_middle20s_std",
+      "TS1_last20s_mean",
+      "TS1_last20s_std",
+      "TS2_rms",
+      "TS2_peak_to_peak",
+      "TS2_iqr",
+      "TS2_mad",
+      "TS2_skewness",
+      "TS2_excess_kurtosis",
+      "TS2_mean_absolute_difference",
+      "TS2_slope_per_second",
+      "TS2_lag1_correlation",
+      "TS2_first20s_mean",
+      "TS2_first20s_std",
+      "TS2_middle20s_mean",
+      "TS2_middle20s_std",
+      "TS2_last20s_mean",
+      "TS2_last20s_std",
+      "TS3_rms",
+      "TS3_peak_to_peak",
+      "TS3_iqr",
+      "TS3_mad",
+      "TS3_skewness",
+      "TS3_excess_kurtosis",
+      "TS3_mean_absolute_difference",
+      "TS3_slope_per_second",
+      "TS3_lag1_correlation",
+      "TS3_first20s_mean",
+      "TS3_first20s_std",
+      "TS3_middle20s_mean",
+      "TS3_middle20s_std",
+      "TS3_last20s_mean",
+      "TS3_last20s_std",
+      "TS4_rms",
+      "TS4_peak_to_peak",
+      "TS4_iqr",
+      "TS4_mad",
+      "TS4_skewness",
+      "TS4_excess_kurtosis",
+      "TS4_mean_absolute_difference",
+      "TS4_slope_per_second",
+      "TS4_lag1_correlation",
+      "TS4_first20s_mean",
+      "TS4_first20s_std",
+      "TS4_middle20s_mean",
+      "TS4_middle20s_std",
+      "TS4_last20s_mean",
+      "TS4_last20s_std",
+      "VS1_rms",
+      "VS1_peak_to_peak",
+      "VS1_iqr",
+      "VS1_mad",
+      "VS1_skewness",
+      "VS1_excess_kurtosis",
+      "VS1_mean_absolute_difference",
+      "VS1_slope_per_second",
+      "VS1_lag1_correlation",
+      "VS1_first20s_mean",
+      "VS1_first20s_std",
+      "VS1_middle20s_mean",
+      "VS1_middle20s_std",
+      "VS1_last20s_mean",
+      "VS1_last20s_std",
+      "PS1_PS2_correlation_1s_means",
+      "PS1_PS2_mean_difference",
+      "PS1_PS2_mean_ratio",
+      "PS3_PS4_correlation_1s_means",
+      "PS3_PS4_mean_difference",
+      "PS3_PS4_mean_ratio",
+      "PS5_PS6_correlation_1s_means",
+      "PS5_PS6_mean_difference",
+      "PS5_PS6_mean_ratio",
+      "FS1_FS2_correlation_1s_means",
+      "FS1_FS2_mean_difference",
+      "FS1_FS2_mean_ratio",
+      "TS1_TS2_correlation_1s_means",
+      "TS1_TS2_mean_difference",
+      "TS1_TS2_mean_ratio",
+      "TS3_TS4_correlation_1s_means",
+      "TS3_TS4_mean_difference",
+      "TS3_TS4_mean_ratio"
+    ],
+    "dependencies": {
+      "PS1_mean": [
+        "PS1"
+      ],
+      "PS1_std": [
+        "PS1"
+      ],
+      "PS1_min": [
+        "PS1"
+      ],
+      "PS1_max": [
+        "PS1"
+      ],
+      "PS1_q05": [
+        "PS1"
+      ],
+      "PS1_median": [
+        "PS1"
+      ],
+      "PS1_q95": [
+        "PS1"
+      ],
+      "PS1_last_first_5s_mean_diff": [
+        "PS1"
+      ],
+      "PS1_rms": [
+        "PS1"
+      ],
+      "PS1_peak_to_peak": [
+        "PS1"
+      ],
+      "PS1_iqr": [
+        "PS1"
+      ],
+      "PS1_mad": [
+        "PS1"
+      ],
+      "PS1_skewness": [
+        "PS1"
+      ],
+      "PS1_excess_kurtosis": [
+        "PS1"
+      ],
+      "PS1_mean_absolute_difference": [
+        "PS1"
+      ],
+      "PS1_slope_per_second": [
+        "PS1"
+      ],
+      "PS1_lag1_correlation": [
+        "PS1"
+      ],
+      "PS1_first20s_mean": [
+        "PS1"
+      ],
+      "PS1_first20s_std": [
+        "PS1"
+      ],
+      "PS1_middle20s_mean": [
+        "PS1"
+      ],
+      "PS1_middle20s_std": [
+        "PS1"
+      ],
+      "PS1_last20s_mean": [
+        "PS1"
+      ],
+      "PS1_last20s_std": [
+        "PS1"
+      ],
+      "PS2_mean": [
+        "PS2"
+      ],
+      "PS2_std": [
+        "PS2"
+      ],
+      "PS2_min": [
+        "PS2"
+      ],
+      "PS2_max": [
+        "PS2"
+      ],
+      "PS2_q05": [
+        "PS2"
+      ],
+      "PS2_median": [
+        "PS2"
+      ],
+      "PS2_q95": [
+        "PS2"
+      ],
+      "PS2_last_first_5s_mean_diff": [
+        "PS2"
+      ],
+      "PS2_rms": [
+        "PS2"
+      ],
+      "PS2_peak_to_peak": [
+        "PS2"
+      ],
+      "PS2_iqr": [
+        "PS2"
+      ],
+      "PS2_mad": [
+        "PS2"
+      ],
+      "PS2_skewness": [
+        "PS2"
+      ],
+      "PS2_excess_kurtosis": [
+        "PS2"
+      ],
+      "PS2_mean_absolute_difference": [
+        "PS2"
+      ],
+      "PS2_slope_per_second": [
+        "PS2"
+      ],
+      "PS2_lag1_correlation": [
+        "PS2"
+      ],
+      "PS2_first20s_mean": [
+        "PS2"
+      ],
+      "PS2_first20s_std": [
+        "PS2"
+      ],
+      "PS2_middle20s_mean": [
+        "PS2"
+      ],
+      "PS2_middle20s_std": [
+        "PS2"
+      ],
+      "PS2_last20s_mean": [
+        "PS2"
+      ],
+      "PS2_last20s_std": [
+        "PS2"
+      ],
+      "PS3_mean": [
+        "PS3"
+      ],
+      "PS3_std": [
+        "PS3"
+      ],
+      "PS3_min": [
+        "PS3"
+      ],
+      "PS3_max": [
+        "PS3"
+      ],
+      "PS3_q05": [
+        "PS3"
+      ],
+      "PS3_median": [
+        "PS3"
+      ],
+      "PS3_q95": [
+        "PS3"
+      ],
+      "PS3_last_first_5s_mean_diff": [
+        "PS3"
+      ],
+      "PS3_rms": [
+        "PS3"
+      ],
+      "PS3_peak_to_peak": [
+        "PS3"
+      ],
+      "PS3_iqr": [
+        "PS3"
+      ],
+      "PS3_mad": [
+        "PS3"
+      ],
+      "PS3_skewness": [
+        "PS3"
+      ],
+      "PS3_excess_kurtosis": [
+        "PS3"
+      ],
+      "PS3_mean_absolute_difference": [
+        "PS3"
+      ],
+      "PS3_slope_per_second": [
+        "PS3"
+      ],
+      "PS3_lag1_correlation": [
+        "PS3"
+      ],
+      "PS3_first20s_mean": [
+        "PS3"
+      ],
+      "PS3_first20s_std": [
+        "PS3"
+      ],
+      "PS3_middle20s_mean": [
+        "PS3"
+      ],
+      "PS3_middle20s_std": [
+        "PS3"
+      ],
+      "PS3_last20s_mean": [
+        "PS3"
+      ],
+      "PS3_last20s_std": [
+        "PS3"
+      ],
+      "PS4_mean": [
+        "PS4"
+      ],
+      "PS4_std": [
+        "PS4"
+      ],
+      "PS4_min": [
+        "PS4"
+      ],
+      "PS4_max": [
+        "PS4"
+      ],
+      "PS4_q05": [
+        "PS4"
+      ],
+      "PS4_median": [
+        "PS4"
+      ],
+      "PS4_q95": [
+        "PS4"
+      ],
+      "PS4_last_first_5s_mean_diff": [
+        "PS4"
+      ],
+      "PS4_rms": [
+        "PS4"
+      ],
+      "PS4_peak_to_peak": [
+        "PS4"
+      ],
+      "PS4_iqr": [
+        "PS4"
+      ],
+      "PS4_mad": [
+        "PS4"
+      ],
+      "PS4_skewness": [
+        "PS4"
+      ],
+      "PS4_excess_kurtosis": [
+        "PS4"
+      ],
+      "PS4_mean_absolute_difference": [
+        "PS4"
+      ],
+      "PS4_slope_per_second": [
+        "PS4"
+      ],
+      "PS4_lag1_correlation": [
+        "PS4"
+      ],
+      "PS4_first20s_mean": [
+        "PS4"
+      ],
+      "PS4_first20s_std": [
+        "PS4"
+      ],
+      "PS4_middle20s_mean": [
+        "PS4"
+      ],
+      "PS4_middle20s_std": [
+        "PS4"
+      ],
+      "PS4_last20s_mean": [
+        "PS4"
+      ],
+      "PS4_last20s_std": [
+        "PS4"
+      ],
+      "PS5_mean": [
+        "PS5"
+      ],
+      "PS5_std": [
+        "PS5"
+      ],
+      "PS5_min": [
+        "PS5"
+      ],
+      "PS5_max": [
+        "PS5"
+      ],
+      "PS5_q05": [
+        "PS5"
+      ],
+      "PS5_median": [
+        "PS5"
+      ],
+      "PS5_q95": [
+        "PS5"
+      ],
+      "PS5_last_first_5s_mean_diff": [
+        "PS5"
+      ],
+      "PS5_rms": [
+        "PS5"
+      ],
+      "PS5_peak_to_peak": [
+        "PS5"
+      ],
+      "PS5_iqr": [
+        "PS5"
+      ],
+      "PS5_mad": [
+        "PS5"
+      ],
+      "PS5_skewness": [
+        "PS5"
+      ],
+      "PS5_excess_kurtosis": [
+        "PS5"
+      ],
+      "PS5_mean_absolute_difference": [
+        "PS5"
+      ],
+      "PS5_slope_per_second": [
+        "PS5"
+      ],
+      "PS5_lag1_correlation": [
+        "PS5"
+      ],
+      "PS5_first20s_mean": [
+        "PS5"
+      ],
+      "PS5_first20s_std": [
+        "PS5"
+      ],
+      "PS5_middle20s_mean": [
+        "PS5"
+      ],
+      "PS5_middle20s_std": [
+        "PS5"
+      ],
+      "PS5_last20s_mean": [
+        "PS5"
+      ],
+      "PS5_last20s_std": [
+        "PS5"
+      ],
+      "PS6_mean": [
+        "PS6"
+      ],
+      "PS6_std": [
+        "PS6"
+      ],
+      "PS6_min": [
+        "PS6"
+      ],
+      "PS6_max": [
+        "PS6"
+      ],
+      "PS6_q05": [
+        "PS6"
+      ],
+      "PS6_median": [
+        "PS6"
+      ],
+      "PS6_q95": [
+        "PS6"
+      ],
+      "PS6_last_first_5s_mean_diff": [
+        "PS6"
+      ],
+      "PS6_rms": [
+        "PS6"
+      ],
+      "PS6_peak_to_peak": [
+        "PS6"
+      ],
+      "PS6_iqr": [
+        "PS6"
+      ],
+      "PS6_mad": [
+        "PS6"
+      ],
+      "PS6_skewness": [
+        "PS6"
+      ],
+      "PS6_excess_kurtosis": [
+        "PS6"
+      ],
+      "PS6_mean_absolute_difference": [
+        "PS6"
+      ],
+      "PS6_slope_per_second": [
+        "PS6"
+      ],
+      "PS6_lag1_correlation": [
+        "PS6"
+      ],
+      "PS6_first20s_mean": [
+        "PS6"
+      ],
+      "PS6_first20s_std": [
+        "PS6"
+      ],
+      "PS6_middle20s_mean": [
+        "PS6"
+      ],
+      "PS6_middle20s_std": [
+        "PS6"
+      ],
+      "PS6_last20s_mean": [
+        "PS6"
+      ],
+      "PS6_last20s_std": [
+        "PS6"
+      ],
+      "EPS1_mean": [
+        "EPS1"
+      ],
+      "EPS1_std": [
+        "EPS1"
+      ],
+      "EPS1_min": [
+        "EPS1"
+      ],
+      "EPS1_max": [
+        "EPS1"
+      ],
+      "EPS1_q05": [
+        "EPS1"
+      ],
+      "EPS1_median": [
+        "EPS1"
+      ],
+      "EPS1_q95": [
+        "EPS1"
+      ],
+      "EPS1_last_first_5s_mean_diff": [
+        "EPS1"
+      ],
+      "EPS1_rms": [
+        "EPS1"
+      ],
+      "EPS1_peak_to_peak": [
+        "EPS1"
+      ],
+      "EPS1_iqr": [
+        "EPS1"
+      ],
+      "EPS1_mad": [
+        "EPS1"
+      ],
+      "EPS1_skewness": [
+        "EPS1"
+      ],
+      "EPS1_excess_kurtosis": [
+        "EPS1"
+      ],
+      "EPS1_mean_absolute_difference": [
+        "EPS1"
+      ],
+      "EPS1_slope_per_second": [
+        "EPS1"
+      ],
+      "EPS1_lag1_correlation": [
+        "EPS1"
+      ],
+      "EPS1_first20s_mean": [
+        "EPS1"
+      ],
+      "EPS1_first20s_std": [
+        "EPS1"
+      ],
+      "EPS1_middle20s_mean": [
+        "EPS1"
+      ],
+      "EPS1_middle20s_std": [
+        "EPS1"
+      ],
+      "EPS1_last20s_mean": [
+        "EPS1"
+      ],
+      "EPS1_last20s_std": [
+        "EPS1"
+      ],
+      "FS1_mean": [
+        "FS1"
+      ],
+      "FS1_std": [
+        "FS1"
+      ],
+      "FS1_min": [
+        "FS1"
+      ],
+      "FS1_max": [
+        "FS1"
+      ],
+      "FS1_q05": [
+        "FS1"
+      ],
+      "FS1_median": [
+        "FS1"
+      ],
+      "FS1_q95": [
+        "FS1"
+      ],
+      "FS1_last_first_5s_mean_diff": [
+        "FS1"
+      ],
+      "FS1_rms": [
+        "FS1"
+      ],
+      "FS1_peak_to_peak": [
+        "FS1"
+      ],
+      "FS1_iqr": [
+        "FS1"
+      ],
+      "FS1_mad": [
+        "FS1"
+      ],
+      "FS1_skewness": [
+        "FS1"
+      ],
+      "FS1_excess_kurtosis": [
+        "FS1"
+      ],
+      "FS1_mean_absolute_difference": [
+        "FS1"
+      ],
+      "FS1_slope_per_second": [
+        "FS1"
+      ],
+      "FS1_lag1_correlation": [
+        "FS1"
+      ],
+      "FS1_first20s_mean": [
+        "FS1"
+      ],
+      "FS1_first20s_std": [
+        "FS1"
+      ],
+      "FS1_middle20s_mean": [
+        "FS1"
+      ],
+      "FS1_middle20s_std": [
+        "FS1"
+      ],
+      "FS1_last20s_mean": [
+        "FS1"
+      ],
+      "FS1_last20s_std": [
+        "FS1"
+      ],
+      "FS2_mean": [
+        "FS2"
+      ],
+      "FS2_std": [
+        "FS2"
+      ],
+      "FS2_min": [
+        "FS2"
+      ],
+      "FS2_max": [
+        "FS2"
+      ],
+      "FS2_q05": [
+        "FS2"
+      ],
+      "FS2_median": [
+        "FS2"
+      ],
+      "FS2_q95": [
+        "FS2"
+      ],
+      "FS2_last_first_5s_mean_diff": [
+        "FS2"
+      ],
+      "FS2_rms": [
+        "FS2"
+      ],
+      "FS2_peak_to_peak": [
+        "FS2"
+      ],
+      "FS2_iqr": [
+        "FS2"
+      ],
+      "FS2_mad": [
+        "FS2"
+      ],
+      "FS2_skewness": [
+        "FS2"
+      ],
+      "FS2_excess_kurtosis": [
+        "FS2"
+      ],
+      "FS2_mean_absolute_difference": [
+        "FS2"
+      ],
+      "FS2_slope_per_second": [
+        "FS2"
+      ],
+      "FS2_lag1_correlation": [
+        "FS2"
+      ],
+      "FS2_first20s_mean": [
+        "FS2"
+      ],
+      "FS2_first20s_std": [
+        "FS2"
+      ],
+      "FS2_middle20s_mean": [
+        "FS2"
+      ],
+      "FS2_middle20s_std": [
+        "FS2"
+      ],
+      "FS2_last20s_mean": [
+        "FS2"
+      ],
+      "FS2_last20s_std": [
+        "FS2"
+      ],
+      "TS1_mean": [
+        "TS1"
+      ],
+      "TS1_std": [
+        "TS1"
+      ],
+      "TS1_min": [
+        "TS1"
+      ],
+      "TS1_max": [
+        "TS1"
+      ],
+      "TS1_q05": [
+        "TS1"
+      ],
+      "TS1_median": [
+        "TS1"
+      ],
+      "TS1_q95": [
+        "TS1"
+      ],
+      "TS1_last_first_5s_mean_diff": [
+        "TS1"
+      ],
+      "TS1_rms": [
+        "TS1"
+      ],
+      "TS1_peak_to_peak": [
+        "TS1"
+      ],
+      "TS1_iqr": [
+        "TS1"
+      ],
+      "TS1_mad": [
+        "TS1"
+      ],
+      "TS1_skewness": [
+        "TS1"
+      ],
+      "TS1_excess_kurtosis": [
+        "TS1"
+      ],
+      "TS1_mean_absolute_difference": [
+        "TS1"
+      ],
+      "TS1_slope_per_second": [
+        "TS1"
+      ],
+      "TS1_lag1_correlation": [
+        "TS1"
+      ],
+      "TS1_first20s_mean": [
+        "TS1"
+      ],
+      "TS1_first20s_std": [
+        "TS1"
+      ],
+      "TS1_middle20s_mean": [
+        "TS1"
+      ],
+      "TS1_middle20s_std": [
+        "TS1"
+      ],
+      "TS1_last20s_mean": [
+        "TS1"
+      ],
+      "TS1_last20s_std": [
+        "TS1"
+      ],
+      "TS2_mean": [
+        "TS2"
+      ],
+      "TS2_std": [
+        "TS2"
+      ],
+      "TS2_min": [
+        "TS2"
+      ],
+      "TS2_max": [
+        "TS2"
+      ],
+      "TS2_q05": [
+        "TS2"
+      ],
+      "TS2_median": [
+        "TS2"
+      ],
+      "TS2_q95": [
+        "TS2"
+      ],
+      "TS2_last_first_5s_mean_diff": [
+        "TS2"
+      ],
+      "TS2_rms": [
+        "TS2"
+      ],
+      "TS2_peak_to_peak": [
+        "TS2"
+      ],
+      "TS2_iqr": [
+        "TS2"
+      ],
+      "TS2_mad": [
+        "TS2"
+      ],
+      "TS2_skewness": [
+        "TS2"
+      ],
+      "TS2_excess_kurtosis": [
+        "TS2"
+      ],
+      "TS2_mean_absolute_difference": [
+        "TS2"
+      ],
+      "TS2_slope_per_second": [
+        "TS2"
+      ],
+      "TS2_lag1_correlation": [
+        "TS2"
+      ],
+      "TS2_first20s_mean": [
+        "TS2"
+      ],
+      "TS2_first20s_std": [
+        "TS2"
+      ],
+      "TS2_middle20s_mean": [
+        "TS2"
+      ],
+      "TS2_middle20s_std": [
+        "TS2"
+      ],
+      "TS2_last20s_mean": [
+        "TS2"
+      ],
+      "TS2_last20s_std": [
+        "TS2"
+      ],
+      "TS3_mean": [
+        "TS3"
+      ],
+      "TS3_std": [
+        "TS3"
+      ],
+      "TS3_min": [
+        "TS3"
+      ],
+      "TS3_max": [
+        "TS3"
+      ],
+      "TS3_q05": [
+        "TS3"
+      ],
+      "TS3_median": [
+        "TS3"
+      ],
+      "TS3_q95": [
+        "TS3"
+      ],
+      "TS3_last_first_5s_mean_diff": [
+        "TS3"
+      ],
+      "TS3_rms": [
+        "TS3"
+      ],
+      "TS3_peak_to_peak": [
+        "TS3"
+      ],
+      "TS3_iqr": [
+        "TS3"
+      ],
+      "TS3_mad": [
+        "TS3"
+      ],
+      "TS3_skewness": [
+        "TS3"
+      ],
+      "TS3_excess_kurtosis": [
+        "TS3"
+      ],
+      "TS3_mean_absolute_difference": [
+        "TS3"
+      ],
+      "TS3_slope_per_second": [
+        "TS3"
+      ],
+      "TS3_lag1_correlation": [
+        "TS3"
+      ],
+      "TS3_first20s_mean": [
+        "TS3"
+      ],
+      "TS3_first20s_std": [
+        "TS3"
+      ],
+      "TS3_middle20s_mean": [
+        "TS3"
+      ],
+      "TS3_middle20s_std": [
+        "TS3"
+      ],
+      "TS3_last20s_mean": [
+        "TS3"
+      ],
+      "TS3_last20s_std": [
+        "TS3"
+      ],
+      "TS4_mean": [
+        "TS4"
+      ],
+      "TS4_std": [
+        "TS4"
+      ],
+      "TS4_min": [
+        "TS4"
+      ],
+      "TS4_max": [
+        "TS4"
+      ],
+      "TS4_q05": [
+        "TS4"
+      ],
+      "TS4_median": [
+        "TS4"
+      ],
+      "TS4_q95": [
+        "TS4"
+      ],
+      "TS4_last_first_5s_mean_diff": [
+        "TS4"
+      ],
+      "TS4_rms": [
+        "TS4"
+      ],
+      "TS4_peak_to_peak": [
+        "TS4"
+      ],
+      "TS4_iqr": [
+        "TS4"
+      ],
+      "TS4_mad": [
+        "TS4"
+      ],
+      "TS4_skewness": [
+        "TS4"
+      ],
+      "TS4_excess_kurtosis": [
+        "TS4"
+      ],
+      "TS4_mean_absolute_difference": [
+        "TS4"
+      ],
+      "TS4_slope_per_second": [
+        "TS4"
+      ],
+      "TS4_lag1_correlation": [
+        "TS4"
+      ],
+      "TS4_first20s_mean": [
+        "TS4"
+      ],
+      "TS4_first20s_std": [
+        "TS4"
+      ],
+      "TS4_middle20s_mean": [
+        "TS4"
+      ],
+      "TS4_middle20s_std": [
+        "TS4"
+      ],
+      "TS4_last20s_mean": [
+        "TS4"
+      ],
+      "TS4_last20s_std": [
+        "TS4"
+      ],
+      "VS1_mean": [
+        "VS1"
+      ],
+      "VS1_std": [
+        "VS1"
+      ],
+      "VS1_min": [
+        "VS1"
+      ],
+      "VS1_max": [
+        "VS1"
+      ],
+      "VS1_q05": [
+        "VS1"
+      ],
+      "VS1_median": [
+        "VS1"
+      ],
+      "VS1_q95": [
+        "VS1"
+      ],
+      "VS1_last_first_5s_mean_diff": [
+        "VS1"
+      ],
+      "VS1_rms": [
+        "VS1"
+      ],
+      "VS1_peak_to_peak": [
+        "VS1"
+      ],
+      "VS1_iqr": [
+        "VS1"
+      ],
+      "VS1_mad": [
+        "VS1"
+      ],
+      "VS1_skewness": [
+        "VS1"
+      ],
+      "VS1_excess_kurtosis": [
+        "VS1"
+      ],
+      "VS1_mean_absolute_difference": [
+        "VS1"
+      ],
+      "VS1_slope_per_second": [
+        "VS1"
+      ],
+      "VS1_lag1_correlation": [
+        "VS1"
+      ],
+      "VS1_first20s_mean": [
+        "VS1"
+      ],
+      "VS1_first20s_std": [
+        "VS1"
+      ],
+      "VS1_middle20s_mean": [
+        "VS1"
+      ],
+      "VS1_middle20s_std": [
+        "VS1"
+      ],
+      "VS1_last20s_mean": [
+        "VS1"
+      ],
+      "VS1_last20s_std": [
+        "VS1"
+      ],
+      "PS1_PS2_correlation_1s_means": [
+        "PS1",
+        "PS2"
+      ],
+      "PS1_PS2_mean_difference": [
+        "PS1",
+        "PS2"
+      ],
+      "PS1_PS2_mean_ratio": [
+        "PS1",
+        "PS2"
+      ],
+      "PS3_PS4_correlation_1s_means": [
+        "PS3",
+        "PS4"
+      ],
+      "PS3_PS4_mean_difference": [
+        "PS3",
+        "PS4"
+      ],
+      "PS3_PS4_mean_ratio": [
+        "PS3",
+        "PS4"
+      ],
+      "PS5_PS6_correlation_1s_means": [
+        "PS5",
+        "PS6"
+      ],
+      "PS5_PS6_mean_difference": [
+        "PS5",
+        "PS6"
+      ],
+      "PS5_PS6_mean_ratio": [
+        "PS5",
+        "PS6"
+      ],
+      "FS1_FS2_correlation_1s_means": [
+        "FS1",
+        "FS2"
+      ],
+      "FS1_FS2_mean_difference": [
+        "FS1",
+        "FS2"
+      ],
+      "FS1_FS2_mean_ratio": [
+        "FS1",
+        "FS2"
+      ],
+      "TS1_TS2_correlation_1s_means": [
+        "TS1",
+        "TS2"
+      ],
+      "TS1_TS2_mean_difference": [
+        "TS1",
+        "TS2"
+      ],
+      "TS1_TS2_mean_ratio": [
+        "TS1",
+        "TS2"
+      ],
+      "TS3_TS4_correlation_1s_means": [
+        "TS3",
+        "TS4"
+      ],
+      "TS3_TS4_mean_difference": [
+        "TS3",
+        "TS4"
+      ],
+      "TS3_TS4_mean_ratio": [
+        "TS3",
+        "TS4"
+      ]
+    },
+    "extractionSeconds": 5.857367749908008,
+    "scope": "Within-cycle sensor features only. No other profile labels, stable flag, cycle index, neighboring cycles or virtual efficiency channels."
+  },
+  "stressProtocol": {
+    "seed": 20261113,
+    "noiseTrainStdFraction": 0.1,
+    "dropChannel": "PS1",
+    "driftChannel": "PS1",
+    "driftTrainStdFraction": 0.5,
+    "scope": "Independent feature-space sensitivity perturbations on the real test rows; not a physical sensor simulator, not independent validation, not new fault ground truth.",
+    "trainScaleSha256": "e929b47f65fde51d61ee5ca7567764d63c99fbfbe2f4e274ec2433afdd419089"
+  },
+  "versions": {
+    "python": "3.12.12",
+    "numpy": "2.5.4",
+    "catboost": "1.2.10",
+    "autogluon.tabular": "1.6.1"
+  },
+  "registeredArms": [
+    {
+      "name": "catboost_baseline",
+      "engine": "catboost",
+      "features": "baseline",
+      "options": {
+        "iterations": 500,
+        "depth": 5,
+        "learning_rate": 0.05,
+        "loss_function": "MultiClass",
+        "eval_metric": "MultiClass",
+        "random_seed": 42,
+        "task_type": "CPU",
+        "thread_count": 4,
+        "allow_writing_files": false,
+        "early_stopping_rounds": 40
+      }
+    },
+    {
+      "name": "autogluon_baseline",
+      "engine": "autogluon",
+      "features": "baseline",
+      "options": {
+        "hyperparameters": {
+          "CAT": {
+            "iterations": 500,
+            "depth": 5,
+            "learning_rate": 0.05,
+            "random_seed": 42
+          },
+          "RF": {
+            "n_estimators": 300,
+            "max_depth": 12,
+            "min_samples_leaf": 2,
+            "random_state": 42
+          }
+        },
+        "num_cpus": 4,
+        "num_gpus": 0,
+        "time_limit": 300,
+        "memory_limit": 4.0,
+        "fit_strategy": "sequential",
+        "num_bag_folds": 0,
+        "num_stack_levels": 0,
+        "auto_stack": false,
+        "dynamic_stacking": false,
+        "refit_full": false,
+        "fit_weighted_ensemble": true,
+        "calibrate_decision_threshold": false
+      }
+    },
+    {
+      "name": "catboost_enhanced",
+      "engine": "catboost",
+      "features": "enhanced",
+      "options": {
+        "iterations": 500,
+        "depth": 5,
+        "learning_rate": 0.05,
+        "loss_function": "MultiClass",
+        "eval_metric": "MultiClass",
+        "random_seed": 42,
+        "task_type": "CPU",
+        "thread_count": 4,
+        "allow_writing_files": false,
+        "early_stopping_rounds": 40
+      }
+    },
+    {
+      "name": "autogluon_enhanced",
+      "engine": "autogluon",
+      "features": "enhanced",
+      "options": {
+        "hyperparameters": {
+          "CAT": {
+            "iterations": 500,
+            "depth": 5,
+            "learning_rate": 0.05,
+            "random_seed": 42
+          },
+          "RF": {
+            "n_estimators": 300,
+            "max_depth": 12,
+            "min_samples_leaf": 2,
+            "random_state": 42
+          }
+        },
+        "num_cpus": 4,
+        "num_gpus": 0,
+        "time_limit": 300,
+        "memory_limit": 4.0,
+        "fit_strategy": "sequential",
+        "num_bag_folds": 0,
+        "num_stack_levels": 0,
+        "auto_stack": false,
+        "dynamic_stacking": false,
+        "refit_full": false,
+        "fit_weighted_ensemble": true,
+        "calibrate_decision_threshold": false
+      }
+    }
+  ],
+  "selection": "AutoGluon uses validation log_loss only; four arms registered before fit. CatBoost early stopping=40, AutoGluon native early stopping.",
+  "arms": {
+    "catboost_baseline": {
+      "featureCount": 112,
+      "fitSeconds": 0.7271023750072345,
+      "trees": 98,
+      "metrics": {
+        "validation": {
+          "accuracy": 0.8299319727891157,
+          "macro_f1": 0.7234156820622987,
+          "balanced_accuracy": 0.6951219512195123,
+          "confusion_matrix": [
+            [
+              277,
+              0,
+              0
+            ],
+            [
+              34,
+              48,
+              0
+            ],
+            [
+              0,
+              41,
+              41
+            ]
+          ],
+          "log_loss": 0.3345719670324299,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.5853658536585366,
+            "2": 0.5
+          }
+        },
+        "test": {
+          "accuracy": 0.5306122448979592,
+          "macro_f1": 0.36548967355096607,
+          "balanced_accuracy": 0.43902439024390244,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              84,
+              39,
+              0
+            ],
+            [
+              0,
+              123,
+              0
+            ]
+          ],
+          "log_loss": 0.7870020662437603,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.3170731707317073,
+            "2": 0.0
+          }
+        }
+      },
+      "stress": {
+        "feature_noise": {
+          "accuracy": 0.7052154195011338,
+          "macro_f1": 0.6582317121991715,
+          "balanced_accuracy": 0.6476964769647696,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              69,
+              53,
+              1
+            ],
+            [
+              11,
+              49,
+              63
+            ]
+          ],
+          "log_loss": 0.6828487072784536,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.43089430894308944,
+            "2": 0.5121951219512195
+          }
+        },
+        "PS1_missing": {
+          "accuracy": 0.5306122448979592,
+          "macro_f1": 0.36548967355096607,
+          "balanced_accuracy": 0.43902439024390244,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              84,
+              39,
+              0
+            ],
+            [
+              0,
+              123,
+              0
+            ]
+          ],
+          "log_loss": 0.6819883624356531,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.3170731707317073,
+            "2": 0.0
+          }
+        },
+        "PS1_feature_drift": {
+          "accuracy": 0.5306122448979592,
+          "macro_f1": 0.36548967355096607,
+          "balanced_accuracy": 0.43902439024390244,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              84,
+              39,
+              0
+            ],
+            [
+              0,
+              123,
+              0
+            ]
+          ],
+          "log_loss": 0.7717091206573439,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.3170731707317073,
+            "2": 0.0
+          }
+        }
+      },
+      "cumulativeProcessPeakRSSBytes": 1205321728
+    },
+    "autogluon_baseline": {
+      "featureCount": 112,
+      "fitSeconds": 5.478462666971609,
+      "model": "WeightedEnsemble_L2",
+      "validationCandidates": [
+        {
+          "model": "WeightedEnsemble_L2",
+          "validation_log_loss": 0.2828710079193115
+        },
+        {
+          "model": "RandomForest",
+          "validation_log_loss": 0.29078221321105957
+        },
+        {
+          "model": "CatBoost",
+          "validation_log_loss": 0.31999921798706055
+        }
+      ],
+      "metrics": {
+        "validation": {
+          "accuracy": 0.8163265306122449,
+          "macro_f1": 0.7028058361391695,
+          "balanced_accuracy": 0.6707317073170732,
+          "confusion_matrix": [
+            [
+              277,
+              0,
+              0
+            ],
+            [
+              40,
+              42,
+              0
+            ],
+            [
+              0,
+              41,
+              41
+            ]
+          ],
+          "log_loss": 0.28287098725490484,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.5121951219512195,
+            "2": 0.5
+          }
+        },
+        "test": {
+          "accuracy": 0.48072562358276644,
+          "macro_f1": 0.3103208819835326,
+          "balanced_accuracy": 0.3794037940379404,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              108,
+              15,
+              0
+            ],
+            [
+              0,
+              121,
+              2
+            ]
+          ],
+          "log_loss": 0.626494274106698,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.12195121951219512,
+            "2": 0.016260162601626018
+          }
+        }
+      },
+      "stress": {
+        "feature_noise": {
+          "accuracy": 0.6598639455782312,
+          "macro_f1": 0.5907038441199932,
+          "balanced_accuracy": 0.5934959349593496,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              98,
+              24,
+              1
+            ],
+            [
+              18,
+              33,
+              72
+            ]
+          ],
+          "log_loss": 0.7198871844216663,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.1951219512195122,
+            "2": 0.5853658536585366
+          }
+        },
+        "PS1_missing": {
+          "accuracy": 0.8503401360544217,
+          "macro_f1": 0.8330339978213434,
+          "balanced_accuracy": 0.8211382113821138,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              59,
+              64,
+              0
+            ],
+            [
+              0,
+              7,
+              116
+            ]
+          ],
+          "log_loss": 0.5827687424022521,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.5203252032520326,
+            "2": 0.943089430894309
+          }
+        },
+        "PS1_feature_drift": {
+          "accuracy": 0.48299319727891155,
+          "macro_f1": 0.3156768825023238,
+          "balanced_accuracy": 0.38211382113821135,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              108,
+              15,
+              0
+            ],
+            [
+              0,
+              120,
+              3
+            ]
+          ],
+          "log_loss": 0.6267190909006103,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.12195121951219512,
+            "2": 0.024390243902439025
+          }
+        }
+      },
+      "cumulativeProcessPeakRSSBytes": 1205321728
+    },
+    "catboost_enhanced": {
+      "featureCount": 340,
+      "fitSeconds": 1.977160791051574,
+      "trees": 78,
+      "metrics": {
+        "validation": {
+          "accuracy": 0.9024943310657596,
+          "macro_f1": 0.8170822947553287,
+          "balanced_accuracy": 0.8252032520325203,
+          "confusion_matrix": [
+            [
+              277,
+              0,
+              0
+            ],
+            [
+              2,
+              80,
+              0
+            ],
+            [
+              0,
+              41,
+              41
+            ]
+          ],
+          "log_loss": 0.2278203244221084,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.975609756097561,
+            "2": 0.5
+          }
+        },
+        "test": {
+          "accuracy": 0.7278911564625851,
+          "macro_f1": 0.5840187782314535,
+          "balanced_accuracy": 0.6747967479674797,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              3,
+              120,
+              0
+            ],
+            [
+              0,
+              117,
+              6
+            ]
+          ],
+          "log_loss": 0.47890314241125265,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.975609756097561,
+            "2": 0.04878048780487805
+          }
+        }
+      },
+      "stress": {
+        "feature_noise": {
+          "accuracy": 0.7573696145124716,
+          "macro_f1": 0.7214966972354345,
+          "balanced_accuracy": 0.711027725661872,
+          "confusion_matrix": [
+            [
+              194,
+              1,
+              0
+            ],
+            [
+              49,
+              72,
+              2
+            ],
+            [
+              1,
+              54,
+              68
+            ]
+          ],
+          "log_loss": 0.5384953020180291,
+          "recall_by_class": {
+            "0": 0.9948717948717949,
+            "1": 0.5853658536585366,
+            "2": 0.5528455284552846
+          }
+        },
+        "PS1_missing": {
+          "accuracy": 0.7165532879818595,
+          "macro_f1": 0.5958568395317289,
+          "balanced_accuracy": 0.6612466124661246,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              15,
+              108,
+              0
+            ],
+            [
+              0,
+              110,
+              13
+            ]
+          ],
+          "log_loss": 0.4588209214848709,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.8780487804878049,
+            "2": 0.10569105691056911
+          }
+        },
+        "PS1_feature_drift": {
+          "accuracy": 0.7052154195011338,
+          "macro_f1": 0.5410839120289835,
+          "balanced_accuracy": 0.6476964769647696,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              7,
+              116,
+              0
+            ],
+            [
+              0,
+              123,
+              0
+            ]
+          ],
+          "log_loss": 0.526323443833065,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.943089430894309,
+            "2": 0.0
+          }
+        }
+      },
+      "cumulativeProcessPeakRSSBytes": 1205321728
+    },
+    "autogluon_enhanced": {
+      "featureCount": 340,
+      "fitSeconds": 8.030731040984392,
+      "model": "WeightedEnsemble_L2",
+      "validationCandidates": [
+        {
+          "model": "CatBoost",
+          "validation_log_loss": 0.2352701723575592
+        },
+        {
+          "model": "WeightedEnsemble_L2",
+          "validation_log_loss": 0.2352701723575592
+        },
+        {
+          "model": "RandomForest",
+          "validation_log_loss": 0.27624595165252686
+        }
+      ],
+      "metrics": {
+        "validation": {
+          "accuracy": 0.8299319727891157,
+          "macro_f1": 0.7234156820622987,
+          "balanced_accuracy": 0.6951219512195123,
+          "confusion_matrix": [
+            [
+              277,
+              0,
+              0
+            ],
+            [
+              34,
+              48,
+              0
+            ],
+            [
+              0,
+              41,
+              41
+            ]
+          ],
+          "log_loss": 0.23527016142480495,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.5853658536585366,
+            "2": 0.5
+          }
+        },
+        "test": {
+          "accuracy": 0.6439909297052154,
+          "macro_f1": 0.5352053999894532,
+          "balanced_accuracy": 0.5745257452574526,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              51,
+              72,
+              0
+            ],
+            [
+              0,
+              106,
+              17
+            ]
+          ],
+          "log_loss": 0.4773231115338061,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.5853658536585366,
+            "2": 0.13821138211382114
+          }
+        }
+      },
+      "stress": {
+        "feature_noise": {
+          "accuracy": 0.7233560090702947,
+          "macro_f1": 0.672495552698895,
+          "balanced_accuracy": 0.6693766937669378,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              73,
+              41,
+              9
+            ],
+            [
+              5,
+              35,
+              83
+            ]
+          ],
+          "log_loss": 0.579974005189001,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.3333333333333333,
+            "2": 0.6747967479674797
+          }
+        },
+        "PS1_missing": {
+          "accuracy": 0.6417233560090703,
+          "macro_f1": 0.5228668055017773,
+          "balanced_accuracy": 0.5718157181571816,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              48,
+              75,
+              0
+            ],
+            [
+              0,
+              110,
+              13
+            ]
+          ],
+          "log_loss": 0.48254305324096325,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.6097560975609756,
+            "2": 0.10569105691056911
+          }
+        },
+        "PS1_feature_drift": {
+          "accuracy": 0.6258503401360545,
+          "macro_f1": 0.4697098550708027,
+          "balanced_accuracy": 0.5528455284552846,
+          "confusion_matrix": [
+            [
+              195,
+              0,
+              0
+            ],
+            [
+              43,
+              80,
+              0
+            ],
+            [
+              0,
+              122,
+              1
+            ]
+          ],
+          "log_loss": 0.5575751958201726,
+          "recall_by_class": {
+            "0": 1.0,
+            "1": 0.6504065040650406,
+            "2": 0.008130081300813009
+          }
+        }
+      },
+      "cumulativeProcessPeakRSSBytes": 1205321728
+    }
+  },
+  "derivedDatasets": {
+    "path": "cyber102-uci-hydraulic-features-v1.zip",
+    "sha256": "3e1d2155b11fdb1e118a1b652b76cf90795a4e9750be45fe04bf97bd0b59853e",
+    "files": {
+      "train.csv": {
+        "sha256": "e6e52ada1ae14cdbb8a647e01b1f5a86be503fa2fe6f8e590ef84fed109b2632",
+        "rows": 1323,
+        "origin": "uci_real_cycle",
+        "split": "train"
+      },
+      "validation.csv": {
+        "sha256": "79a601e7aabd619c0266299d2407396aaafcdc7626e426ec359e87a4547d4f59",
+        "rows": 441,
+        "origin": "uci_real_cycle",
+        "split": "validation"
+      },
+      "test.csv": {
+        "sha256": "943e3747cc0f99870dfda95f5fdda8aa21e28a4bfdf5e4deda20f318cd3eb713",
+        "rows": 441,
+        "origin": "uci_real_cycle",
+        "split": "test"
+      },
+      "feature_noise.csv": {
+        "sha256": "ea2616979e0a27ea61465bd49a7589c6417876a31087521279a6e38b17996a16",
+        "rows": 441,
+        "origin": "synthetic_feature_perturbation_of_real_test",
+        "split": "test_only"
+      },
+      "PS1_missing.csv": {
+        "sha256": "59de431f1478de587cbe19fc68b2084faf86bb6dde7eae3e69122c83e2964a94",
+        "rows": 441,
+        "origin": "synthetic_feature_perturbation_of_real_test",
+        "split": "test_only"
+      },
+      "PS1_feature_drift.csv": {
+        "sha256": "6339f6a62ee5181b481e605a55c57160edc47e6ee91b433dfca60b030e9b91e2",
+        "rows": 441,
+        "origin": "synthetic_feature_perturbation_of_real_test",
+        "split": "test_only"
+      }
+    }
+  },
+  "trainPrevalenceBaseline": {
+    "validation": {
+      "accuracy": 0.6281179138321995,
+      "macro_f1": 0.25719591457753016,
+      "balanced_accuracy": 0.3333333333333333,
+      "confusion_matrix": [
+        [
+          277,
+          0,
+          0
+        ],
+        [
+          82,
+          0,
+          0
+        ],
+        [
+          82,
+          0,
+          0
+        ]
+      ],
+      "log_loss": 0.9256485885620132,
+      "recall_by_class": {
+        "0": 1.0,
+        "1": 0.0,
+        "2": 0.0
+      }
+    },
+    "test": {
+      "accuracy": 0.4421768707482993,
+      "macro_f1": 0.20440251572327042,
+      "balanced_accuracy": 0.3333333333333333,
+      "confusion_matrix": [
+        [
+          195,
+          0,
+          0
+        ],
+        [
+          123,
+          0,
+          0
+        ],
+        [
+          123,
+          0,
+          0
+        ]
+      ],
+      "log_loss": 1.1040137925441518,
+      "recall_by_class": {
+        "0": 1.0,
+        "1": 0.0,
+        "2": 0.0
+      }
+    }
+  },
+  "finishedAt": "2026-11-13T18:41:28.531712+00:00",
+  "processPeakRSSBytes": 1205321728,
+  "memoryScope": "Whole-process cumulative peak RSS, including feature extraction and all arms; not isolated model memory.",
+  "serializationVerification": {
+    "performedAt": "2026-11-13T18:45:42.497250+00:00",
+    "scope": "Reload saved trusted artifacts and reproduce existing test metrics, without refitting or tuning.",
+    "checks": [
+      {
+        "arm": "catboost_baseline",
+        "probabilityShape": [
+          441,
+          3
+        ],
+        "finite": true,
+        "savedMetricsMatch": true,
+        "maxAbsoluteMetricDifference": 0.0
+      },
+      {
+        "arm": "autogluon_baseline",
+        "probabilityShape": [
+          441,
+          3
+        ],
+        "finite": true,
+        "savedMetricsMatch": true,
+        "maxAbsoluteMetricDifference": 0.0
+      },
+      {
+        "arm": "catboost_enhanced",
+        "probabilityShape": [
+          441,
+          3
+        ],
+        "finite": true,
+        "savedMetricsMatch": true,
+        "maxAbsoluteMetricDifference": 0.0
+      },
+      {
+        "arm": "autogluon_enhanced",
+        "probabilityShape": [
+          441,
+          3
+        ],
+        "finite": true,
+        "savedMetricsMatch": true,
+        "maxAbsoluteMetricDifference": 0.0
+      }
+    ]
+  },
+  "bestArmByValidationLogLoss": "catboost_enhanced",
+  "bestArmScope": "Validation ranking of the four fixed experiments; no model is approved for production.",
+  "executedScriptSnapshot": "benchmark_uci_autogluon.executed.py",
+  "artifactPackagingScriptSha256": "98284bf17cebb4a2865cfa431f47a2e19180134b857001da5bd08665c9dfd8c9"
+}

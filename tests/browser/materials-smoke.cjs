@@ -41,9 +41,12 @@ async function run(browser, options, name) {
   });
   try {
     await page.goto(new URL('/materials.html', origin).href);
-    await page.getByText(/Уникальных фото: 53/).waitFor();
-    await page.getByText(/500 строк/).waitFor();
-    await page.getByText(/Достаточность входов \(0 из 12\)/).waitFor();
+    await page.getByText('О подборке', {exact:true}).click();
+    await page.locator('#catalog-provenance').getByText(/Уникальных фото: 53/).waitFor();
+    assert.match(await page.locator('#catalog-provenance').textContent(), /Экспертные метки дефектов отсутствуют/);
+    await page.getByText('О подборке', {exact:true}).click();
+    await page.getByText(/500 записей/).waitFor();
+    await page.getByText(/Полнота данных \(0 из 12\)/).waitFor();
     const scope = page.getByLabel('Условия осмотра');
     const category = page.getByLabel('Категория');
     assert.equal(await scope.inputValue(), 'external');
@@ -58,7 +61,11 @@ async function run(browser, options, name) {
     await readings.click();
     assert.equal(await page.locator('.sensor-table:visible').count(), 0);
     assert.equal(await page.locator('#rule-fields details[open]').count(), 0);
+    const thresholds = page.getByText('Источник и пороги', {exact:true});
+    await thresholds.first().click();
+    await page.locator('.sensor-thresholds:visible').getByText(/порог тревоги не указан/).first().waitFor();
     assert.equal(await page.getByText(/порог тревоги не указан/).count(), 2);
+    await thresholds.first().click();
     await page.getByRole('button',{name:'Показать ещё'}).click();
     assert.equal(await page.locator('.photo-option').count(), 24);
     await scope.selectOption('repair');
@@ -66,7 +73,10 @@ async function run(browser, options, name) {
     await scope.selectOption('restricted_access');
     assert.equal(await page.locator('.photo-option').count(), 4);
     await page.locator('.photo-option').first().click();
-    await page.getByText(/Ограниченный доступ\. Крышка клеммной коробки снята/).waitFor();
+    await page.locator('#photo-detail').getByText('О фото', {exact:true}).click();
+    await page.locator('#photo-scope').getByText(/Ограниченный доступ\. Крышка клеммной коробки снята/).waitFor();
+    await page.getByText(/Экспертной метки дефекта нет/).waitFor();
+    await page.locator('#photo-detail').getByText('О фото', {exact:true}).click();
     await scope.selectOption('unreviewed');
     assert.equal(await page.locator('.photo-option').count(), 4);
     await scope.selectOption('');
@@ -79,7 +89,10 @@ async function run(browser, options, name) {
     await photo.click();
     const analyze = page.getByRole('button',{name:'Проверить фото'});
     await analyze.click();
-    await page.getByText('Предварительная оценка фотографии.').waitFor();
+    await page.getByText('Предварительная оценка', {exact:true}).waitFor();
+    await page.locator('#photo-result').getByText('О результате', {exact:true}).click();
+    assert.match(await page.locator('#photo-result details').innerText(), /InternVL3/);
+    await page.locator('#photo-result').getByText('О результате', {exact:true}).click();
     assert.match(uploads[0].headers()['content-type'], /^multipart\/form-data; boundary=/);
     assert.match(uploads[0].postDataBuffer().toString('latin1'), /filename="frame.jpg"/);
     const box = await page.locator('#photo-box').boundingBox();
@@ -107,7 +120,7 @@ async function run(browser, options, name) {
     assert.equal(diagnose, undefined);
     await page.getByText('Подтверждённые наблюдения', { exact: true }).click();
     await page.locator('#vision-guard_issue').selectOption('true');
-    await page.getByText(/Достаточность входов \(1 из 12\)/).waitFor();
+    await page.getByText(/Полнота данных \(1 из 12\)/).waitFor();
     await manual.click();
     await page.getByText('Сработало правил: 1.').waitFor();
     assert.deepEqual(diagnose,{serial:'P-102',telemetry:{},vision:{guard_issue:true}});

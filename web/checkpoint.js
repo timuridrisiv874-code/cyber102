@@ -149,15 +149,17 @@ function renderHistory(records) {
     entry.append(time, element('strong', cameraInspection ? captureLabel : scenarioName));
     if (cameraInspection) {
       entry.append(element('p', record.provenance.telemetry === 'manual' ?
-        'Телеметрия: показания введены оператором для выбранного оборудования.' : record.provenance.telemetry === 'demo_scenario' ?
-        `Телеметрия: демонстрационный сценарий «${scenarioName}». Это не текущие показания датчиков.` :
-        'Телеметрия: отсутствует. Правила, требующие датчиков, могут быть не оценены.'));
+        'Показания введены вручную.' : record.provenance.telemetry === 'demo_scenario' ?
+        `Показания: демо · ${scenarioName}` :
+        'Показаний нет — оценка ограничена.'));
       const evidence = record.evidence;
       if (Number.isFinite(evidence?.result?.media?.videoTimeSeconds)) {
         entry.append(element('p', `Позиция в загруженном видео: ${evidence.result.media.videoTimeSeconds} с.`));
       }
       if (typeof evidence?.result?.model === 'string') {
-        entry.append(element('p', `Предварительный анализ: ${evidence.result.model}. Привязка к насосу выбрана оператором.`));
+        const details = element('details', undefined, 'data-note');
+        details.append(element('summary', 'Данные осмотра'), element('p', `${evidence.result.model}. Оборудование выбрано инженером.`));
+        entry.append(details);
       }
       if (typeof evidence?.result?.observation === 'string') entry.append(element('p', evidence.result.observation));
       // Evidence links are generated from server UUIDs, never arbitrary result URLs.

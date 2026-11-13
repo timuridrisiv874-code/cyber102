@@ -87,12 +87,16 @@ async function run(browser, engine, state, server, android) {
   try {
     await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
     if (!android) {
+      assert.equal(await page.locator('#check').isVisible(), false, 'No analysis action before selecting a source');
+      await page.locator('#demo-options > summary').click();
+      await page.locator('#show-example').click();
       await page.locator('#check').click();
       await page.locator('#details').waitFor();
       assert.equal(await page.locator('#inspection-workflow').isVisible(), false, 'Fixture cannot become a real inspection');
     }
     await camera(page);
     await page.locator('#camera').click();
+    if (!android) await page.getByText('Настройки анализа', {exact:true}).click();
     await page.locator('#analysis-profile').selectOption('fast');
     await page.locator('#check').click();
     await page.locator('#inspection-preview:not([disabled])').waitFor();
@@ -102,8 +106,17 @@ async function run(browser, engine, state, server, android) {
     assert.match(state.analyses[0], /name="profile"\r\n\r\nfast/);
     await page.locator('#analysis-timing').getByText('Ответ на телефоне:', { exact: false }).waitFor();
     await page.locator('#analysis-timing').getByText('Сервер:', { exact: false }).waitFor();
-    await page.locator('#vision-observation').getByText('cyber102-detector-test', { exact: false }).waitFor();
-    await page.locator('#vision-observation').getByText('описание по классу', { exact: false }).waitFor();
+    if (android) {
+      await page.locator('#vision-observation').getByText('cyber102-detector-test', { exact: false }).waitFor();
+      await page.locator('#vision-observation').getByText('описание по классу', { exact: false }).waitFor();
+    } else {
+      await page.locator('#vision-observation').getByText('Проверка контракта модели', {exact:true}).waitFor();
+      await page.locator('.result-provenance > summary').click();
+      await page.locator('#analysis-model').getByText('cyber102-detector-test', {exact:false}).waitFor();
+      assert.match(await page.locator('#analysis-model').innerText(), /описание по классу/);
+      assert.ok((await page.locator('#equipment-id').innerText()).trim());
+      await page.locator('.result-provenance > summary').click();
+    }
     assert.equal(await page.locator('#inspection-foundation_issue').inputValue(), '', 'Corrosion does not auto-confirm a foundation defect');
     assert.equal(await page.locator('#inspection-seal_leak').inputValue(), '');
     assert.equal(await page.locator('#inspection-telemetry').inputValue(), '', 'No demo telemetry is assumed');

@@ -217,6 +217,7 @@ class InspectionApiTest(unittest.TestCase):
         self.assertEqual(self.request('POST', '/api/inspections', payload | {'analysisId': 'missing', 'requestId': 'new'})[0], 404)
 
     def test_unusable_frame_is_not_saveable_and_busy_has_retry_guidance(self):
+        self.handler.keywords['vision_backend'] = 'internvl3'
         with patch.object(vision, 'extract_request', return_value=(b'jpeg', 'fast', {'captureSource': 'camera', 'declaredBy': 'client'})), \
              patch.object(vision, 'analyze', return_value={'status': 'unusable', 'source': 'local_vision'}):
             status, _, raw = self.request('POST', '/analyze', b'upload')

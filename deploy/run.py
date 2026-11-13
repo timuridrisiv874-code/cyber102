@@ -7,6 +7,8 @@ import sys
 root = Path(__file__).resolve().parent.parent
 os.chdir(root)
 sys.path.insert(0, str(root))
+from server.vision_models import configure_from_file
+configure_from_file(root)
 backend_file = root / 'var' / 'vision-backend.txt'
 backend = backend_file.read_text(encoding='utf-8-sig').strip() if backend_file.exists() else 'internvl3'
 if backend not in ('internvl3', 'ollama', 'detector'):

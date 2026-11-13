@@ -3,7 +3,14 @@ $ErrorActionPreference='Stop'
 $root='C:\cyber102'
 $python="$root\.venv-internvl\Scripts\python.exe"
 if (!(Test-Path $python)) { throw 'Install the isolated .venv-internvl Python environment first' }
-if (!(Test-Path "$root\models\internvl3_5-2b-hf\cyber102-manifest.json")) { throw 'Download and verify the pinned InternVL3.5 model first' }
+$modelKey='internvl3_5'
+if (Test-Path "$root\var\vlm-model.txt") { $modelKey=[IO.File]::ReadAllText("$root\var\vlm-model.txt").Trim() }
+$modelDirectory = switch -CaseSensitive ($modelKey) {
+    'internvl3_5' { 'internvl3_5-2b-hf' }
+    'qwen3_vl_4b' { 'qwen3-vl-4b-instruct' }
+    default { throw 'Unknown configured local VLM' }
+}
+if (!(Test-Path "$root\models\$modelDirectory\cyber102-manifest.json")) { throw 'Download and verify the selected pinned VLM first' }
 $task='Cyber102InternVL'
 $action=New-ScheduledTaskAction -Execute $python -Argument '-u C:\cyber102\deploy\run-internvl.py' -WorkingDirectory $root
 $principal=New-ScheduledTaskPrincipal -UserId "$env:COMPUTERNAME\fatik" -LogonType S4U -RunLevel Limited

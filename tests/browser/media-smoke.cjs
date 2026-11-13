@@ -63,6 +63,7 @@ async function run(browser, engine, android) {
     await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
     await page.locator('#media-file').setInputFiles(photo);
     await page.locator('#message').getByText('Фото открыто.', { exact: false }).waitFor();
+    if (!android) await page.getByText('Настройки анализа', {exact:true}).click();
     await page.locator('#analysis-profile').selectOption('fast');
     await page.locator('#check').click();
     await page.locator('#message').getByText('Проверка завершена.', { exact: true }).waitFor();
@@ -71,7 +72,9 @@ async function run(browser, engine, android) {
     assert.equal(state.posts[0].profile, 'fast'); assert.equal(state.posts[0].name, 'frame.jpg');
     assert.equal(state.posts[0].type, 'image/jpeg'); assert.equal(state.posts[0].image.subarray(0, 2).toString('hex'), 'ffd8');
     assert.deepEqual(await page.locator('#snapshot').evaluate(el => [el.width, el.height]), [1280, 720]);
-    assert.match(await page.locator('#capture-provenance').textContent(), /Загруженное фото/);
+    if (!android) await page.locator('.result-provenance > summary').click();
+    assert.match(await page.locator('#capture-provenance').innerText(), /Загруженное фото/);
+    if (!android) await page.locator('.result-provenance > summary').click();
     assert.equal(state.mocks, 0, 'An uploaded image must never use a mock result');
 
     await page.locator('#media-file').setInputFiles(clip);
@@ -80,7 +83,9 @@ async function run(browser, engine, android) {
     await page.locator('#check').click();
     await page.locator('#message').getByText('Проверка завершена.', { exact: true }).waitFor();
     assert.equal(state.posts.at(-1).source, 'uploaded_video'); assert.equal(Number(state.posts.at(-1).time), 1);
-    assert.match(await page.locator('#capture-provenance').textContent(), /0:01\.0/);
+    if (!android) await page.locator('.result-provenance > summary').click();
+    assert.match(await page.locator('#capture-provenance').innerText(), /0:01\.0/);
+    if (!android) await page.locator('.result-provenance > summary').click();
     await page.locator('#camera-mode').selectOption('video');
     await page.locator('#frame-interval').selectOption('2000');
     await page.locator('#uploaded-video').evaluate(async el => { await new Promise(resolve => { el.addEventListener('seeked', resolve, { once: true }); el.currentTime = 0; }); });

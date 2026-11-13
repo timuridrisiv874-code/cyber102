@@ -16,6 +16,7 @@ const videoToggle = byId('video-toggle');
 const checkedViewfinder = byId('checked-viewfinder');
 const videoMetrics = byId('video-metrics');
 const endpoint = document.querySelector('main').dataset.analysisEndpoint.trim();
+const offlineMode = window.CyberOffline?.enabled === true;
 const latencyFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 });
 const rateFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
 
@@ -42,7 +43,7 @@ const media = window.CyberMedia.create({
   input: byId('media-file'), image: byId('uploaded-image'), video: byId('uploaded-video'),
   beforeChange: resetInput, changed: render, message: showMessage,
 });
-clipReview = window.CyberVideoReview?.create({
+clipReview = offlineMode ? null : window.CyberVideoReview?.create({
   media,
   beforeStart: () => {
     inputGeneration += 1;
@@ -101,7 +102,18 @@ function positionDetection() {
 }
 
 function render() {
+  if (offlineMode) cameraMode.value = 'single';
   const clipBusy = Boolean(clipReview?.busy);
+  const videoOverview = !offlineMode && media.kind === 'uploaded_video';
+  if (!offlineMode) {
+    const reviewPanel = byId('video-review-panel');
+    const destination = videoOverview ? byId('result') : byId('video-review-home');
+    if (reviewPanel && destination && reviewPanel.parentElement !== destination) destination.append(reviewPanel);
+    byId('result').dataset.videoReview = String(videoOverview);
+    byId('result-title').textContent = videoOverview && !result ? 'Обзор видео' : 'Результат осмотра';
+    byId('video-review-title').hidden = videoOverview && !result;
+    reviewPanel?.setAttribute('aria-labelledby', videoOverview && !result ? 'result-title' : 'video-review-title');
+  }
   const videoMode = cameraMode.value === 'video';
   const frozen = frameSource !== null;
   const live = Boolean(stream && (videoMode || !frozen));
@@ -127,8 +139,10 @@ function render() {
   byId('checked-frame').hidden = !videoMode || !frozen;
   byId('guide').hidden = (!live && !demoActive) || (!videoMode && frozen) || Boolean(media.kind);
   byId('source').dataset.live = String(live);
+  byId('source').hidden = !(media.kind || live || demoActive || frameSource);
   byId('source-text').textContent = media.kind ? sourceLabel(media.metadata()) : live ? 'Камера' : frameSource === 'camera' ? 'Кадр с камеры' : demoActive ? 'Тестовый пример' : 'Выберите источник';
-  if (byId('mode')) byId('mode').textContent = endpoint && (live || frameSource === 'camera' || media.kind) ? 'Локальная VLM' : demoActive ? 'Тестовый пример' : 'Готово к осмотру';
+  if (byId('mode')) byId('mode').textContent = offlineMode ? 'На телефоне · без сервера' :
+    endpoint && (live || frameSource === 'camera' || media.kind) ? 'Модель на сервере' : demoActive ? 'Тестовый пример' : 'Готово к осмотру';
   if (demoScenario) {
     byId('demo-options').hidden = !example || Boolean(stream || openingCamera || frameSource === 'camera' || media.kind);
     demoScenario.disabled = checking;
@@ -156,9 +170,13 @@ function render() {
     }
   }
   if (byId('video-summary')) renderVideoSummary();
-  checkButton.hidden = videoMode;
+  checkButton.hidden = videoMode || (!frameReady && !checking && !result);
+  cameraButton.classList.toggle('primary', !frameReady && !result);
+  cameraButton.classList.toggle('secondary', frameReady || Boolean(result));
+  document.body.dataset.hasResult = String(Boolean(result));
   checkButton.disabled = clipBusy || openingCamera || checking || media.loading || Boolean(analysisController) || (!frozen && !frameReady);
   cameraButton.disabled = false;
+  if (byId('analysis-cancel')) byId('analysis-cancel').hidden = !checking || frameSource === 'example';
   byId('check-label').textContent = checking ? 'Проверяем…' :
     result ? (['camera', 'uploaded_video'].includes(frameSource) ? 'Новый кадр' : 'Проверить ещё раз') : 'Проверить кадр';
   byId('camera-label').textContent = openingCamera ? 'Отменить запуск' :
@@ -167,9 +185,11 @@ function render() {
   byId('capture-provenance').textContent = frameMetadata ? sourceLabel(frameMetadata) : '';
 
   const detected = result && (result.status === 'defect' || result.status === 'clear');
+  document.body.dataset.analysisState = checking || Boolean(videoRun) || clipBusy ? 'working' : 'idle';
+  byId('result').dataset.resultReady = String(Boolean(detected || (offlineMode && result?.status === 'offline_observation')));
   detection.hidden = !detected;
   byId('details').hidden = !detected;
-  byId('empty').hidden = Boolean(detected);
+  byId('empty').hidden = Boolean(detected) || (videoOverview && !result);
 
   if (detected) {
     detection.dataset.status = result.status;
@@ -181,7 +201,8 @@ function render() {
     byId('equipment-id').textContent = result.equipment.id;
     byId('vision-observation').hidden = !result.observation;
     const languageNote = /[\u3400-\u9fff\u3040-\u30ff]/u.test(result.observation || '') ? 'В описании есть языковые ошибки; сверяйте его с кадром. ' : '';
-    byId('vision-observation').textContent = result.observation ? `${languageNote}Предварительный осмотр · ${result.model}${result.observationKind === 'template' ? ' · описание по классу' : ''}: ${result.observation}` : '';
+    byId('vision-observation').textContent = result.observation ? `${languageNote}${result.observation}` : '';
+    if (byId('analysis-model')) byId('analysis-model').textContent = `${result.model || 'Демонстрационный ответ'}${result.observationKind === 'template' ? ' · описание по классу' : ''}`;
     byId('component').textContent = result.component;
     if (byId('service-life')) byId('service-life').textContent = result.serviceLife;
     if (byId('next-service')) byId('next-service').textContent = result.nextService;
@@ -189,15 +210,16 @@ function render() {
     positionDetection();
   } else {
     const [title, description] = unavailableResults[result?.status] ?? [
-      'Результат появится здесь',
-      'Выберите фото, видео или включите камеру. После анализа проверьте наблюдение и следующий шаг.',
+      'Ожидает кадр',
+      'Добавьте фото или видео для проверки.',
     ];
     byId('empty-title').textContent = checking ? 'Проверяем кадр…' : title;
     byId('empty-text').textContent = checking ? '' : description;
   }
-  window.CyberCamera.renderTiming(result);
+  if (!offlineMode) window.CyberCamera.renderTiming(result);
   window.CyberInspection.update(result, clipBusy || checking || Boolean(videoRun));
   clipReview?.update();
+  if (offlineMode) window.CyberOffline.render(result, checking);
 }
 
 function stopCamera() {
@@ -293,7 +315,7 @@ function drawFrame(canvas, source) {
   if (!width || !height || (source.tagName === 'VIDEO' && source.readyState < 2)) {
     throw new Error('Кадр недоступен. Дождитесь загрузки изображения.');
   }
-  const scale = Math.min(1, 1280 / Math.max(width, height));
+  const scale = Math.min(1, (offlineMode ? 768 : 1280) / Math.max(width, height));
   canvas.width = Math.max(1, Math.round(width * scale));
   canvas.height = Math.max(1, Math.round(height * scale));
   canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
@@ -307,8 +329,17 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
   const timeout = setTimeout(() => {
     timedOut = true;
     controller.abort();
-  }, useServer ? 120000 : 12000);
+  }, offlineMode ? 180000 : useServer ? 13 * 60 * 1000 : 12000);
   try {
+    if (offlineMode) {
+      const image = await new Promise((resolve) => frame.toBlob(resolve, 'image/jpeg', 0.85));
+      if (!image) throw new Error('Не удалось подготовить кадр.');
+      const data = await window.CyberOffline.analyze(image, {
+        signal: controller.signal, onProgress: showMessage, metadata,
+      });
+      data.clientDurationSeconds = (performance.now() - started) / 1000;
+      return readResult(data);
+    }
     const options = { signal: controller.signal, cache: 'no-store' };
     if (useServer) {
       const image = await new Promise((resolve) => frame.toBlob(resolve, 'image/jpeg', 0.85));
@@ -335,7 +366,7 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
     }
     return readResult(data);
   } catch (error) {
-    if (timedOut) throw new Error('Сервер не ответил вовремя. Повторите проверку.');
+    if (timedOut) throw new Error(offlineMode ? 'Модель на телефоне не завершила анализ вовремя. Попробуйте другой кадр.' : 'Сервер не ответил вовремя. Повторите проверку.');
     throw error;
   } finally {
     clearTimeout(timeout);
@@ -344,6 +375,9 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
 }
 
 function readResult(data) {
+  if (offlineMode && data?.status === 'offline_observation' && data.source === 'on_device' &&
+      typeof data.model === 'string' && typeof data.observation === 'string' &&
+      data.observation.trim() && data.observation.length <= 4000 && !data.box) return data;
   if (data && Object.prototype.hasOwnProperty.call(unavailableResults, data.status)) return data;
   if (!data || !['defect', 'clear'].includes(data.status)) throw new Error('Invalid result status');
 
@@ -385,8 +419,8 @@ async function checkFrame() {
       frameMetadata = frameSource === 'example' ? null : captureMetadata();
     }
     const useServer = frameSource !== 'example';
-    if (useServer && !endpoint) throw new Error('Не задан адрес сервера анализа.');
-    if (useServer) showMessage('Модель анализирует кадр. Задержка появится после ответа.');
+    if (useServer && !endpoint && !offlineMode) throw new Error('Не задан адрес сервера анализа.');
+    if (useServer) showMessage(offlineMode ? 'SmolVLM анализирует кадр на телефоне…' : 'Модель анализирует кадр. Задержка появится после ответа.');
     render();
     const nextResult = await analyzeFrame(useServer, snapshot, frameMetadata);
     if (generation !== inputGeneration) return;
@@ -401,6 +435,7 @@ async function checkFrame() {
 }
 
 function changeCameraMode() {
+  if (offlineMode) cameraMode.value = 'single';
   const target = cameraMode.value === 'video' ? checkedViewfinder : viewfinder;
   target.append(snapshot, detection);
   frameSource = null;
@@ -508,6 +543,7 @@ async function checkVideoFrame(run) {
 }
 
 function toggleVideoRun() {
+  if (offlineMode) return;
   if (clipReview?.busy) return;
   if (videoRun) {
     stopVideoRun(); showMessage('Видеопроверка остановлена.'); render(); return;
@@ -529,9 +565,16 @@ function toggleVideoRun() {
 
 cameraButton.addEventListener('click', toggleCamera);
 checkButton.addEventListener('click', checkFrame);
+byId('analysis-cancel')?.addEventListener('click', () => {
+  if (!checking) return;
+  inputGeneration += 1;
+  analysisController?.abort(); analysisController = null; checking = false;
+  showMessage('Анализ отменён.'); render();
+});
 cameraMode.addEventListener('change', changeCameraMode);
 videoToggle.addEventListener('click', toggleVideoRun);
 function updateDemoExample() {
+  if (offlineMode) return;
   if (!example || !demoScenario) return;
   resetInput();
   media.clear();
@@ -583,12 +626,14 @@ render();
 
 
 async function loadCapabilities() {
+  if (offlineMode) return;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
   try {
     const response = await fetch('/api/capabilities', { signal: controller.signal, cache: 'no-store', redirect: 'error' });
     if (!response.ok) return;
     const capabilities = await response.json();
+    window.CyberAnalysisJobs?.setCapabilities(capabilities);
     if (typeof capabilities?.vision?.videoReview === 'boolean') {
       clipReview?.setAvailable(capabilities.vision.videoReview);
     }

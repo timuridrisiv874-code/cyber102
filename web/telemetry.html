@@ -17,40 +17,41 @@
     <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
     <p class="brand-caption">Инженерный контроль</p>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nav-label-wide">Оборудование</span><span class="nav-label-short">Объекты</span></a><a href="checkpoint.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="materials.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M8 13h8m-8 4h5"/></svg><span>Материалы</span></a><a href="telemetry.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
-    <div class="sidebar-foot"><strong>Осмотр оборудования</strong>Предварительный осмотр<br>Решение принимает инженер</div>
+    <div class="sidebar-foot"><span class="sidebar-foot-mark" aria-hidden="true"></span>Визуальная диагностика</div>
   </aside>
-  <header class="topbar"><div class="topbar-inner"><div class="topbar-location"><span class="workspace-name">Cyber102</span><span class="divider">/</span><strong>Показания</strong></div><span class="mode">Воспроизведение данных</span></div></header>
   <main id="main-content" class="page workspace-page">
-    <header class="intro"><div class="page-heading-group"><div class="eyebrow">Вибрация и температура</div><h1>Показания оборудования</h1><p>Просматривайте измерения и отклонения от заданных порогов.</p></div><a class="button secondary" href="materials.html#measurements">Посмотреть графики ↗</a></header><div class="section-banner"><span><strong>Пример данных организаторов</strong><br>Воспроизводятся строки из таблиц. Связь с конкретным серийным номером не установлена.</span></div>
+    <header class="intro"><div class="page-heading-group"><h1>Показания оборудования</h1><p>Вибрация и температура по записям организаторов.</p></div><a class="button secondary" href="materials.html#measurements">Посмотреть графики ↗</a></header><p class="data-tag">Пример данных · без подключения к оборудованию</p>
     <section class="panel" aria-labelledby="playback-title">
-      <div class="panel-heading"><h2 id="playback-title">Управление просмотром</h2><span class="source" id="playback-state">Пауза</span></div>
+      <div class="panel-heading"><h2 id="playback-title">Просмотр записей</h2><span class="source" id="playback-state">Пауза</span></div>
       <div class="section-body">
         <div class="playback-controls">
           <button type="button" class="button primary" id="replay-play" disabled>Воспроизвести</button>
-          <button type="button" class="button secondary" id="replay-step" disabled>Следующая строка</button>
+          <button type="button" class="button secondary" id="replay-step" disabled>Следующая запись</button>
           <button type="button" class="button secondary" id="replay-reset" disabled>В начало</button>
-          <div class="field"><label for="replay-speed">Интервал показа строки</label><select id="replay-speed"><option value="1000">1 секунда</option><option value="2000" selected>2 секунды</option><option value="5000">5 секунд</option></select></div>
+          <div class="field"><label for="replay-speed">Интервал</label><select id="replay-speed"><option value="1000">1 секунда</option><option value="2000" selected>2 секунды</option><option value="5000">5 секунд</option></select></div>
         </div>
-        <div class="field replay-position"><label for="replay-position">Позиция в наборе</label><input type="range" id="replay-position" min="0" max="0" value="0" disabled></div>
+        <div class="field replay-position"><label for="replay-position">Запись</label><input type="range" id="replay-position" min="0" max="0" value="0" disabled></div>
         <p class="message" id="replay-message" role="status">Загружаем источник…</p>
         <dl class="workspace-facts" id="replay-timestamp"></dl>
-        <p class="workspace-note">Один шаг = одна почасовая запись. Скорость показа не меняет время исходных измерений. При уходе со страницы воспроизведение останавливается.</p>
+
       </div>
+    </section>
+    <section class="panel telemetry-trend" aria-labelledby="trend-title">
+      <div class="panel-heading"><h2 id="trend-title">Общая вибрация</h2><span class="source">RMS · мм/с</span></div>
+      <div class="section-body"><div id="telemetry-trend-chart" class="telemetry-chart" role="img" aria-label="График общей вибрации по записям организаторов"></div><p id="telemetry-trend-status" class="message" role="status">Загружаем график…</p></div>
     </section>
     <section class="panel" aria-labelledby="channels-title">
       <div class="panel-heading"><h2 id="channels-title">Измерительные каналы</h2><span class="source">Пороги из описаний баз</span></div>
       <div class="section-body"><div id="telemetry-channels" class="workspace-grid"></div><p class="workspace-note" id="telemetry-disagreement"></p></div>
     </section>
-    <section class="panel" aria-labelledby="source-title">
-      <div class="panel-heading"><h2 id="source-title">Источник и доступность данных</h2></div>
-      <div class="section-body">
-        <p class="workspace-note">Источник — переданные организаторами таблицы. Фактическое подключение к оборудованию не выполнено.</p>
-        <p class="workspace-note">В этих таблицах отсутствуют токи фаз, давление, КПД и наработка. Они остаются неизвестными. Превышение порога не означает, что величина растёт; полная диагностическая связка требует всех её условий.</p>
+    <details class="data-note data-note-panel"><summary id="source-title">О данных</summary><div>
+        <p class="workspace-note">Источник — таблицы организаторов. Серийный номер не установлен. Один шаг — одна почасовая запись; скорость просмотра не меняет время измерений.</p>
+        <p class="workspace-note">Часовой пояс записей не указан. В этих таблицах отсутствуют токи фаз, давление, КПД и наработка. Они остаются неизвестными. Превышение порога не означает, что величина растёт; полная диагностическая связка требует всех её условий.</p>
 
         <details class="workspace-details"><summary>Происхождение текущей строки</summary><pre id="replay-provenance"></pre></details>
         <a href="materials.html#manual" class="text-link">Проверить диагностические связки по подтверждённым данным →</a>
       </div>
-    </section>
+    </details>
   </main>
 </body>
 </html>

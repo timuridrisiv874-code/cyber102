@@ -17,12 +17,11 @@
     <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
     <p class="brand-caption">Инженерный контроль</p>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nav-label-wide">Оборудование</span><span class="nav-label-short">Объекты</span></a><a href="checkpoint.html" aria-current="page" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="materials.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M8 13h8m-8 4h5"/></svg><span>Материалы</span></a><a href="telemetry.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
-    <div class="sidebar-foot"><strong>Осмотр оборудования</strong>Предварительный осмотр<br>Решение принимает инженер</div>
+    <div class="sidebar-foot"><span class="sidebar-foot-mark" aria-hidden="true"></span>Визуальная диагностика</div>
   </aside>
-  <header class="topbar"><div class="topbar-inner"><div class="topbar-location"><span class="workspace-name">Cyber102</span><span class="divider">/</span><strong>Журнал осмотров</strong></div><span class="mode">Демонстрационные сценарии</span></div></header>
 
     <main id="main-content" class="page">
-      <header class="intro"><div class="page-heading-group"><div class="eyebrow">История и контроль</div><h1>Журнал осмотров</h1><p>Замечания, выполненные проверки и решения по оборудованию.</p></div><a class="button primary" href="index.html" data-serial-link>Новый осмотр</a></header>
+      <header class="intro"><div class="page-heading-group"><h1>Журнал осмотров</h1><p>История проверок и решения инженера.</p></div><a class="button primary" href="index.html" data-serial-link>Новый осмотр</a></header>
 
       <section class="panel" id="inspection-history" aria-labelledby="history-title" hidden>
             <div class="panel-heading"><h2 id="history-title">История осмотров</h2><span class="source">Демо</span></div>
@@ -31,11 +30,11 @@
               <ol class="history-list" id="history-records"></ol>
             </div>
           </section>
-      <div class="section-banner"><span><strong>Проверка на демонстрационных данных</strong><br>Сценарии P-102 показывают работу правил. Паспорта AMS и измерения организаторов не привязаны к этому профилю.</span></div>
+      <div class="journal-demo-heading"><h2>Проверка сценария</h2><span class="data-tag">Демо · P-102</span><details class="data-note"><summary>О данных</summary><p>Сценарии показывают работу правил. Паспорта AMS и измерения организаторов не привязаны к P-102.</p></details></div>
       <div class="dashboard">
         <div class="inspection-column">
           <section class="panel" aria-labelledby="passport-title">
-            <div class="panel-heading"><h2 id="passport-title"><span class="section-number" aria-hidden="true">01</span>Выбрать оборудование</h2></div>
+            <div class="panel-heading"><h2 id="passport-title">Оборудование</h2></div>
             <div class="section-body">
               <form id="lookup" class="lookup">
                 <div class="field"><label for="serial">Серийный номер</label><input id="serial" maxlength="80" value="P-102" required autocomplete="off" autocapitalize="characters"></div>
@@ -63,7 +62,7 @@
 
         <div class="inspection-column">
           <section class="panel" aria-labelledby="analysis-title">
-            <div class="panel-heading"><h2 id="analysis-title"><span class="section-number" aria-hidden="true">02</span>Проверить сценарий</h2></div>
+            <div class="panel-heading"><h2 id="analysis-title">Диагностические правила</h2></div>
             <div class="section-body">
               <form id="analysis-form" class="lookup scenario-form">
                 <div class="field"><label for="scenario">Сценарий</label><select id="scenario" disabled></select></div>

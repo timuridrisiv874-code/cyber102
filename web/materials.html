@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="checkpoint.css">
     <link rel="stylesheet" href="materials.css">
   <link rel="stylesheet" href="workspace.css">
+    <script src="analysis-jobs.js" defer></script>
     <script src="materials.js" defer></script>
     <script src="shell.js" defer></script>
 </head>
@@ -18,18 +19,18 @@
     <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
     <p class="brand-caption">Инженерный контроль</p>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nav-label-wide">Оборудование</span><span class="nav-label-short">Объекты</span></a><a href="checkpoint.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="materials.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M8 13h8m-8 4h5"/></svg><span>Материалы</span></a><a href="telemetry.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
-    <div class="sidebar-foot"><strong>Осмотр оборудования</strong>Предварительный осмотр<br>Решение принимает инженер</div>
+    <div class="sidebar-foot"><span class="sidebar-foot-mark" aria-hidden="true"></span>Визуальная диагностика</div>
   </aside>
-  <header class="topbar"><div class="topbar-inner"><div class="topbar-location"><span class="workspace-name">Cyber102</span><span class="divider">/</span><strong>Материалы</strong></div><span class="mode">Подборка организаторов</span></div></header>
 
     <main id="main-content" class="page materials-page">
-      <header class="intro"><div class="page-heading-group"><div class="eyebrow">Материалы для проверки</div><h1>Библиотека материалов</h1><p>Фотографии, измерения и подтверждённые наблюдения.</p><nav class="section-nav" aria-label="Разделы материалов"><a href="#photos">Фотографии</a><a href="#measurements">Измерения</a><a href="#manual">Проверка правил</a><a href="documents.html">Документы ↗</a></nav></div></header>
+      <header class="intro"><div class="page-heading-group"><h1>Библиотека материалов</h1><p>Фотографии оборудования и примеры измерений.</p><nav class="section-nav" aria-label="Разделы материалов"><a href="#photos">Фотографии</a><a href="#measurements">Измерения</a><a href="#manual">Проверка правил</a><a href="documents.html">Документы ↗</a></nav></div></header>
 
       <section class="panel" id="photos" aria-labelledby="photos-title">
         <div class="panel-heading"><h2 id="photos-title">Фотографии оборудования</h2><span class="source">Подборка организаторов</span></div>
         <div class="section-body">
-          <p class="material-note">По умолчанию — внешний обход. Снятые детали и узлы с ограниченным доступом доступны через фильтр.</p>
+
           <p id="catalog-status" class="message" role="status">Загружаем каталог…</p>
+          <details class="data-note"><summary>О подборке</summary><p id="catalog-provenance" class="material-note"></p></details>
           <div class="catalog-layout" id="catalog" hidden>
             <div>
               <div class="catalog-filters">
@@ -42,15 +43,13 @@
             </div>
             <section class="photo-detail" id="photo-detail" aria-labelledby="photo-title" hidden>
               <h3 id="photo-title" tabindex="-1"></h3>
-              <p class="material-note" id="photo-source"></p>
-              <p class="material-note" id="photo-scope"></p>
-              <p class="material-note" id="photo-aliases" hidden></p>
+              <p class="material-note" id="photo-source"></p><details class="data-note"><summary>О фото</summary><p class="material-note" id="photo-scope"></p><p class="material-note" id="photo-aliases" hidden></p><p class="material-note">Экспертной метки дефекта нет. Наблюдение модели требует проверки.</p></details>
               <div class="analysis-image">
                 <img id="selected-image" alt="">
                 <div id="photo-box" aria-hidden="true" hidden></div>
               </div>
-              <button type="button" id="analyze-photo" class="button primary" disabled>Проверить фото</button>
-              <p class="material-note">Предварительное наблюдение модели. Подтвердите признак перед выводом о состоянии.</p>
+              <div class="actions photo-actions"><button type="button" id="analyze-photo" class="button primary" disabled>Проверить фото</button><button type="button" id="photo-cancel" class="button secondary" hidden>Отмена</button></div>
+
               <p class="message" id="photo-status" role="status"></p>
               <div id="photo-result" hidden></div>
             </section>
@@ -65,27 +64,27 @@
       <section class="panel" id="measurements" aria-labelledby="measurements-title">
         <div class="panel-heading"><h2 id="measurements-title">Примеры измерений</h2></div>
         <div class="section-body">
-          <p id="sensor-note" class="material-note"></p>
+          <details class="data-note"><summary>О данных</summary><p id="sensor-note" class="material-note"></p><p id="sensor-provenance" class="material-note"></p></details>
           <p class="message" id="sensor-status" role="status">Загружаем измерения…</p>
           <div class="measurement-grid" id="measurement-grid"></div>
         </div>
       </section>
 
       <section class="panel" id="manual" aria-labelledby="manual-title">
-        <div class="panel-heading"><h2 id="manual-title">Проверка по подтверждённым данным</h2><span class="source">Демонстрационный P-102</span></div>
+        <div class="panel-heading"><h2 id="manual-title">Проверка диагностических правил</h2><span class="source">Демо · P-102</span></div>
         <div class="section-body">
-          <p class="material-note">Демонстрационный профиль насоса P-102. Введите подтверждённые признаки вручную. Значения из галереи и таблиц не подставляются.</p>
+          <p class="material-note">Введите известные показания и признаки осмотра.</p><details class="data-note"><summary>О данных</summary><p class="material-note">Демонстрационный профиль P-102. Фото и измерения из библиотеки не подставляются автоматически.</p></details>
           <p class="message" id="rules-status" role="status">Загружаем правила…</p>
           <form id="manual-form" hidden>
-            <p class="material-note">Раскройте группу и заполните известные признаки.</p>
+
             <div id="rule-fields"></div>
             <button type="submit" class="button primary" id="run-rules">Проверить связки</button>
           </form>
           <p class="message" id="diagnosis-status" role="status"></p>
           <div id="manual-findings"></div>
           <section id="rule-coverage" aria-labelledby="coverage-title" hidden>
-            <h3 id="coverage-title">Достаточность входов</h3>
-            <p class="material-note">Показано, для каких связок заполнены необходимые поля. Результат зависит от их значений.</p>
+            <h3 id="coverage-title">Полнота данных</h3>
+            <p class="material-note">Правила, для которых заполнены необходимые поля.</p>
             <div class="coverage-grid" id="coverage-list"></div>
           </section>
         </div>

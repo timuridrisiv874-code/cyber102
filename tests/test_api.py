@@ -1,4 +1,5 @@
 import json
+import os
 import socket
 import tempfile
 import threading
@@ -234,6 +235,14 @@ class ApiTest(unittest.TestCase):
                 with self.subTest(headers=headers):
                     self.json_request('POST', '/api/video-review', status, body=b'{}', headers=headers)
             analyze.assert_not_called()
+
+    def test_capabilities_identify_the_selected_local_vlm(self):
+        self.handler.keywords.update(vision_enabled=True, vision_backend='internvl3')
+        with patch.dict(os.environ, {'CYBER102_VLM_MODEL': 'qwen3_vl_4b'}):
+            caps = self.json_request('GET', '/api/capabilities')['vision']
+            self.assertEqual(caps['model'], 'Qwen/Qwen3-VL-4B-Instruct')
+            self.assertEqual(caps['revision'], vision.model_spec().revision)
+            self.assertTrue(caps['videoReview'])
 
     def test_video_review_returns_preview_and_busy_without_writing_history(self):
         self.handler.keywords.update(vision_enabled=True, vision_backend='internvl3')

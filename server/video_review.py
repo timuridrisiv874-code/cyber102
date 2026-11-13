@@ -101,11 +101,12 @@ def prepare_request(data):
 
 
 def result_from_envelope(envelope, payload):
+    expected = vision.model_spec()
     required = {'model', 'revision', 'observations', 'summary', 'durationSeconds'}
     if (not isinstance(envelope, dict) or not required <= set(envelope)
             or set(envelope) - required - {'clipDurationSeconds', 'metrics'}
-            or envelope['model'] != vision.INTERNVL_MODEL
-            or envelope['revision'] != vision.INTERNVL_REVISION):
+            or envelope['model'] != expected.model_id
+            or envelope['revision'] != expected.revision):
         raise ValueError('Unexpected video model response')
     summary, duration = envelope['summary'], envelope['durationSeconds']
     if (not isinstance(summary, str) or not summary.strip() or len(summary) > 1500
