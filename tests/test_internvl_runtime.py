@@ -14,6 +14,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 from vision_runtime import worker
 from vision_runtime import benchmark_profiles
+from vision_runtime import download
 
 
 OBSERVATION = {
@@ -33,6 +34,11 @@ def encoded_image(image_format="JPEG", size=(32, 16)):
 
 
 class RuntimeValidationTest(unittest.TestCase):
+    def test_downloader_and_runtime_pin_the_same_native_release(self):
+        self.assertEqual((download.REPOSITORY, download.REVISION), (worker.MODEL, worker.REVISION))
+        self.assertEqual(worker.MODEL, 'OpenGVLab/InternVL3_5-2B-HF')
+        self.assertEqual(len(worker.REVISION), 40)
+
     def test_accepts_exact_json_and_optional_single_fence(self):
         document = json.dumps(OBSERVATION, ensure_ascii=False)
         for output in (document, f"\n```json\n{document}\n```\n", f"```\n{document}\n```"):
@@ -232,12 +238,82 @@ class EngineProfilingTest(unittest.TestCase):
                 engine = worker.Engine(root)
         processor = transformers.AutoProcessor.from_pretrained.return_value
         self.assertEqual(processor.apply_chat_template.call_count, 2)
-        prompts = [call.args[0][0]['content'][1]['text'] for call in processor.apply_chat_template.call_args_list]
+        prompts = [call.args[0][-1]['content'][1]['text'] for call in processor.apply_chat_template.call_args_list]
         self.assertEqual(prompts, [worker.PROMPT, worker.COMPACT_PROMPT])
+        for call in processor.apply_chat_template.call_args_list:
+            self.assertEqual(call.args[0][0], {'role': 'system', 'content': worker.SYSTEM_PROMPT})
         self.assertEqual(engine.prompt, processor.apply_chat_template.return_value)
         self.assertIsNone(engine.last_metrics)
         transformers.AutoProcessor.from_pretrained.assert_called_once_with(root, local_files_only=True, trust_remote_code=False)
         self.assertIs(transformers.AutoModelForImageTextToText.from_pretrained.call_args.kwargs['local_files_only'], True)
+        self.assertIs(transformers.AutoModelForImageTextToText.from_pretrained.call_args.kwargs['trust_remote_code'], False)
+        self.assertIs(transformers.AutoModelForImageTextToText.from_pretrained.call_args.kwargs['use_safetensors'], True)
+
+    def test_video_is_one_multimodal_generation_with_ordered_image_placeholders(self):
+        images, timestamps = [object(), object()], [0, 2.5]
+        model_rows = [dict(OBSERVATION, frameIndex=index) for index in range(2)]
+        self.engine.processor.decode.return_value = json.dumps({'observations': model_rows, 'summary': 'На двух кадрах видны признаки коррозии.'})
+        with patch.object(worker.time, 'perf_counter', side_effect=[1, 1.2, 4.2, 4.25]):
+            result = self.engine.infer_video(images, timestamps)
+        content = self.engine.processor.apply_chat_template.call_args.args[0][-1]['content']
+        self.assertEqual([item['type'] for item in content], ['text', 'image', 'text', 'image', 'text'])
+        self.assertIn('Frame 1, time 2.5', content[2]['text'])
+        self.assertIn('EXACTLY 2 observations', content[-1]['text'])
+        self.assertIn('[0, 1]', content[-1]['text'])
+        self.assertIn('NOT frame indices', content[-1]['text'])
+        self.engine.processor.assert_called_once_with(text=self.engine.processor.apply_chat_template.return_value,
+            images=images, return_tensors='pt', crop_to_patches=True, max_patches=worker.VIDEO_MAX_PATCHES)
+        self.engine.model.generate.assert_called_once()
+        options = self.engine.model.generate.call_args.kwargs
+        self.assertEqual((options['max_new_tokens'], options['max_time']), (1800, 110))
+        self.assertEqual([row['timestampSeconds'] for row in result['observations']], timestamps)
+        self.assertEqual(self.engine.last_metrics['frames'], 2)
+
+
+class VideoValidationTest(unittest.TestCase):
+    def test_bounds_timestamps_fields_and_frame_count_before_decoding(self):
+        frame = {'image': encoded_image(), 'timestampSeconds': 0}
+        self.assertEqual(worker.video_request({'frames': [frame], 'durationSeconds': 5}), ([frame], 5))
+        bad = [None, {}, {'frames': []}, {'frames': [frame] * 9},
+               {'frames': [frame, frame]}, {'frames': [frame], 'prompt': 'override'},
+               {'frames': [dict(frame, timestampSeconds=6)], 'durationSeconds': 5},
+               {'frames': [dict(frame, timestampSeconds=-1)]},
+               {'frames': [dict(frame, timestampSeconds=True)]},
+               {'frames': [dict(frame, timestampSeconds=float('nan'))]},
+               {'frames': [dict(frame, timestampSeconds=float('inf'))]},
+               {'frames': [dict(frame, timestampSeconds=10**1000)]},
+               {'frames': [dict(frame, timestampSeconds=121)]},
+               {'frames': [frame], 'durationSeconds': 0},
+               {'frames': [frame], 'durationSeconds': True},
+               {'frames': [frame], 'durationSeconds': 10**1000},
+               {'frames': [dict(frame, url='https://example.invalid')]},
+               {'frames': [dict(frame, image=123)]}]
+        for payload in bad:
+            with self.subTest(payload=payload), self.assertRaises(ValueError):
+                worker.video_request(payload)
+
+    def test_output_requires_each_frame_once_and_preserves_input_timestamps(self):
+        rows = [dict(OBSERVATION, frameIndex=index) for index in range(2)]
+        data = {'observations': rows, 'summary': 'Видны признаки коррозии.'}
+        self.assertEqual([row['timestampSeconds'] for row in worker.parse_video_observations(json.dumps(data), [0, 2.5])['observations']], [0, 2.5])
+        invalid = [dict(data, observations=[]), dict(data, observations=rows[:1]),
+                   dict(data, observations=rows[::-1]), dict(data, observations=[rows[0], rows[0]]),
+                   dict(data, observations=[dict(rows[0], frameIndex=False), rows[1]]),
+                   dict(data, observations=[dict(rows[0], timestampSeconds=99), rows[1]]),
+                   dict(data, observations=[dict(rows[0], box=[0, 0, 1001, 800]), rows[1]]),
+                   dict(data, observations=[dict(rows[0], condition='safe'), rows[1]]),
+                   dict(data, summary=''), dict(data, summary='x' * 1501), dict(data, diagnosis='invented')]
+        for value in invalid:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                worker.parse_video_observations(json.dumps(value), [0, 2.5])
+
+    def test_abstention_is_allowed_but_duplicate_json_and_nonfinite_fields_are_rejected(self):
+        none = {'component': 'none', 'condition': 'uncertain', 'box': [0, 0, 0, 0], 'observation': '', 'frameIndex': 0}
+        result = worker.parse_video_observations(json.dumps({'observations': [none], 'summary': 'Недостаточно видимых данных.'}), [0])
+        self.assertEqual(result['observations'][0]['component'], 'none')
+        for text in ('{"observations":[],"summary":"a","summary":"b"}', '{"observations":[],"summary":NaN}'):
+            with self.assertRaises(ValueError):
+                worker.parse_video_observations(text, [0])
 
 
 class FakeEngine:
@@ -261,6 +337,13 @@ class FakeEngine:
         self.last_metrics = {'preprocessMs': 1, 'generateMs': 10, 'decodeMs': 1, 'totalMs': 12,
                              'inputTokens': 400, 'outputTokens': 100, 'patches': worker.PROFILES[profile]}
         return OBSERVATION
+
+    def infer_video(self, images, timestamps):
+        self.images.extend((image.mode, image.size) for image in images)
+        self.last_metrics = {'frames': len(images)}
+        return {'observations': [dict(OBSERVATION, frameIndex=index, timestampSeconds=timestamp)
+                                 for index, timestamp in enumerate(timestamps)],
+                'summary': 'На выбранных кадрах видны признаки коррозии.'}
 
 
 class RuntimeHTTPTest(unittest.TestCase):
@@ -316,6 +399,30 @@ class RuntimeHTTPTest(unittest.TestCase):
                 self.assertIn("error", self.request("POST", "/analyze", payload, headers, expected=status))
         self.assertIn("error", self.request("POST", "/analyze", {"image": "https://example.invalid/pump.jpg"}, expected=400))
         self.assertEqual(self.engine.images, [])
+
+    def test_video_endpoint_returns_frame_grounded_observations(self):
+        frames = [{'image': encoded_image(), 'timestampSeconds': timestamp} for timestamp in (0, 3)]
+        result = self.request('POST', '/analyze-video', {'frames': frames, 'durationSeconds': 5})
+        self.assertEqual(result['model'], worker.MODEL)
+        self.assertEqual(result['revision'], worker.REVISION)
+        self.assertEqual(result['clipDurationSeconds'], 5)
+        self.assertEqual([row['timestampSeconds'] for row in result['observations']], [0, 3])
+        self.assertEqual(self.engine.images, [('RGB', (32, 16))] * 2)
+
+    def test_video_errors_do_not_infer_partial_decoded_clips(self):
+        frame = {'image': encoded_image(), 'timestampSeconds': 0}
+        for payload in ({'frames': [frame, dict(frame, timestampSeconds=1, image='bad')]},
+                        {'frames': [frame, frame]}, {'frames': [frame], 'prompt': 'override'}):
+            self.request('POST', '/analyze-video', payload, expected=400)
+        self.assertEqual(self.engine.images, [])
+        with patch.object(self.engine, 'infer_video', side_effect=ValueError('invalid model JSON')):
+            self.request('POST', '/analyze-video', {'frames': [frame]}, expected=502)
+        self.assertIs(self.engine.lock.locked(), False)
+
+    def test_video_and_photo_share_the_same_busy_lock(self):
+        with self.engine.lock:
+            failure = self.request('POST', '/analyze-video', {'frames': [{'image': encoded_image(), 'timestampSeconds': 0}]}, expected=503)
+        self.assertEqual(failure['code'], 'vision_busy')
 
     def test_explicit_profile_is_reported_and_invalid_profile_never_reaches_engine(self):
         payload = {'image': encoded_image()}

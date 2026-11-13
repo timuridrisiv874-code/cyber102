@@ -4,14 +4,14 @@ https://cyber102.94.41.87.102.sslip.io {
         import C:/cyber102/private/auth.caddy
     }
     request_body {
-        max_size 4MiB
+        max_size 12MiB
     }
     encode gzip
     reverse_proxy 127.0.0.1:8102 {
         header_up -Authorization
         transport http {
             dial_timeout 3s
-            response_header_timeout 120s
+            response_header_timeout 180s
         }
     }
 }

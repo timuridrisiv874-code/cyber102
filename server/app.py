@@ -14,7 +14,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 from .demo_data import PASSPORT, SCENARIOS
 from . import history
 from . import vision
-from . import inspections, customer, recommendations, assessment
+from . import inspections, customer, recommendations, assessment, video_review
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -273,7 +273,7 @@ class Handler(SimpleHTTPRequestHandler):
         if target.path == '/':
             query = f'?{target.query}' if target.query else ''
             self.send_response(HTTPStatus.FOUND)
-            self.send_header('Location', f'/checkpoint.html{query}')
+            self.send_header('Location', f'/index.html{query}')
             self.send_header('Content-Length', '0')
             self.end_headers()
             return
@@ -289,9 +289,11 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_json({'status': 'ok', 'source': 'demo'})
             elif target.path == '/api/capabilities':
                 self.send_json({'vision': {'enabled': self.vision_enabled, 'backend': self.vision_backend,
+                    'model': vision.INTERNVL_MODEL if self.vision_backend == 'internvl3' else None,
+                    'videoReview': self.vision_enabled and self.vision_backend == 'internvl3',
                     'profiles': list(vision.PROFILES) if self.vision_backend == 'internvl3' else ['standard']},
                     'media': {'maxPhotoBytes': 20 * 1024 * 1024, 'maxVideoBytes': 150 * 1024 * 1024,
-                              'maxVideoSeconds': 120, 'maxSampledFrames': 20}})
+                              'maxVideoSeconds': 120, 'maxSampledFrames': 20, 'maxReviewFrames': 8}})
             elif target.path == '/api/scenarios':
                 self.scenarios(connection, serial)
             elif target.path == '/api/diagnose':
@@ -307,7 +309,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         route = urlsplit(self.path).path
-        if route not in ('/api/diagnose', '/api/history', '/analyze', '/api/inspections', '/api/inspections/preview'):
+        if route not in ('/api/diagnose', '/api/history', '/analyze', '/api/video-review', '/api/inspections', '/api/inspections/preview'):
             self.error(HTTPStatus.NOT_FOUND, 'Маршрут не найден.')
             return
         origins = self.headers.get_all('Origin', [])
@@ -317,6 +319,9 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if route == '/analyze':
             self.analyze_frame()
+            return
+        if route == '/api/video-review':
+            self.analyze_video()
             return
         if self.headers.get_content_type() != 'application/json':
             self.error(HTTPStatus.UNSUPPORTED_MEDIA_TYPE, 'Ожидается application/json.')
@@ -427,6 +432,41 @@ class Handler(SimpleHTTPRequestHandler):
             self.error(HTTPStatus.SERVICE_UNAVAILABLE, str(error))
         except sqlite3.Error:
             self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Не удалось сохранить кадр. Повторите проверку.')
+        else:
+            self.send_json(result)
+
+    def analyze_video(self):
+        if not self.vision_enabled or self.vision_backend != 'internvl3':
+            self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Совместный анализ видео недоступен на этом сервере.')
+            return
+        if self.headers.get_content_type() != 'application/json':
+            self.error(HTTPStatus.UNSUPPORTED_MEDIA_TYPE, 'Ожидается application/json с кадрами видео.')
+            return
+        lengths = self.headers.get_all('Content-Length', [])
+        if self.headers.get_all('Transfer-Encoding') or len(lengths) != 1:
+            self.error(HTTPStatus.BAD_REQUEST, 'Укажите одну длину тела запроса в Content-Length.')
+            return
+        try:
+            length_header = lengths[0].strip()
+            if not length_header.isascii() or not length_header.isdecimal():
+                raise ValueError('Некорректное значение Content-Length.')
+            length = int(length_header)
+            if not 0 < length <= video_review.MAX_REQUEST_BYTES:
+                self.error(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, 'Слишком большой набор кадров. Выберите более короткое видео.')
+                return
+            body = self.rfile.read(length)
+            if len(body) != length:
+                raise ValueError('Кадры получены не полностью. Повторите отправку.')
+            result = video_review.analyze_request(self.headers.get('Content-Type', ''), body)
+        except TimeoutError:
+            self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить кадры за отведённое время.')
+        except (ValueError, UnicodeError) as error:
+            self.error(HTTPStatus.BAD_REQUEST, str(error))
+        except vision.VisionBusy as error:
+            self.send_json({'error': str(error), 'code': 'vision_busy', 'retryAfterSeconds': 2},
+                           HTTPStatus.SERVICE_UNAVAILABLE, headers={'Retry-After': '2'})
+        except (vision.VisionUnavailable, ImportError) as error:
+            self.error(HTTPStatus.SERVICE_UNAVAILABLE, str(error))
         else:
             self.send_json(result)
 

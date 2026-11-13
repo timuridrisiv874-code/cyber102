@@ -11,7 +11,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from server.app import BoundedHTTPServer, Handler, initialize
-from server import vision
+from server import vision, video_review
 
 
 class ApiTest(unittest.TestCase):
@@ -213,6 +213,45 @@ class ApiTest(unittest.TestCase):
                 self.assertEqual(card, vision.result_from_observation(observation, model=model))
                 build.return_value.open.side_effect = TimeoutError("worker timed out")
                 self.json_request("POST", "/analyze", 503, body=body, headers=headers)
+
+    def test_video_review_capabilities_and_server_boundary(self):
+        caps = self.json_request('GET', '/api/capabilities')
+        self.assertFalse(caps['vision']['videoReview'])
+        self.json_request('POST', '/api/video-review', 503, body={})
+        self.handler.keywords.update(vision_enabled=True, vision_backend='internvl3')
+        caps = self.json_request('GET', '/api/capabilities')
+        self.assertTrue(caps['vision']['videoReview'])
+        self.assertEqual(caps['vision']['model'], vision.INTERNVL_MODEL)
+        self.assertEqual(caps['media']['maxReviewFrames'], 8)
+        with patch.object(video_review, 'analyze_request') as analyze:
+            for status, headers in (
+                (403, {'Origin': 'https://elsewhere.example.test'}),
+                (415, {'Content-Type': 'text/plain'}),
+                (400, {'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked'}),
+                (400, {'Content-Type': 'application/json', 'Content-Length': '+2'}),
+                (413, {'Content-Type': 'application/json', 'Content-Length': str(video_review.MAX_REQUEST_BYTES + 1)}),
+            ):
+                with self.subTest(headers=headers):
+                    self.json_request('POST', '/api/video-review', status, body=b'{}', headers=headers)
+            analyze.assert_not_called()
+
+    def test_video_review_returns_preview_and_busy_without_writing_history(self):
+        self.handler.keywords.update(vision_enabled=True, vision_backend='internvl3')
+        body = {'frames': [{'image': 'validated-by-adapter', 'timestampSeconds': 0}], 'durationSeconds': 1}
+        result = {'source': 'local_vision', 'model': vision.INTERNVL_MODEL,
+                  'summary': 'Видимые признаки требуют проверки.', 'observations': [], 'preliminary': True}
+        with patch.object(video_review, 'analyze_request', return_value=result) as analyze:
+            self.assertEqual(self.json_request('POST', '/api/video-review', body=body), result)
+            analyze.assert_called_once()
+            self.assertEqual(json.loads(analyze.call_args.args[1]), body)
+        self.assertEqual(self.json_request('GET', '/api/history?serial=P-102'), {'records': []})
+        for error, status in ((ValueError('Invalid frames'), 400),
+                              (vision.VisionUnavailable('Model unavailable'), 503),
+                              (vision.VisionBusy('Busy'), 503)):
+            with self.subTest(error=type(error)), patch.object(video_review, 'analyze_request', side_effect=error):
+                payload = self.json_request('POST', '/api/video-review', status, body=body)
+                if isinstance(error, vision.VisionBusy):
+                    self.assertEqual(payload['code'], 'vision_busy')
 
 
 if __name__ == "__main__":

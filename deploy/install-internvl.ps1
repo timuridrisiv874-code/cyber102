@@ -3,7 +3,7 @@ $ErrorActionPreference='Stop'
 $root='C:\cyber102'
 $python="$root\.venv-internvl\Scripts\python.exe"
 if (!(Test-Path $python)) { throw 'Install the isolated .venv-internvl Python environment first' }
-if (!(Test-Path "$root\models\internvl3-2b-hf\cyber102-manifest.json")) { throw 'Download and verify the pinned model first' }
+if (!(Test-Path "$root\models\internvl3_5-2b-hf\cyber102-manifest.json")) { throw 'Download and verify the pinned InternVL3.5 model first' }
 $task='Cyber102InternVL'
 $action=New-ScheduledTaskAction -Execute $python -Argument '-u C:\cyber102\deploy\run-internvl.py' -WorkingDirectory $root
 $principal=New-ScheduledTaskPrincipal -UserId "$env:COMPUTERNAME\fatik" -LogonType S4U -RunLevel Limited

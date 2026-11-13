@@ -1,6 +1,10 @@
 # Обучение моделей диагностики насосов
 
-CatBoost обучает отдельный двоичный классификатор для каждого выбранного отказа. AutoGluon Tabular позволяет сравнить CatBoost и случайный лес на том же разбиении. Один осмотр может содержать несколько подтверждённых отказов. Модели обучаются локально на размеченных наблюдениях, а их отчёт предназначен для оценки командой. Диагностика первого чекпоинта продолжает работать по 12 правилам и демонстрационным сценариям. Наработка по регламенту и критические предупреждения остаются правилами. Для этой задачи ещё нужна размеченная заводская выборка. CatBoost обучен в отдельном эксперименте на лабораторном наборе UCI. [Эксперимент на стенде UCI](../docs/ml/benchmark-uci.md)
+AutoGluon Tabular — основной путь для новых табличных экспериментов (`--engine autogluon`, выбран по умолчанию). Для каждого отказа он сравнивает CatBoost, случайный лес и их взвешенный ансамбль по отложенной валидации. Отдельный CatBoost сохранён как контрольная модель на том же разбиении. Один осмотр может содержать несколько подтверждённых отказов, поэтому для каждой метки обучается отдельный двоичный классификатор. [Проект AutoGluon](https://github.com/autogluon/autogluon)
+
+Переключение библиотеки не доказывает улучшение диагностики. Модели обучаются локально и не подключаются к эксплуатационным заключениям. VLM-анализ фото и видео остаётся отдельным процессом; критические и регламентные предупреждения задаются правилами. Для оценки на реальном оборудовании нужна размеченная заводская выборка. Фактически обучен отдельный CatBoost на лабораторном наборе UCI; AutoGluon на данных заказчика ещё не обучался. [Эксперимент UCI](../docs/ml/benchmark-uci.md)
+
+500 строк организаторов имеют происхождение `customer_example`, без подтверждённых серийного номера, часового пояса и связи с физическим насосом. Их диагнозы основаны на порогах, а не независимой проверке ремонта. Они подходят для эмулятора и проверки правил; переименование источника в `field` не делает их пригодными для обучения заводской диагностики. [Происхождение и ограничения](../docs/architecture/customer-data.md) · [Отчёт импорта](../data/customer/sensor-import-report.json)
 
 ## Формат данных
 
@@ -51,11 +55,15 @@ serial,timestamp,source,vibration_rms_mm_s,bearing_temperature_c,motor_current_a
 
 Серийные номера трёх частей должны различаться. Обучение берёт строки строго до первой даты, валидация берёт строки от первой даты до второй, тест берёт строки от второй даты включительно. Строки вне назначенного окна или без назначенной части исключаются и учитываются в отчёте. Для каждой выбранной метки нужны положительные и отрицательные примеры в каждой части. При нехватке данных для части отказов укажите только проверяемые метки через `--labels`.
 
-Валидационная выборка используется для остановки CatBoost или выбора модели AutoGluon. Тестовая применяется один раз после выбора модели. Отчёт содержит состав выборок, average precision, долю положительных, матрицу ошибок, precision, recall, specificity, F1 и balanced accuracy при пороге 0,5. Порог служит для сравнения моделей. Для эксплуатации его отдельно согласуют по риску пропусков и ложных срабатываний. Малое число насосов и подтверждённых отказов ограничивает применимость результата.
+Валидационная выборка используется для остановки CatBoost и выбора модели или весов ансамбля AutoGluon по `log_loss`. Кандидаты сравниваются только на валидации. Тест применяется после выбора модели; нельзя многократно подбирать настройки по его результату. Для сравнения двух библиотек заранее зафиксируйте конфигурации и один `split.json`.
 
-## Запуск на сервере с RTX 3090
+Отчёт содержит состав выборок, average precision, долю положительных, матрицу ошибок, precision, recall, specificity, F1 и balanced accuracy при пороге 0,5. Рядом приводится простой контроль: постоянная вероятность, равная доле отказов **только в обучающей части**. Для AutoGluon сохраняются список завершённых кандидатов с валидационным `log_loss`, выбранная модель, настройки и время. При исчерпании бюджета не все кандидаты могут завершиться. Метка `runtime_ready=false` остаётся в отчёте. Порог 0,5 нужен для сравнения; для эксплуатации его отдельно согласуют по цене пропусков и ложных тревог. Малое число насосов и подтверждённых отказов ограничивает применимость результата.
 
-Команды обучения используют отдельное окружение на Python 3.12. Если интерпретатор ещё отсутствует на сервере, установите его параллельно с Python 3.11 приложения. Схему и разбиение можно проверить в имеющемся Python без ML-библиотек:
+## Основной запуск: AutoGluon на CPU
+
+Команды используют отдельное окружение Python 3.12; окружение веб-приложения и VLM не меняется. AutoGluon 1.6.1 поддерживает Windows, Linux и macOS, Python 3.10–3.13. Устанавливается только Tabular с CatBoost, без пакетов multimodal, timeseries и дополнительных pretrained-моделей. [Установка AutoGluon](https://auto.gluon.ai/stable/install.html)
+
+Схему и разбиение можно проверить без ML-библиотек:
 
 ```sh
 python -m ml.train validate --data var/observations.csv --split var/split.json --labels bearing_fault
@@ -64,31 +72,31 @@ python -m ml.train validate --data var/observations.csv --split var/split.json -
 В Windows PowerShell:
 
 ```powershell
-nvidia-smi
-py -3.12 -m venv .venv-ml
-.\.venv-ml\Scripts\python.exe -m pip install -r ml/requirements-catboost.txt
-.\.venv-ml\Scripts\python.exe -m ml.train train --data var/observations.csv --split var/split.json --labels bearing_fault --engine catboost --gpu --output var/model-catboost
+py -3.12 -m venv .venv-automl
+.\.venv-automl\Scripts\python.exe -m pip install -r ml/requirements-autogluon.txt
+.\.venv-automl\Scripts\python.exe -m ml.train train --data var/observations.csv --split var/split.json --labels bearing_fault --cpus 4 --time-limit 300 --memory-gb 4 --output var/model-autogluon
 ```
 
-В Linux или WSL с доступным GPU:
-
-```sh
-nvidia-smi
-python3.12 -m venv .venv-ml
-.venv-ml/bin/python -m pip install -r ml/requirements-catboost.txt
-.venv-ml/bin/python -m ml.train train --data var/observations.csv --split var/split.json --labels bearing_fault --engine catboost --gpu --output var/model-catboost
-```
-
-Для CPU уберите `--gpu`. CatBoost принимает номер первой видимой GPU и фиксированный seed. Обучение на GPU может давать небольшие различия между запусками. [Документация CatBoost о GPU](https://catboost.ai/docs/en/features/training-on-gpu)
-
-Для сравнения на Linux или WSL создайте `.venv-automl`. В Windows используйте `py -3.12 -m venv .venv-automl`, а затем `.\.venv-automl\Scripts\python.exe` в командах установки и запуска.
+В Linux, WSL или macOS:
 
 ```sh
 python3.12 -m venv .venv-automl
 .venv-automl/bin/python -m pip install -r ml/requirements-autogluon.txt
-.venv-automl/bin/python -m ml.train train --data var/observations.csv --split var/split.json --labels bearing_fault --engine autogluon --time-limit 300 --output var/model-autogluon
+.venv-automl/bin/python -m ml.train train --data var/observations.csv --split var/split.json --labels bearing_fault --cpus 4 --time-limit 300 --memory-gb 4 --output var/model-autogluon
 ```
 
-Команда AutoGluon использует CPU по умолчанию. Валидация передаётся явно, случайное разбиение для бэггинга и стекинга отключено. Для GPU поддержку выбранных моделей и драйвера следует проверить на целевом сервере. [Установка AutoGluon Tabular](https://auto.gluon.ai/stable/install.html) · [Параметры обучения](https://auto.gluon.ai/stable/api/autogluon.tabular.TabularPredictor.fit.html)
+Профиль в `ml/train.py`: CatBoost до 500 деревьев глубины 6 и Random Forest до 300 деревьев глубины 12; модели обучаются последовательно на 4 CPU. Валидация передаётся явно; бэггинг, стекинг, случайное разделение строк и дообучение на объединённых частях отключены. Взвешенный ансамбль обучается на валидационных прогнозах. GPU в этом профиле отключена, чтобы не конкурировать с VLM.
+
+По умолчанию бюджет обучения — примерно 300 секунд **на одну метку**, память — мягкий лимит 4 ГБ. Для пяти меток это около 25 минут бюджета плюс обработка и оценка; это не гарантированный срок. Лимит памяти не является ограничителем ОС: оставьте запас для системы, веб-сервера и VLM. При недостатке RAM уменьшите `--memory-gb` и запускайте одну метку; оцените фактический расход в отдельном эксперименте. [Параметры и ограничения AutoGluon](https://auto.gluon.ai/stable/api/autogluon.tabular.TabularPredictor.fit.html)
+
+## Контрольный запуск CatBoost
+
+В установленном окружении AutoGluon уже есть та же закреплённая версия CatBoost. На тех же данных и разбиении:
+
+```sh
+.venv-automl/bin/python -m ml.train train --data var/observations.csv --split var/split.json --labels bearing_fault --engine catboost --cpus 4 --output var/model-catboost
+```
+
+В Windows замените интерпретатор на `.\.venv-automl\Scripts\python.exe`. Для отдельной установки достаточно `ml/requirements-catboost.txt`. Только для CatBoost можно добавить `--gpu` после проверки `nvidia-smi`; GPU может давать небольшие различия между запусками. Его остановка ограничена 500 деревьями и ранней остановкой, параметры `--time-limit` и `--memory-gb` относятся к AutoGluon. [GPU CatBoost](https://catboost.ai/docs/en/features/training-on-gpu)
 
 Результат сохраняется в новую папку с `report.json`, хешами входных файлов, версиями, списком признаков и артефактами моделей. После оценки AutoGluon удаляет из артефактов кэш обучающей и валидационной выборок. Храните каталог моделей в доверенном контуре и загружайте только собственные артефакты с совместимой версией пакета. [Очистка кэша AutoGluon](https://auto.gluon.ai/stable/api/autogluon.tabular.TabularPredictor.save_space.html) · [Загрузка моделей AutoGluon](https://auto.gluon.ai/stable/api/autogluon.tabular.TabularPredictor.load.html)

@@ -11,6 +11,7 @@ from importlib.metadata import version
 from itertools import groupby
 from pathlib import Path
 from tempfile import mkdtemp
+from time import perf_counter
 
 from .contract import FEATURES, LABELS, PARTITIONS, labeled_partitions, read_observations, split_observations, unique_fields
 
@@ -97,20 +98,43 @@ def train_autogluon(label, partitions, output, args):
         return table
 
     artifact = label
-    models = {"CAT": {"random_seed": args.seed}, "RF": {"random_state": args.seed}}
+    fit_options = autogluon_fit_options(args)
     predictor = TabularPredictor(label=label, problem_type="binary", eval_metric="log_loss",
                                  positive_class=1, path=str(output / artifact), verbosity=1)
     predictor.fit(
         frame("train", True), tuning_data=frame("validation", True),
-        hyperparameters=models, num_bag_folds=0, num_stack_levels=0,
-        num_cpus=args.cpus, num_gpus=int(args.gpu), time_limit=args.time_limit,
+        **fit_options,
     )
+    # No test data is passed to model selection or the candidate leaderboard.
+    candidates = [
+        {"model": str(row["model"]), "validation_log_loss": -float(row["score_val"])}
+        for row in predictor.leaderboard(display=False).to_dict(orient="records")
+    ]
     scores = {
         part: predictor.predict_proba(frame(part, False), as_multiclass=False).tolist()
         for part in ("validation", "test")
     }
     predictor.save_space(remove_data=True)
-    return artifact, scores, {"model": predictor.model_best}
+    return artifact, scores, {"model": predictor.model_best, "fit": fit_options,
+                              "selection": "minimum validation log_loss",
+                              "validation_candidates": candidates}
+
+
+def autogluon_fit_options(args):
+    """A small CPU comparison, with no random folds or pretrained model downloads."""
+    if args.gpu:
+        raise ValueError("the AutoGluon experiment uses CPU; remove --gpu or use --engine catboost")
+    return {
+        "hyperparameters": {
+            "CAT": {"iterations": 500, "depth": 6, "learning_rate": 0.05, "random_seed": args.seed},
+            "RF": {"n_estimators": 300, "max_depth": 12, "min_samples_leaf": 2, "random_state": args.seed},
+        },
+        "num_bag_folds": 0, "num_stack_levels": 0, "auto_stack": False,
+        "dynamic_stacking": False, "refit_full": False,
+        "fit_weighted_ensemble": True, "calibrate_decision_threshold": False,
+        "fit_strategy": "sequential", "num_cpus": args.cpus, "num_gpus": 0,
+        "time_limit": args.time_limit, "memory_limit": args.memory_gb,
+    }
 
 
 def file_digest(path):
@@ -124,6 +148,8 @@ def file_digest(path):
 def train(args, selected, summary, digests):
     if args.output.exists():
         raise ValueError("output must be a new directory")
+    if args.engine == "autogluon":
+        autogluon_fit_options(args)
     fit = train_catboost if args.engine == "catboost" else train_autogluon
     distribution = "catboost" if args.engine == "catboost" else "autogluon.tabular"
     try:
@@ -131,8 +157,10 @@ def train(args, selected, summary, digests):
     except ImportError as error:
         raise ValueError(f"install the optional dependencies for {args.engine} first") from error
     report = {
-        "schema_version": 1, "engine": args.engine, "engine_version": engine_version,
+        "schema_version": 2, "engine": args.engine, "engine_version": engine_version,
         "python_version": platform.python_version(), "source": "field",
+        "purpose": "offline field-data experiment; not an operational diagnostic model",
+        "runtime_ready": False,
         "device": "gpu" if args.gpu else "cpu", "seed": args.seed, "cpus": args.cpus,
         "features": list(FEATURES), "dataset": summary, "sha256": digests,
         "models": {},
@@ -141,13 +169,23 @@ def train(args, selected, summary, digests):
     staging = Path(mkdtemp(prefix=f".{args.output.name}-", dir=args.output.parent))
     try:
         for label, partitions in selected.items():
+            started = perf_counter()
             artifact, probabilities, details = fit(label, partitions, staging, args)
             metrics = {
                 part: counts_and_metrics([row.labels[label] for row in partitions[part]], scores)
                 for part, scores in probabilities.items()
             }
-            report["models"][label] = {"artifact": artifact, "metrics": metrics, **details}
-        (staging / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            prevalence = sum(row.labels[label] for row in partitions["train"]) / len(partitions["train"])
+            baseline = {
+                part: counts_and_metrics([row.labels[label] for row in partitions[part]],
+                                         [prevalence] * len(partitions[part]))
+                for part in ("validation", "test")
+            }
+            report["models"][label] = {
+                "artifact": artifact, "metrics": metrics, "elapsed_seconds": round(perf_counter() - started, 3),
+                "train_prevalence_baseline": {"probability": prevalence, "metrics": baseline}, **details,
+            }
+        (staging / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
         if args.output.exists():
             raise ValueError("output already exists")
         staging.rename(args.output)
@@ -164,6 +202,13 @@ def positive_int(value):
     return result
 
 
+def positive_float(value):
+    result = float(value)
+    if not math.isfinite(result) or result <= 0:
+        raise argparse.ArgumentTypeError("expected a positive finite number")
+    return result
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -173,12 +218,13 @@ def main(argv=None):
         command.add_argument("--data", type=Path, required=True)
         command.add_argument("--split", type=Path, required=True)
         command.add_argument("--labels", choices=LABELS, nargs="+", default=list(LABELS))
-    training.add_argument("--engine", choices=("catboost", "autogluon"), default="catboost")
+    training.add_argument("--engine", choices=("autogluon", "catboost"), default="autogluon")
     training.add_argument("--output", type=Path, required=True)
-    training.add_argument("--gpu", action="store_true", help="use the first visible CUDA GPU")
+    training.add_argument("--gpu", action="store_true", help="CatBoost only: use the first visible CUDA GPU")
     training.add_argument("--cpus", type=positive_int, default=4)
     training.add_argument("--seed", type=int, default=42)
     training.add_argument("--time-limit", type=positive_int, default=300, help="AutoGluon time budget per label in seconds")
+    training.add_argument("--memory-gb", type=positive_float, default=4.0, help="AutoGluon soft memory budget in GB")
     args = parser.parse_args(argv)
 
     try:

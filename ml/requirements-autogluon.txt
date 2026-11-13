@@ -1,1 +1,2 @@
 autogluon.tabular[catboost]==1.6.1
+catboost==1.2.10
