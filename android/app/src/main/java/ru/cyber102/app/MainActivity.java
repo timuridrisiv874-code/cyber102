@@ -328,7 +328,7 @@ public final class MainActivity extends ComponentActivity {
                 updateBackNavigation();
                 progress.setVisibility(View.GONE);
                 if (!failed && sameOrigin(Uri.parse(url), Uri.parse(activeUrl))) {
-                    status.setText(isOffline() ? "На телефоне · SmolVLM · без сети" : isDemo() ? "Демо · ответы заданы заранее" : "Сервер · " + Uri.parse(activeUrl).getHost());
+                    status.setText(isOffline() ? "На телефоне · VisionPsy · без сети" : isDemo() ? "Демо · ответы заданы заранее" : "Сервер · " + Uri.parse(activeUrl).getHost());
                     if (isOffline()) onOfflineEvent(offline.snapshot());
                 }
             }

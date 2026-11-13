@@ -1,4 +1,4 @@
-"""Verify or explicitly download the pinned on-device SmolVLM files for an APK."""
+"""Verify or explicitly download the pinned on-device vision files for an APK."""
 import argparse
 import hashlib
 import json
@@ -24,11 +24,11 @@ def verify(path, entry):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--download', action='store_true', help='Download missing official weights; otherwise only verify local files')
-    parser.add_argument('--directory', type=Path, default=ROOT / 'var/models/smolvlm')
+    parser.add_argument('--directory', type=Path, default=ROOT / 'var/models/visionpsy')
     args = parser.parse_args()
     catalog = json.loads(MANIFEST.read_text(encoding='utf-8'))
     repository, revision = catalog['repository'], catalog['revision']
-    if repository not in ('ggml-org/SmolVLM-256M-Instruct-GGUF', 'ggml-org/SmolVLM-500M-Instruct-GGUF', 'ggml-org/SmolVLM2-2.2B-Instruct-GGUF') or not re.fullmatch(r'[a-f0-9]{40}', revision):
+    if repository not in ('ggml-org/SmolVLM-256M-Instruct-GGUF', 'ggml-org/SmolVLM-500M-Instruct-GGUF', 'ggml-org/SmolVLM2-2.2B-Instruct-GGUF', 'qvac/VisionPsy-Nano-460M-GGUFs') or not re.fullmatch(r'[a-f0-9]{40}', revision):
         raise ValueError('Expected an approved official repository and pinned revision')
     if {entry['role'] for entry in catalog['files']} != {'model', 'projector'} or len(catalog['files']) != 2:
         raise ValueError('Expected one model and its matching projector')

@@ -9,8 +9,8 @@ const origin = 'https://appassets.androidplatform.net';
 const mime = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.jpg': 'image/jpeg', '.json': 'application/json' };
 
 async function run(browser, name, android) {
-  const model = android ? 'SmolVLM2-2.2B-Instruct' : name === 'WebKit' ? 'SmolVLM-500M-Instruct' : 'SmolVLM-256M-Instruct';
-  const modelBytes = android ? 1705000000 : name === 'WebKit' ? 546000000 : 278824384;
+  const model = android ? 'VisionPsy-Nano-460M' : name === 'WebKit' ? 'SmolVLM-500M-Instruct' : 'SmolVLM-256M-Instruct';
+  const modelBytes = android ? 364547104 : name === 'WebKit' ? 546000000 : 278824384;
   const page = await browser.newPage({ ...devices['iPhone 13'], defaultBrowserType: undefined });
   page.setDefaultTimeout(15000);
   const errors = [], unexpected = [];
@@ -59,7 +59,7 @@ async function run(browser, name, android) {
     }
     assert.equal(await page.evaluate(() => CyberOffline.enabled), true);
     assert.ok((await page.locator('#offline-model-description').textContent()).includes(model));
-    if (android) assert.match(await page.locator('#offline-model-description').textContent(), /1,71 ГБ/);
+    if (android) assert.match(await page.locator('#offline-model-description').textContent(), /365 МБ/);
     assert.equal(await page.locator('.active-equipment-bar').isVisible(), false);
     assert.equal(await page.locator('#demo-options').isVisible(), false);
     await page.locator('#media-file').setInputFiles(path.join(root, 'web/demo-pump.jpg'));

@@ -1,3 +1,5 @@
+#include <cstdio>
+#include <cstdlib>
 #include "smol_engine.h"
 #include "llama.h"
 #include "mtmd.h"
@@ -25,7 +27,7 @@ constexpr int CONTEXT_SIZE = 2048;
 constexpr int BATCH_SIZE = 256;
 constexpr std::size_t MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 
-void quiet_log(ggml_log_level, const char *, void *) {}
+void quiet_log(ggml_log_level level, const char * text, void *) { if (level >= GGML_LOG_LEVEL_WARN) std::fputs(text, stderr); }
 bool is_cancelled() { return cancel_epoch.load() != active_epoch; }
 bool abort_decode(void *) { return is_cancelled(); }
 bool load_progress(float, void *) { return !is_cancelled(); }
@@ -114,14 +116,14 @@ std::vector<unsigned char> read_image(const std::string & path) {
 std::string format_prompt(const std::string & prompt) {
     const std::string content = std::string(mtmd_default_marker()) + "\n" + prompt;
     llama_chat_message message{"user", content.c_str()};
-    // The pinned official model uses this built-in template. This avoids a
+    // The pinned VisionPsy model uses ChatML. This avoids a
     // general template/Jinja dependency while preserving its turn markers.
     std::vector<char> buffer(content.size() * 2 + 256);
-    int length = llama_chat_apply_template("smolvlm", &message, 1, true, buffer.data(), buffer.size());
-    if (length < 0) throw std::runtime_error("Unsupported SmolVLM chat template");
+    int length = llama_chat_apply_template("chatml", &message, 1, true, buffer.data(), buffer.size());
+    if (length < 0) throw std::runtime_error("Unsupported VisionPsy chat template");
     if (static_cast<std::size_t>(length) > buffer.size()) {
         buffer.resize(length);
-        length = llama_chat_apply_template("smolvlm", &message, 1, true, buffer.data(), buffer.size());
+        length = llama_chat_apply_template("chatml", &message, 1, true, buffer.data(), buffer.size());
     }
     return std::string(buffer.data(), length);
 }
@@ -154,6 +156,7 @@ void load(const std::string & model_path, const std::string & projector_path, in
     loaded.store(false);
     engine.reset();
     std::call_once(backend_once, [] {
+        setenv("MTMD_NO_UPSCALE", "1", 1);
         llama_log_set(quiet_log, nullptr);
         mtmd_helper_log_set(quiet_log, nullptr);
         llama_backend_init();
@@ -185,8 +188,7 @@ void load(const std::string & model_path, const std::string & projector_path, in
     vision_params.image_max_tokens = 256;
     vision_params.cb_eval = graph_progress;
     vision_params.cb_eval_user_data = nullptr;
-    vision_params.progress_callback = load_progress;
-    vision_params.progress_callback_user_data = nullptr;
+
     next->vision = mtmd_init_from_file(projector_path.c_str(), next->model, vision_params);
     if (!next->vision || !mtmd_support_vision(next->vision)) throw std::runtime_error(is_cancelled() ? "Model loading cancelled" : "Cannot load matching local vision projector");
     if (is_cancelled()) throw std::runtime_error("Model loading cancelled");
@@ -205,11 +207,11 @@ Result analyze(const std::string & image_path, const std::string & prompt, int m
     const auto start = Clock::now();
     llama_memory_clear(llama_get_memory(engine->context), true);
     const auto bytes = read_image(image_path);
-    auto wrapped = mtmd_helper_bitmap_init_from_buf(engine->vision, bytes.data(), bytes.size(), false, mtmd_helper_init_opt_default());
+    auto wrapped = mtmd_helper_bitmap_init_from_buf(engine->vision, bytes.data(), bytes.size(), false);
     std::unique_ptr<mtmd_bitmap, decltype(&mtmd_bitmap_free)> bitmap(wrapped.bitmap, mtmd_bitmap_free);
     if (!bitmap || mtmd_bitmap_is_audio(bitmap.get()) || mtmd_bitmap_get_nx(bitmap.get()) > 1280 || mtmd_bitmap_get_ny(bitmap.get()) > 1280) throw std::runtime_error("Cannot decode normalized frame");
     const std::string formatted = format_prompt(prompt);
-    mtmd_input_text input{formatted.c_str(), formatted.size(), true, true};
+    mtmd_input_text input{formatted.c_str(), true, true};
     const mtmd_bitmap * bitmaps[] = {bitmap.get()};
     std::unique_ptr<mtmd_input_chunks, decltype(&mtmd_input_chunks_free)> chunks(mtmd_input_chunks_init(), mtmd_input_chunks_free);
     const int tokenized = mtmd_tokenize(engine->vision, chunks.get(), &input, bitmaps, 1);

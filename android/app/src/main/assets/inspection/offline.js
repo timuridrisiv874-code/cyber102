@@ -9,8 +9,8 @@
   let modelDescription;
   let historyPanel, renderedResult = null;
   const HISTORY_KEY = 'cyber102.offline.inspections.v1';
-  const MODELS = new Set(['SmolVLM-256M-Instruct', 'SmolVLM-500M-Instruct', 'SmolVLM2-2.2B-Instruct']);
-  const modelName = model => MODELS.has(model) ? model : 'SmolVLM';
+  const MODELS = new Set(['SmolVLM-256M-Instruct', 'SmolVLM-500M-Instruct', 'SmolVLM2-2.2B-Instruct', 'VisionPsy-Nano-460M']);
+  const modelName = model => MODELS.has(model) ? model : 'VisionPsy-Nano-460M';
   const displayBytes = bytes => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(2).replace('.', ',')} ГБ` : `${Math.ceil(bytes / 1e6)} МБ`;
   let counter = 0;
   const text = (tag, value, className) => {
@@ -152,7 +152,7 @@
       renderedResult = null;
       if (!checking) {
         const emptyText = document.getElementById('empty-text');
-        if (emptyText) emptyText.textContent = 'Проверьте кадр: SmolVLM даст предварительное описание видимого объекта прямо на телефоне.';
+        if (emptyText) emptyText.textContent = 'Проверьте кадр: VisionPsy даст предварительное описание видимого объекта прямо на телефоне.';
       }
       return;
     }
