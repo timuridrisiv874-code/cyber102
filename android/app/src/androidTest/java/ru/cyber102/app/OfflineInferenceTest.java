@@ -103,6 +103,14 @@ public final class OfflineInferenceTest {
             String encoded = Base64.encodeToString(bytes, Base64.NO_WRAP);
             js("(()=>{const b=atob(" + JSONObject.quote(encoded) + ");const a=Uint8Array.from(b,c=>c.charCodeAt(0));const dt=new DataTransfer();dt.items.add(new File([a],'pump.jpg',{type:'image/jpeg'}));const el=document.getElementById('media-file');el.files=dt.files;el.dispatchEvent(new Event('change',{bubbles:true}));return true;})()");
             await("uploaded photo decoded", "!document.getElementById('check').disabled", 30000);
+            if ("true".equals(InstrumentationRegistry.getArguments().getString("cancelOnly"))) {
+                long first = cancelActiveInference();
+                long second = cancelActiveInference();
+                Bundle report = new Bundle();
+                report.putString("stream", "\nOFFLINE_CANCEL_MS " + first + ", " + second + "\n");
+                instrumentation.sendStatus(0, report);
+                return;
+            }
             js("document.getElementById('check').click(); true");
             await("real model observation", "!document.getElementById('offline-result').hidden", 240000);
             String observation = stringJs("document.querySelector('#offline-result .offline-observation').textContent");
@@ -124,16 +132,7 @@ public final class OfflineInferenceTest {
             report.putString("stream", "\nREAL_OFFLINE_RESULT " + saved + "\nAPP_PSS_KIB " + Debug.getPss() + "\n");
             instrumentation.sendStatus(0, report);
 
-            js("document.getElementById('check').click();true");
-            await("second inference started", "JSON.parse(CyberSmolNative.state()).state === 'analyzing'", 10000);
-            SystemClock.sleep(1000);
-            long cancelStarted = SystemClock.elapsedRealtime();
-            js("document.getElementById('offline-cancel').click();true");
-            await("cancel finishes", "!JSON.parse(CyberSmolNative.state()).busy && !document.getElementById('check').disabled", 60000);
-            long cancelMs = SystemClock.elapsedRealtime() - cancelStarted;
-            assertEquals("true", js("document.getElementById('offline-result').hidden"));
-            // Cancellation must leave the same warm model usable.
-            assertTrue(SmolNative.isLoaded());
+            long cancelMs = cancelActiveInference();
             js("document.getElementById('check').click();true");
             await("warm inference after cancellation", "!document.getElementById('offline-result').hidden", 240000);
             assertTrue(stringJs("document.querySelector('#offline-result .offline-observation').textContent").trim().length() > 2);
@@ -158,6 +157,19 @@ public final class OfflineInferenceTest {
                 assertTrue(restore.commit());
             }
         }
+    }
+
+    private long cancelActiveInference() throws Exception {
+        js("document.getElementById('check').click();true");
+        await("inference started", "JSON.parse(CyberSmolNative.state()).state === 'analyzing'", 10000);
+        SystemClock.sleep(1000);
+        long started = SystemClock.elapsedRealtime();
+        js("document.getElementById('offline-cancel').click();true");
+        await("cancel finishes", "!JSON.parse(CyberSmolNative.state()).busy && !document.getElementById('check').disabled", 60000);
+        long elapsed = SystemClock.elapsedRealtime() - started;
+        assertEquals("true", js("document.getElementById('offline-result').hidden"));
+        assertTrue("The model remains loaded after cancellation", SmolNative.isLoaded());
+        return elapsed;
     }
 
     private String js(String code) throws Exception {
