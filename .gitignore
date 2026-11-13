@@ -14,6 +14,7 @@ __pycache__/
 .venv-internvl/
 /models/
 /runtime-llama/
+/output/android/*-offline.apk
 
 # Supplied case originals and previews stay on the team server, outside source control.
 /data/customer/raw/

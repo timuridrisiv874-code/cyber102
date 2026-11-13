@@ -22,6 +22,7 @@ const reports=[];
    }
   });
   await page.goto(origin+'/index.html',{waitUntil:'networkidle'});
+  await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
   await page.locator('#example').evaluate(img=>img.decode());
   await page.evaluate(()=>{
    Object.defineProperty(navigator,'mediaDevices',{value:{getUserMedia:async()=>{
@@ -34,7 +35,7 @@ const reports=[];
   });
   await page.getByRole('button',{name:'Включить камеру'}).click();
   await page.locator('#video').waitFor();
-  await page.getByLabel('Режим').selectOption('video');
+  await page.locator('#camera-mode').selectOption('video');
   await page.getByLabel('Интервал').selectOption('2000');
   await page.getByRole('button',{name:'Начать проверку'}).click();
   const count=engine==='chromium'?3:1;

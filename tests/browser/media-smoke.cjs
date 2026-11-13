@@ -61,6 +61,7 @@ async function run(browser, engine, android) {
   });
   try {
     await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
+    await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
     await page.locator('#media-file').setInputFiles(photo);
     await page.locator('#message').getByText('Фото открыто.', { exact: false }).waitFor();
     await page.locator('#analysis-profile').selectOption('fast');

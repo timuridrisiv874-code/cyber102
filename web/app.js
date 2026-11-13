@@ -16,6 +16,7 @@ const videoToggle = byId('video-toggle');
 const checkedViewfinder = byId('checked-viewfinder');
 const videoMetrics = byId('video-metrics');
 const endpoint = document.querySelector('main').dataset.analysisEndpoint.trim();
+const offlineMode = window.CyberOffline?.enabled === true;
 const latencyFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 });
 const rateFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
 
@@ -42,7 +43,7 @@ const media = window.CyberMedia.create({
   input: byId('media-file'), image: byId('uploaded-image'), video: byId('uploaded-video'),
   beforeChange: resetInput, changed: render, message: showMessage,
 });
-clipReview = window.CyberVideoReview?.create({
+clipReview = offlineMode ? null : window.CyberVideoReview?.create({
   media,
   beforeStart: () => {
     inputGeneration += 1;
@@ -101,6 +102,7 @@ function positionDetection() {
 }
 
 function render() {
+  if (offlineMode) cameraMode.value = 'single';
   const clipBusy = Boolean(clipReview?.busy);
   const videoMode = cameraMode.value === 'video';
   const frozen = frameSource !== null;
@@ -128,7 +130,8 @@ function render() {
   byId('guide').hidden = (!live && !demoActive) || (!videoMode && frozen) || Boolean(media.kind);
   byId('source').dataset.live = String(live);
   byId('source-text').textContent = media.kind ? sourceLabel(media.metadata()) : live ? 'Камера' : frameSource === 'camera' ? 'Кадр с камеры' : demoActive ? 'Тестовый пример' : 'Выберите источник';
-  if (byId('mode')) byId('mode').textContent = endpoint && (live || frameSource === 'camera' || media.kind) ? 'Локальная VLM' : demoActive ? 'Тестовый пример' : 'Готово к осмотру';
+  if (byId('mode')) byId('mode').textContent = offlineMode ? 'На телефоне · без сервера' :
+    endpoint && (live || frameSource === 'camera' || media.kind) ? 'Модель на сервере' : demoActive ? 'Тестовый пример' : 'Готово к осмотру';
   if (demoScenario) {
     byId('demo-options').hidden = !example || Boolean(stream || openingCamera || frameSource === 'camera' || media.kind);
     demoScenario.disabled = checking;
@@ -167,6 +170,8 @@ function render() {
   byId('capture-provenance').textContent = frameMetadata ? sourceLabel(frameMetadata) : '';
 
   const detected = result && (result.status === 'defect' || result.status === 'clear');
+  document.body.dataset.analysisState = checking || Boolean(videoRun) || clipBusy ? 'working' : 'idle';
+  byId('result').dataset.resultReady = String(Boolean(detected || (offlineMode && result?.status === 'offline_observation')));
   detection.hidden = !detected;
   byId('details').hidden = !detected;
   byId('empty').hidden = Boolean(detected);
@@ -195,9 +200,10 @@ function render() {
     byId('empty-title').textContent = checking ? 'Проверяем кадр…' : title;
     byId('empty-text').textContent = checking ? '' : description;
   }
-  window.CyberCamera.renderTiming(result);
+  if (!offlineMode) window.CyberCamera.renderTiming(result);
   window.CyberInspection.update(result, clipBusy || checking || Boolean(videoRun));
   clipReview?.update();
+  if (offlineMode) window.CyberOffline.render(result, checking);
 }
 
 function stopCamera() {
@@ -293,7 +299,7 @@ function drawFrame(canvas, source) {
   if (!width || !height || (source.tagName === 'VIDEO' && source.readyState < 2)) {
     throw new Error('Кадр недоступен. Дождитесь загрузки изображения.');
   }
-  const scale = Math.min(1, 1280 / Math.max(width, height));
+  const scale = Math.min(1, (offlineMode ? 768 : 1280) / Math.max(width, height));
   canvas.width = Math.max(1, Math.round(width * scale));
   canvas.height = Math.max(1, Math.round(height * scale));
   canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
@@ -307,8 +313,17 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
   const timeout = setTimeout(() => {
     timedOut = true;
     controller.abort();
-  }, useServer ? 120000 : 12000);
+  }, offlineMode ? 180000 : useServer ? 120000 : 12000);
   try {
+    if (offlineMode) {
+      const image = await new Promise((resolve) => frame.toBlob(resolve, 'image/jpeg', 0.85));
+      if (!image) throw new Error('Не удалось подготовить кадр.');
+      const data = await window.CyberOffline.analyze(image, {
+        signal: controller.signal, onProgress: showMessage, metadata,
+      });
+      data.clientDurationSeconds = (performance.now() - started) / 1000;
+      return readResult(data);
+    }
     const options = { signal: controller.signal, cache: 'no-store' };
     if (useServer) {
       const image = await new Promise((resolve) => frame.toBlob(resolve, 'image/jpeg', 0.85));
@@ -335,7 +350,7 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
     }
     return readResult(data);
   } catch (error) {
-    if (timedOut) throw new Error('Сервер не ответил вовремя. Повторите проверку.');
+    if (timedOut) throw new Error(offlineMode ? 'Модель на телефоне не завершила анализ вовремя. Попробуйте другой кадр.' : 'Сервер не ответил вовремя. Повторите проверку.');
     throw error;
   } finally {
     clearTimeout(timeout);
@@ -344,6 +359,9 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
 }
 
 function readResult(data) {
+  if (offlineMode && data?.status === 'offline_observation' && data.source === 'on_device' &&
+      typeof data.model === 'string' && typeof data.observation === 'string' &&
+      data.observation.trim() && data.observation.length <= 4000 && !data.box) return data;
   if (data && Object.prototype.hasOwnProperty.call(unavailableResults, data.status)) return data;
   if (!data || !['defect', 'clear'].includes(data.status)) throw new Error('Invalid result status');
 
@@ -385,8 +403,8 @@ async function checkFrame() {
       frameMetadata = frameSource === 'example' ? null : captureMetadata();
     }
     const useServer = frameSource !== 'example';
-    if (useServer && !endpoint) throw new Error('Не задан адрес сервера анализа.');
-    if (useServer) showMessage('Модель анализирует кадр. Задержка появится после ответа.');
+    if (useServer && !endpoint && !offlineMode) throw new Error('Не задан адрес сервера анализа.');
+    if (useServer) showMessage(offlineMode ? 'SmolVLM анализирует кадр на телефоне…' : 'Модель анализирует кадр. Задержка появится после ответа.');
     render();
     const nextResult = await analyzeFrame(useServer, snapshot, frameMetadata);
     if (generation !== inputGeneration) return;
@@ -401,6 +419,7 @@ async function checkFrame() {
 }
 
 function changeCameraMode() {
+  if (offlineMode) cameraMode.value = 'single';
   const target = cameraMode.value === 'video' ? checkedViewfinder : viewfinder;
   target.append(snapshot, detection);
   frameSource = null;
@@ -508,6 +527,7 @@ async function checkVideoFrame(run) {
 }
 
 function toggleVideoRun() {
+  if (offlineMode) return;
   if (clipReview?.busy) return;
   if (videoRun) {
     stopVideoRun(); showMessage('Видеопроверка остановлена.'); render(); return;
@@ -532,6 +552,7 @@ checkButton.addEventListener('click', checkFrame);
 cameraMode.addEventListener('change', changeCameraMode);
 videoToggle.addEventListener('click', toggleVideoRun);
 function updateDemoExample() {
+  if (offlineMode) return;
   if (!example || !demoScenario) return;
   resetInput();
   media.clear();
@@ -583,6 +604,7 @@ render();
 
 
 async function loadCapabilities() {
+  if (offlineMode) return;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
   try {

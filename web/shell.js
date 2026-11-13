@@ -1,6 +1,7 @@
 /* Shared navigation and selected-equipment context for the web workspace. */
 (() => {
   'use strict';
+  if (window.CyberOffline?.enabled) return;
   const active = document.getElementById('active-equipment');
   const inspection = document.getElementById('inspection-serial');
   const lookup = document.getElementById('serial');

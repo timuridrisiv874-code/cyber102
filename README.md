@@ -2,11 +2,14 @@
 
 Осмотр промышленных насосов в Safari на iPhone и Android WebView: камера, предварительная визуальная оценка, паспорт по серийному номеру/QR, диагностика по датчикам и журнал осмотров.
 
+Android 0.7 включает автономный анализ кадра с SmolVLM2 2.2B и локальные заметки. [Установка и сборка APK](android/README.md) · [Сценарий показа](TIMUR/ANDROID_OFFLINE.md).
+
 ## Структура проекта
 
 ```text
 Cyber102/
 ├── TIMUR/          задачи Тимура, запуск и проверки
+├── android/        APK и автономный SmolVLM
 ├── web/            интерфейс Safari и Android WebView
 ├── server/         API, SQLite, правила и локальное зрение
 ├── ml/             обучение AutoGluon и контрольного CatBoost
