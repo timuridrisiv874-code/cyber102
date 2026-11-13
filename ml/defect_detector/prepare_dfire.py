@@ -3,12 +3,23 @@ import argparse
 from collections import Counter, defaultdict
 import hashlib
 import json
+import math
 from pathlib import Path, PurePosixPath
 from tarfile import open as open_tar
 
 
 CLASSES = ('smoke', 'flame')
 STRATA = ('clear', 'smoke', 'flame', 'both')
+
+
+def clip_box(x, y, width, height):
+    if width <= 0 or height <= 0 or not all(map(math.isfinite, (x, y, width, height))):
+        return None
+    left, top = max(0, x - width / 2), max(0, y - height / 2)
+    right, bottom = min(1, x + width / 2), min(1, y + height / 2)
+    if left >= right or top >= bottom:
+        return None
+    return (left + right) / 2, (top + bottom) / 2, right - left, bottom - top
 
 
 def read_index(archive):
@@ -25,23 +36,30 @@ def read_index(archive):
             labels[path.stem] = member
 
     strata = defaultdict(list)
+    rejected = 0
     for name, member in labels.items():
         if name not in images:
             continue
         raw = archive.extractfile(member).read().decode('utf-8').strip()
-        ids = set()
+        ids, boxes = set(), []
         for row in raw.splitlines():
-            label, x, y, width, height = row.split()
-            if label not in ('0', '1') or not all(0 <= float(n) <= 1 for n in (x, y, width, height)):
-                raise ValueError(f'Invalid D-Fire annotation in {member.name}')
+            if not row.strip():
+                continue
+            label, *coordinates = row.split()
+            box = clip_box(*map(float, coordinates))
+            if label not in ('0', '1') or box is None:
+                rejected += 1
+                break
             ids.add(int(label))
-        stratum = STRATA[sum(1 << idx for idx in ids)]
-        strata[stratum].append((name, images[name], raw))
-    return strata
+            boxes.append(label + ' ' + ' '.join(f'{value:.8f}' for value in box))
+        else:
+            stratum = STRATA[sum(1 << idx for idx in ids)]
+            strata[stratum].append((name, images[name], '\n'.join(boxes)))
+    return strata, rejected
 
 
 def sample(archive, output, splits, seen):
-    strata = read_index(archive)
+    strata, rejected = read_index(archive)
     counts = {split: Counter() for split in splits}
     for stratum in STRATA:
         ordered = sorted(strata[stratum], key=lambda item: hashlib.sha256(item[0].encode()).digest())
@@ -63,7 +81,7 @@ def sample(archive, output, splits, seen):
                     break
             if counts[split][stratum] < target:
                 raise ValueError(f'{split}/{stratum}: found {counts[split][stratum]}, expected {target}')
-    return counts
+    return counts, rejected
 
 
 def main():
@@ -83,11 +101,13 @@ def main():
 
     seen = set()
     with open_tar(args.test_archive) as archive:
-        counts = sample(archive, args.output, {'test': args.holdout_per_stratum}, seen)
+        counts, rejected_test = sample(archive, args.output, {'test': args.holdout_per_stratum}, seen)
     with open_tar(args.train_archive) as archive:
-        counts.update(sample(archive, args.output, {'val': args.holdout_per_stratum,
-                                                    'train': args.train_per_stratum}, seen))
+        training, rejected_train = sample(archive, args.output, {'val': args.holdout_per_stratum,
+                                                                'train': args.train_per_stratum}, seen)
+        counts.update(training)
     coverage = {'classes': list(CLASSES), 'modality': 'rgb',
+                'rejectedSourceFrames': {'train': rejected_train, 'test': rejected_test},
                 'imageCountsByStratum': counts, 'missingTrainLabels': [], 'missingValLabels': []}
     (args.output / 'coverage.json').write_text(json.dumps(coverage, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(coverage))
