@@ -6,8 +6,8 @@
   const COMPONENTS = { pump: 'Корпус насоса', motor: 'Электродвигатель', coupling: 'Муфта или кожух',
     pipe: 'Трубопровод или фланец', bearing: 'Подшипниковый узел', valve: 'Запорная арматура',
     terminal: 'Клеммная коробка', other: 'Другое оборудование', none: 'Узел не определён' };
-  const CONDITIONS = { corrosion: 'Возможная коррозия', wet_patch: 'Возможные следы жидкости',
-    visible_damage: 'Возможное повреждение', no_visible_defect: 'Явных внешних дефектов не замечено',
+  const CONDITIONS = { corrosion: 'Видимая коррозия', wet_patch: 'Видимые следы жидкости',
+    visible_damage: 'Видимое повреждение', no_visible_defect: 'Явных внешних дефектов не замечено',
     uncertain: 'Недостаточно данных' };
   const aborted = () => new DOMException('Операция отменена', 'AbortError');
   const text = (tag, className, value) => {

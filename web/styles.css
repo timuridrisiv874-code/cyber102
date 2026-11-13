@@ -168,9 +168,6 @@ summary::marker { color: #626a60; }
 #inspection-guidance ul, #inspection-references ul { padding-left: 16px; }
 #inspection-guidance li, #inspection-references li { margin-bottom: 8px; }
 #inspection-history { font-size: 13px; }
-.inspection-boundary { margin-top: 24px; padding: 0; color: var(--muted); font-size: 12px; max-width: 90ch; }
-.inspection-boundary summary { color: #626a60; }
-.inspection-boundary p { margin-top: 8px; }
 .video-review-panel { margin-top: 20px; padding: 20px 0 0; border-top: 1px solid var(--line); background: transparent; }
 .video-review-panel h3 { font-size: 15px; }
 .video-review-panel .actions { margin-top: 12px; }

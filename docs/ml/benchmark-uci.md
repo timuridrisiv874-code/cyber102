@@ -67,6 +67,40 @@ CatBoost ограничен 500 деревьями глубины 5 и ранн�
 
 Извлечение признаков заняло 5,86 с. Пиковая память всего процесса, включая извлечение и все четыре варианта, — 1,21 ГБ; это не отдельный замер памяти каждой модели. Сохранённые модели повторно загружены, и их прогнозы воспроизвели исходные метрики на всех 441 тестовых циклах без переобучения.
 
+### Использовать готовый CatBoost без обучения
+
+В рабочей копии завершённый запуск находится в `var/automl-comparison/uci-four-arm-v1/`. Модель `catboost_enhanced/model.cbm` содержит 78 деревьев и ожидает 340 именованных признаков. Рядом сохранены `features.npz`, `report.json` и `serialization-check.json`. Каталог `var/` исключён из Git: в свежем клоне эти локальные артефакты отсутствуют; опубликованный отчёт находится в [uci-autogluon-report.json](uci-autogluon-report.json).
+
+Из корня этой рабочей копии можно повторить проверку готовой модели на сохранённом тесте, не вызывая обучение:
+
+```sh
+.venv-automl/bin/python - <<'PY'
+import json
+from pathlib import Path
+import numpy as np
+from catboost import CatBoostClassifier, Pool
+from ml.benchmark_uci_autogluon import metrics
+
+run = Path('var/automl-comparison/uci-four-arm-v1')
+model = CatBoostClassifier()
+model.load_model(str(run / 'catboost_enhanced/model.cbm'))
+with np.load(run / 'features.npz', allow_pickle=False) as saved:
+    names = saved['names'].tolist()
+    test = saved['enhanced'][1764:]
+    labels = saved['leakage'][1764:]
+assert names == model.feature_names_
+probabilities = model.predict_proba(Pool(test, feature_names=names))
+result = metrics(labels, probabilities, np)
+report = json.loads((run / 'report.json').read_text())
+assert result == report['arms']['catboost_enhanced']['metrics']['test']
+print(json.dumps(result, ensure_ascii=False, indent=2))
+PY
+```
+
+Проверка выполнена 13 ноября 2026: имена всех 340 признаков совпали, результат имел форму `441 × 3`, метрики точно совпали с локальным и опубликованным отчётами. SHA-256 модели: `57aa5f49785b2e6d02a1ebdf8b0faccaea6a8c9de896839b28904fb305032ad3`.
+
+Для нового входа нужны законченные 60-секундные сигналы тех же 14 каналов с теми же единицами, частотами и порядком расчёта признаков. Одна строка текущих показаний Cyber102 не заменяет такой цикл. Готового серверного адаптера для этих сигналов нет: `server/assessment.py` вызывает правила, а не эту модель. `runtimeReady: false` в отчёте обозначает эту границу применения, а не незавершённое обучение.
+
 ### Созданные данные и проверка чувствительности
 
 Подготовлен архив `cyber102-uci-hydraulic-features-v1.zip`: реальные `train.csv`, `validation.csv`, `test.csv` и три искусственно изменённых варианта тех же тестовых строк. В таблицах отдельно записаны номер исходного цикла, часть выборки, происхождение и исходная метка утечки; эти поля нельзя подавать модели как признаки. Архив содержит список признаков, контрольные суммы, описание преобразований, авторство UCI и лицензию CC BY 4.0.
