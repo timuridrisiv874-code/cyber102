@@ -1,0 +1,4989 @@
+{
+  "schemaVersion": 1,
+  "completed": true,
+  "protocol": {
+    "schemaVersion": 1,
+    "registeredAt": "2026-11-13T21:11:21.799646+00:00",
+    "purpose": "Fixed feature and loss-weight ablation under the existing operating-condition shift.",
+    "archiveSha256": "24128aad2ee45eea7e6b63ebbd9992cdf25d0483a2cebefbfc13bc69079af1f2",
+    "previousReportSha256": "676f69cec18aec81d6fc71406e96fd3527b7b852b6da64babe4b1a79113dcdfd",
+    "cachedFeaturesSha256": "cbf87ce07f1c715574d08ae2047588d9b09d36d84e3f35e0884127338b9721f3",
+    "scriptSha256": "400c623c30bd756fc46e41c36c2ecb853a69980f7ee6c71be2d4607619a9b0ab",
+    "split": {
+      "train": {
+        "startInclusive": 0,
+        "endExclusive": 1323
+      },
+      "validation": {
+        "startInclusive": 1323,
+        "endExclusive": 1764
+      },
+      "test": {
+        "startInclusive": 1764,
+        "endExclusive": 2205
+      }
+    },
+    "features": {
+      "full340": [
+        "PS1_mean",
+        "PS1_std",
+        "PS1_min",
+        "PS1_max",
+        "PS1_q05",
+        "PS1_median",
+        "PS1_q95",
+        "PS1_last_first_5s_mean_diff",
+        "PS2_mean",
+        "PS2_std",
+        "PS2_min",
+        "PS2_max",
+        "PS2_q05",
+        "PS2_median",
+        "PS2_q95",
+        "PS2_last_first_5s_mean_diff",
+        "PS3_mean",
+        "PS3_std",
+        "PS3_min",
+        "PS3_max",
+        "PS3_q05",
+        "PS3_median",
+        "PS3_q95",
+        "PS3_last_first_5s_mean_diff",
+        "PS4_mean",
+        "PS4_std",
+        "PS4_min",
+        "PS4_max",
+        "PS4_q05",
+        "PS4_median",
+        "PS4_q95",
+        "PS4_last_first_5s_mean_diff",
+        "PS5_mean",
+        "PS5_std",
+        "PS5_min",
+        "PS5_max",
+        "PS5_q05",
+        "PS5_median",
+        "PS5_q95",
+        "PS5_last_first_5s_mean_diff",
+        "PS6_mean",
+        "PS6_std",
+        "PS6_min",
+        "PS6_max",
+        "PS6_q05",
+        "PS6_median",
+        "PS6_q95",
+        "PS6_last_first_5s_mean_diff",
+        "EPS1_mean",
+        "EPS1_std",
+        "EPS1_min",
+        "EPS1_max",
+        "EPS1_q05",
+        "EPS1_median",
+        "EPS1_q95",
+        "EPS1_last_first_5s_mean_diff",
+        "FS1_mean",
+        "FS1_std",
+        "FS1_min",
+        "FS1_max",
+        "FS1_q05",
+        "FS1_median",
+        "FS1_q95",
+        "FS1_last_first_5s_mean_diff",
+        "FS2_mean",
+        "FS2_std",
+        "FS2_min",
+        "FS2_max",
+        "FS2_q05",
+        "FS2_median",
+        "FS2_q95",
+        "FS2_last_first_5s_mean_diff",
+        "TS1_mean",
+        "TS1_std",
+        "TS1_min",
+        "TS1_max",
+        "TS1_q05",
+        "TS1_median",
+        "TS1_q95",
+        "TS1_last_first_5s_mean_diff",
+        "TS2_mean",
+        "TS2_std",
+        "TS2_min",
+        "TS2_max",
+        "TS2_q05",
+        "TS2_median",
+        "TS2_q95",
+        "TS2_last_first_5s_mean_diff",
+        "TS3_mean",
+        "TS3_std",
+        "TS3_min",
+        "TS3_max",
+        "TS3_q05",
+        "TS3_median",
+        "TS3_q95",
+        "TS3_last_first_5s_mean_diff",
+        "TS4_mean",
+        "TS4_std",
+        "TS4_min",
+        "TS4_max",
+        "TS4_q05",
+        "TS4_median",
+        "TS4_q95",
+        "TS4_last_first_5s_mean_diff",
+        "VS1_mean",
+        "VS1_std",
+        "VS1_min",
+        "VS1_max",
+        "VS1_q05",
+        "VS1_median",
+        "VS1_q95",
+        "VS1_last_first_5s_mean_diff",
+        "PS1_rms",
+        "PS1_peak_to_peak",
+        "PS1_iqr",
+        "PS1_mad",
+        "PS1_skewness",
+        "PS1_excess_kurtosis",
+        "PS1_mean_absolute_difference",
+        "PS1_slope_per_second",
+        "PS1_lag1_correlation",
+        "PS1_first20s_mean",
+        "PS1_first20s_std",
+        "PS1_middle20s_mean",
+        "PS1_middle20s_std",
+        "PS1_last20s_mean",
+        "PS1_last20s_std",
+        "PS2_rms",
+        "PS2_peak_to_peak",
+        "PS2_iqr",
+        "PS2_mad",
+        "PS2_skewness",
+        "PS2_excess_kurtosis",
+        "PS2_mean_absolute_difference",
+        "PS2_slope_per_second",
+        "PS2_lag1_correlation",
+        "PS2_first20s_mean",
+        "PS2_first20s_std",
+        "PS2_middle20s_mean",
+        "PS2_middle20s_std",
+        "PS2_last20s_mean",
+        "PS2_last20s_std",
+        "PS3_rms",
+        "PS3_peak_to_peak",
+        "PS3_iqr",
+        "PS3_mad",
+        "PS3_skewness",
+        "PS3_excess_kurtosis",
+        "PS3_mean_absolute_difference",
+        "PS3_slope_per_second",
+        "PS3_lag1_correlation",
+        "PS3_first20s_mean",
+        "PS3_first20s_std",
+        "PS3_middle20s_mean",
+        "PS3_middle20s_std",
+        "PS3_last20s_mean",
+        "PS3_last20s_std",
+        "PS4_rms",
+        "PS4_peak_to_peak",
+        "PS4_iqr",
+        "PS4_mad",
+        "PS4_skewness",
+        "PS4_excess_kurtosis",
+        "PS4_mean_absolute_difference",
+        "PS4_slope_per_second",
+        "PS4_lag1_correlation",
+        "PS4_first20s_mean",
+        "PS4_first20s_std",
+        "PS4_middle20s_mean",
+        "PS4_middle20s_std",
+        "PS4_last20s_mean",
+        "PS4_last20s_std",
+        "PS5_rms",
+        "PS5_peak_to_peak",
+        "PS5_iqr",
+        "PS5_mad",
+        "PS5_skewness",
+        "PS5_excess_kurtosis",
+        "PS5_mean_absolute_difference",
+        "PS5_slope_per_second",
+        "PS5_lag1_correlation",
+        "PS5_first20s_mean",
+        "PS5_first20s_std",
+        "PS5_middle20s_mean",
+        "PS5_middle20s_std",
+        "PS5_last20s_mean",
+        "PS5_last20s_std",
+        "PS6_rms",
+        "PS6_peak_to_peak",
+        "PS6_iqr",
+        "PS6_mad",
+        "PS6_skewness",
+        "PS6_excess_kurtosis",
+        "PS6_mean_absolute_difference",
+        "PS6_slope_per_second",
+        "PS6_lag1_correlation",
+        "PS6_first20s_mean",
+        "PS6_first20s_std",
+        "PS6_middle20s_mean",
+        "PS6_middle20s_std",
+        "PS6_last20s_mean",
+        "PS6_last20s_std",
+        "EPS1_rms",
+        "EPS1_peak_to_peak",
+        "EPS1_iqr",
+        "EPS1_mad",
+        "EPS1_skewness",
+        "EPS1_excess_kurtosis",
+        "EPS1_mean_absolute_difference",
+        "EPS1_slope_per_second",
+        "EPS1_lag1_correlation",
+        "EPS1_first20s_mean",
+        "EPS1_first20s_std",
+        "EPS1_middle20s_mean",
+        "EPS1_middle20s_std",
+        "EPS1_last20s_mean",
+        "EPS1_last20s_std",
+        "FS1_rms",
+        "FS1_peak_to_peak",
+        "FS1_iqr",
+        "FS1_mad",
+        "FS1_skewness",
+        "FS1_excess_kurtosis",
+        "FS1_mean_absolute_difference",
+        "FS1_slope_per_second",
+        "FS1_lag1_correlation",
+        "FS1_first20s_mean",
+        "FS1_first20s_std",
+        "FS1_middle20s_mean",
+        "FS1_middle20s_std",
+        "FS1_last20s_mean",
+        "FS1_last20s_std",
+        "FS2_rms",
+        "FS2_peak_to_peak",
+        "FS2_iqr",
+        "FS2_mad",
+        "FS2_skewness",
+        "FS2_excess_kurtosis",
+        "FS2_mean_absolute_difference",
+        "FS2_slope_per_second",
+        "FS2_lag1_correlation",
+        "FS2_first20s_mean",
+        "FS2_first20s_std",
+        "FS2_middle20s_mean",
+        "FS2_middle20s_std",
+        "FS2_last20s_mean",
+        "FS2_last20s_std",
+        "TS1_rms",
+        "TS1_peak_to_peak",
+        "TS1_iqr",
+        "TS1_mad",
+        "TS1_skewness",
+        "TS1_excess_kurtosis",
+        "TS1_mean_absolute_difference",
+        "TS1_slope_per_second",
+        "TS1_lag1_correlation",
+        "TS1_first20s_mean",
+        "TS1_first20s_std",
+        "TS1_middle20s_mean",
+        "TS1_middle20s_std",
+        "TS1_last20s_mean",
+        "TS1_last20s_std",
+        "TS2_rms",
+        "TS2_peak_to_peak",
+        "TS2_iqr",
+        "TS2_mad",
+        "TS2_skewness",
+        "TS2_excess_kurtosis",
+        "TS2_mean_absolute_difference",
+        "TS2_slope_per_second",
+        "TS2_lag1_correlation",
+        "TS2_first20s_mean",
+        "TS2_first20s_std",
+        "TS2_middle20s_mean",
+        "TS2_middle20s_std",
+        "TS2_last20s_mean",
+        "TS2_last20s_std",
+        "TS3_rms",
+        "TS3_peak_to_peak",
+        "TS3_iqr",
+        "TS3_mad",
+        "TS3_skewness",
+        "TS3_excess_kurtosis",
+        "TS3_mean_absolute_difference",
+        "TS3_slope_per_second",
+        "TS3_lag1_correlation",
+        "TS3_first20s_mean",
+        "TS3_first20s_std",
+        "TS3_middle20s_mean",
+        "TS3_middle20s_std",
+        "TS3_last20s_mean",
+        "TS3_last20s_std",
+        "TS4_rms",
+        "TS4_peak_to_peak",
+        "TS4_iqr",
+        "TS4_mad",
+        "TS4_skewness",
+        "TS4_excess_kurtosis",
+        "TS4_mean_absolute_difference",
+        "TS4_slope_per_second",
+        "TS4_lag1_correlation",
+        "TS4_first20s_mean",
+        "TS4_first20s_std",
+        "TS4_middle20s_mean",
+        "TS4_middle20s_std",
+        "TS4_last20s_mean",
+        "TS4_last20s_std",
+        "VS1_rms",
+        "VS1_peak_to_peak",
+        "VS1_iqr",
+        "VS1_mad",
+        "VS1_skewness",
+        "VS1_excess_kurtosis",
+        "VS1_mean_absolute_difference",
+        "VS1_slope_per_second",
+        "VS1_lag1_correlation",
+        "VS1_first20s_mean",
+        "VS1_first20s_std",
+        "VS1_middle20s_mean",
+        "VS1_middle20s_std",
+        "VS1_last20s_mean",
+        "VS1_last20s_std",
+        "PS1_PS2_correlation_1s_means",
+        "PS1_PS2_mean_difference",
+        "PS1_PS2_mean_ratio",
+        "PS3_PS4_correlation_1s_means",
+        "PS3_PS4_mean_difference",
+        "PS3_PS4_mean_ratio",
+        "PS5_PS6_correlation_1s_means",
+        "PS5_PS6_mean_difference",
+        "PS5_PS6_mean_ratio",
+        "FS1_FS2_correlation_1s_means",
+        "FS1_FS2_mean_difference",
+        "FS1_FS2_mean_ratio",
+        "TS1_TS2_correlation_1s_means",
+        "TS1_TS2_mean_difference",
+        "TS1_TS2_mean_ratio",
+        "TS3_TS4_correlation_1s_means",
+        "TS3_TS4_mean_difference",
+        "TS3_TS4_mean_ratio"
+      ],
+      "shape53": [
+        "PS1_skewness",
+        "PS1_excess_kurtosis",
+        "PS1_lag1_correlation",
+        "PS2_skewness",
+        "PS2_excess_kurtosis",
+        "PS2_lag1_correlation",
+        "PS3_skewness",
+        "PS3_excess_kurtosis",
+        "PS3_lag1_correlation",
+        "PS4_skewness",
+        "PS4_excess_kurtosis",
+        "PS4_lag1_correlation",
+        "PS5_skewness",
+        "PS5_excess_kurtosis",
+        "PS5_lag1_correlation",
+        "PS6_skewness",
+        "PS6_excess_kurtosis",
+        "PS6_lag1_correlation",
+        "EPS1_skewness",
+        "EPS1_excess_kurtosis",
+        "EPS1_lag1_correlation",
+        "FS1_skewness",
+        "FS1_excess_kurtosis",
+        "FS1_lag1_correlation",
+        "FS2_skewness",
+        "FS2_excess_kurtosis",
+        "FS2_lag1_correlation",
+        "TS1_skewness",
+        "TS1_excess_kurtosis",
+        "TS1_lag1_correlation",
+        "TS2_skewness",
+        "TS2_excess_kurtosis",
+        "TS2_lag1_correlation",
+        "TS3_skewness",
+        "TS3_excess_kurtosis",
+        "TS3_lag1_correlation",
+        "TS4_skewness",
+        "TS4_excess_kurtosis",
+        "TS4_lag1_correlation",
+        "VS1_skewness",
+        "VS1_excess_kurtosis",
+        "VS1_lag1_correlation",
+        "PS1_PS2_correlation_1s_means",
+        "PS3_PS4_correlation_1s_means",
+        "PS5_PS6_correlation_1s_means",
+        "FS1_FS2_correlation_1s_means",
+        "TS1_TS2_correlation_1s_means",
+        "TS3_TS4_correlation_1s_means",
+        "PS1_PS2_mean_ratio",
+        "PS5_PS6_mean_ratio",
+        "FS1_FS2_mean_ratio",
+        "TS1_TS2_mean_ratio",
+        "TS3_TS4_mean_ratio"
+      ],
+      "phase389": [
+        "PS1_skewness",
+        "PS1_excess_kurtosis",
+        "PS1_lag1_correlation",
+        "PS2_skewness",
+        "PS2_excess_kurtosis",
+        "PS2_lag1_correlation",
+        "PS3_skewness",
+        "PS3_excess_kurtosis",
+        "PS3_lag1_correlation",
+        "PS4_skewness",
+        "PS4_excess_kurtosis",
+        "PS4_lag1_correlation",
+        "PS5_skewness",
+        "PS5_excess_kurtosis",
+        "PS5_lag1_correlation",
+        "PS6_skewness",
+        "PS6_excess_kurtosis",
+        "PS6_lag1_correlation",
+        "EPS1_skewness",
+        "EPS1_excess_kurtosis",
+        "EPS1_lag1_correlation",
+        "FS1_skewness",
+        "FS1_excess_kurtosis",
+        "FS1_lag1_correlation",
+        "FS2_skewness",
+        "FS2_excess_kurtosis",
+        "FS2_lag1_correlation",
+        "TS1_skewness",
+        "TS1_excess_kurtosis",
+        "TS1_lag1_correlation",
+        "TS2_skewness",
+        "TS2_excess_kurtosis",
+        "TS2_lag1_correlation",
+        "TS3_skewness",
+        "TS3_excess_kurtosis",
+        "TS3_lag1_correlation",
+        "TS4_skewness",
+        "TS4_excess_kurtosis",
+        "TS4_lag1_correlation",
+        "VS1_skewness",
+        "VS1_excess_kurtosis",
+        "VS1_lag1_correlation",
+        "PS1_PS2_correlation_1s_means",
+        "PS3_PS4_correlation_1s_means",
+        "PS5_PS6_correlation_1s_means",
+        "FS1_FS2_correlation_1s_means",
+        "TS1_TS2_correlation_1s_means",
+        "TS3_TS4_correlation_1s_means",
+        "PS1_PS2_mean_ratio",
+        "PS5_PS6_mean_ratio",
+        "FS1_FS2_mean_ratio",
+        "TS1_TS2_mean_ratio",
+        "TS3_TS4_mean_ratio",
+        "PS1_window00_mean_over_cycle_rms",
+        "PS1_window00_std_over_cycle_rms",
+        "PS1_window01_mean_over_cycle_rms",
+        "PS1_window01_std_over_cycle_rms",
+        "PS1_window02_mean_over_cycle_rms",
+        "PS1_window02_std_over_cycle_rms",
+        "PS1_window03_mean_over_cycle_rms",
+        "PS1_window03_std_over_cycle_rms",
+        "PS1_window04_mean_over_cycle_rms",
+        "PS1_window04_std_over_cycle_rms",
+        "PS1_window05_mean_over_cycle_rms",
+        "PS1_window05_std_over_cycle_rms",
+        "PS1_window06_mean_over_cycle_rms",
+        "PS1_window06_std_over_cycle_rms",
+        "PS1_window07_mean_over_cycle_rms",
+        "PS1_window07_std_over_cycle_rms",
+        "PS1_window08_mean_over_cycle_rms",
+        "PS1_window08_std_over_cycle_rms",
+        "PS1_window09_mean_over_cycle_rms",
+        "PS1_window09_std_over_cycle_rms",
+        "PS1_window10_mean_over_cycle_rms",
+        "PS1_window10_std_over_cycle_rms",
+        "PS1_window11_mean_over_cycle_rms",
+        "PS1_window11_std_over_cycle_rms",
+        "PS2_window00_mean_over_cycle_rms",
+        "PS2_window00_std_over_cycle_rms",
+        "PS2_window01_mean_over_cycle_rms",
+        "PS2_window01_std_over_cycle_rms",
+        "PS2_window02_mean_over_cycle_rms",
+        "PS2_window02_std_over_cycle_rms",
+        "PS2_window03_mean_over_cycle_rms",
+        "PS2_window03_std_over_cycle_rms",
+        "PS2_window04_mean_over_cycle_rms",
+        "PS2_window04_std_over_cycle_rms",
+        "PS2_window05_mean_over_cycle_rms",
+        "PS2_window05_std_over_cycle_rms",
+        "PS2_window06_mean_over_cycle_rms",
+        "PS2_window06_std_over_cycle_rms",
+        "PS2_window07_mean_over_cycle_rms",
+        "PS2_window07_std_over_cycle_rms",
+        "PS2_window08_mean_over_cycle_rms",
+        "PS2_window08_std_over_cycle_rms",
+        "PS2_window09_mean_over_cycle_rms",
+        "PS2_window09_std_over_cycle_rms",
+        "PS2_window10_mean_over_cycle_rms",
+        "PS2_window10_std_over_cycle_rms",
+        "PS2_window11_mean_over_cycle_rms",
+        "PS2_window11_std_over_cycle_rms",
+        "PS3_window00_mean_over_cycle_rms",
+        "PS3_window00_std_over_cycle_rms",
+        "PS3_window01_mean_over_cycle_rms",
+        "PS3_window01_std_over_cycle_rms",
+        "PS3_window02_mean_over_cycle_rms",
+        "PS3_window02_std_over_cycle_rms",
+        "PS3_window03_mean_over_cycle_rms",
+        "PS3_window03_std_over_cycle_rms",
+        "PS3_window04_mean_over_cycle_rms",
+        "PS3_window04_std_over_cycle_rms",
+        "PS3_window05_mean_over_cycle_rms",
+        "PS3_window05_std_over_cycle_rms",
+        "PS3_window06_mean_over_cycle_rms",
+        "PS3_window06_std_over_cycle_rms",
+        "PS3_window07_mean_over_cycle_rms",
+        "PS3_window07_std_over_cycle_rms",
+        "PS3_window08_mean_over_cycle_rms",
+        "PS3_window08_std_over_cycle_rms",
+        "PS3_window09_mean_over_cycle_rms",
+        "PS3_window09_std_over_cycle_rms",
+        "PS3_window10_mean_over_cycle_rms",
+        "PS3_window10_std_over_cycle_rms",
+        "PS3_window11_mean_over_cycle_rms",
+        "PS3_window11_std_over_cycle_rms",
+        "PS4_window00_mean_over_cycle_rms",
+        "PS4_window00_std_over_cycle_rms",
+        "PS4_window01_mean_over_cycle_rms",
+        "PS4_window01_std_over_cycle_rms",
+        "PS4_window02_mean_over_cycle_rms",
+        "PS4_window02_std_over_cycle_rms",
+        "PS4_window03_mean_over_cycle_rms",
+        "PS4_window03_std_over_cycle_rms",
+        "PS4_window04_mean_over_cycle_rms",
+        "PS4_window04_std_over_cycle_rms",
+        "PS4_window05_mean_over_cycle_rms",
+        "PS4_window05_std_over_cycle_rms",
+        "PS4_window06_mean_over_cycle_rms",
+        "PS4_window06_std_over_cycle_rms",
+        "PS4_window07_mean_over_cycle_rms",
+        "PS4_window07_std_over_cycle_rms",
+        "PS4_window08_mean_over_cycle_rms",
+        "PS4_window08_std_over_cycle_rms",
+        "PS4_window09_mean_over_cycle_rms",
+        "PS4_window09_std_over_cycle_rms",
+        "PS4_window10_mean_over_cycle_rms",
+        "PS4_window10_std_over_cycle_rms",
+        "PS4_window11_mean_over_cycle_rms",
+        "PS4_window11_std_over_cycle_rms",
+        "PS5_window00_mean_over_cycle_rms",
+        "PS5_window00_std_over_cycle_rms",
+        "PS5_window01_mean_over_cycle_rms",
+        "PS5_window01_std_over_cycle_rms",
+        "PS5_window02_mean_over_cycle_rms",
+        "PS5_window02_std_over_cycle_rms",
+        "PS5_window03_mean_over_cycle_rms",
+        "PS5_window03_std_over_cycle_rms",
+        "PS5_window04_mean_over_cycle_rms",
+        "PS5_window04_std_over_cycle_rms",
+        "PS5_window05_mean_over_cycle_rms",
+        "PS5_window05_std_over_cycle_rms",
+        "PS5_window06_mean_over_cycle_rms",
+        "PS5_window06_std_over_cycle_rms",
+        "PS5_window07_mean_over_cycle_rms",
+        "PS5_window07_std_over_cycle_rms",
+        "PS5_window08_mean_over_cycle_rms",
+        "PS5_window08_std_over_cycle_rms",
+        "PS5_window09_mean_over_cycle_rms",
+        "PS5_window09_std_over_cycle_rms",
+        "PS5_window10_mean_over_cycle_rms",
+        "PS5_window10_std_over_cycle_rms",
+        "PS5_window11_mean_over_cycle_rms",
+        "PS5_window11_std_over_cycle_rms",
+        "PS6_window00_mean_over_cycle_rms",
+        "PS6_window00_std_over_cycle_rms",
+        "PS6_window01_mean_over_cycle_rms",
+        "PS6_window01_std_over_cycle_rms",
+        "PS6_window02_mean_over_cycle_rms",
+        "PS6_window02_std_over_cycle_rms",
+        "PS6_window03_mean_over_cycle_rms",
+        "PS6_window03_std_over_cycle_rms",
+        "PS6_window04_mean_over_cycle_rms",
+        "PS6_window04_std_over_cycle_rms",
+        "PS6_window05_mean_over_cycle_rms",
+        "PS6_window05_std_over_cycle_rms",
+        "PS6_window06_mean_over_cycle_rms",
+        "PS6_window06_std_over_cycle_rms",
+        "PS6_window07_mean_over_cycle_rms",
+        "PS6_window07_std_over_cycle_rms",
+        "PS6_window08_mean_over_cycle_rms",
+        "PS6_window08_std_over_cycle_rms",
+        "PS6_window09_mean_over_cycle_rms",
+        "PS6_window09_std_over_cycle_rms",
+        "PS6_window10_mean_over_cycle_rms",
+        "PS6_window10_std_over_cycle_rms",
+        "PS6_window11_mean_over_cycle_rms",
+        "PS6_window11_std_over_cycle_rms",
+        "EPS1_window00_mean_over_cycle_rms",
+        "EPS1_window00_std_over_cycle_rms",
+        "EPS1_window01_mean_over_cycle_rms",
+        "EPS1_window01_std_over_cycle_rms",
+        "EPS1_window02_mean_over_cycle_rms",
+        "EPS1_window02_std_over_cycle_rms",
+        "EPS1_window03_mean_over_cycle_rms",
+        "EPS1_window03_std_over_cycle_rms",
+        "EPS1_window04_mean_over_cycle_rms",
+        "EPS1_window04_std_over_cycle_rms",
+        "EPS1_window05_mean_over_cycle_rms",
+        "EPS1_window05_std_over_cycle_rms",
+        "EPS1_window06_mean_over_cycle_rms",
+        "EPS1_window06_std_over_cycle_rms",
+        "EPS1_window07_mean_over_cycle_rms",
+        "EPS1_window07_std_over_cycle_rms",
+        "EPS1_window08_mean_over_cycle_rms",
+        "EPS1_window08_std_over_cycle_rms",
+        "EPS1_window09_mean_over_cycle_rms",
+        "EPS1_window09_std_over_cycle_rms",
+        "EPS1_window10_mean_over_cycle_rms",
+        "EPS1_window10_std_over_cycle_rms",
+        "EPS1_window11_mean_over_cycle_rms",
+        "EPS1_window11_std_over_cycle_rms",
+        "FS1_window00_mean_over_cycle_rms",
+        "FS1_window00_std_over_cycle_rms",
+        "FS1_window01_mean_over_cycle_rms",
+        "FS1_window01_std_over_cycle_rms",
+        "FS1_window02_mean_over_cycle_rms",
+        "FS1_window02_std_over_cycle_rms",
+        "FS1_window03_mean_over_cycle_rms",
+        "FS1_window03_std_over_cycle_rms",
+        "FS1_window04_mean_over_cycle_rms",
+        "FS1_window04_std_over_cycle_rms",
+        "FS1_window05_mean_over_cycle_rms",
+        "FS1_window05_std_over_cycle_rms",
+        "FS1_window06_mean_over_cycle_rms",
+        "FS1_window06_std_over_cycle_rms",
+        "FS1_window07_mean_over_cycle_rms",
+        "FS1_window07_std_over_cycle_rms",
+        "FS1_window08_mean_over_cycle_rms",
+        "FS1_window08_std_over_cycle_rms",
+        "FS1_window09_mean_over_cycle_rms",
+        "FS1_window09_std_over_cycle_rms",
+        "FS1_window10_mean_over_cycle_rms",
+        "FS1_window10_std_over_cycle_rms",
+        "FS1_window11_mean_over_cycle_rms",
+        "FS1_window11_std_over_cycle_rms",
+        "FS2_window00_mean_over_cycle_rms",
+        "FS2_window00_std_over_cycle_rms",
+        "FS2_window01_mean_over_cycle_rms",
+        "FS2_window01_std_over_cycle_rms",
+        "FS2_window02_mean_over_cycle_rms",
+        "FS2_window02_std_over_cycle_rms",
+        "FS2_window03_mean_over_cycle_rms",
+        "FS2_window03_std_over_cycle_rms",
+        "FS2_window04_mean_over_cycle_rms",
+        "FS2_window04_std_over_cycle_rms",
+        "FS2_window05_mean_over_cycle_rms",
+        "FS2_window05_std_over_cycle_rms",
+        "FS2_window06_mean_over_cycle_rms",
+        "FS2_window06_std_over_cycle_rms",
+        "FS2_window07_mean_over_cycle_rms",
+        "FS2_window07_std_over_cycle_rms",
+        "FS2_window08_mean_over_cycle_rms",
+        "FS2_window08_std_over_cycle_rms",
+        "FS2_window09_mean_over_cycle_rms",
+        "FS2_window09_std_over_cycle_rms",
+        "FS2_window10_mean_over_cycle_rms",
+        "FS2_window10_std_over_cycle_rms",
+        "FS2_window11_mean_over_cycle_rms",
+        "FS2_window11_std_over_cycle_rms",
+        "TS1_window00_mean_over_cycle_rms",
+        "TS1_window00_std_over_cycle_rms",
+        "TS1_window01_mean_over_cycle_rms",
+        "TS1_window01_std_over_cycle_rms",
+        "TS1_window02_mean_over_cycle_rms",
+        "TS1_window02_std_over_cycle_rms",
+        "TS1_window03_mean_over_cycle_rms",
+        "TS1_window03_std_over_cycle_rms",
+        "TS1_window04_mean_over_cycle_rms",
+        "TS1_window04_std_over_cycle_rms",
+        "TS1_window05_mean_over_cycle_rms",
+        "TS1_window05_std_over_cycle_rms",
+        "TS1_window06_mean_over_cycle_rms",
+        "TS1_window06_std_over_cycle_rms",
+        "TS1_window07_mean_over_cycle_rms",
+        "TS1_window07_std_over_cycle_rms",
+        "TS1_window08_mean_over_cycle_rms",
+        "TS1_window08_std_over_cycle_rms",
+        "TS1_window09_mean_over_cycle_rms",
+        "TS1_window09_std_over_cycle_rms",
+        "TS1_window10_mean_over_cycle_rms",
+        "TS1_window10_std_over_cycle_rms",
+        "TS1_window11_mean_over_cycle_rms",
+        "TS1_window11_std_over_cycle_rms",
+        "TS2_window00_mean_over_cycle_rms",
+        "TS2_window00_std_over_cycle_rms",
+        "TS2_window01_mean_over_cycle_rms",
+        "TS2_window01_std_over_cycle_rms",
+        "TS2_window02_mean_over_cycle_rms",
+        "TS2_window02_std_over_cycle_rms",
+        "TS2_window03_mean_over_cycle_rms",
+        "TS2_window03_std_over_cycle_rms",
+        "TS2_window04_mean_over_cycle_rms",
+        "TS2_window04_std_over_cycle_rms",
+        "TS2_window05_mean_over_cycle_rms",
+        "TS2_window05_std_over_cycle_rms",
+        "TS2_window06_mean_over_cycle_rms",
+        "TS2_window06_std_over_cycle_rms",
+        "TS2_window07_mean_over_cycle_rms",
+        "TS2_window07_std_over_cycle_rms",
+        "TS2_window08_mean_over_cycle_rms",
+        "TS2_window08_std_over_cycle_rms",
+        "TS2_window09_mean_over_cycle_rms",
+        "TS2_window09_std_over_cycle_rms",
+        "TS2_window10_mean_over_cycle_rms",
+        "TS2_window10_std_over_cycle_rms",
+        "TS2_window11_mean_over_cycle_rms",
+        "TS2_window11_std_over_cycle_rms",
+        "TS3_window00_mean_over_cycle_rms",
+        "TS3_window00_std_over_cycle_rms",
+        "TS3_window01_mean_over_cycle_rms",
+        "TS3_window01_std_over_cycle_rms",
+        "TS3_window02_mean_over_cycle_rms",
+        "TS3_window02_std_over_cycle_rms",
+        "TS3_window03_mean_over_cycle_rms",
+        "TS3_window03_std_over_cycle_rms",
+        "TS3_window04_mean_over_cycle_rms",
+        "TS3_window04_std_over_cycle_rms",
+        "TS3_window05_mean_over_cycle_rms",
+        "TS3_window05_std_over_cycle_rms",
+        "TS3_window06_mean_over_cycle_rms",
+        "TS3_window06_std_over_cycle_rms",
+        "TS3_window07_mean_over_cycle_rms",
+        "TS3_window07_std_over_cycle_rms",
+        "TS3_window08_mean_over_cycle_rms",
+        "TS3_window08_std_over_cycle_rms",
+        "TS3_window09_mean_over_cycle_rms",
+        "TS3_window09_std_over_cycle_rms",
+        "TS3_window10_mean_over_cycle_rms",
+        "TS3_window10_std_over_cycle_rms",
+        "TS3_window11_mean_over_cycle_rms",
+        "TS3_window11_std_over_cycle_rms",
+        "TS4_window00_mean_over_cycle_rms",
+        "TS4_window00_std_over_cycle_rms",
+        "TS4_window01_mean_over_cycle_rms",
+        "TS4_window01_std_over_cycle_rms",
+        "TS4_window02_mean_over_cycle_rms",
+        "TS4_window02_std_over_cycle_rms",
+        "TS4_window03_mean_over_cycle_rms",
+        "TS4_window03_std_over_cycle_rms",
+        "TS4_window04_mean_over_cycle_rms",
+        "TS4_window04_std_over_cycle_rms",
+        "TS4_window05_mean_over_cycle_rms",
+        "TS4_window05_std_over_cycle_rms",
+        "TS4_window06_mean_over_cycle_rms",
+        "TS4_window06_std_over_cycle_rms",
+        "TS4_window07_mean_over_cycle_rms",
+        "TS4_window07_std_over_cycle_rms",
+        "TS4_window08_mean_over_cycle_rms",
+        "TS4_window08_std_over_cycle_rms",
+        "TS4_window09_mean_over_cycle_rms",
+        "TS4_window09_std_over_cycle_rms",
+        "TS4_window10_mean_over_cycle_rms",
+        "TS4_window10_std_over_cycle_rms",
+        "TS4_window11_mean_over_cycle_rms",
+        "TS4_window11_std_over_cycle_rms",
+        "VS1_window00_mean_over_cycle_rms",
+        "VS1_window00_std_over_cycle_rms",
+        "VS1_window01_mean_over_cycle_rms",
+        "VS1_window01_std_over_cycle_rms",
+        "VS1_window02_mean_over_cycle_rms",
+        "VS1_window02_std_over_cycle_rms",
+        "VS1_window03_mean_over_cycle_rms",
+        "VS1_window03_std_over_cycle_rms",
+        "VS1_window04_mean_over_cycle_rms",
+        "VS1_window04_std_over_cycle_rms",
+        "VS1_window05_mean_over_cycle_rms",
+        "VS1_window05_std_over_cycle_rms",
+        "VS1_window06_mean_over_cycle_rms",
+        "VS1_window06_std_over_cycle_rms",
+        "VS1_window07_mean_over_cycle_rms",
+        "VS1_window07_std_over_cycle_rms",
+        "VS1_window08_mean_over_cycle_rms",
+        "VS1_window08_std_over_cycle_rms",
+        "VS1_window09_mean_over_cycle_rms",
+        "VS1_window09_std_over_cycle_rms",
+        "VS1_window10_mean_over_cycle_rms",
+        "VS1_window10_std_over_cycle_rms",
+        "VS1_window11_mean_over_cycle_rms",
+        "VS1_window11_std_over_cycle_rms"
+      ]
+    },
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "weightings": [
+      "None",
+      "Balanced"
+    ],
+    "fitCount": 18,
+    "fitOptions": {
+      "iterations": 500,
+      "depth": 5,
+      "learning_rate": 0.05,
+      "loss_function": "MultiClass",
+      "eval_metric": "MultiClass",
+      "random_seed": 42,
+      "task_type": "CPU",
+      "thread_count": 4,
+      "allow_writing_files": false,
+      "use_best_model": true
+    },
+    "earlyStoppingRounds": 40,
+    "validationMetricRule": {
+      "None": "MultiClass",
+      "Balanced": "MultiClass:use_weights=false"
+    },
+    "balancedClassWeightsFromTrain": [
+      1.0,
+      2.6097560975609757,
+      2.6097560975609757
+    ],
+    "shapeRule": "14 physical channels x skewness/excess_kurtosis/lag1_correlation, six pair correlations, five pair mean ratios; omit PS3_PS4_mean_ratio because zero meanPS4 makes it undefined.",
+    "phaseRule": "Append 14 x 12 x 2 features: equal5s block mean and population std divided by max(current-cycle RMS,1e-12). Zero channels yield zero. No neighboring cycles, fitted scaling or profile predictors.",
+    "phaseScope": "Generic within-cycle normalization, not physical efficiency or exactly the paper operational phase boundaries.",
+    "paper": {
+      "url": "https://jsss.copernicus.org/articles/7/359/2018/jsss-7-359-2018.pdf",
+      "sectionsPDFPagesZeroBased": [
+        3,
+        5
+      ]
+    },
+    "selectionRule": "Mean validation balanced accuracy across three fixed seeds; exact ties use lower mean validation log loss, fewer features, None weighting, then lexical feature group. Representative seed42 fixed.",
+    "testPolicy": "Historical test has already been inspected. No test prediction from this experiment until all18fits finish and selection.json is written. One final diagnostic test pass; no adaptive rounds afterwards.",
+    "limits": [
+      "Profile cooler/valve/accumulator/stability only used for audit strata, never model input.",
+      "Seeds measure fitting sensitivity, not independent operating regimes.",
+      "Only one severe validation block has cooler100 and it is confounded with accumulator130.",
+      "Neither source photographs nor organizer live snapshots are inputs to this laboratory-cycle model.",
+      "No production runtime integration or model replacement."
+    ],
+    "versions": {
+      "numpy": "2.5.4",
+      "catboost": "1.2.10"
+    },
+    "featureExtractionSeconds": 10.420516500016674
+  },
+  "preregisteredSha256": "5b0c156efec39b6da4edfd1d7a3603c73bcfe26bb361ed41de818017d455b366",
+  "runtimeReady": false,
+  "records": [
+    {
+      "id": "full340-none-seed42",
+      "featureGroup": "full340",
+      "weighting": "None",
+      "seed": 42,
+      "features": 340,
+      "trees": 78,
+      "fitSeconds": 4.766248208004981,
+      "modelSha256": "97c8e1ac64042b314af7a3b857a85f15f9cca45c2009fa4aae55e8a131c050b5",
+      "validation": {
+        "accuracy": 0.9024943310657596,
+        "macro_f1": 0.8170822947553287,
+        "balanced_accuracy": 0.8252032520325203,
+        "confusion_matrix": [
+          [
+            277,
+            0,
+            0
+          ],
+          [
+            2,
+            80,
+            0
+          ],
+          [
+            0,
+            41,
+            41
+          ]
+        ],
+        "log_loss": 0.2278203244221084,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 0.975609756097561,
+          "2": 0.5
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 11,
+            "severeRecall": 0.5
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 40,
+            "severeRecall": 0.5
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 1,
+            "severeRecall": 0.5
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.7278911564625851,
+        "macro_f1": 0.5840187782314535,
+        "balanced_accuracy": 0.6747967479674797,
+        "confusion_matrix": [
+          [
+            195,
+            0,
+            0
+          ],
+          [
+            3,
+            120,
+            0
+          ],
+          [
+            0,
+            117,
+            6
+          ]
+        ],
+        "log_loss": 0.47890314241125265,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 0.975609756097561,
+          "2": 0.04878048780487805
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 6,
+            "severeRecall": 0.04878048780487805
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 6,
+            "severeRecall": 0.2
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 4,
+            "severeRecall": 0.0975609756097561
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 1,
+            "severeRecall": 0.024390243902439025
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 1,
+            "severeRecall": 0.024390243902439025
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 6,
+            "severeRecall": 0.05
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "full340-none-seed43",
+      "featureGroup": "full340",
+      "weighting": "None",
+      "seed": 43,
+      "features": 340,
+      "trees": 72,
+      "fitSeconds": 4.4647282919613644,
+      "modelSha256": "8395542fedc985efaa452addd30de3d41580f8699d4f93583ab5a0d2a5a20e2a",
+      "validation": {
+        "accuracy": 0.8276643990929705,
+        "macro_f1": 0.7200616975709355,
+        "balanced_accuracy": 0.6910569105691057,
+        "confusion_matrix": [
+          [
+            277,
+            0,
+            0
+          ],
+          [
+            35,
+            47,
+            0
+          ],
+          [
+            0,
+            41,
+            41
+          ]
+        ],
+        "log_loss": 0.2659232704318482,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 0.573170731707317,
+          "2": 0.5
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 11,
+            "severeRecall": 0.5
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 40,
+            "severeRecall": 0.5
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 1,
+            "severeRecall": 0.5
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.5986394557823129,
+        "macro_f1": 0.4388245388245388,
+        "balanced_accuracy": 0.5203252032520326,
+        "confusion_matrix": [
+          [
+            195,
+            0,
+            0
+          ],
+          [
+            54,
+            69,
+            0
+          ],
+          [
+            0,
+            123,
+            0
+          ]
+        ],
+        "log_loss": 0.5883563417605762,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 0.5609756097560976,
+          "2": 0.0
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "full340-none-seed44",
+      "featureGroup": "full340",
+      "weighting": "None",
+      "seed": 44,
+      "features": 340,
+      "trees": 375,
+      "fitSeconds": 16.907347665983252,
+      "modelSha256": "5b115e927328b39432503d8c9d468c8ff13a973626005374d635f9388bcdc877",
+      "validation": {
+        "accuracy": 0.8843537414965986,
+        "macro_f1": 0.7957992362247682,
+        "balanced_accuracy": 0.7926829268292682,
+        "confusion_matrix": [
+          [
+            277,
+            0,
+            0
+          ],
+          [
+            10,
+            72,
+            0
+          ],
+          [
+            0,
+            41,
+            41
+          ]
+        ],
+        "log_loss": 0.19717952360672547,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 0.8780487804878049,
+          "2": 0.5
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 11,
+            "severeRecall": 0.5
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 40,
+            "severeRecall": 0.5
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 1,
+            "severeRecall": 0.5
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.7165532879818595,
+        "macro_f1": 0.6070089999185354,
+        "balanced_accuracy": 0.6612466124661247,
+        "confusion_matrix": [
+          [
+            195,
+            0,
+            0
+          ],
+          [
+            19,
+            104,
+            0
+          ],
+          [
+            0,
+            106,
+            17
+          ]
+        ],
+        "log_loss": 0.46612268670244766,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 0.8455284552845529,
+          "2": 0.13821138211382114
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 17,
+            "severeRecall": 0.13821138211382114
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 9,
+            "severeRecall": 0.3
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 6,
+            "severeRecall": 0.2
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 1,
+            "severeRecall": 0.03333333333333333
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 1,
+            "severeRecall": 0.030303030303030304
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 16,
+            "severeRecall": 0.3902439024390244
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 1,
+            "severeRecall": 0.024390243902439025
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 17,
+            "severeRecall": 0.14166666666666666
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "full340-balanced-seed42",
+      "featureGroup": "full340",
+      "weighting": "Balanced",
+      "seed": 42,
+      "features": 340,
+      "trees": 272,
+      "fitSeconds": 12.054826417006552,
+      "modelSha256": "1b70b4e063768faa32f0ecb2856a12ac34966efa962349935dfeba891601a731",
+      "validation": {
+        "accuracy": 0.9183673469387755,
+        "macro_f1": 0.84625,
+        "balanced_accuracy": 0.8536585365853658,
+        "confusion_matrix": [
+          [
+            277,
+            0,
+            0
+          ],
+          [
+            0,
+            82,
+            0
+          ],
+          [
+            0,
+            36,
+            46
+          ]
+        ],
+        "log_loss": 0.15489931356459882,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 1.0,
+          "2": 0.5609756097560976
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 5,
+            "severeRecall": 0.12195121951219512
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 16,
+            "severeRecall": 0.7272727272727273
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 5,
+            "severeRecall": 0.12195121951219512
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 45,
+            "severeRecall": 0.5625
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 1,
+            "severeRecall": 0.5
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.9160997732426304,
+        "macro_f1": 0.8974081525690228,
+        "balanced_accuracy": 0.8997289972899729,
+        "confusion_matrix": [
+          [
+            195,
+            0,
+            0
+          ],
+          [
+            0,
+            123,
+            0
+          ],
+          [
+            0,
+            37,
+            86
+          ]
+        ],
+        "log_loss": 0.30296629754707066,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 1.0,
+          "2": 0.6991869918699187
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 86,
+            "severeRecall": 0.6991869918699187
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 18,
+            "severeRecall": 0.6
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 19,
+            "severeRecall": 0.6333333333333333
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 16,
+            "severeRecall": 0.5333333333333333
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 33,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 29,
+            "severeRecall": 0.7073170731707317
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 16,
+            "severeRecall": 0.3902439024390244
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 83,
+            "severeRecall": 0.6916666666666667
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 3,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "full340-balanced-seed43",
+      "featureGroup": "full340",
+      "weighting": "Balanced",
+      "seed": 43,
+      "features": 340,
+      "trees": 473,
+      "fitSeconds": 17.36547029099893,
+      "modelSha256": "df1cad805eb816252aafed709ea853f6a3bd5ea5ba5da5c9bb8a3d87ab189127",
+      "validation": {
+        "accuracy": 0.9070294784580499,
+        "macro_f1": 0.8222222222222223,
+        "balanced_accuracy": 0.8333333333333334,
+        "confusion_matrix": [
+          [
+            277,
+            0,
+            0
+          ],
+          [
+            0,
+            82,
+            0
+          ],
+          [
+            0,
+            41,
+            41
+          ]
+        ],
+        "log_loss": 0.17527863990657291,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 1.0,
+          "2": 0.5
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 11,
+            "severeRecall": 0.5
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 40,
+            "severeRecall": 0.5
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 1,
+            "severeRecall": 0.5
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.7233560090702947,
+        "macro_f1": 0.5615357643758766,
+        "balanced_accuracy": 0.6693766937669378,
+        "confusion_matrix": [
+          [
+            195,
+            0,
+            0
+          ],
+          [
+            0,
+            123,
+            0
+          ],
+          [
+            0,
+            122,
+            1
+          ]
+        ],
+        "log_loss": 0.3950715132848489,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 1.0,
+          "2": 0.008130081300813009
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 1,
+            "severeRecall": 0.008130081300813009
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 1,
+            "severeRecall": 0.03333333333333333
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 1,
+            "severeRecall": 0.024390243902439025
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 1,
+            "severeRecall": 0.008333333333333333
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "full340-balanced-seed44",
+      "featureGroup": "full340",
+      "weighting": "Balanced",
+      "seed": 44,
+      "features": 340,
+      "trees": 315,
+      "fitSeconds": 12.03169962496031,
+      "modelSha256": "4c3c57d4fe5cf95627735e6e9c4bccd593b6bb1071d66543e4144bbb4a94b208",
+      "validation": {
+        "accuracy": 0.9070294784580499,
+        "macro_f1": 0.8222222222222223,
+        "balanced_accuracy": 0.8333333333333334,
+        "confusion_matrix": [
+          [
+            277,
+            0,
+            0
+          ],
+          [
+            0,
+            82,
+            0
+          ],
+          [
+            0,
+            41,
+            41
+          ]
+        ],
+        "log_loss": 0.1872572461665501,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 1.0,
+          "2": 0.5
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 10,
+            "severeRecall": 0.5
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 11,
+            "severeRecall": 0.5
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 40,
+            "severeRecall": 0.5
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 1,
+            "severeRecall": 0.5
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.7437641723356009,
+        "macro_f1": 0.6118709028839509,
+        "balanced_accuracy": 0.6937669376693766,
+        "confusion_matrix": [
+          [
+            195,
+            0,
+            0
+          ],
+          [
+            0,
+            123,
+            0
+          ],
+          [
+            0,
+            113,
+            10
+          ]
+        ],
+        "log_loss": 0.4092567781335423,
+        "recall_by_class": {
+          "0": 1.0,
+          "1": 1.0,
+          "2": 0.08130081300813008
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 10,
+            "severeRecall": 0.08130081300813008
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 7,
+            "severeRecall": 0.23333333333333334
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 2,
+            "severeRecall": 0.06666666666666667
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 1,
+            "severeRecall": 0.03333333333333333
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 9,
+            "severeRecall": 0.21951219512195122
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 1,
+            "severeRecall": 0.024390243902439025
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 10,
+            "severeRecall": 0.08333333333333333
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 0,
+            "severeRecall": 0.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "shape53-none-seed42",
+      "featureGroup": "shape53",
+      "weighting": "None",
+      "seed": 42,
+      "features": 53,
+      "trees": 170,
+      "fitSeconds": 1.1032761660171673,
+      "modelSha256": "331ec169deff51cddb1c194117a41e36bbe41cfca026ea72b83aa707055b0422",
+      "validation": {
+        "accuracy": 0.8775510204081632,
+        "macro_f1": 0.7798593507662285,
+        "balanced_accuracy": 0.8033811746059699,
+        "confusion_matrix": [
+          [
+            269,
+            6,
+            2
+          ],
+          [
+            0,
+            36,
+            46
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.662023177327541,
+        "recall_by_class": {
+          "0": 0.9711191335740073,
+          "1": 0.43902439024390244,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.5102040816326531,
+        "macro_f1": 0.447423354816792,
+        "balanced_accuracy": 0.4956848030018762,
+        "confusion_matrix": [
+          [
+            114,
+            50,
+            31
+          ],
+          [
+            17,
+            9,
+            97
+          ],
+          [
+            15,
+            6,
+            102
+          ]
+        ],
+        "log_loss": 1.0724564389590125,
+        "recall_by_class": {
+          "0": 0.5846153846153846,
+          "1": 0.07317073170731707,
+          "2": 0.8292682926829268
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 102,
+            "severeRecall": 0.8292682926829268
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 29,
+            "severeRecall": 0.9666666666666667
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 16,
+            "severeRecall": 0.5333333333333333
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 24,
+            "severeRecall": 0.8
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 33,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 28,
+            "severeRecall": 0.6829268292682927
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 33,
+            "severeRecall": 0.8048780487804879
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 99,
+            "severeRecall": 0.825
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 3,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "shape53-none-seed43",
+      "featureGroup": "shape53",
+      "weighting": "None",
+      "seed": 43,
+      "features": 53,
+      "trees": 143,
+      "fitSeconds": 1.1793060839409009,
+      "modelSha256": "f80a242bd54c4e0f2340681b112421e6cf89b94a63ca99ed7459d038df28ea77",
+      "validation": {
+        "accuracy": 0.7256235827664399,
+        "macro_f1": 0.6689700442479624,
+        "balanced_accuracy": 0.7227554225000734,
+        "confusion_matrix": [
+          [
+            202,
+            8,
+            67
+          ],
+          [
+            0,
+            36,
+            46
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.6960960577020876,
+        "recall_by_class": {
+          "0": 0.7292418772563177,
+          "1": 0.43902439024390244,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.4217687074829932,
+        "macro_f1": 0.3356694807845159,
+        "balanced_accuracy": 0.43902439024390244,
+        "confusion_matrix": [
+          [
+            65,
+            24,
+            106
+          ],
+          [
+            1,
+            0,
+            122
+          ],
+          [
+            2,
+            0,
+            121
+          ]
+        ],
+        "log_loss": 1.1176429057420494,
+        "recall_by_class": {
+          "0": 0.3333333333333333,
+          "1": 0.0,
+          "2": 0.983739837398374
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 121,
+            "severeRecall": 0.983739837398374
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 28,
+            "severeRecall": 0.9333333333333333
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 33,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 40,
+            "severeRecall": 0.975609756097561
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 40,
+            "severeRecall": 0.975609756097561
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 118,
+            "severeRecall": 0.9833333333333333
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 3,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "shape53-none-seed44",
+      "featureGroup": "shape53",
+      "weighting": "None",
+      "seed": 44,
+      "features": 53,
+      "trees": 151,
+      "fitSeconds": 1.268988833995536,
+      "modelSha256": "13d46bd2dd47573fceb903e59d6ce7b01c799e3208a5f99038f0dffc336fd679",
+      "validation": {
+        "accuracy": 0.8390022675736961,
+        "macro_f1": 0.7572212476026553,
+        "balanced_accuracy": 0.7857855654368818,
+        "confusion_matrix": [
+          [
+            251,
+            0,
+            26
+          ],
+          [
+            1,
+            37,
+            44
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.6665022653820619,
+        "recall_by_class": {
+          "0": 0.9061371841155235,
+          "1": 0.45121951219512196,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.48072562358276644,
+        "macro_f1": 0.38389265055931726,
+        "balanced_accuracy": 0.480466958515739,
+        "confusion_matrix": [
+          [
+            94,
+            7,
+            94
+          ],
+          [
+            3,
+            0,
+            120
+          ],
+          [
+            5,
+            0,
+            118
+          ]
+        ],
+        "log_loss": 1.1165673694156117,
+        "recall_by_class": {
+          "0": 0.48205128205128206,
+          "1": 0.0,
+          "2": 0.959349593495935
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 118,
+            "severeRecall": 0.959349593495935
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 26,
+            "severeRecall": 0.8666666666666667
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 29,
+            "severeRecall": 0.9666666666666667
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 33,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 37,
+            "severeRecall": 0.9024390243902439
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 40,
+            "severeRecall": 0.975609756097561
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 115,
+            "severeRecall": 0.9583333333333334
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 3,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "shape53-balanced-seed42",
+      "featureGroup": "shape53",
+      "weighting": "Balanced",
+      "seed": 42,
+      "features": 53,
+      "trees": 95,
+      "fitSeconds": 0.7053849999792874,
+      "modelSha256": "24a447a0cb97b427f902f963224260047d201240fd8fe03171edf9b642725105",
+      "validation": {
+        "accuracy": 0.5668934240362812,
+        "macro_f1": 0.5619308253516625,
+        "balanced_accuracy": 0.6327962196589475,
+        "confusion_matrix": [
+          [
+            134,
+            137,
+            6
+          ],
+          [
+            3,
+            36,
+            43
+          ],
+          [
+            0,
+            2,
+            80
+          ]
+        ],
+        "log_loss": 0.7821327133438819,
+        "recall_by_class": {
+          "0": 0.48375451263537905,
+          "1": 0.43902439024390244,
+          "2": 0.975609756097561
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 39,
+            "severeRecall": 0.9512195121951219
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 18,
+            "severeRecall": 0.9
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 39,
+            "severeRecall": 0.9512195121951219
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 78,
+            "severeRecall": 0.975
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.37188208616780044,
+        "macro_f1": 0.36040757162495746,
+        "balanced_accuracy": 0.4154263081092349,
+        "confusion_matrix": [
+          [
+            29,
+            147,
+            19
+          ],
+          [
+            0,
+            37,
+            86
+          ],
+          [
+            4,
+            21,
+            98
+          ]
+        ],
+        "log_loss": 1.1189219954039458,
+        "recall_by_class": {
+          "0": 0.14871794871794872,
+          "1": 0.3008130081300813,
+          "2": 0.7967479674796748
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 98,
+            "severeRecall": 0.7967479674796748
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 20,
+            "severeRecall": 0.6666666666666666
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 15,
+            "severeRecall": 0.5
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 33,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 25,
+            "severeRecall": 0.6097560975609756
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 32,
+            "severeRecall": 0.7804878048780488
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 95,
+            "severeRecall": 0.7916666666666666
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 3,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "shape53-balanced-seed43",
+      "featureGroup": "shape53",
+      "weighting": "Balanced",
+      "seed": 43,
+      "features": 53,
+      "trees": 35,
+      "fitSeconds": 0.38878275000024587,
+      "modelSha256": "19dc695177ed219f56c106cd79ef46319e74052a0d230f700b87113248eb9042",
+      "validation": {
+        "accuracy": 0.4013605442176871,
+        "macro_f1": 0.4046245909919406,
+        "balanced_accuracy": 0.5249185524346218,
+        "confusion_matrix": [
+          [
+            68,
+            20,
+            189
+          ],
+          [
+            8,
+            27,
+            47
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.9005901985932855,
+        "recall_by_class": {
+          "0": 0.24548736462093862,
+          "1": 0.32926829268292684,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.30839002267573695,
+        "macro_f1": 0.19726438962681847,
+        "balanced_accuracy": 0.35555555555555557,
+        "confusion_matrix": [
+          [
+            13,
+            24,
+            158
+          ],
+          [
+            0,
+            0,
+            123
+          ],
+          [
+            0,
+            0,
+            123
+          ]
+        ],
+        "log_loss": 1.1278846311587385,
+        "recall_by_class": {
+          "0": 0.06666666666666667,
+          "1": 0.0,
+          "2": 1.0
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 123,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 33,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 120,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 3,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "shape53-balanced-seed44",
+      "featureGroup": "shape53",
+      "weighting": "Balanced",
+      "seed": 44,
+      "features": 53,
+      "trees": 135,
+      "fitSeconds": 0.9409349999623373,
+      "modelSha256": "2c4f155ff0648a06326f5be21191a6f8abe40f2c383858eb491603ee8e2084f8",
+      "validation": {
+        "accuracy": 0.6031746031746031,
+        "macro_f1": 0.5964417642256857,
+        "balanced_accuracy": 0.66349681547357,
+        "confusion_matrix": [
+          [
+            146,
+            5,
+            126
+          ],
+          [
+            0,
+            38,
+            44
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.7653438793665758,
+        "recall_by_class": {
+          "0": 0.5270758122743683,
+          "1": 0.4634146341463415,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.3287981859410431,
+        "macro_f1": 0.23562111253808768,
+        "balanced_accuracy": 0.37094017094017095,
+        "confusion_matrix": [
+          [
+            22,
+            54,
+            119
+          ],
+          [
+            0,
+            0,
+            123
+          ],
+          [
+            0,
+            0,
+            123
+          ]
+        ],
+        "log_loss": 1.1641678735529226,
+        "recall_by_class": {
+          "0": 0.11282051282051282,
+          "1": 0.0,
+          "2": 1.0
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 123,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 33,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 120,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 3,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "phase389-none-seed42",
+      "featureGroup": "phase389",
+      "weighting": "None",
+      "seed": 42,
+      "features": 389,
+      "trees": 120,
+      "fitSeconds": 7.31050875002984,
+      "modelSha256": "0fd08cfc7b136799672ad8c5d45e58ea5fc7d18ab77655635ef04ed172e98f4d",
+      "validation": {
+        "accuracy": 0.4489795918367347,
+        "macro_f1": 0.4470621212890724,
+        "balanced_accuracy": 0.5702210090692964,
+        "confusion_matrix": [
+          [
+            82,
+            39,
+            156
+          ],
+          [
+            0,
+            34,
+            48
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.8215617378541993,
+        "recall_by_class": {
+          "0": 0.296028880866426,
+          "1": 0.4146341463414634,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.30158730158730157,
+        "macro_f1": 0.21263795535640195,
+        "balanced_accuracy": 0.34842609964561183,
+        "confusion_matrix": [
+          [
+            12,
+            79,
+            104
+          ],
+          [
+            1,
+            1,
+            121
+          ],
+          [
+            0,
+            3,
+            120
+          ]
+        ],
+        "log_loss": 1.1268581431526479,
+        "recall_by_class": {
+          "0": 0.06153846153846154,
+          "1": 0.008130081300813009,
+          "2": 0.975609756097561
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 120,
+            "severeRecall": 0.975609756097561
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 29,
+            "severeRecall": 0.9666666666666667
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 31,
+            "severeRecall": 0.9393939393939394
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 38,
+            "severeRecall": 0.926829268292683
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 118,
+            "severeRecall": 0.9833333333333333
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 2,
+            "severeRecall": 0.6666666666666666
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "phase389-none-seed43",
+      "featureGroup": "phase389",
+      "weighting": "None",
+      "seed": 43,
+      "features": 389,
+      "trees": 85,
+      "fitSeconds": 5.926419125054963,
+      "modelSha256": "a66ad6e899477e2605300ae134747f43a2e586e07967b46cfeb65c394b48f587",
+      "validation": {
+        "accuracy": 0.4308390022675737,
+        "macro_f1": 0.45149540517961567,
+        "balanced_accuracy": 0.5634557248099558,
+        "confusion_matrix": [
+          [
+            73,
+            16,
+            188
+          ],
+          [
+            0,
+            35,
+            47
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.8275169916716598,
+        "recall_by_class": {
+          "0": 0.26353790613718414,
+          "1": 0.4268292682926829,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.2811791383219955,
+        "macro_f1": 0.16814385088496764,
+        "balanced_accuracy": 0.33404210965186576,
+        "confusion_matrix": [
+          [
+            2,
+            57,
+            136
+          ],
+          [
+            0,
+            0,
+            123
+          ],
+          [
+            0,
+            1,
+            122
+          ]
+        ],
+        "log_loss": 1.1670106557377031,
+        "recall_by_class": {
+          "0": 0.010256410256410256,
+          "1": 0.0,
+          "2": 0.991869918699187
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 122,
+            "severeRecall": 0.991869918699187
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 32,
+            "severeRecall": 0.9696969696969697
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 40,
+            "severeRecall": 0.975609756097561
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 120,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 2,
+            "severeRecall": 0.6666666666666666
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "phase389-none-seed44",
+      "featureGroup": "phase389",
+      "weighting": "None",
+      "seed": 44,
+      "features": 389,
+      "trees": 85,
+      "fitSeconds": 5.49169549997896,
+      "modelSha256": "b9d601487c3f210757a1ead3ec52e87606ecca550d9de1097d2836a84d0ab241",
+      "validation": {
+        "accuracy": 0.41043083900226757,
+        "macro_f1": 0.42984496124031013,
+        "balanced_accuracy": 0.5440403862522379,
+        "confusion_matrix": [
+          [
+            67,
+            14,
+            196
+          ],
+          [
+            0,
+            32,
+            50
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.89701572928731,
+        "recall_by_class": {
+          "0": 0.24187725631768953,
+          "1": 0.3902439024390244,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.2811791383219955,
+        "macro_f1": 0.15168345819340395,
+        "balanced_accuracy": 0.335042735042735,
+        "confusion_matrix": [
+          [
+            1,
+            10,
+            184
+          ],
+          [
+            0,
+            0,
+            123
+          ],
+          [
+            0,
+            0,
+            123
+          ]
+        ],
+        "log_loss": 1.1979155168644247,
+        "recall_by_class": {
+          "0": 0.005128205128205128,
+          "1": 0.0,
+          "2": 1.0
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 123,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 33,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 120,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 3,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "phase389-balanced-seed42",
+      "featureGroup": "phase389",
+      "weighting": "Balanced",
+      "seed": 42,
+      "features": 389,
+      "trees": 153,
+      "fitSeconds": 8.699184749973938,
+      "modelSha256": "f497bef66116086481d8452bcb32919ce326b89d006a8db31f449cbee1138018",
+      "validation": {
+        "accuracy": 0.5804988662131519,
+        "macro_f1": 0.5569817961832481,
+        "balanced_accuracy": 0.6457397786974259,
+        "confusion_matrix": [
+          [
+            138,
+            27,
+            112
+          ],
+          [
+            3,
+            36,
+            43
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.756195147521451,
+        "recall_by_class": {
+          "0": 0.4981949458483754,
+          "1": 0.43902439024390244,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.34467120181405897,
+        "macro_f1": 0.26721878711814745,
+        "balanced_accuracy": 0.38390660829685214,
+        "confusion_matrix": [
+          [
+            28,
+            73,
+            94
+          ],
+          [
+            0,
+            2,
+            121
+          ],
+          [
+            0,
+            1,
+            122
+          ]
+        ],
+        "log_loss": 1.135140246110071,
+        "recall_by_class": {
+          "0": 0.14358974358974358,
+          "1": 0.016260162601626018,
+          "2": 0.991869918699187
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 122,
+            "severeRecall": 0.991869918699187
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 32,
+            "severeRecall": 0.9696969696969697
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 40,
+            "severeRecall": 0.975609756097561
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 120,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 2,
+            "severeRecall": 0.6666666666666666
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "phase389-balanced-seed43",
+      "featureGroup": "phase389",
+      "weighting": "Balanced",
+      "seed": 43,
+      "features": 389,
+      "trees": 95,
+      "fitSeconds": 5.1886428750585765,
+      "modelSha256": "6ab58146aac9de3ebf025045a9a708ac5778b9369cef0729fe3749a4a142ab0f",
+      "validation": {
+        "accuracy": 0.7392290249433107,
+        "macro_f1": 0.6739827484983968,
+        "balanced_accuracy": 0.7356989815385518,
+        "confusion_matrix": [
+          [
+            206,
+            32,
+            39
+          ],
+          [
+            5,
+            38,
+            39
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.7699462450556643,
+        "recall_by_class": {
+          "0": 0.7436823104693141,
+          "1": 0.4634146341463415,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.36281179138321995,
+        "macro_f1": 0.30541055924637067,
+        "balanced_accuracy": 0.3975818219720659,
+        "confusion_matrix": [
+          [
+            36,
+            82,
+            77
+          ],
+          [
+            1,
+            7,
+            115
+          ],
+          [
+            0,
+            6,
+            117
+          ]
+        ],
+        "log_loss": 1.1116740672260153,
+        "recall_by_class": {
+          "0": 0.18461538461538463,
+          "1": 0.056910569105691054,
+          "2": 0.9512195121951219
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 117,
+            "severeRecall": 0.9512195121951219
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 29,
+            "severeRecall": 0.9666666666666667
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 28,
+            "severeRecall": 0.9333333333333333
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 30,
+            "severeRecall": 0.9090909090909091
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 40,
+            "severeRecall": 0.975609756097561
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 36,
+            "severeRecall": 0.8780487804878049
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 116,
+            "severeRecall": 0.9666666666666667
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 1,
+            "severeRecall": 0.3333333333333333
+          }
+        }
+      },
+      "serializationExact": true
+    },
+    {
+      "id": "phase389-balanced-seed44",
+      "featureGroup": "phase389",
+      "weighting": "Balanced",
+      "seed": 44,
+      "features": 389,
+      "trees": 95,
+      "fitSeconds": 5.491918584099039,
+      "modelSha256": "59c5ca03fdda162863a2133071039c4a1f7406f81c7304b31ae2b8e02dfb5f8b",
+      "validation": {
+        "accuracy": 0.41496598639455784,
+        "macro_f1": 0.4307772735204624,
+        "balanced_accuracy": 0.5464471251210706,
+        "confusion_matrix": [
+          [
+            69,
+            17,
+            191
+          ],
+          [
+            0,
+            32,
+            50
+          ],
+          [
+            0,
+            0,
+            82
+          ]
+        ],
+        "log_loss": 0.8750395435155176,
+        "recall_by_class": {
+          "0": 0.2490974729241877,
+          "1": 0.3902439024390244,
+          "2": 1.0
+        }
+      },
+      "validationSevereStrata": {
+        "cooler": {
+          "20": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 20,
+            "severeFound": 20,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 22,
+            "severeFound": 22,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          },
+          "130": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 80,
+            "severeFound": 80,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 2,
+            "severeFound": 2,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.2789115646258503,
+        "macro_f1": 0.1586073500967118,
+        "balanced_accuracy": 0.3333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            47,
+            148
+          ],
+          [
+            0,
+            0,
+            123
+          ],
+          [
+            0,
+            0,
+            123
+          ]
+        ],
+        "log_loss": 1.2164214083842833,
+        "recall_by_class": {
+          "0": 0.0,
+          "1": 0.0,
+          "2": 1.0
+        }
+      },
+      "testSevereStrata": {
+        "cooler": {
+          "100": {
+            "severeSupport": 123,
+            "severeFound": 123,
+            "severeRecall": 1.0
+          }
+        },
+        "valve": {
+          "73": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "80": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "90": {
+            "severeSupport": 30,
+            "severeFound": 30,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 33,
+            "severeFound": 33,
+            "severeRecall": 1.0
+          }
+        },
+        "accumulator": {
+          "90": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "100": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "115": {
+            "severeSupport": 41,
+            "severeFound": 41,
+            "severeRecall": 1.0
+          },
+          "130": {
+            "severeSupport": 0,
+            "severeFound": 0,
+            "severeRecall": null
+          }
+        },
+        "stability": {
+          "0": {
+            "severeSupport": 120,
+            "severeFound": 120,
+            "severeRecall": 1.0
+          },
+          "1": {
+            "severeSupport": 3,
+            "severeFound": 3,
+            "severeRecall": 1.0
+          }
+        }
+      },
+      "serializationExact": true
+    }
+  ],
+  "productionChanged": false,
+  "selection": {
+    "rule": "Highest mean validation balanced accuracy over seeds42/43/44; exact ties: lower mean unweighted log loss, fewer features, no weighting, lexical group name. No best-seed selection.",
+    "ranking": [
+      {
+        "featureGroup": "full340",
+        "weighting": "Balanced",
+        "features": 340,
+        "meanValidationBalancedAccuracy": 0.8401084010840109,
+        "meanValidationLogLoss": 0.1724783998792406
+      },
+      {
+        "featureGroup": "shape53",
+        "weighting": "None",
+        "features": 53,
+        "meanValidationBalancedAccuracy": 0.7706407208476418,
+        "meanValidationLogLoss": 0.6748738334705635
+      },
+      {
+        "featureGroup": "full340",
+        "weighting": "None",
+        "features": 340,
+        "meanValidationBalancedAccuracy": 0.7696476964769646,
+        "meanValidationLogLoss": 0.2303077061535607
+      },
+      {
+        "featureGroup": "phase389",
+        "weighting": "Balanced",
+        "features": 389,
+        "meanValidationBalancedAccuracy": 0.6426286284523495,
+        "meanValidationLogLoss": 0.800393645364211
+      },
+      {
+        "featureGroup": "shape53",
+        "weighting": "Balanced",
+        "features": 53,
+        "meanValidationBalancedAccuracy": 0.6070705291890465,
+        "meanValidationLogLoss": 0.8160222637679144
+      },
+      {
+        "featureGroup": "phase389",
+        "weighting": "None",
+        "features": 389,
+        "meanValidationBalancedAccuracy": 0.55923904004383,
+        "meanValidationLogLoss": 0.848698152937723
+      }
+    ],
+    "winner": {
+      "featureGroup": "full340",
+      "weighting": "Balanced",
+      "features": 340,
+      "meanValidationBalancedAccuracy": 0.8401084010840109,
+      "meanValidationLogLoss": 0.1724783998792406
+    },
+    "representativeSeed": 42,
+    "testPredictionsAvailableAtSelection": false,
+    "frozenAt": "2026-11-13T21:13:13.938749+00:00"
+  },
+  "selectionSha256": "7c99df426dfd359b22525183f166e76be57e2dde2c5028c80d4e17c6c3b375a0",
+  "testEvaluationStartedAt": "2026-11-13T21:13:13.939574+00:00",
+  "historicalBaselineReproduced": true,
+  "finishedAt": "2026-11-13T21:13:14.056994+00:00",
+  "totalSeconds": 122.63692700001411,
+  "processPeakRSSBytes": 1130561536,
+  "memoryScope": "Peak resident memory of this whole process, including raw feature extraction and all18models; not individual model memory. Not measured where the resource module is unavailable.",
+  "host": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "python": "3.12.12"
+  },
+  "rawReportSha256": "e8552702abe4f6ac7cbe947ecff5f6418ad5ea43c240ec68fdef77f411ce42eb",
+  "status": "completed_diagnostic_experiment_not_deployed",
+  "auditSources": {
+    "audit.json": "183862de4858b4f19217aa1e4f62e935763921ed33f5c11d20a79e0c39d43c96",
+    "feature-audit.json": "714871afc6e8c7895b78fa00b76ad60ed4c1cd0c378d4ed8e097bd9d8ce71cbb"
+  },
+  "additionalRuntimeDependencies": {
+    "threadpoolctl": "3.8.0"
+  },
+  "setupAttempt": {
+    "firstAttemptCompletedFits": 0,
+    "testPredictions": 0,
+    "note": "CatBoost rejects use_weights=false when no weights are set. Before any completed fit, use plain MultiClass for None and MultiClass:use_weights=false for Balanced; both validation metrics are unweighted. Failed attempt retained locally; successful protocol frozen anew before18fits."
+  },
+  "armSummaries": [
+    {
+      "featureGroup": "full340",
+      "weighting": "Balanced",
+      "features": 340,
+      "meanValidationBalancedAccuracy": 0.8401084010840109,
+      "meanValidationLogLoss": 0.1724783998792406,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "test": {
+        "accuracy": {
+          "mean": 0.7944066515495086,
+          "min": 0.7233560090702947,
+          "max": 0.9160997732426304,
+          "populationStdAcrossSeeds": 0.08645243463904895
+        },
+        "balanced_accuracy": {
+          "mean": 0.7542908762420958,
+          "min": 0.6693766937669378,
+          "max": 0.8997289972899729,
+          "populationStdAcrossSeeds": 0.10332120237349751
+        },
+        "macro_f1": {
+          "mean": 0.6902716066096167,
+          "min": 0.5615357643758766,
+          "max": 0.8974081525690228,
+          "populationStdAcrossSeeds": 0.14790214793606304
+        },
+        "log_loss": {
+          "mean": 0.3690981963218206,
+          "min": 0.30296629754707066,
+          "max": 0.4092567781335423,
+          "populationStdAcrossSeeds": 0.04711953919817287
+        }
+      },
+      "validation": {
+        "accuracy": {
+          "mean": 0.9108087679516251,
+          "min": 0.9070294784580499,
+          "max": 0.9183673469387755,
+          "populationStdAcrossSeeds": 0.005344722457948194
+        },
+        "balanced_accuracy": {
+          "mean": 0.8401084010840109,
+          "min": 0.8333333333333334,
+          "max": 0.8536585365853658,
+          "populationStdAcrossSeeds": 0.009581392699004683
+        },
+        "macro_f1": {
+          "mean": 0.8302314814814815,
+          "min": 0.8222222222222223,
+          "max": 0.84625,
+          "populationStdAcrossSeeds": 0.011326803069006672
+        },
+        "log_loss": {
+          "mean": 0.1724783998792406,
+          "min": 0.15489931356459882,
+          "max": 0.1872572461665501,
+          "populationStdAcrossSeeds": 0.013357643472961108
+        }
+      },
+      "fitSecondsTotal": 41.45199633296579,
+      "testSevereFoundBySeed": {
+        "42": 86,
+        "43": 1,
+        "44": 10
+      },
+      "validationCooler100SevereFoundBySeed": {
+        "42": 5,
+        "43": 0,
+        "44": 0
+      }
+    },
+    {
+      "featureGroup": "shape53",
+      "weighting": "None",
+      "features": 53,
+      "meanValidationBalancedAccuracy": 0.7706407208476418,
+      "meanValidationLogLoss": 0.6748738334705635,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "test": {
+        "accuracy": {
+          "mean": 0.47089947089947093,
+          "min": 0.4217687074829932,
+          "max": 0.5102040816326531,
+          "populationStdAcrossSeeds": 0.036766096771021335
+        },
+        "balanced_accuracy": {
+          "mean": 0.4717253839205059,
+          "min": 0.43902439024390244,
+          "max": 0.4956848030018762,
+          "populationStdAcrossSeeds": 0.023943154042843605
+        },
+        "macro_f1": {
+          "mean": 0.38899516205354173,
+          "min": 0.3356694807845159,
+          "max": 0.447423354816792,
+          "populationStdAcrossSeeds": 0.04576577183854748
+        },
+        "log_loss": {
+          "mean": 1.1022222380388913,
+          "min": 1.0724564389590125,
+          "max": 1.1176429057420494,
+          "populationStdAcrossSeeds": 0.021052177888049993
+        }
+      },
+      "validation": {
+        "accuracy": {
+          "mean": 0.8140589569160998,
+          "min": 0.7256235827664399,
+          "max": 0.8775510204081632,
+          "populationStdAcrossSeeds": 0.06448314062355603
+        },
+        "balanced_accuracy": {
+          "mean": 0.7706407208476417,
+          "min": 0.7227554225000734,
+          "max": 0.8033811746059699,
+          "populationStdAcrossSeeds": 0.0346136072846556
+        },
+        "macro_f1": {
+          "mean": 0.7353502142056154,
+          "min": 0.6689700442479624,
+          "max": 0.7798593507662285,
+          "populationStdAcrossSeeds": 0.04783907852663497
+        },
+        "log_loss": {
+          "mean": 0.6748738334705635,
+          "min": 0.662023177327541,
+          "max": 0.6960960577020876,
+          "populationStdAcrossSeeds": 0.015117377604374248
+        }
+      },
+      "fitSecondsTotal": 3.551571083953604,
+      "testSevereFoundBySeed": {
+        "42": 102,
+        "43": 121,
+        "44": 118
+      },
+      "validationCooler100SevereFoundBySeed": {
+        "42": 41,
+        "43": 41,
+        "44": 41
+      }
+    },
+    {
+      "featureGroup": "full340",
+      "weighting": "None",
+      "features": 340,
+      "meanValidationBalancedAccuracy": 0.7696476964769646,
+      "meanValidationLogLoss": 0.2303077061535607,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "test": {
+        "accuracy": {
+          "mean": 0.6810279667422525,
+          "min": 0.5986394557823129,
+          "max": 0.7278911564625851,
+          "populationStdAcrossSeeds": 0.0584410635830014
+        },
+        "balanced_accuracy": {
+          "mean": 0.6187895212285457,
+          "min": 0.5203252032520326,
+          "max": 0.6747967479674797,
+          "populationStdAcrossSeeds": 0.06984419794066017
+        },
+        "macro_f1": {
+          "mean": 0.5432841056581759,
+          "min": 0.4388245388245388,
+          "max": 0.6070089999185354,
+          "populationStdAcrossSeeds": 0.07445798994783843
+        },
+        "log_loss": {
+          "mean": 0.5111273902914255,
+          "min": 0.46612268670244766,
+          "max": 0.5883563417605762,
+          "populationStdAcrossSeeds": 0.054857805405122945
+        }
+      },
+      "validation": {
+        "accuracy": {
+          "mean": 0.8715041572184429,
+          "min": 0.8276643990929705,
+          "max": 0.9024943310657596,
+          "populationStdAcrossSeeds": 0.031871759096459576
+        },
+        "balanced_accuracy": {
+          "mean": 0.7696476964769647,
+          "min": 0.6910569105691057,
+          "max": 0.8252032520325203,
+          "populationStdAcrossSeeds": 0.05713595838023852
+        },
+        "macro_f1": {
+          "mean": 0.7776477428503441,
+          "min": 0.7200616975709355,
+          "max": 0.8170822947553287,
+          "populationStdAcrossSeeds": 0.04163617500279767
+        },
+        "log_loss": {
+          "mean": 0.2303077061535607,
+          "min": 0.19717952360672547,
+          "max": 0.2659232704318482,
+          "populationStdAcrossSeeds": 0.028119577791965694
+        }
+      },
+      "fitSecondsTotal": 26.138324165949598,
+      "testSevereFoundBySeed": {
+        "42": 6,
+        "43": 0,
+        "44": 17
+      },
+      "validationCooler100SevereFoundBySeed": {
+        "42": 0,
+        "43": 0,
+        "44": 0
+      }
+    },
+    {
+      "featureGroup": "phase389",
+      "weighting": "Balanced",
+      "features": 389,
+      "meanValidationBalancedAccuracy": 0.6426286284523495,
+      "meanValidationLogLoss": 0.800393645364211,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "test": {
+        "accuracy": {
+          "mean": 0.3287981859410431,
+          "min": 0.2789115646258503,
+          "max": 0.36281179138321995,
+          "populationStdAcrossSeeds": 0.03604419959959597
+        },
+        "balanced_accuracy": {
+          "mean": 0.3716072545340838,
+          "min": 0.3333333333333333,
+          "max": 0.3975818219720659,
+          "populationStdAcrossSeeds": 0.02763358645231837
+        },
+        "macro_f1": {
+          "mean": 0.24374556548707665,
+          "min": 0.1586073500967118,
+          "max": 0.30541055924637067,
+          "populationStdAcrossSeeds": 0.06218809990379
+        },
+        "log_loss": {
+          "mean": 1.154411907240123,
+          "min": 1.1116740672260153,
+          "max": 1.2164214083842833,
+          "populationStdAcrossSeeds": 0.044881689376740405
+        }
+      },
+      "validation": {
+        "accuracy": {
+          "mean": 0.5782312925170068,
+          "min": 0.41496598639455784,
+          "max": 0.7392290249433107,
+          "populationStdAcrossSeeds": 0.13238954127892952
+        },
+        "balanced_accuracy": {
+          "mean": 0.6426286284523495,
+          "min": 0.5464471251210706,
+          "max": 0.7356989815385518,
+          "populationStdAcrossSeeds": 0.07729306019409207
+        },
+        "macro_f1": {
+          "mean": 0.5539139394007024,
+          "min": 0.4307772735204624,
+          "max": 0.6739827484983968,
+          "populationStdAcrossSeeds": 0.09931191460490973
+        },
+        "log_loss": {
+          "mean": 0.800393645364211,
+          "min": 0.756195147521451,
+          "max": 0.8750395435155176,
+          "populationStdAcrossSeeds": 0.05308032123716091
+        }
+      },
+      "fitSecondsTotal": 19.379746209131554,
+      "testSevereFoundBySeed": {
+        "42": 122,
+        "43": 117,
+        "44": 123
+      },
+      "validationCooler100SevereFoundBySeed": {
+        "42": 41,
+        "43": 41,
+        "44": 41
+      }
+    },
+    {
+      "featureGroup": "shape53",
+      "weighting": "Balanced",
+      "features": 53,
+      "meanValidationBalancedAccuracy": 0.6070705291890465,
+      "meanValidationLogLoss": 0.8160222637679144,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "test": {
+        "accuracy": {
+          "mean": 0.3363567649281935,
+          "min": 0.30839002267573695,
+          "max": 0.37188208616780044,
+          "populationStdAcrossSeeds": 0.026465822222239747
+        },
+        "balanced_accuracy": {
+          "mean": 0.3806406782016538,
+          "min": 0.35555555555555557,
+          "max": 0.4154263081092349,
+          "populationStdAcrossSeeds": 0.02538636948815298
+        },
+        "macro_f1": {
+          "mean": 0.2644310245966212,
+          "min": 0.19726438962681847,
+          "max": 0.36040757162495746,
+          "populationStdAcrossSeeds": 0.06964879866269436
+        },
+        "log_loss": {
+          "mean": 1.1369915000385356,
+          "min": 1.1189219954039458,
+          "max": 1.1641678735529226,
+          "populationStdAcrossSeeds": 0.019561844970305133
+        }
+      },
+      "validation": {
+        "accuracy": {
+          "mean": 0.5238095238095238,
+          "min": 0.4013605442176871,
+          "max": 0.6031746031746031,
+          "populationStdAcrossSeeds": 0.08784226561372488
+        },
+        "balanced_accuracy": {
+          "mean": 0.6070705291890465,
+          "min": 0.5249185524346218,
+          "max": 0.66349681547357,
+          "populationStdAcrossSeeds": 0.05942694175393203
+        },
+        "macro_f1": {
+          "mean": 0.5209990601897629,
+          "min": 0.4046245909919406,
+          "max": 0.5964417642256857,
+          "populationStdAcrossSeeds": 0.08348658190111678
+        },
+        "log_loss": {
+          "mean": 0.8160222637679144,
+          "min": 0.7653438793665758,
+          "max": 0.9005901985932855,
+          "populationStdAcrossSeeds": 0.06019007635289252
+        }
+      },
+      "fitSecondsTotal": 2.0351027499418706,
+      "testSevereFoundBySeed": {
+        "42": 98,
+        "43": 123,
+        "44": 123
+      },
+      "validationCooler100SevereFoundBySeed": {
+        "42": 39,
+        "43": 41,
+        "44": 41
+      }
+    },
+    {
+      "featureGroup": "phase389",
+      "weighting": "None",
+      "features": 389,
+      "meanValidationBalancedAccuracy": 0.55923904004383,
+      "meanValidationLogLoss": 0.848698152937723,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "test": {
+        "accuracy": {
+          "mean": 0.28798185941043086,
+          "min": 0.2811791383219955,
+          "max": 0.30158730158730157,
+          "populationStdAcrossSeeds": 0.009620500424306754
+        },
+        "balanced_accuracy": {
+          "mean": 0.33917031478007087,
+          "min": 0.33404210965186576,
+          "max": 0.34842609964561183,
+          "populationStdAcrossSeeds": 0.006557564481883799
+        },
+        "macro_f1": {
+          "mean": 0.17748842147825786,
+          "min": 0.15168345819340395,
+          "max": 0.21263795535640195,
+          "populationStdAcrossSeeds": 0.025746888883620107
+        },
+        "log_loss": {
+          "mean": 1.163928105251592,
+          "min": 1.1268581431526479,
+          "max": 1.1979155168644247,
+          "populationStdAcrossSeeds": 0.02909082533295042
+        }
+      },
+      "validation": {
+        "accuracy": {
+          "mean": 0.43008314436885864,
+          "min": 0.41043083900226757,
+          "max": 0.4489795918367347,
+          "populationStdAcrossSeeds": 0.015746535643234815
+        },
+        "balanced_accuracy": {
+          "mean": 0.5592390400438301,
+          "min": 0.5440403862522379,
+          "max": 0.5702210090692964,
+          "populationStdAcrossSeeds": 0.011096292942087405
+        },
+        "macro_f1": {
+          "mean": 0.44280082923633274,
+          "min": 0.42984496124031013,
+          "max": 0.45149540517961567,
+          "populationStdAcrossSeeds": 0.009338250662777967
+        },
+        "log_loss": {
+          "mean": 0.848698152937723,
+          "min": 0.8215617378541993,
+          "max": 0.89701572928731,
+          "populationStdAcrossSeeds": 0.034252079257871035
+        }
+      },
+      "fitSecondsTotal": 18.728623375063762,
+      "testSevereFoundBySeed": {
+        "42": 120,
+        "43": 122,
+        "44": 123
+      },
+      "validationCooler100SevereFoundBySeed": {
+        "42": 41,
+        "43": 41,
+        "44": 41
+      }
+    }
+  ],
+  "conclusion": {
+    "selectedFeatureGroup": "full340",
+    "selectedWeighting": "Balanced",
+    "selectionUsedTest": false,
+    "representativeSeed": 42,
+    "representativeWasFixedBeforeFit": true,
+    "decision": "Retain as a research candidate; no production integration or old artifact replacement.",
+    "limitations": [
+      "Historical test was reused after earlier analyses and is not a fresh holdout.",
+      "Balanced improves mean scores but severe recall varies strongly between fitting seeds; no independent-regime guarantee.",
+      "High severe recall in normalized-feature arms accompanies many false positives and weak-leak errors; it is not a diagnostic improvement.",
+      "Validation cooler100 severe consists of one41-cycle block, confounded with accumulator130; do not claim cooler alone caused errors.",
+      "Physical leak severity transfer requires additional independent operating-condition groups and equipment validation."
+    ]
+  },
+  "independentVerification": {
+    "metricsRecomputedFromSavedTestProbabilities": 18,
+    "implementation": "scikit-learn",
+    "metrics": [
+      "accuracy",
+      "balanced_accuracy",
+      "macro_f1",
+      "log_loss",
+      "confusion_matrix"
+    ],
+    "absoluteTolerance": 1e-12,
+    "passed": true,
+    "targetedTestsPassed": 13,
+    "verifiedBy": "independent root-agent review"
+  }
+}
