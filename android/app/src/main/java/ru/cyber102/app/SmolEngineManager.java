@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Trace;
 import android.os.StatFs;
 import android.util.Base64;
 import org.json.JSONArray;
@@ -35,7 +36,8 @@ final class SmolEngineManager {
     private final Handler main = new Handler(Looper.getMainLooper());
     // JNI owns one process-wide engine. Recreated activities must use the same
     // queue, and old activity teardown may never unload a new owner's session.
-    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(
+            task -> new Thread(task, "Cyber102-smol"));
     private static final AtomicReference<SmolEngineManager> OWNER = new AtomicReference<>();
     private final ExecutorService executor = EXECUTOR;
     private final AtomicBoolean busy = new AtomicBoolean();
@@ -102,10 +104,13 @@ final class SmolEngineManager {
         if (loaded) { emit(snapshot()); return; }
         int token = start("");
         if (token < 0) return;
-        final long epoch = SmolNative.isAvailable() ? SmolNative.beginOperation() : 0;
         executor.execute(() -> {
+            Trace.beginSection("Cyber102.smol.prepare");
             try {
-                if (!SmolNative.isAvailable()) throw new IOException("Эта сборка модели требует Android arm64-v8a.");
+                check(token);
+                if (!SmolNative.initialize()) throw new IOException("Не удалось загрузить движок SmolVLM. Требуется Android arm64-v8a.");
+                long epoch = SmolNative.beginOperation();
+                check(token);
                 status("preparing", "Проверяем и подготавливаем модель на телефоне…", 0);
                 List<ModelFile> files = manifest();
                 status("preparing", "Проверяем файлы " + modelId + " на телефоне…", 0);
@@ -123,7 +128,11 @@ final class SmolEngineManager {
                 if (OWNER.get() == this && SmolNative.isAvailable()) SmolNative.unload();
                 if (token != generation.get()) status("idle", "Подготовка модели отменена.", 0);
                 else status("error", safeMessage(error), 0);
-            } finally { busy.set(false); emit(snapshot()); }
+            } finally {
+                Trace.endSection();
+                busy.set(false);
+                emit(snapshot());
+            }
         });
     }
 
@@ -153,7 +162,13 @@ final class SmolEngineManager {
                 image = File.createTempFile("smol-frame-", ".jpg", context.getCacheDir());
                 try (FileOutputStream output = new FileOutputStream(image)) { output.write(jpeg); }
                 status("analyzing", "SmolVLM рассматривает кадр на телефоне…", 0);
-                JSONObject result = new JSONObject(SmolNative.analyze(image.getAbsolutePath(), PROMPT, 64, epoch));
+                JSONObject result;
+                Trace.beginSection("Cyber102.smol.inference");
+                try {
+                    result = new JSONObject(SmolNative.analyze(image.getAbsolutePath(), PROMPT, 64, epoch));
+                } finally {
+                    Trace.endSection();
+                }
                 check(token);
                 if (result.optBoolean("cancelled")) throw new IOException("Операция отменена.");
                 String text = result.optString("text", "").trim();
@@ -305,7 +320,14 @@ final class SmolEngineManager {
 
     void cancel() {
         generation.incrementAndGet();
-        if (OWNER.get() == this && SmolNative.isAvailable()) SmolNative.cancel();
+        if (OWNER.get() == this && SmolNative.isAvailable()) {
+            Trace.beginSection("Cyber102.smol.cancel");
+            try {
+                SmolNative.cancel();
+            } finally {
+                Trace.endSection();
+            }
+        }
         if (busy.get()) status("cancelling", "Останавливаем текущую операцию…", 0);
     }
 

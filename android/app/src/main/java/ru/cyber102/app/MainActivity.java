@@ -8,11 +8,15 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import android.content.ActivityNotFoundException;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.os.Trace;
+import android.util.Log;
 import android.provider.Settings;
 import android.view.View;
 import android.webkit.*;
@@ -49,13 +53,16 @@ public final class MainActivity extends ComponentActivity {
     private static final int ACCENT = 0xff176451;
     private static final int OUTLINE = 0xffd6e1de;
     private static final int MAX_RECENT = 4;
+    private static final ExecutorService PREFERENCES_IO = Executors.newSingleThreadExecutor(
+            task -> new Thread(task, "Cyber102-prefs"));
     private LinearLayout root;
     private FrameLayout content;
     private volatile WebView web;
     private TextView status;
     private ProgressBar progress;
     private PermissionRequest pendingCamera;
-    private volatile String activeUrl;
+    private volatile String activeUrl = DEMO;
+    private List<String> recent = new ArrayList<>();
     private boolean foreground;
     private boolean failed;
     private final ExecutorService network = Executors.newSingleThreadExecutor();
@@ -154,9 +161,33 @@ public final class MainActivity extends ComponentActivity {
         content = new FrameLayout(this);
         root.addView(content, new LinearLayout.LayoutParams(-1, 0, 1));
         setContentView(root);
-        activeUrl = getPreferences(MODE_PRIVATE).getString("address", DEMO);
-        if (isDemo()) showWelcome();
-        else load(activeUrl);
+        settings.setEnabled(false);
+        status.setText("Открываем настройки…");
+        Context app = getApplicationContext();
+        String preferencesName = getLocalClassName();
+        PREFERENCES_IO.execute(() -> {
+            String savedAddress = DEMO;
+            List<String> savedRecent = new ArrayList<>();
+            Trace.beginSection("Cyber102.preferences.read");
+            try {
+                SharedPreferences preferences = app.getSharedPreferences(preferencesName, MODE_PRIVATE);
+                savedAddress = preferences.getString("address", DEMO);
+                savedRecent = parseRecentServers(preferences.getString("recent_servers", "[]"));
+            } catch (IllegalStateException | ClassCastException error) {
+                Log.w("Cyber102", "Unable to read saved settings", error);
+            } finally {
+                Trace.endSection();
+            }
+            String address = savedAddress;
+            List<String> servers = savedRecent;
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                recent = servers;
+                settings.setEnabled(true);
+                if (DEMO.equals(address)) showWelcome();
+                else load(address);
+            });
+        });
     }
 
     private void showWelcome() {
@@ -577,7 +608,7 @@ public final class MainActivity extends ComponentActivity {
         form.addView(user);
         EditText secret = input("Пароль", android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
         form.addView(secret);
-        List<String> recent = recentServers();
+        List<String> recent = new ArrayList<>(this.recent);
         if (!recent.isEmpty()) form.addView(button("Недавние серверы", () ->
                 new AlertDialog.Builder(this).setTitle("Недавние серверы")
                         .setItems(recent.toArray(new String[0]), (d, which) -> {
@@ -657,9 +688,8 @@ public final class MainActivity extends ComponentActivity {
     private static String origin(Uri url) {
         return "https://" + url.getEncodedAuthority();
     }
-    private List<String> recentServers() {
+    private static List<String> parseRecentServers(String saved) {
         List<String> items = new ArrayList<>();
-        String saved = getPreferences(MODE_PRIVATE).getString("recent_servers", "[]");
         try {
             JSONArray addresses = new JSONArray(saved);
             for (int i = 0; i < addresses.length() && items.size() < MAX_RECENT; i++) {
@@ -672,12 +702,28 @@ public final class MainActivity extends ComponentActivity {
         return items;
     }
     private void rememberServer(String target) {
-        List<String> items = recentServers();
         String address = origin(Uri.parse(target));
-        items.remove(address);
-        items.add(0, address);
-        JSONArray saved = new JSONArray(items.subList(0, Math.min(items.size(), MAX_RECENT)));
-        getPreferences(MODE_PRIVATE).edit().putString("recent_servers", saved.toString()).apply();
+        recent.remove(address);
+        recent.add(0, address);
+        if (recent.size() > MAX_RECENT) recent.remove(MAX_RECENT);
+        writePreference("recent_servers", new JSONArray(recent).toString());
+    }
+    private void writePreference(String key, String value) {
+        Context app = getApplicationContext();
+        String name = getLocalClassName();
+        // commit runs on our executor. A pending apply would be drained by
+        // Android on the main thread during a lifecycle transition.
+        PREFERENCES_IO.execute(() -> {
+            Trace.beginSection("Cyber102.preferences.write");
+            try {
+                boolean saved = app.getSharedPreferences(name, MODE_PRIVATE).edit().putString(key, value).commit();
+                if (!saved) Log.w("Cyber102", "Unable to save preference: " + key);
+            } catch (IllegalStateException error) {
+                Log.w("Cyber102", "Unable to save preference: " + key, error);
+            } finally {
+                Trace.endSection();
+            }
+        });
     }
     private static String validatedUrl(String value) {
         try {
@@ -700,7 +746,7 @@ public final class MainActivity extends ComponentActivity {
             login = null;
             password = null;
         }
-        getPreferences(MODE_PRIVATE).edit().putString("address", url).apply();
+        writePreference("address", url);
         load(url);
     }
     private Button button(String label, Runnable action) {

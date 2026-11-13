@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Debug;
@@ -60,11 +61,22 @@ public final class OfflineInferenceTest {
         Context target = instrumentation.getTargetContext();
         assertEquals("Run this test with airplane mode enabled", 1,
                 Settings.Global.getInt(target.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0));
-        assertTrue("arm64 native library must load", SmolNative.isAvailable());
-        target.getSharedPreferences("MainActivity", Context.MODE_PRIVATE).edit().clear().commit();
+        SharedPreferences settings = target.getSharedPreferences("MainActivity", Context.MODE_PRIVATE);
+        String originalAddress = settings.getString("address", null);
+        assertTrue(settings.edit().remove("address").commit());
         Intent intent = new Intent(target, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         Activity activity = instrumentation.startActivitySync(intent);
+        String originalHistory = null;
+        boolean historyCaptured = false;
         try {
+            long startupDeadline = SystemClock.elapsedRealtime() + 60000;
+            AtomicReference<Button> choice = new AtomicReference<>();
+            while (choice.get() == null && SystemClock.elapsedRealtime() < startupDeadline) {
+                instrumentation.runOnMainSync(() -> choice.set(findButton(
+                        activity.getWindow().getDecorView(), "Офлайн на телефоне")));
+                if (choice.get() == null) SystemClock.sleep(100);
+            }
+            assertFalse("Opening settings must not load the native library", SmolNative.isAvailable());
             instrumentation.runOnMainSync(() -> {
                 Button offline = findButton(activity.getWindow().getDecorView(), "Офлайн на телефоне");
                 assertNotNull("Offline entry is visible without a server", offline);
@@ -74,6 +86,7 @@ public final class OfflineInferenceTest {
             });
             await("offline page and native bridge", "Boolean(window.CyberOffline?.enabled && window.CyberSmolNative)", 60000);
             await("real weights prepared and loaded", "JSON.parse(CyberSmolNative.state()).loaded", 240000);
+            assertTrue("arm64 native library must load in the model worker", SmolNative.isAvailable());
             assertTrue(SmolNative.isLoaded());
             assertEquals("https://appassets.androidplatform.net/offline/index.html", stringJs("location.href"));
             // Reject a web network request by CSP even if the device's network changes.
@@ -96,6 +109,8 @@ public final class OfflineInferenceTest {
             assertTrue(observation.trim().length() > 2);
             assertEquals("true", js("document.getElementById('detection').hidden || getComputedStyle(document.getElementById('detection')).display==='none'"));
             assertEquals("true", js("document.getElementById('inspection-workflow').hidden"));
+            originalHistory = js("localStorage.getItem('cyber102.offline.inspections.v1')");
+            historyCaptured = true;
             js("document.getElementById('offline-note').value='Android instrumentation: actual GGUF in airplane mode';document.getElementById('offline-save').click();true");
             JSONObject saved = new JSONArray(stringJs("localStorage.getItem('cyber102.offline.inspections.v1')")).getJSONObject(0);
             assertEquals("on_device", saved.getString("source"));
@@ -112,8 +127,10 @@ public final class OfflineInferenceTest {
             js("document.getElementById('check').click();true");
             await("second inference started", "JSON.parse(CyberSmolNative.state()).state === 'analyzing'", 10000);
             SystemClock.sleep(1000);
+            long cancelStarted = SystemClock.elapsedRealtime();
             js("document.getElementById('offline-cancel').click();true");
             await("cancel finishes", "!JSON.parse(CyberSmolNative.state()).busy && !document.getElementById('check').disabled", 60000);
+            long cancelMs = SystemClock.elapsedRealtime() - cancelStarted;
             assertEquals("true", js("document.getElementById('offline-result').hidden"));
             // Cancellation must leave the same warm model usable.
             assertTrue(SmolNative.isLoaded());
@@ -121,8 +138,25 @@ public final class OfflineInferenceTest {
             await("warm inference after cancellation", "!document.getElementById('offline-result').hidden", 240000);
             assertTrue(stringJs("document.querySelector('#offline-result .offline-observation').textContent").trim().length() > 2);
             assertEquals(1, Settings.Global.getInt(target.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0));
+            assertEquals("https://appassets.androidplatform.net/offline/index.html",
+                    target.getSharedPreferences("MainActivity", Context.MODE_PRIVATE).getString("address", ""));
+            Bundle cancellation = new Bundle();
+            cancellation.putString("stream", "\nOFFLINE_CANCEL_MS " + cancelMs + "\n");
+            instrumentation.sendStatus(0, cancellation);
         } finally {
-            instrumentation.runOnMainSync(activity::finish);
+            try {
+                if (historyCaptured) {
+                    String key = "'cyber102.offline.inspections.v1'";
+                    if ("null".equals(originalHistory)) js("localStorage.removeItem(" + key + ")");
+                    else js("localStorage.setItem(" + key + "," + originalHistory + ")");
+                }
+            } finally {
+                instrumentation.runOnMainSync(activity::finish);
+                SharedPreferences.Editor restore = settings.edit();
+                if (originalAddress == null) restore.remove("address");
+                else restore.putString("address", originalAddress);
+                assertTrue(restore.commit());
+            }
         }
     }
 
