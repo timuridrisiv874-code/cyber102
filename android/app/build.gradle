@@ -7,11 +7,15 @@ android {
         applicationId 'ru.cyber102.app'
         minSdk 26
         targetSdk 36
-        versionCode 4
-        versionName '0.4-test'
+        versionCode 6
+        versionName '0.6-test'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+}
+
+dependencies {
+    implementation "androidx.activity:activity:1.10.1"
 }

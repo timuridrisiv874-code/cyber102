@@ -3,7 +3,7 @@ import json
 import unittest
 from io import BytesIO
 from unittest.mock import Mock, patch
-from urllib.error import URLError
+from urllib.error import URLError, HTTPError
 
 from server import vision
 
@@ -129,6 +129,44 @@ class VisionTest(unittest.TestCase):
         result.pop("durationSeconds")
         self.assertEqual(result, {"status": "unusable", "source": "local_vision", "model": vision.INTERNVL_MODEL})
 
+    def test_fast_profile_and_stage_metrics_are_propagated(self):
+        metrics = dict(preprocessMs=20, generateMs=2100, decodeMs=2, totalMs=2122,
+                       inputTokens=1400, outputTokens=105, patches=1)
+        with patch.object(vision, 'request_json', return_value={
+            'model': vision.INTERNVL_MODEL, 'observation': OBSERVATION,
+            'profile': 'fast', 'metrics': metrics,
+        }) as request:
+            result = vision.analyze(b'frame', backend='internvl3', profile='fast')
+        self.assertEqual(request.call_args.args[1]['profile'], 'fast')
+        self.assertEqual(result['metrics'], metrics)
+        self.assertEqual(result['profile'], 'fast')
+        self.assertEqual(result['box'], vision.result_from_observation(OBSERVATION)['box'])
+
+    def test_old_worker_must_not_silently_ignore_fast_profile(self):
+        with patch.object(vision, 'request_json', return_value={
+            'model': vision.INTERNVL_MODEL, 'observation': OBSERVATION,
+        }), self.assertRaises(vision.VisionUnavailable):
+            vision.analyze(b'frame', backend='internvl3', profile='fast')
+        with self.assertRaises(ValueError):
+            vision.analyze(b'frame', profile='fast')
+
+    def test_busy_worker_is_distinct_from_other_503_failures(self):
+        for body, expected in (({'code': 'vision_busy'}, vision.VisionBusy),
+                               ({'error': 'Local GPU is busy'}, vision.VisionBusy),
+                               ({'error': 'Local inference unavailable'}, vision.VisionUnavailable)):
+            error = HTTPError(vision.INTERNVL_ENDPOINT, 503, 'unavailable', {}, BytesIO(json.dumps(body).encode()))
+            with self.subTest(body=body), patch.object(vision, 'request_json', side_effect=error):
+                with self.assertRaises(expected) as caught:
+                    vision.analyze(b'frame', backend='internvl3')
+                self.assertIs(type(caught.exception), expected)
+
+    def test_malformed_worker_metrics_cannot_reach_client(self):
+        for metrics in ({}, [], {'totalMs': float('nan')}):
+            with self.subTest(metrics=metrics), patch.object(vision, 'request_json', return_value={
+                'model': vision.INTERNVL_MODEL, 'observation': OBSERVATION, 'metrics': metrics,
+            }), self.assertRaises(vision.VisionUnavailable):
+                vision.analyze(b'frame', backend='internvl3')
+
     def test_internvl_rejects_invalid_envelopes_without_falling_back(self):
         for envelope in (
             {"model": vision.MODEL, "observation": OBSERVATION},
@@ -223,6 +261,21 @@ class VisionTest(unittest.TestCase):
             self.assertFalse(normalized.getexif())
         with self.assertRaisesRegex(ValueError, "не удалось прочитать"):
             vision.extract_image(*multipart(("file", b"not an image")))
+
+    def test_upload_profile_is_optional_strict_and_single(self):
+        from PIL import Image
+        out = BytesIO()
+        Image.new('RGB', (8, 8)).save(out, 'JPEG')
+        image = out.getvalue()
+        for profile in ('standard', 'fast'):
+            normalized, selected = vision.extract_request(*multipart(('file', image), ('profile', profile.encode())))
+            self.assertEqual(selected, profile)
+            self.assertEqual(Image.open(BytesIO(normalized)).size, (8, 8))
+        self.assertEqual(vision.extract_request(*multipart(('file', image)))[1], 'standard')
+        for extras in ((('profile', b'fast'), ('profile', b'fast')),
+                       (('profile', b'invalid'),), (('profile', b'\xff'),), (('prompt', b'override'),)):
+            with self.subTest(extras=extras), self.assertRaises(ValueError):
+                vision.extract_request(*multipart(('file', image), *extras))
 
 
 if __name__ == "__main__":

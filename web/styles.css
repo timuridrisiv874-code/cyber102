@@ -102,6 +102,13 @@ h1 { font-size: clamp(30px, 5vw, 50px); line-height: 1.03; letter-spacing: -.056
 .empty p { margin-top: 6px; max-width: 34ch; }
 .empty p, .equipment-id, .facts dt { font-size: 14px; line-height: 1.5; color: var(--muted); }
 .details { padding: 20px; }
+/* Keep the longer inspection form inside the mobile viewport. Native fieldset
+   min-content sizing otherwise expands the page and displaces touch targets. */
+#inspection-fields { min-width: 0; max-width: 100%; }
+#inspection-fields input, #inspection-fields select, #inspection-fields textarea {
+  min-width: 0; max-width: 100%; font: inherit;
+}
+#inspection-fields .demo-options > * { min-width: 0; max-width: 100%; }
 .finding { display: inline-block; margin-bottom: 12px; background: #fff0d7; color: #713c0b; border-radius: 5px; padding: 5px 8px; font-weight: 700; font-size: 12px; }
 .finding[data-status="clear"] { background: #e4f4e7; color: #1d6339; }
 .details h3 { font-size: 23px; line-height: 1.12; letter-spacing: -.035em; }

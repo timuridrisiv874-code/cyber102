@@ -1,0 +1,72 @@
+[
+  {
+    "name": "01-camera-demo",
+    "url": "https://cyber102.94.41.87.102.sslip.io/index.html",
+    "selector": ".workspace",
+    "note": "Встроенный тестовый ответ, настольная ширина",
+    "time": "2026-11-13T12:00:04.071Z"
+  },
+  {
+    "name": "01b-camera-mobile",
+    "url": "https://cyber102.94.41.87.102.sslip.io/index.html",
+    "selector": ".capture",
+    "note": "Мобильная ширина браузера, тестовый ответ, не APK",
+    "time": "2026-11-13T12:00:04.287Z"
+  },
+  {
+    "name": "01c-result-mobile",
+    "url": "https://cyber102.94.41.87.102.sslip.io/index.html",
+    "selector": "#result",
+    "note": "Карточка тестового ответа, мобильная ширина",
+    "time": "2026-11-13T12:00:04.358Z"
+  },
+  {
+    "name": "02-passports",
+    "url": "https://cyber102.94.41.87.102.sslip.io/documents.html",
+    "selector": null,
+    "note": "Библиотека паспортов организаторов",
+    "time": "2026-11-13T12:00:05.949Z"
+  },
+  {
+    "name": "03-passport-details",
+    "url": "https://cyber102.94.41.87.102.sslip.io/documents.html",
+    "selector": "#equipment-grid .workspace-card:first-child",
+    "note": "Раскрытые характеристики и ссылки на источники",
+    "time": "2026-11-13T12:00:06.121Z"
+  },
+  {
+    "name": "04-telemetry-top",
+    "url": "https://cyber102.94.41.87.102.sslip.io/telemetry.html",
+    "selector": null,
+    "note": "Воспроизведение строки из исходной таблицы",
+    "time": "2026-11-13T12:00:07.247Z"
+  },
+  {
+    "name": "04b-telemetry-channels",
+    "url": "https://cyber102.94.41.87.102.sslip.io/telemetry.html",
+    "selector": "section:has(#channels-title)",
+    "note": "Показания и оценки по документированным порогам",
+    "time": "2026-11-13T12:00:07.683Z"
+  },
+  {
+    "name": "05-diagnosis",
+    "url": "https://cyber102.94.41.87.102.sslip.io/checkpoint.html?serial=P-102",
+    "selector": ".dashboard",
+    "note": "Подготовленный сценарий P-102, 4 правила",
+    "time": "2026-11-13T12:00:14.343Z"
+  },
+  {
+    "name": "05b-findings",
+    "url": "https://cyber102.94.41.87.102.sslip.io/checkpoint.html?serial=P-102",
+    "selector": "#findings",
+    "note": "Объяснение правила о кожухе муфты",
+    "time": "2026-11-13T12:00:14.443Z"
+  },
+  {
+    "name": "06-history",
+    "url": "https://cyber102.94.41.87.102.sslip.io/checkpoint.html?serial=P-102",
+    "selector": "#inspection-history",
+    "note": "Существующие демонстрационные записи",
+    "time": "2026-11-13T12:00:14.525Z"
+  }
+]

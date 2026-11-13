@@ -136,11 +136,55 @@ function severityBadge(level) {
 
 function renderHistory(records) {
   const scenarios = new Map(Array.from(scenarioInput.options, ({ value, text }) => [value, text]));
+  const sourceLabel = historyPanel.querySelector('.panel-heading .source');
+  if (sourceLabel) sourceLabel.textContent = records.some((record) => record.provenance?.source === 'camera_inspection') ?
+    'Осмотры и демо' : 'Демо';
   historyRecords.replaceChildren(...records.map((record) => {
     const entry = element('li', undefined, 'history-entry');
     const time = element('time', historyDate.format(new Date(record.capturedAt)));
     time.dateTime = record.capturedAt;
-    entry.append(time, element('strong', scenarios.get(record.scenarioId) ?? record.scenarioId ?? 'Осмотр'));
+    const cameraInspection = record.provenance?.source === 'camera_inspection';
+    const scenarioName = scenarios.get(record.scenarioId) ?? record.scenarioId ?? 'Осмотр';
+    const captureLabel = { camera: 'Осмотр с камеры', uploaded_photo: 'Осмотр загруженного фото', uploaded_video: 'Осмотр кадра видео' }[record.provenance?.captureSource] || 'Осмотр с камеры';
+    entry.append(time, element('strong', cameraInspection ? captureLabel : scenarioName));
+    if (cameraInspection) {
+      entry.append(element('p', record.provenance.telemetry === 'manual' ?
+        'Телеметрия: показания введены оператором для выбранного оборудования.' : record.provenance.telemetry === 'demo_scenario' ?
+        `Телеметрия: демонстрационный сценарий «${scenarioName}». Это не текущие показания датчиков.` :
+        'Телеметрия: отсутствует. Правила, требующие датчиков, могут быть не оценены.'));
+      const evidence = record.evidence;
+      if (Number.isFinite(evidence?.result?.media?.videoTimeSeconds)) {
+        entry.append(element('p', `Позиция в загруженном видео: ${evidence.result.media.videoTimeSeconds} с.`));
+      }
+      if (typeof evidence?.result?.model === 'string') {
+        entry.append(element('p', `Предварительный анализ: ${evidence.result.model}. Привязка к насосу выбрана оператором.`));
+      }
+      if (typeof evidence?.result?.observation === 'string') entry.append(element('p', evidence.result.observation));
+      // Evidence links are generated from server UUIDs, never arbitrary result URLs.
+      if (typeof evidence?.analysisId === 'string' && /^[0-9a-f-]{36}$/.test(evidence.analysisId)) {
+        const link = element('a', 'Открыть сохранённый кадр');
+        link.href = `/api/analyses/${evidence.analysisId}/image`;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        entry.append(link);
+      }
+      const confirmed = Object.entries(record.vision ?? {}).filter(([, value]) => value !== null && value !== undefined);
+      entry.append(element('p', confirmed.length ?
+        `Отмечено инженером: ${confirmed.map(([key, value]) => `${labels[key] ?? key}: ${observationValue(key, value)}`).join('; ')}.` :
+        'Визуальные признаки инженером не оценены.'));
+      for (const recommendation of record.provenance.manufacturer?.recommendations || []) {
+        entry.append(element('p', `${recommendation.title}: ${recommendation.text} Применимость: ${recommendation.appliesTo}`));
+        for (const source of recommendation.sources || []) {
+          if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(source.documentId) || !Number.isInteger(source.page) || source.page < 1) continue;
+          const link = element('a', `${source.title} · стр. ${source.page}`);
+          link.href = `/api/customer/documents/${source.documentId}/pdf#page=${source.page}`;
+          link.target = '_blank'; link.rel = 'noopener';
+          entry.append(link, element('blockquote', source.quote));
+        }
+      }
+    } else {
+      entry.append(element('p', 'Сохранённый демонстрационный сценарий.'));
+    }
     if (record.note) entry.append(element('p', record.note));
     if (record.findings.length) {
       const findings = element('ul');
@@ -151,7 +195,8 @@ function renderHistory(records) {
       }
       entry.append(findings);
     } else {
-      entry.append(element('p', 'Ни одно правило не сработало.'));
+      entry.append(element('p', cameraInspection ?
+        'Ни одно правило не сработало. Неоценённые признаки не считаются нормой.' : 'Ни одно правило не сработало.'));
     }
     return entry;
   }));

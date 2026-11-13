@@ -9,7 +9,7 @@ os.chdir(root)
 sys.path.insert(0, str(root))
 backend_file = root / 'var' / 'vision-backend.txt'
 backend = backend_file.read_text(encoding='utf-8-sig').strip() if backend_file.exists() else 'internvl3'
-if backend not in ('internvl3', 'ollama'):
+if backend not in ('internvl3', 'ollama', 'detector'):
     raise ValueError('Unknown configured local vision backend')
 with (root / 'var' / 'server.log').open('a', encoding='utf-8', buffering=1) as log:
     sys.stdout = log

@@ -9,7 +9,7 @@ MAX_NOTE_LENGTH = 1000
 MAX_RECORD_LIMIT = 100
 _RECORD_COLUMNS = '''
     id, serial, scenario_id, captured_at, telemetry_json, vision_json,
-    findings_json, note, request_id
+    findings_json, note, request_id, evidence_json, provenance_json
 '''
 
 
@@ -36,6 +36,11 @@ def initialize(connection):
             UNIQUE (serial, request_id)
         )
     ''')
+    # Additive migration: existing demo records retain their original content.
+    columns = {row[1] for row in connection.execute('PRAGMA table_info(inspection_records)')}
+    for name in ('evidence_json', 'provenance_json'):
+        if name not in columns:
+            connection.execute(f"ALTER TABLE inspection_records ADD COLUMN {name} TEXT NOT NULL DEFAULT '{{}}'")
     connection.execute('''
         CREATE INDEX IF NOT EXISTS inspection_records_by_serial
         ON inspection_records (serial, captured_at DESC)
@@ -57,15 +62,16 @@ def _encode(value):
 
 
 def _record(row):
-    id_, serial, scenario, captured_at, telemetry, vision, findings, note, request_id = row
+    id_, serial, scenario, captured_at, telemetry, vision, findings, note, request_id, evidence, provenance = row
     return {
         'id': id_, 'serial': serial, 'scenarioId': scenario, 'capturedAt': captured_at,
         'telemetry': json.loads(telemetry), 'vision': json.loads(vision), 'findings': json.loads(findings),
         'note': note, 'requestId': request_id,
+        'evidence': json.loads(evidence), 'provenance': json.loads(provenance),
     }
 
 
-def save(connection, serial, scenario_id, telemetry, vision, findings, note='', request_id=None):
+def save(connection, serial, scenario_id, telemetry, vision, findings, note='', request_id=None, *, evidence=None, provenance=None):
     """Return (record, created). The caller commits the transaction."""
     _identifier(serial, 'Серийный номер')
     if scenario_id is not None:
@@ -78,16 +84,22 @@ def save(connection, serial, scenario_id, telemetry, vision, findings, note='', 
         raise ValueError('Ожидаются объекты telemetry и vision.')
     if not isinstance(findings, list) or not all(isinstance(finding, dict) for finding in findings):
         raise ValueError('Ожидается список выводов диагностики.')
+    evidence = {} if evidence is None else evidence
+    provenance = {} if provenance is None else provenance
+    if not isinstance(evidence, dict) or not isinstance(provenance, dict):
+        raise ValueError('Ожидаются объекты свидетельства и источников.')
 
     telemetry_json = _encode(telemetry)
     vision_json = _encode(vision)
     findings_json = _encode(findings)
+    evidence_json, provenance_json = _encode(evidence), _encode(provenance)
     id_ = str(uuid4())
     captured_at = datetime.now(timezone.utc).isoformat(timespec='microseconds').replace('+00:00', 'Z')
-    params = (id_, serial, scenario_id, captured_at, telemetry_json, vision_json, findings_json, note, request_id, serial)
+    params = (id_, serial, scenario_id, captured_at, telemetry_json, vision_json, findings_json, note, request_id,
+              evidence_json, provenance_json, serial)
     cursor = connection.execute(f'''
         INSERT INTO inspection_records ({_RECORD_COLUMNS})
-        SELECT ?, ?, ?, ?, ?, ?, ?, ?, ? FROM pumps WHERE serial = ?
+        SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? FROM pumps WHERE serial = ?
         ON CONFLICT (serial, request_id) DO NOTHING
     ''', params)
     if cursor.rowcount:
@@ -98,9 +110,23 @@ def save(connection, serial, scenario_id, telemetry, vision, findings, note='', 
     ''', (serial, request_id)).fetchone()
     if row is None:
         raise UnknownPump(serial)
-    if (row[2], row[4], row[5], row[7]) != (scenario_id, telemetry_json, vision_json, note):
+    if (row[2], row[4], row[5], row[7], row[9], row[10]) != (
+            scenario_id, telemetry_json, vision_json, note, evidence_json, provenance_json):
         raise IdempotencyConflict('Идентификатор запроса уже использован для другого осмотра.')
     return _record(row), False
+
+
+def by_request_id(connection, serial, request_id):
+    row = connection.execute(f'''
+        SELECT {_RECORD_COLUMNS} FROM inspection_records WHERE serial = ? AND request_id = ?
+    ''', (serial, request_id)).fetchone()
+    return _record(row) if row else None
+
+
+def get_record(connection, record_id):
+    _identifier(record_id, 'Идентификатор осмотра')
+    row = connection.execute(f'SELECT {_RECORD_COLUMNS} FROM inspection_records WHERE id = ?', (record_id,)).fetchone()
+    return _record(row) if row else None
 
 
 def list_records(connection, serial, limit=50):

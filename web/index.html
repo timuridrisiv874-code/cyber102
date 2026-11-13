@@ -6,6 +6,8 @@
     <meta name="theme-color" content="#f4f6f3">
     <title>Осмотр оборудования — Cyber102</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="inspection.js" defer></script>
+    <script src="media.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -34,6 +36,8 @@
           <div class="viewfinder" id="viewfinder">
             <img id="example" src="demo-pump.jpg" alt="Демонстрационный кадр промышленного насоса" decoding="async">
             <video id="video" aria-label="Изображение с камеры" muted autoplay playsinline hidden></video>
+            <img id="uploaded-image" alt="Выбранное фото оборудования" hidden>
+            <video id="uploaded-video" aria-label="Выбранное видео оборудования" controls muted playsinline preload="auto" hidden></video>
             <canvas id="snapshot" role="img" aria-label="Зафиксированный кадр осмотра" hidden></canvas>
             <div class="finder-guide" id="guide" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
             <button type="button" class="detection" id="detection" aria-controls="result" hidden>
@@ -42,6 +46,13 @@
           </div>
 
           <div class="capture-footer">
+            <div class="demo-options">
+              <label for="media-file">Фото или видео</label>
+              <input id="media-file" type="file" accept="image/*,video/*" aria-describedby="media-help">
+              <button id="media-clear" class="button secondary" type="button" hidden>Убрать файл</button>
+            </div>
+            <p class="video-help" id="media-help">Фото до 20 МБ; видео до 150 МБ и 2 минут. Видео остаётся на устройстве: анализируются отдельные кадры, не весь поток.</p>
+            <p class="video-metrics" id="media-progress" role="status" hidden></p>
             <div class="demo-options" id="demo-options">
               <label for="demo-scenario">Пример осмотра</label>
               <select id="demo-scenario">
@@ -51,10 +62,15 @@
               </select>
             </div>
             <div class="camera-options" id="camera-options" hidden>
-              <label for="camera-mode">Режим</label>
+              <label for="camera-mode" id="camera-mode-label">Режим</label>
               <select id="camera-mode">
                 <option value="single">Один кадр</option>
                 <option value="video">Видеопроверка</option>
+              </select>
+              <label for="analysis-profile">Анализ кадра</label>
+              <select id="analysis-profile">
+                <option value="standard" selected>Подробный</option>
+                <option value="fast">Быстрый · краткий ответ</option>
               </select>
               <label for="frame-interval" id="frame-interval-label" hidden>Интервал</label>
               <select id="frame-interval" hidden>
@@ -70,6 +86,8 @@
               <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Включить камеру</span></button>
             </div>
             <p class="message" id="message" role="status"></p>
+            <p class="video-help" id="profile-help">Быстрый режим возвращает краткий ответ; описание составляется по классу признака. Режим проходит проверку, подробный остаётся по умолчанию.</p>
+            <p class="video-metrics" id="analysis-timing" hidden></p>
             <p class="video-metrics" id="video-metrics" hidden></p>
           </div>
         </section>
@@ -90,6 +108,7 @@
             <span class="finding" id="finding"></span>
             <h3 id="equipment"></h3>
             <p class="equipment-id" id="equipment-id"></p>
+            <p class="equipment-id" id="capture-provenance" hidden></p>
             <p class="equipment-id" id="vision-observation" hidden></p>
             <dl class="facts">
               <div><dt>Узел</dt><dd id="component"></dd></div>
@@ -101,6 +120,40 @@
               <p id="recommendation"></p>
             </div>
           </div>
+          <section class="details" id="inspection-workflow" aria-labelledby="inspection-title" hidden>
+            <h3 id="inspection-title">Осмотр и телеметрия</h3>
+            <p class="equipment-id">Подтвердите наблюдения на нужном узле. Модель не измеряет параметры датчиков; отсутствие находки не означает исправность.</p>
+            <p class="equipment-id" id="inspection-frame"></p>
+            <p class="message" id="inspection-paused" hidden>Остановите видеопроверку, чтобы подтвердить и сохранить последний кадр.</p>
+            <form id="inspection-form">
+              <fieldset id="inspection-fields">
+                <legend>Оборудование и источник показаний</legend>
+                <p><label for="inspection-serial">Серийный номер</label> <input id="inspection-serial" value="P-102" maxlength="128" autocomplete="off" required></p>
+                <div class="demo-options">
+                  <label for="inspection-telemetry">Телеметрия</label>
+                  <select id="inspection-telemetry"><option value="">Нет данных датчиков</option></select>
+                </div>
+                <p class="equipment-id" id="inspection-source">Данные датчиков не подключены. Проверяются только подтверждённые признаки.</p>
+                <details>
+                  <summary>Подтверждённые признаки · заполнить вручную</summary>
+                  <p class="equipment-id">«Не оценено» сохраняется как неизвестное. Влажное пятно не подтверждает утечку уплотнения без проверки его расположения.</p>
+                  <div id="inspection-confirmations"></div>
+                  <p><label for="inspection-gauge">Манометр нагнетания, МПа · если считано вручную</label> <input id="inspection-gauge" type="number" min="0" step="any" inputmode="decimal" placeholder="Не оценено"></p>
+                </details>
+                <p><label for="inspection-note">Заметка инженера</label><br><textarea id="inspection-note" maxlength="1000" rows="3"></textarea></p>
+              </fieldset>
+              <div class="actions">
+                <button type="button" class="button secondary" id="inspection-preview">Сопоставить показания</button>
+                <button type="submit" class="button primary" id="inspection-save" disabled>Сохранить осмотр</button>
+              </div>
+            </form>
+            <p class="message" id="inspection-message" role="status"></p>
+            <div id="inspection-diagnosis" hidden>
+              <p class="equipment-id" id="inspection-diagnosis-source"></p>
+              <ul id="inspection-findings"></ul>
+            </div>
+            <p><a id="inspection-history" href="/checkpoint.html?serial=P-102">Открыть историю осмотров</a></p>
+          </section>
         </section>
       </div>
     </main>

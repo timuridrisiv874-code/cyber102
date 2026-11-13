@@ -12,9 +12,9 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlsplit
 
 from .demo_data import PASSPORT, SCENARIOS
-from .diagnostics import evaluate
 from . import history
 from . import vision
+from . import inspections, customer, recommendations, assessment
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -28,7 +28,7 @@ def connect(database):
     return connection
 
 
-def initialize(database):
+def initialize(database, customer_root=None):
     database.parent.mkdir(parents=True, exist_ok=True)
     with closing(connect(database)) as connection, connection:
         connection.execute('PRAGMA journal_mode = WAL')
@@ -59,6 +59,17 @@ def initialize(database):
         ''', ((case['id'], serial, case['label'], json.dumps(case['telemetry']),
                json.dumps(case['vision']), json.dumps(case['zones'])) for case in SCENARIOS))
         history.initialize(connection)
+        inspections.initialize(connection)
+        if customer_root is not None:
+            for equipment in recommendations.registry(root=customer_root):
+                if equipment['kind'] != 'pump':
+                    continue
+                passport = {**equipment, 'name': equipment['title'], 'thresholds': {},
+                            'diagnosticsValidated': False,
+                            'serviceLife': 'По паспорту и истории обслуживания',
+                            'nextService': 'Сверить с паспортом выбранного узла'}
+                connection.execute('INSERT OR IGNORE INTO pumps VALUES (?, ?)',
+                                   (passport['serial'], json.dumps(passport, ensure_ascii=False)))
 
 
 class BoundedHTTPServer(ThreadingHTTPServer):
@@ -112,14 +123,16 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header('Permissions-Policy', 'camera=(self), microphone=()')
         super().end_headers()
 
-    def send_json(self, data, status=HTTPStatus.OK):
-        self.send_body(json.dumps(data, ensure_ascii=False).encode(), 'application/json; charset=utf-8', status)
+    def send_json(self, data, status=HTTPStatus.OK, *, headers=None):
+        self.send_body(json.dumps(data, ensure_ascii=False).encode(), 'application/json; charset=utf-8', status, headers=headers)
 
-    def send_body(self, body, content_type, status=HTTPStatus.OK):
+    def send_body(self, body, content_type, status=HTTPStatus.OK, *, headers=None):
         self.send_response(status)
         self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(body)))
         self.send_header('Cache-Control', 'no-store')
+        for name, value in (headers or {}).items():
+            self.send_header(name, value)
         self.end_headers()
         self.wfile.write(body)
 
@@ -180,6 +193,40 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         target = urlsplit(self.path)
+        if target.path in ('/api/equipment', '/api/recommendations'):
+            try:
+                parameters = parse_qs(target.query)
+                if target.path == '/api/equipment':
+                    self.send_json({'equipment': [PASSPORT, *recommendations.registry(root=self.customer_root)]})
+                else:
+                    serial = parameters.get('serial', [PASSPORT['serial']])[0]
+                    component = parameters.get('component', [None])[0]
+                    if component is not None and component not in recommendations.COMPONENT_LABELS:
+                        self.error(HTTPStatus.BAD_REQUEST, 'Неизвестный узел оборудования.')
+                        return
+                    self.send_json(assessment.references(serial, component, root=self.customer_root))
+            except (ValueError, KeyError, OSError):
+                self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Каталог оборудования временно недоступен.')
+            return
+        image_match = re.fullmatch(r'/api/analyses/([0-9a-f-]{36})/image', target.path)
+        inspection_match = re.fullmatch(r'/api/inspections/([0-9a-f-]{36})', target.path)
+        if image_match or inspection_match:
+            try:
+                with closing(connect(self.database)) as connection:
+                    if image_match:
+                        self.send_body(inspections.get_analysis(connection, image_match[1], include_image=True), 'image/jpeg')
+                    else:
+                        record = history.get_record(connection, inspection_match[1])
+                        if record is None:
+                            raise inspections.MissingEvidence('Осмотр не найден.')
+                        self.send_json({'record': record})
+            except inspections.MissingEvidence as error:
+                self.error(HTTPStatus.NOT_FOUND, str(error))
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+            except sqlite3.Error:
+                self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'История временно недоступна.')
+            return
         if target.path.startswith('/api/customer/'):
             from server import customer
             try:
@@ -240,6 +287,11 @@ class Handler(SimpleHTTPRequestHandler):
             if target.path == '/api/health':
                 connection.execute('SELECT serial FROM pumps LIMIT 1').fetchone()
                 self.send_json({'status': 'ok', 'source': 'demo'})
+            elif target.path == '/api/capabilities':
+                self.send_json({'vision': {'enabled': self.vision_enabled, 'backend': self.vision_backend,
+                    'profiles': list(vision.PROFILES) if self.vision_backend == 'internvl3' else ['standard']},
+                    'media': {'maxPhotoBytes': 20 * 1024 * 1024, 'maxVideoBytes': 150 * 1024 * 1024,
+                              'maxVideoSeconds': 120, 'maxSampledFrames': 20}})
             elif target.path == '/api/scenarios':
                 self.scenarios(connection, serial)
             elif target.path == '/api/diagnose':
@@ -247,7 +299,7 @@ class Handler(SimpleHTTPRequestHandler):
                 self.diagnose_demo(connection, serial, scenario)
             elif target.path == '/api/qr':
                 self.qr(connection, serial)
-            elif target.path == '/api/history':
+            elif target.path in ('/api/history', '/api/inspections'):
                 if self.passport(connection, serial):
                     self.send_json({'records': history.list_records(connection, serial)})
             else:
@@ -255,7 +307,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         route = urlsplit(self.path).path
-        if route not in ('/api/diagnose', '/api/history', '/analyze'):
+        if route not in ('/api/diagnose', '/api/history', '/analyze', '/api/inspections', '/api/inspections/preview'):
             self.error(HTTPStatus.NOT_FOUND, 'Маршрут не найден.')
             return
         origins = self.headers.get_all('Origin', [])
@@ -283,6 +335,9 @@ class Handler(SimpleHTTPRequestHandler):
         if route == '/api/history':
             self.save_history(data)
             return
+        if route in ('/api/inspections', '/api/inspections/preview'):
+            self.camera_inspection(data, preview=route.endswith('/preview'))
+            return
         if not isinstance(data, dict) or not isinstance(data.get('serial'), str) or any(
             not isinstance(data.get(key), dict) for key in ('telemetry', 'vision')
         ):
@@ -292,7 +347,27 @@ class Handler(SimpleHTTPRequestHandler):
             passport = self.passport(connection, data['serial'])
             if passport:
                 self.send_json({'source': 'submitted', 'passport': passport,
-                                'findings': evaluate(data['telemetry'], data['vision'], passport['thresholds'])})
+                                **assessment.diagnose(passport, data['telemetry'], data['vision'])})
+
+    def camera_inspection(self, data, *, preview=False):
+        try:
+            with closing(connect(self.database)) as connection, connection:
+                if preview:
+                    result = inspections.preview(connection, data, customer_root=self.customer_root)
+                    status = HTTPStatus.OK
+                else:
+                    record, created = inspections.save(connection, data, customer_root=self.customer_root)
+                    result = {'record': record, 'created': created}
+                    status = HTTPStatus.CREATED if created else HTTPStatus.OK
+            self.send_json(result, status)
+        except history.IdempotencyConflict as error:
+            self.error(HTTPStatus.CONFLICT, str(error))
+        except (history.UnknownPump, inspections.MissingEvidence, inspections.MissingScenario) as error:
+            self.error(HTTPStatus.NOT_FOUND, str(error))
+        except (ValueError, UnicodeError) as error:
+            self.error(HTTPStatus.BAD_REQUEST, str(error))
+        except sqlite3.Error:
+            self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Не удалось сохранить осмотр. Повторите запрос.')
 
     def save_history(self, data):
         if not isinstance(data, dict) or not isinstance(data.get('serial'), str) or not isinstance(data.get('scenarioId'), str):
@@ -310,7 +385,7 @@ class Handler(SimpleHTTPRequestHandler):
                     return
                 telemetry, vision = map(json.loads, row)
                 record, created = history.save(connection, data['serial'], data['scenarioId'], telemetry, vision,
-                    evaluate(telemetry, vision, passport['thresholds']), note=data.get('note', ''), request_id=data.get('requestId'))
+                    assessment.diagnose(passport, telemetry, vision)['findings'], note=data.get('note', ''), request_id=data.get('requestId'))
             self.send_json({'record': record, 'created': created}, HTTPStatus.CREATED if created else HTTPStatus.OK)
         except history.IdempotencyConflict as error:
             self.error(HTTPStatus.CONFLICT, str(error))
@@ -336,14 +411,22 @@ class Handler(SimpleHTTPRequestHandler):
             body = self.rfile.read(length)
             if len(body) != length:
                 raise ValueError('Тело запроса с кадром получено не полностью.')
-            image = vision.extract_image(self.headers.get('Content-Type', ''), body)
-            result = vision.analyze(image, backend=self.vision_backend)
+            image, profile, media = vision.extract_request(self.headers.get('Content-Type', ''), body, include_metadata=True)
+            result = {**vision.analyze(image, backend=self.vision_backend, profile=profile), 'media': media}
+            if result.get('status') in ('defect', 'clear'):
+                with closing(connect(self.database)) as connection, connection:
+                    result = {**result, **inspections.store_analysis(connection, image, result)}
         except TimeoutError:
             self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить кадр за отведённое время.')
         except ValueError as error:
             self.error(HTTPStatus.BAD_REQUEST, str(error))
+        except vision.VisionBusy as error:
+            self.send_json({'error': str(error), 'code': 'vision_busy', 'retryAfterSeconds': 2},
+                           HTTPStatus.SERVICE_UNAVAILABLE, headers={'Retry-After': '2'})
         except (vision.VisionUnavailable, ImportError) as error:
             self.error(HTTPStatus.SERVICE_UNAVAILABLE, str(error))
+        except sqlite3.Error:
+            self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Не удалось сохранить кадр. Повторите проверку.')
         else:
             self.send_json(result)
 
@@ -378,7 +461,7 @@ class Handler(SimpleHTTPRequestHandler):
         vision = json.loads(vision_json)
         self.send_json({'source': source, 'capturedAt': captured_at, 'passport': passport,
                         'scenario': {'id': scenario, 'label': label}, 'telemetry': telemetry, 'vision': vision,
-                        'zones': json.loads(zones_json), 'findings': evaluate(telemetry, vision, passport['thresholds'])})
+                        'zones': json.loads(zones_json), **assessment.diagnose(passport, telemetry, vision)})
 
     def qr(self, connection, serial):
         if self.passport(connection, serial) is None:
@@ -413,7 +496,7 @@ def main():
         url = urlsplit(public_url)
         if url.scheme != 'https' or not url.hostname or url.username or url.password or url.path or url.query or url.fragment:
             parser.error('--public-url должен быть HTTPS-адресом без пути, параметров и учётных данных')
-    initialize(args.database)
+    initialize(args.database, customer_root=customer.ROOT)
     handler = partial(Handler, database=args.database, public_url=public_url,
                       vision_enabled=args.vision, vision_backend=args.vision_backend)
     with BoundedHTTPServer((args.bind, args.port), handler) as server:

@@ -237,7 +237,7 @@ class WorkspaceApiTest(unittest.TestCase):
 
     def test_replay_has_boundaries_and_preserves_provenance_without_running_rules(self):
         data = self.write_replay()
-        with patch.object(app, 'evaluate') as evaluate:
+        with patch.object(app.assessment, 'diagnose') as evaluate:
             catalog = self.get_json('/api/telemetry/catalog')
             self.assertEqual((catalog['firstIndex'], catalog['lastIndex'], catalog['rowCount']), (0, 499, 500))
             self.assertEqual(catalog['sources'], data['sources'])
