@@ -27,6 +27,13 @@
     ['unclear', 'Кадр не даёт однозначного наблюдения'],
     ['indistinct', 'Кадр не даёт однозначного наблюдения'],
   ]);
+  const visualFindingLabels = new Map([
+    ['visible crack or opening', 'Возможная трещина или разрыв'],
+    ['possible damage to electrical contacts', 'Возможное повреждение клеммы или контактов'],
+    ['visible surface corrosion', 'Признаки поверхностной коррозии'],
+    ['visible liquid or streaks', 'Видны следы жидкости или потёки'],
+    ['unclear', 'Кадр не даёт однозначного наблюдения'],
+  ]);
   let counter = 0;
   const text = (tag, value, className) => {
     const element = document.createElement(tag);
@@ -105,6 +112,7 @@
       job.resolve({ status: 'offline_observation', source: 'on_device', model: event.model,
         modelVersion: typeof event.modelVersion === 'string' ? event.modelVersion : '',
         observation: raw.text.trim(), preliminary: true, observationLanguage: 'en',
+        visualFindings: raw.visualFindings === true,
         durationSeconds: Number.isFinite(raw.totalMs) ? raw.totalMs / 1000 : undefined,
         metrics: timings, media: job.metadata });
     } else if (event.type === 'error') {
@@ -178,13 +186,15 @@
     const capture = { camera: 'Кадр камеры', uploaded_photo: 'Загруженное фото', uploaded_video: 'Кадр загруженного видео' }[result.media?.captureSource] || 'Кадр на устройстве';
     const position = result.media?.captureSource === 'uploaded_video' && Number.isFinite(result.media.videoTimeSeconds) ? ` · ${result.media.videoTimeSeconds.toFixed(1)} с` : '';
     const duration = Number.isFinite(result.durationSeconds) ? ` · Анализ ${result.durationSeconds.toFixed(1)} с` : '';
-    const labelText = findingLabels.get(result.observation.toLowerCase().replace(/[.!]+$/, '').trim());
+    const labels = result.visualFindings
+      ? result.observation.split('\n').map(line => visualFindingLabels.get(line)).filter(Boolean)
+      : [findingLabels.get(result.observation.toLowerCase().replace(/[.!]+$/, '').trim())].filter(Boolean);
     resultCard.replaceChildren(text('span', 'Офлайн · предварительное наблюдение', 'finding'),
       text('h3', `${modelName(result.model)} на этом телефоне`),
       text('p', capture + position + duration, 'video-metrics'),
       checkedFrame());
-    if (labelText) resultCard.append(text('p', labelText, 'offline-caption'));
-    resultCard.append(text('p', 'Исходный ответ модели на английском', 'equipment-id'),
+    for (const label of labels) resultCard.append(text('p', label, 'offline-caption'));
+    resultCard.append(text('p', result.visualFindings ? 'Признаки VisionPsy' : 'Исходный ответ модели на английском', 'equipment-id'),
       text('p', result.observation, 'offline-observation'),
       text('p', 'Сверьте описание с кадром. Оценка скрытых неисправностей, ресурса и безопасности эксплуатации требует отдельной проверки.', 'equipment-id'));
     const label = text('label', 'Заметка к осмотру на телефоне'); label.htmlFor = 'offline-note';
@@ -196,7 +206,8 @@
       try {
         const record = { id: `local_${Date.now()}_${++counter}`, source: 'on_device', createdAt: new Date().toISOString(),
           model: result.model, modelVersion: result.modelVersion, observation: result.observation,
-          note: note.value.slice(0,1000), media: result.media, durationSeconds: result.durationSeconds };
+          note: note.value.slice(0,1000), media: result.media, durationSeconds: result.durationSeconds,
+          visualFindings: result.visualFindings };
         localStorage.setItem(HISTORY_KEY, JSON.stringify([record, ...readHistory()].slice(0, 10)));
         save.disabled = note.disabled = true;
         saved.textContent = 'Сохранено на телефоне. На сервер ничего не отправлено.';

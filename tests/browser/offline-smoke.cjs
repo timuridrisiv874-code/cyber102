@@ -28,7 +28,7 @@ async function run(browser, name, android) {
     await route.fulfill({ contentType: mime[path.extname(asset)], body: fs.readFileSync(asset),
       headers: { 'Content-Security-Policy': "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob:; media-src 'self' blob:; connect-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'" } });
   });
-  await page.addInitScript(({ model, modelBytes }) => {
+  await page.addInitScript(({ model, modelBytes, android }) => {
     window.mockSmol = { loaded: false, busy: false, calls: [], cancelled: 0, delay: 50 };
     const snapshot = () => ({ type: 'status', loaded: mockSmol.loaded, busy: mockSmol.busy,
       state: mockSmol.loaded ? 'ready' : 'idle', available: true, message: 'Native mock state', progress: 100, model, modelBytes });
@@ -43,12 +43,16 @@ async function run(browser, name, android) {
         setTimeout(() => {
           mockSmol.busy = false;
           CyberOffline.onNativeEvent({ type: 'result', requestId, model, modelVersion: 'fixture-revision',
-            result: { text: '<script>alert("unsafe")</script> A blue machine with a visible surface.', totalMs: 200, promptMs: 150, generateMs: 50, generatedTokens: 12, inputTokens: 89, cancelled: false } });
+            result: { text: android
+              ? 'visible crack or opening\npossible damage to electrical contacts'
+              : '<script>alert("unsafe")</script> A blue machine with a visible surface.',
+              visualFindings: android, totalMs: 200, promptMs: 150, generateMs: android ? 0 : 50,
+              generatedTokens: android ? 0 : 12, inputTokens: 89, cancelled: false } });
           CyberOffline.onNativeEvent(snapshot());
         }, mockSmol.delay);
       },
     };
-  }, { model, modelBytes });
+  }, { model, modelBytes, android });
   try {
     await page.goto(origin + '/offline/index.html');
     await page.locator('#offline-load:disabled').waitFor();
@@ -66,9 +70,15 @@ async function run(browser, name, android) {
     await page.locator('#check:not([disabled])').waitFor();
     await page.locator('#check').click();
     await page.locator('#offline-result:not([hidden])').waitFor();
-    assert.match(await page.locator('#offline-result').textContent(), /Исходный ответ модели на английском/);
+    if (android) {
+      assert.match(await page.locator('#offline-result').textContent(), /Признаки VisionPsy/);
+      assert.deepEqual(await page.locator('#offline-result .offline-caption').allTextContents(),
+        ['Возможная трещина или разрыв', 'Возможное повреждение клеммы или контактов']);
+    } else {
+      assert.match(await page.locator('#offline-result').textContent(), /Исходный ответ модели на английском/);
+      assert.match(await page.locator('#offline-result').textContent(), /<script>alert/);
+    }
     assert.ok((await page.locator('#offline-result h3').textContent()).includes(model));
-    assert.match(await page.locator('#offline-result').textContent(), /<script>alert/);
     assert.equal(await page.locator('#offline-result script').count(), 0);
     if (android) assert.equal(await page.locator('#offline-result .offline-checked-frame').isVisible(), true);
     assert.equal(await page.locator('#detection').isVisible(), false);
@@ -88,6 +98,7 @@ async function run(browser, name, android) {
     assert.equal(history[0].source, 'on_device');
     assert.match(history[0].note, /Подтверждение инженера/);
     assert.equal(history[0].modelVersion, 'fixture-revision');
+    if (android) assert.equal(history[0].visualFindings, true);
     assert.equal(history[0].model, model);
     assert.ok((await page.locator('#offline-history').textContent()).includes(model));
     assert.equal(history[9].id, 'old_8');
