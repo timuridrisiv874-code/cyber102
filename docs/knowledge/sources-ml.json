@@ -1,0 +1,320 @@
+[
+  {
+    "id": "D01",
+    "title": "Condition monitoring of hydraulic systems",
+    "publisher": "UCI Machine Learning Repository · Helwig, Pignanelli, Schütze",
+    "url": "https://archive.ics.uci.edu/dataset/447/condition+monitoring+of+hydraulic+systems",
+    "type": "dataset",
+    "access_level": "public_download",
+    "license_status": "CC BY 4.0",
+    "claims": [
+      "2 205 циклов по 60 секунд на одном гидравлическом стенде.",
+      "Профиль содержит метки состояния охладителя, клапана, внутренней утечки насоса, аккумулятора и стабильности."
+    ],
+    "limitations": [
+      "Один стенд, нет серийников отдельных насосов и абсолютных временных меток.",
+      "Внутренняя утечка отличается от внешней утечки торцевого уплотнения."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D02",
+    "title": "NLN-EMP — Motor Current and Vibration Monitoring Dataset for various Faults in an E-motor-driven Centrifugal Pump, v4",
+    "publisher": "4TU.ResearchData · Bruinsma, Geertsma, Loendersloot, Tinga",
+    "url": "https://doi.org/10.4121/2b61183e-c14f-4131-829b-cc4822c369d0.v4",
+    "type": "dataset",
+    "access_level": "public_download",
+    "license_status": "CC0 1.0",
+    "claims": [
+      "Два стенда с центробежными насосами и электродвигателями. Записаны ток, напряжение и вибрация при разных режимах.",
+      "Архив 7z с CSV занимает около 20,8 ГБ.",
+      "Таблица 4 статьи авторов описывает стендовые дефекты подшипников, ослабление крепления, расцентровку и режимы сниженного расхода."
+    ],
+    "limitations": [
+      "Контролируемые дефекты и ограниченное число стендов.",
+      "Совместимость конкретной метки с полевой неисправностью требует проверки описания и файлов.",
+      "Авторы отмечают признаки кавитации и в исходном режиме своего стенда."
+    ],
+    "accessed": "2026-11-13",
+    "license_metadata_url": "https://api.datacite.org/dois/10.4121/2b61183e-c14f-4131-829b-cc4822c369d0.v4",
+    "supporting_publication_url": "https://research.utwente.nl/files/346407084/1-s2.0-S235234092301017X-main.pdf"
+  },
+  {
+    "id": "D03",
+    "title": "Raw data on Global measurements and hysteresis-based NPSH acoustic approach for the experimental study of cavitation in a centrifugal pump",
+    "publisher": "Universidad de Oviedo · Zenodo",
+    "url": "https://zenodo.org/records/18500146",
+    "type": "dataset",
+    "access_level": "public_download",
+    "license_status": "CC BY 4.0",
+    "claims": [
+      "Данные экспериментального исследования кавитации и критериев NPSH.",
+      "В открытой карточке есть книга акустических спектров FFT, пояснения и скрипты MATLAB."
+    ],
+    "limitations": [
+      "Лабораторные режимы и точки измерения не эквивалентны полевой разметке.",
+      "Из карточки нельзя заключить, что наблюдения размечены для обучения между несколькими насосами."
+    ],
+    "accessed": "2026-11-13",
+    "license_metadata_url": "https://api.datacite.org/dois/10.5281/zenodo.18500146"
+  },
+  {
+    "id": "D04",
+    "title": "Centrifugal Pump Dataset, v2",
+    "publisher": "Italian Aerospace Research Centre (CIRA) · Angelo Martone, Gaetano Zazzaro · Zenodo",
+    "url": "https://zenodo.org/records/18479728",
+    "type": "dataset",
+    "access_level": "public_download",
+    "license_status": "CC BY 4.0",
+    "claims": [
+      "В карточке восемь CSV измерений насосов A/B/C по трём датам.",
+      "Каналы включают температуру, вибрацию и давление нагнетания."
+    ],
+    "limitations": [
+      "В опубликованном описании структуры нет независимых меток неисправностей.",
+      "Группы измерений неполны по насосу и дате."
+    ],
+    "accessed": "2026-11-13",
+    "license_metadata_url": "https://api.datacite.org/dois/10.5281/zenodo.18479728"
+  },
+  {
+    "id": "D05",
+    "title": "KAt Bearing DataCenter",
+    "publisher": "Paderborn University · Chair of Design and Drive Technology",
+    "url": "https://mb.uni-paderborn.de/en/kat/research/bearing-datacenter",
+    "type": "dataset",
+    "access_level": "public_download",
+    "license_status": "CC BY-NC 4.0",
+    "claims": [
+      "Синхронные измерения тока и вибрации для исправных, искусственно повреждённых и повреждённых ускоренным ресурсным тестом подшипников.",
+      "Разные условия скорости и нагрузки."
+    ],
+    "limitations": [
+      "Лабораторные подшипники. Для коммерческого применения владелец просит связаться с авторами.",
+      "Повторы одного подшипника не являются независимыми объектами."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D06",
+    "title": "Bearing Data Center — Download a Data File",
+    "publisher": "Case Western Reserve University · Bearing Data Center",
+    "url": "https://engineering.case.edu/bearingdatacenter/download-data-file",
+    "type": "dataset",
+    "access_level": "public_download",
+    "license_status": "Лицензия не указана на странице загрузки",
+    "claims": [
+      "Файлы MATLAB для нормального режима и локальных дефектов подшипников, в том числе записи 12 и 48 кГц.",
+      "Доступны каналы измерений с разных точек стенда и частота вращения."
+    ],
+    "limitations": [
+      "Дефекты стендовые, а нарезка одного файла даёт зависимые фрагменты.",
+      "Доступность файлов не устанавливает право на перераспространение."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D07",
+    "title": "XJTU-SY Bearing Datasets",
+    "publisher": "Xi’an Jiaotong University · Changxing Sumyoung · репозиторий авторов",
+    "url": "https://github.com/WangBiaoXJTU/xjtu-sy-bearing-datasets",
+    "type": "dataset",
+    "access_level": "public_download_external_host",
+    "license_status": "Лицензия данных не указана в авторском репозитории",
+    "claims": [
+      "Пятнадцать траекторий подшипников от запуска до отказа в трёх режимах.",
+      "Авторы дают ссылки на скачивание и описывают неисправности и интервалы записи."
+    ],
+    "limitations": [
+      "Небольшое число независимых образцов при большом числе файлов.",
+      "Время до отказа на стенде не даёт срока службы насоса в эксплуатации."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D08",
+    "title": "MIMII Dataset: Sound Dataset for Malfunctioning Industrial Machine Investigation and Inspection",
+    "publisher": "Hitachi, Ltd. · Zenodo",
+    "url": "https://zenodo.org/records/3384388",
+    "type": "dataset",
+    "access_level": "public_download",
+    "license_status": "CC BY-SA 4.0",
+    "claims": [
+      "Записи звука нормальных и аномальных промышленных машин, включая насосы.",
+      "Публикуются варианты с добавленным фоновым шумом."
+    ],
+    "limitations": [
+      "Нормальный и аномальный звук не дают диагноза кавитации.",
+      "Версии с разным уровнем шума могут происходить из одной записи."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D09",
+    "title": "MIMII DUE: Sound Dataset for Malfunctioning Industrial Machine Investigation and Inspection with Domain Shifts due to Operational and Environmental Changes",
+    "publisher": "Hitachi, Ltd. · Zenodo",
+    "url": "https://zenodo.org/records/4740355",
+    "type": "dataset",
+    "access_level": "public_download",
+    "license_status": "CC BY-NC-SA 4.0",
+    "claims": [
+      "Авторы выделяют исходный и целевой домены при изменении условий работы и среды.",
+      "Опубликован отдельный архив по насосам."
+    ],
+    "limitations": [
+      "Аномалия остаётся общей акустической меткой.",
+      "Связанные релизы DCASE следует проверить на повторы."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D10",
+    "title": "MVTec Anomaly Detection Dataset",
+    "publisher": "MVTec Software GmbH",
+    "url": "https://www.mvtec.com/research-teaching/datasets/mvtec-ad",
+    "type": "dataset",
+    "access_level": "publisher_download_form",
+    "license_status": "CC BY-NC-SA 4.0",
+    "claims": [
+      "Более 5 000 промышленных изображений по 15 категориям объектов и текстур.",
+      "Для тестовых аномалий есть пиксельная разметка."
+    ],
+    "limitations": [
+      "Оборудование, ракурс и условия съёмки отличаются от осмотра насосов.",
+      "Доступ к файлам через форму правообладателя."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D11",
+    "title": "MVTec Logical Constraints Anomaly Detection Dataset",
+    "publisher": "MVTec Software GmbH",
+    "url": "https://www.mvtec.com/research-teaching/datasets/mvtec-loco-ad",
+    "type": "dataset",
+    "access_level": "publisher_download_form",
+    "license_status": "CC BY-NC-SA 4.0",
+    "claims": [
+      "3 644 изображения по пяти категориям. Авторы различают структурные и логические аномалии.",
+      "Логический дефект включает отсутствие требуемого объекта и неверное его расположение."
+    ],
+    "limitations": [
+      "Описанные аномалии и маски не относятся к защитным кожухам насосов.",
+      "Доступ к файлам через форму правообладателя."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D12",
+    "title": "Images and pixel annotations for corrosion segmentation",
+    "publisher": "PUC-Rio · Rios, Netto, Roehl · Mendeley Data",
+    "url": "https://data.mendeley.com/datasets/kcyn4nhv2c/1",
+    "type": "dataset",
+    "access_level": "public_download",
+    "license_status": "CC BY 4.0",
+    "claims": [
+      "Коллекция 1 024 фотографий коррозии с объектов эксплуатации.",
+      "На 35 кадрах размечены отдельные небольшие области классов."
+    ],
+    "limitations": [
+      "Разметка покрывает только выбранные фрагменты, а не полные кадры.",
+      "Коррозия на снимке сама по себе не подтверждает ослабление крепления."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D13",
+    "title": "CatBoostClassifier.fit",
+    "publisher": "CatBoost · официальная документация",
+    "url": "https://catboost.ai/docs/en/concepts/python-reference_catboostclassifier_fit",
+    "type": "documentation",
+    "access_level": "public_read",
+    "license_status": "Неприменимо к данным Cyber102",
+    "claims": [
+      "Документация описывает eval_set, use_best_model и early_stopping_rounds."
+    ],
+    "limitations": [
+      "API не гарантирует перенос качества на новый насос."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D14",
+    "title": "autogluon.tabular.TabularPredictor.fit",
+    "publisher": "AutoGluon · официальная документация",
+    "url": "https://auto.gluon.ai/stable/api/autogluon.tabular.TabularPredictor.fit.html",
+    "type": "documentation",
+    "access_level": "public_read",
+    "license_status": "Неприменимо к данным Cyber102",
+    "claims": [
+      "Можно передать отдельный tuning_data и настроить бэггинг, стекинг и вычислительный бюджет."
+    ],
+    "limitations": [
+      "Внешний тест, группы оборудования и смысл меток определяет проект."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D15",
+    "title": "Cross-validation: evaluating estimator performance",
+    "publisher": "scikit-learn · официальная документация",
+    "url": "https://scikit-learn.org/stable/modules/cross_validation.html",
+    "type": "documentation",
+    "access_level": "public_read",
+    "license_status": "Неприменимо к данным Cyber102",
+    "claims": [
+      "Отдельно описаны зависимость записей внутри групп и необходимость учитывать порядок для временных рядов."
+    ],
+    "limitations": [
+      "Для требований Cyber102 нужен совместный контроль двух ограничений, а также сессий до экспорта."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D16",
+    "title": "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets",
+    "publisher": "Takaya Saito, Marc Rehmsmeier · PLOS ONE",
+    "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0118432",
+    "type": "paper",
+    "access_level": "public_read",
+    "license_status": "CC BY",
+    "claims": [
+      "В статье исследована интерпретация PR и ROC при редком положительном классе."
+    ],
+    "limitations": [
+      "Сравнение кривых само по себе не задаёт порог тревоги и допустимую долю пропусков."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D17",
+    "title": "On Calibration of Modern Neural Networks",
+    "publisher": "Guo, Pleiss, Sun, Weinberger · Proceedings of Machine Learning Research",
+    "url": "https://proceedings.mlr.press/v70/guo17a.html",
+    "type": "paper",
+    "access_level": "public_read",
+    "license_status": "Лицензия статьи не переносится на данные Cyber102",
+    "claims": [
+      "Работа разделяет правильность классификации и калибровку уверенности."
+    ],
+    "limitations": [
+      "Постобработка нейросетей из статьи не подтверждена для CatBoost, Qwen или полевых насосов Cyber102."
+    ],
+    "accessed": "2026-11-13"
+  },
+  {
+    "id": "D18",
+    "title": "Can You Trust Your Model’s Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift",
+    "publisher": "Ovadia и соавторы · NeurIPS Proceedings",
+    "url": "https://papers.nips.cc/paper_files/paper/2019/hash/8558cb408c1d76621371888657d2eb1d-Abstract.html",
+    "type": "paper",
+    "access_level": "public_read",
+    "license_status": "Лицензия статьи не переносится на данные Cyber102",
+    "claims": [
+      "В исследовании качество вероятностей оценивается также после сдвига распределения."
+    ],
+    "limitations": [
+      "Работа не определяет величину сдвига, порог или показатели для насосов Cyber102."
+    ],
+    "accessed": "2026-11-13"
+  }
+]

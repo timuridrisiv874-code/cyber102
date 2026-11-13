@@ -1,0 +1,28 @@
+{
+  "prepared": "2026-11-13",
+  "version": "1.0",
+  "application_baseline_commit": "cd85c3b3fe6956e8b4a04bc338ba6cce68a5c145",
+  "source_records": 58,
+  "unique_primary_source_urls": 56,
+  "datasets_catalogued": 12,
+  "schemas_validated": 2,
+  "valid_examples_accepted": 2,
+  "invalid_examples_rejected": 15,
+  "local_markdown_paths_checked": 36,
+  "document_pages": 26,
+  "unique_document_hyperlinks": 81,
+  "tables_with_repeat_header": 7,
+  "validation_scope": "Documentation schemas and examples, registry consistency, local links, rendered layout. Not model accuracy or field engineering acceptance.",
+  "artifacts": [
+    {
+      "path": "output/documents/cyber102-engineering-pack.docx",
+      "bytes": 81302,
+      "sha256": "2e55d05dbb274f9698619db5809178114cda852fa3b40785894db9f73c0b54c3"
+    },
+    {
+      "path": "output/pdf/cyber102-engineering-pack.pdf",
+      "bytes": 537584,
+      "sha256": "f247ed1937129296e02e7b372685f045a0ea665f0541af970db100c9cc4903a2"
+    }
+  ]
+}

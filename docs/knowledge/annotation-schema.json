@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Cyber102 visual annotation record",
+  "description": "One oriented image with manually reviewed component annotations and source provenance. Coordinates are normalized to the oriented image. Validate cross-field bounds separately.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "image", "pump", "session_id", "split", "source", "quality", "annotator", "components"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "sha256", "width", "height"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "path": {"type": "string", "minLength": 1, "maxLength": 512, "description": "Local path relative to the dataset root. The importer rejects absolute paths and directory traversal."},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1},
+        "captured_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
+    "pump": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id", "model", "identity_status"],
+      "properties": {
+        "asset_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+        "model": {"type": ["string", "null"], "minLength": 1, "maxLength": 120},
+        "identity_status": {"enum": ["confirmed_nameplate", "confirmed_passport", "model_number_mentioned", "unverified", "not_applicable"]}
+      },
+      "if": {"properties": {"identity_status": {"enum": ["confirmed_nameplate", "confirmed_passport"]}}},
+      "then": {"properties": {"asset_id": {"$ref": "#/$defs/id"}, "model": {"type": "string", "minLength": 1}}}
+    },
+    "session_id": {"$ref": "#/$defs/id"},
+    "duplicate_group_id": {"$ref": "#/$defs/id"},
+    "split": {"enum": ["quarantine", "train", "validation", "test"]},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "permission_basis"],
+      "properties": {
+        "kind": {"enum": ["site_capture", "commons_reference", "synthetic_demo"]},
+        "permission_basis": {"type": "string", "minLength": 1, "maxLength": 300},
+        "source_url": {"type": "string", "format": "uri"},
+        "license": {"type": "string", "minLength": 1, "maxLength": 200},
+        "license_url": {"type": "string", "format": "uri"},
+        "attribution": {"type": "string", "minLength": 1, "maxLength": 500}
+      },
+      "if": {"properties": {"kind": {"const": "commons_reference"}}},
+      "then": {"required": ["source_url", "license", "license_url", "attribution"]}
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["usable", "issues"],
+      "properties": {
+        "usable": {"type": "boolean"},
+        "issues": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["blur", "glare", "poor_lighting", "occlusion", "cropped_target", "wrong_target", "perspective", "low_resolution", "other"]}
+        }
+      },
+      "if": {"properties": {"usable": {"const": false}}},
+      "then": {"properties": {"issues": {"minItems": 1}}}
+    },
+    "annotator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision", "review_status"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "revision": {"type": "integer", "minimum": 1},
+        "review_status": {"enum": ["draft", "reviewed", "needs_resolution"]},
+        "reviewer_id": {"$ref": "#/$defs/id"}
+      },
+      "if": {"properties": {"review_status": {"const": "reviewed"}}},
+      "then": {"required": ["reviewer_id"]}
+    },
+    "components": {"type": "array", "items": {"$ref": "#/$defs/component"}}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"},
+    "bbox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": {"type": "number", "minimum": 0, "exclusiveMaximum": 1},
+        "y": {"type": "number", "minimum": 0, "exclusiveMaximum": 1},
+        "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "visibility", "bbox", "visual_conditions"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["pump", "motor", "coupling", "guard", "pipe", "flange", "bearing", "seal", "oil_window", "terminal_box", "anchor", "gauge", "inlet_valve", "other"]},
+        "visibility": {"enum": ["visible", "partial", "not_visible"]},
+        "bbox": {"anyOf": [{"$ref": "#/$defs/bbox"}, {"type": "null"}]},
+        "visual_conditions": {"type": "array", "items": {"$ref": "#/$defs/condition"}}
+      },
+      "if": {"properties": {"visibility": {"const": "not_visible"}}},
+      "then": {
+        "properties": {
+          "bbox": {"type": "null"},
+          "visual_conditions": {"items": {"properties": {"state": {"const": "not_visible"}}}}
+        }
+      },
+      "else": {"properties": {"bbox": {"$ref": "#/$defs/bbox"}}}
+    },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "state"],
+      "properties": {
+        "kind": {"enum": ["corrosion", "wet_patch", "visible_damage", "guard_issue", "loose_or_missing_fastener", "oil_cloudy_or_dark", "oil_level_below_min", "terminal_discoloration", "gauge_reading", "flow_instability"]},
+        "state": {"enum": [true, false, "unknown", "not_visible"]},
+        "evidence": {"type": "string", "minLength": 1, "maxLength": 600},
+        "defect_regions": {"type": "array", "items": {"$ref": "#/$defs/bbox"}},
+        "reading": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "unit"],
+          "properties": {
+            "value": {"type": "number"},
+            "unit": {"enum": ["MPa", "bar", "kPa", "psi"]}
+          }
+        }
+      },
+      "allOf": [
+        {"if": {"properties": {"state": {"const": true}}}, "then": {"required": ["evidence"]}, "else": {"properties": {"defect_regions": {"maxItems": 0}}}},
+        {"if": {"properties": {"kind": {"const": "gauge_reading"}, "state": {"const": true}}}, "then": {"required": ["reading"]}, "else": {"not": {"required": ["reading"]}}}
+      ]
+    }
+  }
+}

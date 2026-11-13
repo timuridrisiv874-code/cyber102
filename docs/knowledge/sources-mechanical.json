@@ -1,0 +1,290 @@
+[
+  {
+    "id": "M01",
+    "title": "Руководство по эксплуатации Н03.3.302.00.00.000 РЭ",
+    "publisher": "АО «ГМС Ливгидромаш»",
+    "url": "https://www.hms-livgidromash.ru/upload/iblock/7eb/ka1dtym2cj80axrzyh9nfave3zlbiwar/D-_-N03.3.302.00.00.000-RE.pdf",
+    "type": "manual",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Приложение А, печатная стр. 45, содержит кривую исполнения Д160–112б. Разделы 2 и 4 описывают монтаж, ограждение и обслуживание семейства."
+    ],
+    "limitations": [
+      "Паспорт и шильдик конкретного экземпляра требуются для применения характеристик, комплектности и допусков."
+    ]
+  },
+  {
+    "id": "M02",
+    "title": "Обоснование безопасности Н03.3.302.00.00.000 ОБ",
+    "publisher": "АО «ГМС Ливгидромаш»",
+    "url": "https://www.hms-livgidromash.ru/upload/iblock/6c8/4izytw6ml2sl68cfs0bsd2zxsg235o1t/OB-D.pdf",
+    "type": "safety_manual",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Описывает риски агрегатов семейства и защитные ограждения."
+    ],
+    "limitations": [
+      "Документ семейства. Для работ применяют паспорт, проект и актуальные процедуры площадки."
+    ]
+  },
+  {
+    "id": "M03",
+    "title": "Operating point",
+    "publisher": "KSB",
+    "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/operating-point-1117036",
+    "type": "manufacturer_reference",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Точка работы определяется пересечением характеристик насоса и сети."
+    ],
+    "limitations": [
+      "Иллюстративные кривые. Для установленного исполнения нужны кривые производителя."
+    ]
+  },
+  {
+    "id": "M04",
+    "title": "Characteristic curve",
+    "publisher": "KSB",
+    "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/characteristic-curve-1117926",
+    "type": "manufacturer_reference",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "От расхода зависят напор, потребляемая мощность, КПД и требуемый NPSH."
+    ],
+    "limitations": [
+      "Характеристики зависят от типа, исполнения и режима насоса."
+    ]
+  },
+  {
+    "id": "M05",
+    "title": "Operating behaviour",
+    "publisher": "KSB",
+    "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/operating-behaviour-1118222",
+    "type": "manufacturer_reference",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Отклонение от расчётной области может сопровождаться рециркуляцией, шумом и вибрацией."
+    ],
+    "limitations": [
+      "Предельные расходы и длительность режимов определяются документацией конкретного агрегата."
+    ]
+  },
+  {
+    "id": "M06",
+    "title": "Pump efficiency",
+    "publisher": "KSB",
+    "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/pump-efficiency-1116510",
+    "type": "manufacturer_reference",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Определяет КПД и различает границы учёта мощности насоса и агрегата."
+    ],
+    "limitations": [
+      "Числа КПД в примерах не являются допусками для Д160–112б."
+    ]
+  },
+  {
+    "id": "M07",
+    "title": "ISO 9906:2012 — Rotodynamic pumps — Hydraulic performance acceptance tests — Grades 1, 2 and 3",
+    "publisher": "ISO",
+    "url": "https://www.iso.org/standard/41202.html",
+    "type": "standard_catalog",
+    "accessed": "2026-11-13",
+    "access_level": "metadata",
+    "license_status": "Карточка каталога доступна публично. Полный текст лицензируется.",
+    "claims": [
+      "Карточка относит стандарт к приёмочным гидравлическим испытаниям динамических насосов."
+    ],
+    "limitations": [
+      "Полный нормативный текст не использован. Мониторинговые пороги из карточки не выводятся."
+    ]
+  },
+  {
+    "id": "M08",
+    "title": "NPSH",
+    "publisher": "KSB",
+    "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/npsh-1116954",
+    "type": "manufacturer_reference",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Описывает доступный и требуемый NPSH, критерии начала кавитации и падения напора на 3%."
+    ],
+    "limitations": [
+      "Использовать фактическую рабочую точку, свойства жидкости и запас по проекту."
+    ]
+  },
+  {
+    "id": "M09",
+    "title": "What is cavitation?",
+    "publisher": "Grundfos",
+    "url": "https://www.grundfos.com/us/support/faq/what-is-cavitation",
+    "type": "manufacturer_reference",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Связывает образование и схлопывание паровых пузырьков с давлением и температурой жидкости."
+    ],
+    "limitations": [
+      "Приведённое производителем действие с арматурой зависит от схемы и не переносится на конкретный агрегат."
+    ]
+  },
+  {
+    "id": "M10",
+    "title": "ISO 10816-7:2009 — Mechanical vibration — Evaluation of machine vibration by measurements on non-rotating parts — Part 7",
+    "publisher": "ISO",
+    "url": "https://www.iso.org/standard/41726.html",
+    "type": "standard_catalog",
+    "accessed": "2026-11-13",
+    "access_level": "metadata",
+    "license_status": "Карточка каталога доступна публично. Полный текст лицензируется.",
+    "claims": [
+      "Оценка вибрации промышленных динамических насосов. Статус опубликованного стандарта — пересмотр."
+    ],
+    "limitations": [
+      "Полный нормативный текст не использован. Числовые зоны вибрации не извлекались."
+    ]
+  },
+  {
+    "id": "M11",
+    "title": "ISO/AWI 20816-7 — Mechanical vibration — Measurement and evaluation of machine vibration — Part 7",
+    "publisher": "ISO",
+    "url": "https://www.iso.org/standard/92744.html",
+    "type": "standard_catalog",
+    "accessed": "2026-11-13",
+    "access_level": "metadata",
+    "license_status": "Карточка проекта доступна публично. Проект стандарта в разработке.",
+    "claims": [
+      "В каталоге отмечен как проект замены ISO 10816-7:2009."
+    ],
+    "limitations": [
+      "Документ в разработке. Карточка не задаёт применимых критериев оценки."
+    ]
+  },
+  {
+    "id": "M12",
+    "title": "Mechanical Looseness: What It Is and How to Detect It",
+    "publisher": "Fluke",
+    "url": "https://www.fluke.com/en-us/learn/blog/predictive-maintenance/mechanical-looseness-what-it-is-how-to-detect",
+    "type": "application_note",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Сопоставляет ослабление, дисбаланс, расцентровку и мягкую лапу по спектрам, фазе и результатам осмотра."
+    ],
+    "limitations": [
+      "Признаки эвристические и требуют проверки на месте. Моменты затяжки выбирают по монтажной документации."
+    ]
+  },
+  {
+    "id": "M13",
+    "title": "Operation Inspection",
+    "publisher": "NSK Europe",
+    "url": "https://www.nsk.com/eu-en/tools-resources/maintenance/operation-inspection/",
+    "type": "manufacturer_reference",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Перечисляет причины перегрева и шума подшипников, включая смазку, зазор, монтаж и трение уплотнения."
+    ],
+    "limitations": [
+      "Контекст общих рекомендаций производителя подшипников. Температурные пороги берут из профиля агрегата."
+    ]
+  },
+  {
+    "id": "M14",
+    "title": "Bearing damage and failure",
+    "publisher": "SKF",
+    "url": "https://cdn.skfmediahub.skf.com/api/public/0901d196806f2d3a/pdf_preview_medium/0901d196806f2d3a_pdf_preview_medium.pdf",
+    "type": "manufacturer_reference",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Анализ причин повреждения подшипника опирается на режим работы, смазку, конструкцию и наблюдаемые признаки."
+    ],
+    "limitations": [
+      "Руководство по диагностике повреждений. Температура и вибрация сами по себе не устанавливают причину."
+    ]
+  },
+  {
+    "id": "M15",
+    "title": "What is Pump Alignment? A Complete Guide",
+    "publisher": "Fluke",
+    "url": "https://www.fluke.com/en-us/learn/blog/alignment/pump-alignment-definition-installation-maintenance",
+    "type": "application_note",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Описывает угловое и параллельное смещение, лазерную проверку, мягкую лапу и тепловой рост."
+    ],
+    "limitations": [
+      "Установочные допуски зависят от муфты и агрегата."
+    ]
+  },
+  {
+    "id": "M16",
+    "title": "Maintenance",
+    "publisher": "KSB",
+    "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/maintenance-1116120",
+    "type": "manufacturer_reference",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Общие проверки насосов охватывают смазывание, уплотнения, центровку, промывку и осмотр проточной части."
+    ],
+    "limitations": [
+      "Объём, интервалы и требования к утечке зависят от конкретного агрегата и типа уплотнения."
+    ]
+  },
+  {
+    "id": "M17",
+    "title": "How to Troubleshoot Motors and Drives at the Inputs",
+    "publisher": "Fluke",
+    "url": "https://www.fluke.com/en/learn/blog/motors-drives-pumps-compressors/how-to-troubleshoot-motors-and-drives-starting-at-the-inputs",
+    "type": "application_note",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Показывает расчёт дисбаланса фаз и связь между несимметрией напряжения и токов."
+    ],
+    "limitations": [
+      "Пример 5% взят из демопрофиля Cyber102. Способ измерения и пороги сверяют с документацией электрооборудования."
+    ]
+  },
+  {
+    "id": "M18",
+    "title": "Rosemount 3051 Pressure Transmitter Reference Manual, 00809-0100-4774",
+    "publisher": "Emerson",
+    "url": "https://www.emerson.com/content/dam/emerson/en/measurement-instrumentation/technical/products/pressure/documents/dl-rmt-3051-pressure-transmitter-76002.pdf",
+    "type": "manual",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Материал доступен для чтения. Открытая лицензия на воспроизведение не указана.",
+    "claims": [
+      "Раздел 7.6 объясняет влияние засора импульсной линии на отклик и шум сигнала давления."
+    ],
+    "limitations": [
+      "Диагностика производителя относится к Rosemount 3051. Применимость проверяется для фактического датчика и схемы подключения."
+    ]
+  }
+]

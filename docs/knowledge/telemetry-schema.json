@@ -1,0 +1,441 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Cyber102 proposed telemetry record",
+  "description": "Proposed import record, not the current HTTP API. Synthetic examples are not field measurements. See integration-contract.md for semantic checks.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_id",
+    "serial",
+    "sensor_id",
+    "component_id",
+    "source_timestamp",
+    "received_at",
+    "source",
+    "quality",
+    "measurement",
+    "window",
+    "operating_state",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "record_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"
+    },
+    "serial": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"
+    },
+    "sensor_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"
+    },
+    "component_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"
+    },
+    "source_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "enum": [
+        "scada",
+        "opc_ua",
+        "manual",
+        "synthetic_demo"
+      ]
+    },
+    "quality": {
+      "enum": [
+        "good",
+        "uncertain",
+        "bad",
+        "missing"
+      ]
+    },
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quantity",
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "quantity": {
+          "enum": [
+            "bearing_temperature",
+            "vibration_velocity_rms",
+            "vibration_acceleration_rms",
+            "pressure",
+            "current_rms",
+            "active_power",
+            "volumetric_flow",
+            "runtime_hours"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "degC",
+            "mm/s",
+            "m/s2",
+            "MPa",
+            "A",
+            "kW",
+            "m3/h",
+            "h"
+          ]
+        },
+        "pressure_reference": {
+          "enum": [
+            "absolute",
+            "gauge",
+            "differential"
+          ]
+        },
+        "axis": {
+          "enum": [
+            "axial",
+            "radial_horizontal",
+            "radial_vertical"
+          ]
+        },
+        "band_hz": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lower_hz",
+            "upper_hz"
+          ],
+          "properties": {
+            "lower_hz": {
+              "type": "number",
+              "minimum": 0
+            },
+            "upper_hz": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "bearing_temperature"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "degC"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "vibration_velocity_rms"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mm/s"
+              }
+            },
+            "required": [
+              "axis",
+              "band_hz"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "vibration_acceleration_rms"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "m/s2"
+              }
+            },
+            "required": [
+              "axis",
+              "band_hz"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "pressure"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "MPa"
+              }
+            },
+            "required": [
+              "pressure_reference"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "current_rms"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "A"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "active_power"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "kW"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "volumetric_flow"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "m3/h"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "runtime_hours"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "h"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end",
+        "sample_count",
+        "expected_sample_count",
+        "aggregation"
+      ],
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sample_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_sample_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sample_rate_hz": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "aggregation": {
+          "enum": [
+            "instantaneous",
+            "mean",
+            "rms",
+            "median",
+            "max",
+            "counter"
+          ]
+        }
+      }
+    },
+    "operating_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "speed_rpm",
+        "load_fraction"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "steady",
+            "starting",
+            "stopping",
+            "stopped",
+            "unknown"
+          ]
+        },
+        "speed_rpm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "load_fraction": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_version",
+        "conversion_version",
+        "raw_reference"
+      ],
+      "properties": {
+        "profile_version": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"
+        },
+        "conversion_version": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"
+        },
+        "raw_reference": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 512
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "quality": {
+            "const": "good"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "measurement": {
+            "properties": {
+              "value": {
+                "type": "number"
+              }
+            }
+          },
+          "window": {
+            "properties": {
+              "sample_count": {
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "quality": {
+            "const": "missing"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "measurement": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          },
+          "window": {
+            "properties": {
+              "sample_count": {
+                "const": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

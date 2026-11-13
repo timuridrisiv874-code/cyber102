@@ -1,0 +1,114 @@
+[
+  {
+    "id": "I01",
+    "title": "OPC UA Part 4 DataValue",
+    "publisher": "OPC Foundation",
+    "url": "https://reference.opcfoundation.org/specs/OPC-10000-4/7.11",
+    "type": "technical_documentation",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Официальная страница для чтения и цитирования; права на перепубликацию полного текста не предполагаются.",
+    "claims": [
+      "Значение сопровождается статусом качества и исходной/серверной временными метками."
+    ],
+    "limitations": [
+      "Схема обмена не задаёт инженерные допуски конкретного насоса."
+    ]
+  },
+  {
+    "id": "I02",
+    "title": "OPC UA Part 8 EUInformation",
+    "publisher": "OPC Foundation",
+    "url": "https://reference.opcfoundation.org/specs/OPC-10000-8/5.6.4",
+    "type": "technical_documentation",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Официальная страница для чтения и цитирования; права на перепубликацию полного текста не предполагаются.",
+    "claims": [
+      "Инженерные единицы имеют машинное представление и человекочитаемое описание."
+    ],
+    "limitations": [
+      "Соответствие канала физической величине проверяется интегратором."
+    ]
+  },
+  {
+    "id": "I03",
+    "title": "Acquiring an Analog Signal: Bandwidth and Nyquist",
+    "publisher": "NI",
+    "url": "https://www.ni.com/en/shop/data-acquisition/measurement-fundamentals/analog-fundamentals/acquiring-an-analog-signal--bandwidth--nyquist-sampling-theorem-.html",
+    "type": "technical_documentation",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Официальная страница для чтения и цитирования; права на перепубликацию полного текста не предполагаются.",
+    "claims": [
+      "Полоса измерения, частота дискретизации и антиалиасинговая фильтрация связаны."
+    ],
+    "limitations": [
+      "Общий принцип не определяет необходимую полосу диагностики данного подшипника."
+    ]
+  },
+  {
+    "id": "I04",
+    "title": "SQLite Online Backup API",
+    "publisher": "SQLite",
+    "url": "https://sqlite.org/backup.html",
+    "type": "technical_documentation",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Официальная страница для чтения и цитирования; права на перепубликацию полного текста не предполагаются.",
+    "claims": [
+      "API позволяет создавать согласованную резервную копию работающей базы."
+    ],
+    "limitations": [
+      "Восстановление и права доступа необходимо проверить отдельно."
+    ]
+  },
+  {
+    "id": "I05",
+    "title": "SQLite Write-Ahead Logging",
+    "publisher": "SQLite",
+    "url": "https://www.sqlite.org/wal.html",
+    "type": "technical_documentation",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Официальная страница для чтения и цитирования; права на перепубликацию полного текста не предполагаются.",
+    "claims": [
+      "WAL имеет конкретные ограничения конкурентного доступа и общего хранилища."
+    ],
+    "limitations": [
+      "Это не распределённая БД и не промышленный SLA."
+    ]
+  },
+  {
+    "id": "I06",
+    "title": "Pump efficiency",
+    "publisher": "KSB",
+    "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/pump-efficiency-1116510",
+    "type": "technical_documentation",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Официальная страница для чтения и цитирования; права на перепубликацию полного текста не предполагаются.",
+    "claims": [
+      "КПД зависит от границы между полезной и подводимой мощностью."
+    ],
+    "limitations": [
+      "Значения конкретного исполнения нужны из его характеристики; 15% здесь не норматив."
+    ]
+  },
+  {
+    "id": "I07",
+    "title": "JSON Schema Draft 2020-12",
+    "publisher": "JSON Schema",
+    "url": "https://json-schema.org/draft/2020-12",
+    "type": "technical_documentation",
+    "accessed": "2026-11-13",
+    "access_level": "full_text",
+    "license_status": "Официальная страница для чтения и цитирования; права на перепубликацию полного текста не предполагаются.",
+    "claims": [
+      "Схема позволяет проверить структуру документа и ограничения типов."
+    ],
+    "limitations": [
+      "Форматы даты проверяются с FormatChecker; инженерная истинность и межполевые связи требуют дополнительной проверки."
+    ]
+  }
+]

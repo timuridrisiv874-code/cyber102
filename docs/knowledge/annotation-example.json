@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "image": {
+    "id": "demo-schema-only",
+    "path": "examples/demo-schema-only.jpg",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "width": 1280,
+    "height": 720,
+    "captured_at": null
+  },
+  "pump": {"asset_id": null, "model": null, "identity_status": "not_applicable"},
+  "session_id": "demo-schema-01",
+  "split": "quarantine",
+  "source": {"kind": "synthetic_demo", "permission_basis": "Пример структуры без исходного файла"},
+  "quality": {"usable": true, "issues": ["glare"]},
+  "annotator": {"id": "demo", "revision": 1, "review_status": "draft"},
+  "components": [
+    {
+      "id": "flange-01",
+      "kind": "flange",
+      "visibility": "visible",
+      "bbox": {"x": 0.3, "y": 0.2, "width": 0.4, "height": 0.5},
+      "visual_conditions": [
+        {
+          "kind": "corrosion",
+          "state": true,
+          "evidence": "Пример отметки видимой ржавчины на краю фланца",
+          "defect_regions": [{"x": 0.44, "y": 0.46, "width": 0.11, "height": 0.08}]
+        },
+        {"kind": "wet_patch", "state": "unknown", "evidence": "Блик мешает отличить жидкость от отражения"}
+      ]
+    },
+    {
+      "id": "seal-01",
+      "kind": "seal",
+      "visibility": "not_visible",
+      "bbox": null,
+      "visual_conditions": [{"kind": "wet_patch", "state": "not_visible"}]
+    }
+  ]
+}
