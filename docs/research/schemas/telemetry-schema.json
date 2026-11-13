@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Cyber102 proposed telemetry record",
-  "description": "Proposed import record, not the current HTTP API. Synthetic examples are not field measurements. See integration-contract.md for semantic checks.",
+  "description": "Proposed import record, not the current HTTP API. Synthetic examples are not field measurements. See ../chapters/integration-contract.md for semantic checks.",
   "type": "object",
   "additionalProperties": false,
   "required": [

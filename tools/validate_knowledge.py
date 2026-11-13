@@ -12,7 +12,10 @@ from jsonschema.exceptions import SchemaError, ValidationError
 
 
 ROOT = Path(__file__).resolve().parents[1]
-KNOWLEDGE = ROOT / 'docs' / 'knowledge'
+DOCS = ROOT / 'docs'
+RESEARCH = DOCS / 'research'
+SCHEMAS = RESEARCH / 'schemas'
+SOURCES = RESEARCH / 'sources'
 SOURCE_FIELDS = ('id', 'title', 'publisher', 'url', 'type', 'accessed', 'access_level', 'license_status')
 INLINE_LINK = re.compile(r'\]\((?P<target><[^>\n]+>|[^\s)]+)')
 
@@ -64,8 +67,8 @@ def invalid_annotation(example):
 
 
 def validate_schema(name, invalid_examples, formats):
-    schema = load_json(KNOWLEDGE / f'{name}-schema.json')
-    example = load_json(KNOWLEDGE / f'{name}-example.json')
+    schema = load_json(SCHEMAS / f'{name}-schema.json')
+    example = load_json(SCHEMAS / f'{name}-example.json')
     if schema.get('$schema') != Draft202012Validator.META_SCHEMA['$id']:
         raise ValueError(f'{name}: expected the Draft 2020-12 declaration')
     try:
@@ -82,7 +85,7 @@ def validate_schema(name, invalid_examples, formats):
 def validate_sources(formats):
     ids = set()
     by_id = {}
-    for file in sorted(KNOWLEDGE.glob('sources-*.json')):
+    for file in sorted(SOURCES.glob('sources-*.json')):
         records = load_json(file)
         if not isinstance(records, list) or not records:
             raise ValueError(f'{file.name}: expected a non-empty array of source records')
@@ -108,12 +111,12 @@ def validate_sources(formats):
                     raise ValueError(f'{file.name}: invalid {field} for {id_}')
     if not ids:
         raise ValueError('No source registries found')
-    combined = load_json(KNOWLEDGE / 'sources.json')
+    combined = load_json(SOURCES / 'sources.json')
     if not isinstance(combined, list) or len(combined) != len(ids) or {
         item['id']: item for item in combined
     } != by_id:
         raise ValueError('sources.json differs from the thematic registries')
-    datasets = load_json(KNOWLEDGE / 'dataset-catalog.json')
+    datasets = load_json(RESEARCH / 'datasets' / 'catalog.json')
     dataset_ids = set()
     for dataset in datasets:
         id_ = dataset.get('id')
@@ -128,7 +131,10 @@ def validate_sources(formats):
 
 def validate_local_links():
     count = 0
-    for file in sorted(KNOWLEDGE.glob('*.md')):
+    files = [ROOT / 'README.md', *DOCS.rglob('*.md')]
+    for directory in ('ml', 'data', 'data_tools', 'tools', 'TIMUR', 'output'):
+        files.extend((ROOT / directory).glob('*.md'))
+    for file in sorted(files):
         for line_number, line in enumerate(file.read_text(encoding='utf-8').splitlines(), start=1):
             for match in INLINE_LINK.finditer(line):
                 target = urlsplit(match['target'].strip('<>'))
@@ -136,7 +142,7 @@ def validate_local_links():
                     continue
                 path = (file.parent / unquote(target.path)).resolve()
                 if not path.is_relative_to(ROOT) or not path.exists():
-                    raise ValueError(f'{file.name}:{line_number}: missing or external local path {target.path}')
+                    raise ValueError(f'{file.relative_to(ROOT)}:{line_number}: missing or external local path {target.path}')
                 count += 1
     return count
 

@@ -1,6 +1,6 @@
 {
   "prepared": "2026-11-13",
-  "version": "1.0",
+  "version": "1.1",
   "application_baseline_commit": "cd85c3b3fe6956e8b4a04bc338ba6cce68a5c145",
   "source_records": 58,
   "unique_primary_source_urls": 56,
@@ -8,7 +8,7 @@
   "schemas_validated": 2,
   "valid_examples_accepted": 2,
   "invalid_examples_rejected": 15,
-  "local_markdown_paths_checked": 36,
+  "local_markdown_paths_checked": 101,
   "document_pages": 26,
   "unique_document_hyperlinks": 81,
   "tables_with_repeat_header": 7,
@@ -16,13 +16,23 @@
   "artifacts": [
     {
       "path": "output/documents/cyber102-engineering-pack.docx",
-      "bytes": 81302,
-      "sha256": "2e55d05dbb274f9698619db5809178114cda852fa3b40785894db9f73c0b54c3"
+      "bytes": 81316,
+      "sha256": "9d8c3d7399d71536bd0fff92b1e57ab9ca9ae13cb91021e523edaa94c51b20d3"
     },
     {
       "path": "output/pdf/cyber102-engineering-pack.pdf",
-      "bytes": 537584,
-      "sha256": "f247ed1937129296e02e7b372685f045a0ea665f0541af970db100c9cc4903a2"
+      "bytes": 537764,
+      "sha256": "16d99309034a732e93b5f9c0c9179b4c71f0edbd688ee8460929d4f370b3df7d"
     }
-  ]
+  ],
+  "application_tests_passed": 45,
+  "layout_revision": "Organized docs by topic and added TIMUR; application paths retained.",
+  "render_qa": {
+    "pages_pixel_identical_to_previous": 26,
+    "changed_pages": [],
+    "repository_link_targets": 21,
+    "stale_repository_targets": 0,
+    "missing_repository_targets": 0,
+    "docx_pdf_link_sets_equal": true
+  }
 }

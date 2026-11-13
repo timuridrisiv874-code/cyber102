@@ -18,16 +18,18 @@ from docx.shared import Inches, Pt, RGBColor
 
 
 ROOT = Path(__file__).resolve().parents[1]
-KNOWLEDGE = ROOT / "docs" / "knowledge"
+RESEARCH = ROOT / "docs" / "research"
+INTRODUCTION = RESEARCH / "README.md"
+SOURCE_INDEX = RESEARCH / "sources" / "README.md"
 CHAPTERS = (
-    "README",
-    "pump-engineering",
-    "ml-and-datasets",
-    "vision-and-annotation",
-    "integration-contract",
-    "data-request",
-    "acceptance-and-roadmap",
-    "source-index",
+    INTRODUCTION,
+    RESEARCH / "chapters/pump-engineering.md",
+    RESEARCH / "chapters/ml-and-datasets.md",
+    RESEARCH / "chapters/vision-and-annotation.md",
+    RESEARCH / "chapters/integration-contract.md",
+    RESEARCH / "chapters/data-request.md",
+    RESEARCH / "chapters/acceptance-and-roadmap.md",
+    SOURCE_INDEX,
 )
 GITHUB = "https://github.com/timuridrisiv874-code/cyber102/blob/main/"
 BODY_FONT = "Arial"
@@ -188,7 +190,7 @@ def table_widths(chapter, columns, header):
         return (0.28, 0.72)
     if columns == 4:
         return (0.46, 0.17, 0.16, 0.21)
-    if chapter.stem == "README":
+    if chapter == INTRODUCTION:
         return (0.23, 0.49, 0.28)
     if header == "Канал":
         return (0.19, 0.40, 0.41)
@@ -243,7 +245,7 @@ def add_list(doc, token, chapter):
         add_inline(paragraph, item["tokens"], chapter)
 
 
-def add_chapter(doc, tokens, chapter, index):
+def add_chapter(doc, tokens, chapter):
     after_table = False
     for token in tokens:
         kind = token["type"]
@@ -252,12 +254,12 @@ def add_chapter(doc, tokens, chapter, index):
         paragraph_count = len(doc.paragraphs) if after_table else 0
         if kind == "heading":
             depth = token["depth"]
-            if index == 0 and depth == 1:
+            if chapter == INTRODUCTION and depth == 1:
                 style = "Title"
             else:
                 style = f"Heading {depth}"
             paragraph = doc.add_paragraph(heading_text(token["tokens"]), style)
-            if depth == 1 and chapter.stem == "source-index":
+            if depth == 1 and chapter == SOURCE_INDEX:
                 paragraph.paragraph_format.page_break_before = True
         elif kind == "paragraph":
             add_inline(doc.add_paragraph(), token["tokens"], chapter)
@@ -278,9 +280,8 @@ def main():
     parser.add_argument("--marked", default="", help="Path to marked.esm.js, when not installed next to the tokenizer")
     parser.add_argument("--output", type=Path, default=ROOT / "output/documents/cyber102-engineering-pack.docx")
     args = parser.parse_args()
-    chapters = [KNOWLEDGE / f"{name}.md" for name in CHAPTERS]
     result = subprocess.run(
-        [args.node, str(ROOT / "tools/tokenize_knowledge.mjs"), args.marked, *map(str, chapters)],
+        [args.node, str(ROOT / "tools/tokenize_knowledge.mjs"), args.marked, *map(str, CHAPTERS)],
         check=True,
         capture_output=True,
     )
@@ -289,8 +290,8 @@ def main():
     doc.core_properties.title = "Инженерный пакет Cyber102"
     doc.core_properties.subject = "Диагностика промышленных центробежных насосов"
     doc.core_properties.author = "Команда Cyber102"
-    for index, (tokens, chapter) in enumerate(zip(json.loads(result.stdout), chapters)):
-        add_chapter(doc, tokens, chapter, index)
+    for tokens, chapter in zip(json.loads(result.stdout), CHAPTERS, strict=True):
+        add_chapter(doc, tokens, chapter)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     doc.save(args.output)
     print(args.output)

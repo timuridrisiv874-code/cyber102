@@ -4,14 +4,14 @@
 
 ## Состав
 
-- `build_knowledge_pack.py` создаёт Word из восьми глав `docs/knowledge/`; нужны Python с `python-docx`, Node.js и `marked`.
+- `build_knowledge_pack.py` создаёт Word из введения, шести глав и библиографии в `docs/research/`; нужны Python с `python-docx`, Node.js и `marked`.
 - `tokenize_knowledge.mjs` передаёт токены Markdown сборщику. Путь к `marked.esm.js` можно указать явно.
 - `package_knowledge.py` формирует ZIP по разрешённым каталогам, добавляет манифест SHA-256 и проверяет каждое вложение.
 - `validate_knowledge.py` проверяет две JSON Schema, примеры, 15 отрицательных случаев, согласованность реестров источников/каталога данных и локальные ссылки.
 
 ## Порядок обновления
 
-1. Изменить главу и соответствующий `sources-*.json`; синхронизировать объединённый `sources.json` и `source-index.md`. Вставлять ссылки на первоисточники рядом с утверждениями.
+1. Изменить главу в `docs/research/chapters/` и соответствующий реестр `docs/research/sources/sources-*.json`; синхронизировать `sources/sources.json` и библиографию `sources/README.md`. Вставлять ссылки на первоисточники рядом с утверждениями.
 2. Создать отдельное Python-окружение для инструментов. Установить `python-docx` и зависимости `knowledge-requirements.txt`. `jsonschema[format]` нужен для действительной проверки даты и URI.
 3. Собрать Word из корня репозитория:
 

@@ -13,10 +13,13 @@ SUFFIXES = {'.md', '.json', '.py', '.mjs', '.txt', '.ps1', '.html', '.js', '.css
 def main():
     files = [ROOT / p for p in ('README.md', '.gitignore', 'requirements.txt',
              'data/README.md', 'data/commons-manifest.json',
-             'output/documents/cyber102-engineering-pack.docx',
+             'TIMUR/README.md', 'TIMUR/TASKS.md', 'TIMUR/CHECKLIST.md',
+             'output/README.md', 'output/documents/cyber102-engineering-pack.docx',
              'output/pdf/cyber102-engineering-pack.pdf')]
     for directory in ALLOWED:
         for path in sorted((ROOT / directory).rglob('*')):
+            if path.is_relative_to(ROOT / 'ml/artifacts'):
+                continue
             if path.is_file() and '__pycache__' not in path.parts and (
                 path.suffix in SUFFIXES or path.name == 'Caddyfile'
             ):
