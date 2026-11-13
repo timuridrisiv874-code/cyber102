@@ -1,7 +1,8 @@
 package ru.cyber102.app;
 
 import android.Manifest;
-import android.app.Activity;
+import androidx.activity.ComponentActivity;
+import androidx.activity.OnBackPressedCallback;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -32,7 +33,7 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.HttpsURLConnection;
 
 /** Small Android host for the team's shared inspection screen. */
-public final class MainActivity extends Activity {
+public final class MainActivity extends ComponentActivity {
     private static final String DEMO = "https://appassets.androidplatform.net/index.html";
     private static final int CAMERA_REQUEST = 20;
     private static final int BACKGROUND = 0xfff4f6f5;
@@ -55,9 +56,26 @@ public final class MainActivity extends Activity {
     private String login;
     private String password;
     private AlertDialog settingsDialog;
+    private OnBackPressedCallback webBackCallback;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        // AndroidX forwards both legacy Back and Android 13+ predictive Back.
+        // Intercept only while WebView has history; otherwise the system owns
+        // back-to-home navigation and its predictive animation.
+        webBackCallback = new OnBackPressedCallback(false) {
+            @Override public void handleOnBackPressed() {
+                releaseCamera();
+                cancelCamera();
+                if (web != null && !failed && web.canGoBack()) {
+                    web.goBack();
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, webBackCallback);
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(BACKGROUND);
@@ -180,6 +198,8 @@ public final class MainActivity extends Activity {
                 switch (path) {
                     case "/__mobile_inspection/app.js":
                         return bundledAsset("inspection/app.js");
+                    case "/__mobile_inspection/inspection.js":
+                        return bundledAsset("inspection/inspection.js");
                     case "/__mobile_inspection/styles.css":
                         return bundledAsset("inspection/styles.css");
                     default:
@@ -202,7 +222,11 @@ public final class MainActivity extends Activity {
                     showError("Сервер перенаправил на другой адрес. Укажите конечный HTTPS-адрес в настройках.");
                 }
             }
+            @Override public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
+                updateBackNavigation();
+            }
             @Override public void onPageFinished(WebView view, String url) {
+                updateBackNavigation();
                 progress.setVisibility(View.GONE);
                 if (!failed && sameOrigin(Uri.parse(url), Uri.parse(activeUrl))) status.setText(isDemo() ? "Демо · ответы заданы заранее" : "Сервер · " + Uri.parse(activeUrl).getHost());
             }
@@ -320,6 +344,7 @@ public final class MainActivity extends Activity {
         }
         activeUrl = url;
         failed = false;
+        updateBackNavigation();
         content.removeAllViews();
         if (web == null) createWebView();
         else content.addView(web, new FrameLayout.LayoutParams(-1, -1));
@@ -394,6 +419,7 @@ public final class MainActivity extends Activity {
     }
     private void showError(String message) {
         failed = true;
+        updateBackNavigation();
         progress.setVisibility(View.GONE);
         if (web != null) web.setVisibility(View.GONE);
         TextView error = new TextView(this);
@@ -569,17 +595,15 @@ public final class MainActivity extends Activity {
     private void releaseCamera() {
         if (web != null) web.evaluateJavascript("if (typeof releaseCamera === 'function') releaseCamera();", null);
     }
-    @Override public void onBackPressed() {
-        if (web != null && !failed && web.canGoBack()) {
-            releaseCamera();
-            web.goBack();
-        } else {
-            super.onBackPressed();
+    private void updateBackNavigation() {
+        if (webBackCallback != null) {
+            webBackCallback.setEnabled(web != null && !failed && web.canGoBack());
         }
     }
     @Override protected void onResume() {
         super.onResume(); foreground = true;
         if (web != null) web.onResume();
+        updateBackNavigation();
     }
     @Override protected void onPause() {
         foreground = false;

@@ -1,0 +1,1416 @@
+{
+  "scope": "Functional and latency comparison on identical synthetic/unlabelled images. Differences are disagreements, not correctness or accuracy measurements. Warmup requests are reported separately; cold-start latency is not measured.",
+  "model": "OpenGVLab/InternVL3-2B-hf",
+  "expectedRevision": "cb57a075cb75a2e6d1b668b128d48bb00ae321d2",
+  "profiles": {
+    "standard": {
+      "maxPatches": 4,
+      "maxNewTokens": 180,
+      "outputMode": "descriptive",
+      "observationKind": "model"
+    },
+    "fast": {
+      "maxPatches": 4,
+      "maxNewTokens": 180,
+      "outputMode": "compact",
+      "observationKind": "template"
+    }
+  },
+  "records": [
+    {
+      "case": "demo-pump.jpg",
+      "source": "synthetic_demo",
+      "sha256": "038ebfc6e131cca27290dcf12017e2759f345e0bb8de71a6b1d7c563e740d61f",
+      "phase": "warmup",
+      "repeat": 0,
+      "profile": "standard",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            600
+          ],
+          "observation": "Помповая установка с видимым коррозионным повреждением."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 36.056,
+          "generateMs": 5813.02,
+          "decodeMs": 12.88,
+          "totalMs": 5861.956,
+          "inputTokens": 1044,
+          "outputTokens": 74,
+          "patches": 3
+        },
+        "observationKind": "model",
+        "durationSeconds": 5.906
+      },
+      "seconds": 5.941
+    },
+    {
+      "case": "demo-pump.jpg",
+      "source": "synthetic_demo",
+      "sha256": "038ebfc6e131cca27290dcf12017e2759f345e0bb8de71a6b1d7c563e740d61f",
+      "phase": "warmup",
+      "repeat": 0,
+      "profile": "fast",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            600
+          ],
+          "observation": "Корпус насоса: возможные признаки коррозии."
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 29.498,
+          "generateMs": 2937.487,
+          "decodeMs": 0.206,
+          "totalMs": 2967.191,
+          "inputTokens": 1028,
+          "outputTokens": 44,
+          "patches": 3
+        },
+        "observationKind": "template",
+        "durationSeconds": 3.0
+      },
+      "seconds": 3.015
+    },
+    {
+      "case": "demo-pump.jpg",
+      "source": "synthetic_demo",
+      "sha256": "038ebfc6e131cca27290dcf12017e2759f345e0bb8de71a6b1d7c563e740d61f",
+      "phase": "measured",
+      "repeat": 0,
+      "profile": "standard",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            600
+          ],
+          "observation": "Помповая установка с видимым коррозионным повреждением."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 31.285,
+          "generateMs": 4687.225,
+          "decodeMs": 0.244,
+          "totalMs": 4718.754,
+          "inputTokens": 1044,
+          "outputTokens": 74,
+          "patches": 3
+        },
+        "observationKind": "model",
+        "durationSeconds": 4.735
+      },
+      "seconds": 4.752
+    },
+    {
+      "case": "demo-pump.jpg",
+      "source": "synthetic_demo",
+      "sha256": "038ebfc6e131cca27290dcf12017e2759f345e0bb8de71a6b1d7c563e740d61f",
+      "phase": "measured",
+      "repeat": 0,
+      "profile": "fast",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            600
+          ],
+          "observation": "Корпус насоса: возможные признаки коррозии."
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 30.294,
+          "generateMs": 2799.442,
+          "decodeMs": 0.215,
+          "totalMs": 2829.951,
+          "inputTokens": 1028,
+          "outputTokens": 44,
+          "patches": 3
+        },
+        "observationKind": "template",
+        "durationSeconds": 2.844
+      },
+      "seconds": 2.87
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "source": "synthetic_demo",
+      "sha256": "4745b98e985387514d626d4e3ae2f43be0df8b8b79946258a7165058816fdb78",
+      "phase": "measured",
+      "repeat": 0,
+      "profile": "fast",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            800,
+            800
+          ],
+          "observation": "Корпус насоса: возможные признаки коррозии."
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 28.867,
+          "generateMs": 2731.074,
+          "decodeMs": 0.279,
+          "totalMs": 2760.221,
+          "inputTokens": 1028,
+          "outputTokens": 44,
+          "patches": 3
+        },
+        "observationKind": "template",
+        "durationSeconds": 2.797
+      },
+      "seconds": 2.799
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "source": "synthetic_demo",
+      "sha256": "4745b98e985387514d626d4e3ae2f43be0df8b8b79946258a7165058816fdb78",
+      "phase": "measured",
+      "repeat": 0,
+      "profile": "standard",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            800,
+            600
+          ],
+          "observation": "Помповая установка с видимым коррозионным повреждением."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 32.546,
+          "generateMs": 4676.012,
+          "decodeMs": 0.226,
+          "totalMs": 4708.784,
+          "inputTokens": 1044,
+          "outputTokens": 74,
+          "patches": 3
+        },
+        "observationKind": "model",
+        "durationSeconds": 4.719
+      },
+      "seconds": 4.735
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "source": "licensed_unlabelled_reference",
+      "sha256": "2e1cb3cc308765c1e78da3c4c708dbc1697a05a77113afa74f7d4c34da552c0f",
+      "phase": "measured",
+      "repeat": 0,
+      "profile": "standard",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            500
+          ],
+          "observation": "Помповая насосная установка с видимым коррозионным повреждением."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 41.277,
+          "generateMs": 4940.545,
+          "decodeMs": 0.225,
+          "totalMs": 4982.047,
+          "inputTokens": 1556,
+          "outputTokens": 77,
+          "patches": 5
+        },
+        "observationKind": "model",
+        "durationSeconds": 5.016
+      },
+      "seconds": 5.009
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "source": "licensed_unlabelled_reference",
+      "sha256": "2e1cb3cc308765c1e78da3c4c708dbc1697a05a77113afa74f7d4c34da552c0f",
+      "phase": "measured",
+      "repeat": 0,
+      "profile": "fast",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            500
+          ],
+          "observation": "Корпус насоса: возможные признаки коррозии."
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 40.703,
+          "generateMs": 2959.307,
+          "decodeMs": 0.292,
+          "totalMs": 3000.302,
+          "inputTokens": 1540,
+          "outputTokens": 44,
+          "patches": 5
+        },
+        "observationKind": "template",
+        "durationSeconds": 3.0
+      },
+      "seconds": 3.027
+    },
+    {
+      "case": "blank",
+      "source": "synthetic_negative",
+      "sha256": "f9d06083b28ae2cb1c008fe129a683a617f6a7ee501559fdd9f1b9716baee234",
+      "phase": "measured",
+      "repeat": 0,
+      "profile": "fast",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "motor",
+          "condition": "uncertain",
+          "box": [
+            200,
+            100,
+            300,
+            200
+          ],
+          "observation": ""
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 8.118,
+          "generateMs": 1822.294,
+          "decodeMs": 0.298,
+          "totalMs": 1830.709,
+          "inputTokens": 516,
+          "outputTokens": 29,
+          "patches": 1
+        },
+        "observationKind": "template",
+        "durationSeconds": 1.828
+      },
+      "seconds": 1.835
+    },
+    {
+      "case": "blank",
+      "source": "synthetic_negative",
+      "sha256": "f9d06083b28ae2cb1c008fe129a683a617f6a7ee501559fdd9f1b9716baee234",
+      "phase": "measured",
+      "repeat": 0,
+      "profile": "standard",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "motor",
+          "condition": "uncertain",
+          "box": [
+            200,
+            100,
+            300,
+            200
+          ],
+          "observation": "Visible damage on the motor casing."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 11.809,
+          "generateMs": 2595.947,
+          "decodeMs": 0.184,
+          "totalMs": 2607.94,
+          "inputTokens": 532,
+          "outputTokens": 39,
+          "patches": 1
+        },
+        "observationKind": "model",
+        "durationSeconds": 2.609
+      },
+      "seconds": 2.634
+    },
+    {
+      "case": "text_only",
+      "source": "synthetic_negative",
+      "sha256": "dae76978f35da16ca741a61610a5d90cc456d3d641465ab57fd343d04be755a9",
+      "phase": "measured",
+      "repeat": 0,
+      "profile": "standard",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "none",
+          "condition": "uncertain",
+          "box": [
+            0,
+            0,
+            1000,
+            1000
+          ],
+          "observation": "No visible equipment is present."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 8.616,
+          "generateMs": 3404.047,
+          "decodeMs": 0.191,
+          "totalMs": 3412.854,
+          "inputTokens": 532,
+          "outputTokens": 55,
+          "patches": 1
+        },
+        "observationKind": "model",
+        "durationSeconds": 3.406
+      },
+      "seconds": 3.417
+    },
+    {
+      "case": "text_only",
+      "source": "synthetic_negative",
+      "sha256": "dae76978f35da16ca741a61610a5d90cc456d3d641465ab57fd343d04be755a9",
+      "phase": "measured",
+      "repeat": 0,
+      "profile": "fast",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "none",
+          "condition": "uncertain",
+          "box": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "observation": ""
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 9.371,
+          "generateMs": 1330.225,
+          "decodeMs": 0.18,
+          "totalMs": 1339.776,
+          "inputTokens": 516,
+          "outputTokens": 21,
+          "patches": 1
+        },
+        "observationKind": "template",
+        "durationSeconds": 1.344
+      },
+      "seconds": 1.362
+    },
+    {
+      "case": "demo-pump.jpg",
+      "source": "synthetic_demo",
+      "sha256": "038ebfc6e131cca27290dcf12017e2759f345e0bb8de71a6b1d7c563e740d61f",
+      "phase": "measured",
+      "repeat": 1,
+      "profile": "fast",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            600
+          ],
+          "observation": "Корпус насоса: возможные признаки коррозии."
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 28.392,
+          "generateMs": 2732.21,
+          "decodeMs": 0.239,
+          "totalMs": 2760.842,
+          "inputTokens": 1028,
+          "outputTokens": 44,
+          "patches": 3
+        },
+        "observationKind": "template",
+        "durationSeconds": 2.797
+      },
+      "seconds": 2.801
+    },
+    {
+      "case": "demo-pump.jpg",
+      "source": "synthetic_demo",
+      "sha256": "038ebfc6e131cca27290dcf12017e2759f345e0bb8de71a6b1d7c563e740d61f",
+      "phase": "measured",
+      "repeat": 1,
+      "profile": "standard",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            600
+          ],
+          "observation": "Помповая установка с видимым коррозионным повреждением."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 29.866,
+          "generateMs": 4646.46,
+          "decodeMs": 0.218,
+          "totalMs": 4676.545,
+          "inputTokens": 1044,
+          "outputTokens": 74,
+          "patches": 3
+        },
+        "observationKind": "model",
+        "durationSeconds": 4.703
+      },
+      "seconds": 4.733
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "source": "synthetic_demo",
+      "sha256": "4745b98e985387514d626d4e3ae2f43be0df8b8b79946258a7165058816fdb78",
+      "phase": "measured",
+      "repeat": 1,
+      "profile": "standard",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            800,
+            600
+          ],
+          "observation": "Помповая установка с видимым коррозионным повреждением."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 31.173,
+          "generateMs": 4815.239,
+          "decodeMs": 0.229,
+          "totalMs": 4846.641,
+          "inputTokens": 1044,
+          "outputTokens": 74,
+          "patches": 3
+        },
+        "observationKind": "model",
+        "durationSeconds": 4.875
+      },
+      "seconds": 4.883
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "source": "synthetic_demo",
+      "sha256": "4745b98e985387514d626d4e3ae2f43be0df8b8b79946258a7165058816fdb78",
+      "phase": "measured",
+      "repeat": 1,
+      "profile": "fast",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            800,
+            800
+          ],
+          "observation": "Корпус насоса: возможные признаки коррозии."
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 32.682,
+          "generateMs": 3217.164,
+          "decodeMs": 0.222,
+          "totalMs": 3250.069,
+          "inputTokens": 1028,
+          "outputTokens": 44,
+          "patches": 3
+        },
+        "observationKind": "template",
+        "durationSeconds": 3.297
+      },
+      "seconds": 3.289
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "source": "licensed_unlabelled_reference",
+      "sha256": "2e1cb3cc308765c1e78da3c4c708dbc1697a05a77113afa74f7d4c34da552c0f",
+      "phase": "measured",
+      "repeat": 1,
+      "profile": "fast",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            500
+          ],
+          "observation": "Корпус насоса: возможные признаки коррозии."
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 40.566,
+          "generateMs": 3038.219,
+          "decodeMs": 0.189,
+          "totalMs": 3078.974,
+          "inputTokens": 1540,
+          "outputTokens": 44,
+          "patches": 5
+        },
+        "observationKind": "template",
+        "durationSeconds": 3.093
+      },
+      "seconds": 3.114
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "source": "licensed_unlabelled_reference",
+      "sha256": "2e1cb3cc308765c1e78da3c4c708dbc1697a05a77113afa74f7d4c34da552c0f",
+      "phase": "measured",
+      "repeat": 1,
+      "profile": "standard",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            500
+          ],
+          "observation": "Помповая насосная установка с видимым коррозионным повреждением."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 42.434,
+          "generateMs": 5163.121,
+          "decodeMs": 0.218,
+          "totalMs": 5205.773,
+          "inputTokens": 1556,
+          "outputTokens": 77,
+          "patches": 5
+        },
+        "observationKind": "model",
+        "durationSeconds": 5.235
+      },
+      "seconds": 5.235
+    },
+    {
+      "case": "blank",
+      "source": "synthetic_negative",
+      "sha256": "f9d06083b28ae2cb1c008fe129a683a617f6a7ee501559fdd9f1b9716baee234",
+      "phase": "measured",
+      "repeat": 1,
+      "profile": "standard",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "motor",
+          "condition": "uncertain",
+          "box": [
+            200,
+            100,
+            300,
+            200
+          ],
+          "observation": "Visible damage on the motor casing."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 8.533,
+          "generateMs": 2396.253,
+          "decodeMs": 0.194,
+          "totalMs": 2404.98,
+          "inputTokens": 532,
+          "outputTokens": 39,
+          "patches": 1
+        },
+        "observationKind": "model",
+        "durationSeconds": 2.406
+      },
+      "seconds": 2.41
+    },
+    {
+      "case": "blank",
+      "source": "synthetic_negative",
+      "sha256": "f9d06083b28ae2cb1c008fe129a683a617f6a7ee501559fdd9f1b9716baee234",
+      "phase": "measured",
+      "repeat": 1,
+      "profile": "fast",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "motor",
+          "condition": "uncertain",
+          "box": [
+            200,
+            100,
+            300,
+            200
+          ],
+          "observation": ""
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 11.564,
+          "generateMs": 1812.809,
+          "decodeMs": 0.18,
+          "totalMs": 1824.552,
+          "inputTokens": 516,
+          "outputTokens": 29,
+          "patches": 1
+        },
+        "observationKind": "template",
+        "durationSeconds": 1.828
+      },
+      "seconds": 1.846
+    },
+    {
+      "case": "text_only",
+      "source": "synthetic_negative",
+      "sha256": "dae76978f35da16ca741a61610a5d90cc456d3d641465ab57fd343d04be755a9",
+      "phase": "measured",
+      "repeat": 1,
+      "profile": "fast",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "none",
+          "condition": "uncertain",
+          "box": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "observation": ""
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 8.968,
+          "generateMs": 1290.094,
+          "decodeMs": 0.176,
+          "totalMs": 1299.239,
+          "inputTokens": 516,
+          "outputTokens": 21,
+          "patches": 1
+        },
+        "observationKind": "template",
+        "durationSeconds": 1.297
+      },
+      "seconds": 1.326
+    },
+    {
+      "case": "text_only",
+      "source": "synthetic_negative",
+      "sha256": "dae76978f35da16ca741a61610a5d90cc456d3d641465ab57fd343d04be755a9",
+      "phase": "measured",
+      "repeat": 1,
+      "profile": "standard",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "none",
+          "condition": "uncertain",
+          "box": [
+            0,
+            0,
+            1000,
+            1000
+          ],
+          "observation": "No visible equipment is present."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 8.952,
+          "generateMs": 3410.427,
+          "decodeMs": 0.191,
+          "totalMs": 3419.571,
+          "inputTokens": 532,
+          "outputTokens": 55,
+          "patches": 1
+        },
+        "observationKind": "model",
+        "durationSeconds": 3.422
+      },
+      "seconds": 3.441
+    },
+    {
+      "case": "demo-pump.jpg",
+      "source": "synthetic_demo",
+      "sha256": "038ebfc6e131cca27290dcf12017e2759f345e0bb8de71a6b1d7c563e740d61f",
+      "phase": "measured",
+      "repeat": 2,
+      "profile": "standard",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            600
+          ],
+          "observation": "Помповая установка с видимым коррозионным повреждением."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 29.036,
+          "generateMs": 4624.868,
+          "decodeMs": 0.231,
+          "totalMs": 4654.135,
+          "inputTokens": 1044,
+          "outputTokens": 74,
+          "patches": 3
+        },
+        "observationKind": "model",
+        "durationSeconds": 4.656
+      },
+      "seconds": 4.684
+    },
+    {
+      "case": "demo-pump.jpg",
+      "source": "synthetic_demo",
+      "sha256": "038ebfc6e131cca27290dcf12017e2759f345e0bb8de71a6b1d7c563e740d61f",
+      "phase": "measured",
+      "repeat": 2,
+      "profile": "fast",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            600
+          ],
+          "observation": "Корпус насоса: возможные признаки коррозии."
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 32.528,
+          "generateMs": 2882.306,
+          "decodeMs": 0.194,
+          "totalMs": 2915.028,
+          "inputTokens": 1028,
+          "outputTokens": 44,
+          "patches": 3
+        },
+        "observationKind": "template",
+        "durationSeconds": 2.922
+      },
+      "seconds": 2.951
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "source": "synthetic_demo",
+      "sha256": "4745b98e985387514d626d4e3ae2f43be0df8b8b79946258a7165058816fdb78",
+      "phase": "measured",
+      "repeat": 2,
+      "profile": "fast",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            800,
+            800
+          ],
+          "observation": "Корпус насоса: возможные признаки коррозии."
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 29.891,
+          "generateMs": 2982.452,
+          "decodeMs": 0.272,
+          "totalMs": 3012.615,
+          "inputTokens": 1028,
+          "outputTokens": 44,
+          "patches": 3
+        },
+        "observationKind": "template",
+        "durationSeconds": 3.031
+      },
+      "seconds": 3.042
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "source": "synthetic_demo",
+      "sha256": "4745b98e985387514d626d4e3ae2f43be0df8b8b79946258a7165058816fdb78",
+      "phase": "measured",
+      "repeat": 2,
+      "profile": "standard",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            800,
+            600
+          ],
+          "observation": "Помповая установка с видимым коррозионным повреждением."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 33.558,
+          "generateMs": 5081.252,
+          "decodeMs": 0.285,
+          "totalMs": 5115.095,
+          "inputTokens": 1044,
+          "outputTokens": 74,
+          "patches": 3
+        },
+        "observationKind": "model",
+        "durationSeconds": 5.141
+      },
+      "seconds": 5.171
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "source": "licensed_unlabelled_reference",
+      "sha256": "2e1cb3cc308765c1e78da3c4c708dbc1697a05a77113afa74f7d4c34da552c0f",
+      "phase": "measured",
+      "repeat": 2,
+      "profile": "standard",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            500
+          ],
+          "observation": "Помповая насосная установка с видимым коррозионным повреждением."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 40.957,
+          "generateMs": 4862.1,
+          "decodeMs": 0.234,
+          "totalMs": 4903.291,
+          "inputTokens": 1556,
+          "outputTokens": 77,
+          "patches": 5
+        },
+        "observationKind": "model",
+        "durationSeconds": 4.907
+      },
+      "seconds": 4.929
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "source": "licensed_unlabelled_reference",
+      "sha256": "2e1cb3cc308765c1e78da3c4c708dbc1697a05a77113afa74f7d4c34da552c0f",
+      "phase": "measured",
+      "repeat": 2,
+      "profile": "fast",
+      "status": "defect",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "pump",
+          "condition": "corrosion",
+          "box": [
+            100,
+            100,
+            600,
+            500
+          ],
+          "observation": "Корпус насоса: возможные признаки коррозии."
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 42.283,
+          "generateMs": 2833.901,
+          "decodeMs": 0.189,
+          "totalMs": 2876.373,
+          "inputTokens": 1540,
+          "outputTokens": 44,
+          "patches": 5
+        },
+        "observationKind": "template",
+        "durationSeconds": 2.891
+      },
+      "seconds": 2.906
+    },
+    {
+      "case": "blank",
+      "source": "synthetic_negative",
+      "sha256": "f9d06083b28ae2cb1c008fe129a683a617f6a7ee501559fdd9f1b9716baee234",
+      "phase": "measured",
+      "repeat": 2,
+      "profile": "fast",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "motor",
+          "condition": "uncertain",
+          "box": [
+            200,
+            100,
+            300,
+            200
+          ],
+          "observation": ""
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 11.374,
+          "generateMs": 1816.491,
+          "decodeMs": 0.249,
+          "totalMs": 1828.114,
+          "inputTokens": 516,
+          "outputTokens": 29,
+          "patches": 1
+        },
+        "observationKind": "template",
+        "durationSeconds": 1.828
+      },
+      "seconds": 1.851
+    },
+    {
+      "case": "blank",
+      "source": "synthetic_negative",
+      "sha256": "f9d06083b28ae2cb1c008fe129a683a617f6a7ee501559fdd9f1b9716baee234",
+      "phase": "measured",
+      "repeat": 2,
+      "profile": "standard",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "motor",
+          "condition": "uncertain",
+          "box": [
+            200,
+            100,
+            300,
+            200
+          ],
+          "observation": "Visible damage on the motor casing."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 9.596,
+          "generateMs": 2362.597,
+          "decodeMs": 0.215,
+          "totalMs": 2372.408,
+          "inputTokens": 532,
+          "outputTokens": 39,
+          "patches": 1
+        },
+        "observationKind": "model",
+        "durationSeconds": 2.375
+      },
+      "seconds": 2.392
+    },
+    {
+      "case": "text_only",
+      "source": "synthetic_negative",
+      "sha256": "dae76978f35da16ca741a61610a5d90cc456d3d641465ab57fd343d04be755a9",
+      "phase": "measured",
+      "repeat": 2,
+      "profile": "standard",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "none",
+          "condition": "uncertain",
+          "box": [
+            0,
+            0,
+            1000,
+            1000
+          ],
+          "observation": "No visible equipment is present."
+        },
+        "profile": "standard",
+        "metrics": {
+          "preprocessMs": 9.339,
+          "generateMs": 3360.006,
+          "decodeMs": 0.197,
+          "totalMs": 3369.543,
+          "inputTokens": 532,
+          "outputTokens": 55,
+          "patches": 1
+        },
+        "observationKind": "model",
+        "durationSeconds": 3.375
+      },
+      "seconds": 3.396
+    },
+    {
+      "case": "text_only",
+      "source": "synthetic_negative",
+      "sha256": "dae76978f35da16ca741a61610a5d90cc456d3d641465ab57fd343d04be755a9",
+      "phase": "measured",
+      "repeat": 2,
+      "profile": "fast",
+      "status": "unusable",
+      "result": {
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "observation": {
+          "component": "none",
+          "condition": "uncertain",
+          "box": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "observation": ""
+        },
+        "profile": "fast",
+        "metrics": {
+          "preprocessMs": 9.505,
+          "generateMs": 1359.228,
+          "decodeMs": 0.295,
+          "totalMs": 1369.028,
+          "inputTokens": 516,
+          "outputTokens": 21,
+          "patches": 1
+        },
+        "observationKind": "template",
+        "durationSeconds": 1.359
+      },
+      "seconds": 1.393
+    }
+  ],
+  "summary": {
+    "standard": {
+      "requests": 15,
+      "successful": 15,
+      "errors": 0,
+      "medianSeconds": 4.733,
+      "p95Seconds": 5.235,
+      "allRequestP95Seconds": 5.235
+    },
+    "fast": {
+      "requests": 15,
+      "successful": 15,
+      "errors": 0,
+      "medianSeconds": 2.801,
+      "p95Seconds": 3.289,
+      "allRequestP95Seconds": 3.289
+    }
+  },
+  "comparisons": [
+    {
+      "case": "demo-pump.jpg",
+      "repeat": 0,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": 1.0
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "repeat": 0,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": 0.7143
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "repeat": 0,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": 1.0
+    },
+    {
+      "case": "blank",
+      "repeat": 0,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": null
+    },
+    {
+      "case": "text_only",
+      "repeat": 0,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": null
+    },
+    {
+      "case": "demo-pump.jpg",
+      "repeat": 1,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": 1.0
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "repeat": 1,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": 0.7143
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "repeat": 1,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": 1.0
+    },
+    {
+      "case": "blank",
+      "repeat": 1,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": null
+    },
+    {
+      "case": "text_only",
+      "repeat": 1,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": null
+    },
+    {
+      "case": "demo-pump.jpg",
+      "repeat": 2,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": 1.0
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "repeat": 2,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": 0.7143
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "repeat": 2,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": 1.0
+    },
+    {
+      "case": "blank",
+      "repeat": 2,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": null
+    },
+    {
+      "case": "text_only",
+      "repeat": 2,
+      "baseline": "standard",
+      "profile": "fast",
+      "comparable": true,
+      "statusChanged": false,
+      "componentChanged": false,
+      "conditionChanged": false,
+      "observationChanged": true,
+      "boxIoU": null
+    }
+  ],
+  "date": "2026-11-13",
+  "device": "NVIDIA GeForce RTX 3090 Ti",
+  "relativeMedianReductionPct": 40.82,
+  "validation": {
+    "cases": 5,
+    "measuredRequests": 30,
+    "warmupRequests": 2,
+    "classificationDisagreements": 0,
+    "bboxDisagreements": 3,
+    "accuracyClaim": false,
+    "pythonTestsOnWindows": 131,
+    "browserCoverage": "Chromium and WebKit: web + Android assets; history; existing video flow",
+    "android": "assembleDebug and lintDebug passed; APK signature verified; physical device untested"
+  },
+  "httpsIntegration": {
+    "scope": "HTTPS integration with real GPU, synthetic test photo, demo telemetry, not field accuracy.",
+    "analyses": [
+      {
+        "profile": "standard",
+        "httpsSeconds": 5.61,
+        "serverSeconds": 5.203,
+        "model": "OpenGVLab/InternVL3-2B-hf"
+      },
+      {
+        "profile": "fast",
+        "httpsSeconds": 3.889,
+        "serverSeconds": 3.093,
+        "model": "OpenGVLab/InternVL3-2B-hf"
+      }
+    ],
+    "findings": [
+      "bearing_lubrication"
+    ],
+    "evidenceHashVerified": true,
+    "idempotentRetryVerified": true,
+    "historyVerified": true
+  },
+  "apk": {
+    "version": "0.5-test",
+    "sha256": "fda107dd49703b5a57b3e9387934185ad89412bb0f6415c6ad0bdd177c7135cb",
+    "downloadUrl": "https://cyber102.94.41.87.102.sslip.io/cyber102-0.5-test.apk",
+    "signatureChangedFrom0_4": true
+  }
+}

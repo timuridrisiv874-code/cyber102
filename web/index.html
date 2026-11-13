@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#f4f6f3">
     <title>Осмотр оборудования — Cyber102</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="inspection.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -56,6 +57,11 @@
                 <option value="single">Один кадр</option>
                 <option value="video">Видеопроверка</option>
               </select>
+              <label for="analysis-profile">Анализ кадра</label>
+              <select id="analysis-profile">
+                <option value="standard" selected>Подробный</option>
+                <option value="fast">Быстрый · краткий ответ</option>
+              </select>
               <label for="frame-interval" id="frame-interval-label" hidden>Интервал</label>
               <select id="frame-interval" hidden>
                 <option value="2000">2 секунды</option>
@@ -70,6 +76,8 @@
               <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Включить камеру</span></button>
             </div>
             <p class="message" id="message" role="status"></p>
+            <p class="video-help" id="profile-help">Быстрый режим возвращает краткий ответ; описание составляется по классу признака. Режим проходит проверку, подробный остаётся по умолчанию.</p>
+            <p class="video-metrics" id="analysis-timing" hidden></p>
             <p class="video-metrics" id="video-metrics" hidden></p>
           </div>
         </section>
@@ -101,6 +109,40 @@
               <p id="recommendation"></p>
             </div>
           </div>
+          <section class="details" id="inspection-workflow" aria-labelledby="inspection-title" hidden>
+            <h3 id="inspection-title">Осмотр и телеметрия</h3>
+            <p class="equipment-id">Подтвердите наблюдения на нужном узле. Модель не измеряет параметры датчиков; отсутствие находки не означает исправность.</p>
+            <p class="equipment-id" id="inspection-frame"></p>
+            <p class="message" id="inspection-paused" hidden>Остановите видеопроверку, чтобы подтвердить и сохранить последний кадр.</p>
+            <form id="inspection-form">
+              <fieldset id="inspection-fields">
+                <legend>Оборудование и источник показаний</legend>
+                <p><label for="inspection-serial">Серийный номер</label> <input id="inspection-serial" value="P-102" maxlength="128" autocomplete="off" required></p>
+                <div class="demo-options">
+                  <label for="inspection-telemetry">Телеметрия</label>
+                  <select id="inspection-telemetry"><option value="">Нет данных датчиков</option></select>
+                </div>
+                <p class="equipment-id" id="inspection-source">Данные датчиков не подключены. Проверяются только подтверждённые признаки.</p>
+                <details>
+                  <summary>Подтверждённые признаки · заполнить вручную</summary>
+                  <p class="equipment-id">«Не оценено» сохраняется как неизвестное. Влажное пятно не подтверждает утечку уплотнения без проверки его расположения.</p>
+                  <div id="inspection-confirmations"></div>
+                  <p><label for="inspection-gauge">Манометр нагнетания, МПа · если считано вручную</label> <input id="inspection-gauge" type="number" min="0" step="any" inputmode="decimal" placeholder="Не оценено"></p>
+                </details>
+                <p><label for="inspection-note">Заметка инженера</label><br><textarea id="inspection-note" maxlength="1000" rows="3"></textarea></p>
+              </fieldset>
+              <div class="actions">
+                <button type="button" class="button secondary" id="inspection-preview">Сопоставить показания</button>
+                <button type="submit" class="button primary" id="inspection-save" disabled>Сохранить осмотр</button>
+              </div>
+            </form>
+            <p class="message" id="inspection-message" role="status"></p>
+            <div id="inspection-diagnosis" hidden>
+              <p class="equipment-id" id="inspection-diagnosis-source"></p>
+              <ul id="inspection-findings"></ul>
+            </div>
+            <p><a id="inspection-history" href="/checkpoint.html?serial=P-102">Открыть историю осмотров</a></p>
+          </section>
         </section>
       </div>
     </main>

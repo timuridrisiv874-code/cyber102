@@ -10,6 +10,7 @@ const cameraButton = byId('camera');
 const demoScenario = byId('demo-scenario');
 const cameraMode = byId('camera-mode');
 const intervalSelect = byId('frame-interval');
+const profileSelect = byId('analysis-profile');
 const videoToggle = byId('video-toggle');
 const checkedViewfinder = byId('checked-viewfinder');
 const videoMetrics = byId('video-metrics');
@@ -78,6 +79,7 @@ function render() {
   byId('frame-interval-label').hidden = !videoMode;
   intervalSelect.hidden = !videoMode;
   intervalSelect.disabled = Boolean(videoRun);
+  profileSelect.disabled = openingCamera || checking || Boolean(videoRun) || Boolean(analysisController);
   byId('video-help').hidden = !videoMode;
   videoToggle.hidden = !videoMode;
   videoToggle.disabled = !videoRun && (!stream || !cameraReady || openingCamera || Boolean(analysisController));
@@ -112,7 +114,7 @@ function render() {
     byId('equipment').textContent = result.equipment.name;
     byId('equipment-id').textContent = result.equipment.id;
     byId('vision-observation').hidden = !result.observation;
-    byId('vision-observation').textContent = result.observation ? `Предварительный осмотр · ${result.model}: ${result.observation}` : '';
+    byId('vision-observation').textContent = result.observation ? `Предварительный осмотр · ${result.model}${result.observationKind === 'template' ? ' · описание по классу' : ''}: ${result.observation}` : '';
     byId('component').textContent = result.component;
     byId('service-life').textContent = result.serviceLife;
     byId('next-service').textContent = result.nextService;
@@ -126,6 +128,8 @@ function render() {
     byId('empty-title').textContent = checking ? 'Проверяем кадр…' : title;
     byId('empty-text').textContent = checking ? '' : description;
   }
+  window.CyberCamera.renderTiming(result);
+  window.CyberInspection.update(result, checking || Boolean(videoRun));
 }
 
 function stopCamera() {
@@ -227,6 +231,7 @@ function drawFrame(canvas, source) {
 
 async function analyzeFrame(useServer, frame) {
   const controller = new AbortController();
+  const started = performance.now();
   analysisController = controller;
   let timedOut = false;
   const timeout = setTimeout(() => {
@@ -240,15 +245,23 @@ async function analyzeFrame(useServer, frame) {
       if (!image) throw new Error('Не удалось подготовить кадр.');
       const body = new FormData();
       body.append('file', image, 'frame.jpg');
+      body.append('profile', profileSelect.value);
       Object.assign(options, { method: 'POST', body });
     }
     const mockPath = frameSource === 'example' ? demoScenario.selectedOptions[0].dataset.response : 'mock-analysis.json';
-    const response = await fetch(useServer ? endpoint : `./${mockPath}`, options);
+    const response = useServer ?
+      await window.CyberCamera.fetchAnalysis(endpoint, options, showMessage) :
+      await fetch(`./${mockPath}`, options);
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
       throw new Error(error.error || `Ошибка анализа: ${response.status}`);
     }
-    return readResult(await response.json());
+    const data = await response.json();
+    if (useServer) {
+      window.CyberCamera.validateModel(data);
+      data.clientDurationSeconds = (performance.now() - started) / 1000;
+    }
+    return readResult(data);
   } catch (error) {
     if (timedOut) throw new Error('Сервер не ответил вовремя. Повторите проверку.');
     throw error;
@@ -301,7 +314,7 @@ async function checkFrame() {
       drawFrame(snapshot, stream ? video : example);
       frameSource = stream ? 'camera' : 'example';
     }
-    if (endpoint && frameSource === 'camera') showMessage('Модель анализирует кадр. Первый запуск может занять до двух минут.');
+    if (endpoint && frameSource === 'camera') showMessage('Модель анализирует кадр. Задержка появится после ответа.');
     render();
     result = await analyzeFrame(Boolean(endpoint && frameSource === 'camera'), snapshot);
     showMessage('Проверка завершена.');

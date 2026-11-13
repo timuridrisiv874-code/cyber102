@@ -1,13 +1,14 @@
 """Preliminary visual observations using local vision services."""
 import base64
 import json
+import math
 import threading
 import time
 from email import policy
 from email.parser import BytesParser
 from http.client import HTTPException
 from io import BytesIO
-from urllib.error import URLError
+from urllib.error import URLError, HTTPError
 from urllib.request import Request, ProxyHandler, HTTPRedirectHandler, build_opener
 
 MODEL = 'qwen3-vl:8b'
@@ -15,6 +16,7 @@ ENDPOINT = 'http://127.0.0.1:11435/api/chat'
 INTERNVL_MODEL = 'OpenGVLab/InternVL3-2B-hf'
 INTERNVL_ENDPOINT = 'http://127.0.0.1:11436/analyze'
 BACKENDS = ('ollama', 'internvl3')
+PROFILES = ('standard', 'fast')
 MAX_IMAGE_BYTES = 3 * 1024 * 1024
 MAX_RESPONSE_BYTES = 128 * 1024
 _slot = threading.BoundedSemaphore(1)
@@ -51,21 +53,38 @@ class VisionUnavailable(Exception):
     pass
 
 
+class VisionBusy(VisionUnavailable):
+    """Transient contention, distinct from an invalid output or failed worker."""
+    pass
+
+
 class NoRedirects(HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         raise URLError('Local vision service redirects are forbidden')
 
 
-def extract_image(content_type, body):
+def extract_request(content_type, body):
     if not content_type.lower().startswith('multipart/form-data;'):
         raise ValueError('Ожидается JPEG или PNG в multipart-поле file.')
     message = BytesParser(policy=policy.default).parsebytes(
         b'Content-Type: ' + content_type.encode('ascii') + b'\r\nMIME-Version: 1.0\r\n\r\n' + body)
     if not message.is_multipart() or message.defects:
         raise ValueError('Некорректная форма загрузки.')
-    files = [part for part in message.iter_parts() if part.get_param('name', header='content-disposition') == 'file']
+    parts = list(message.iter_parts())
+    files = [part for part in parts if part.get_param('name', header='content-disposition') == 'file']
     if len(files) != 1:
         raise ValueError('Передайте ровно одно изображение в поле file.')
+    profiles = [part for part in parts if part.get_param('name', header='content-disposition') == 'profile']
+    if len(profiles) > 1 or any(part.get_param('name', header='content-disposition') not in ('file', 'profile') for part in parts):
+        raise ValueError('Допустимы только поля file и profile.')
+    profile = 'standard'
+    if profiles:
+        try:
+            profile = profiles[0].get_payload(decode=True).decode('ascii')
+        except (UnicodeError, AttributeError) as error:
+            raise ValueError('Некорректный режим анализа.') from error
+        if profile not in PROFILES:
+            raise ValueError('Неизвестный режим анализа.')
     image = files[0].get_payload(decode=True)
     if not image or len(image) > MAX_IMAGE_BYTES:
         raise ValueError('Недопустимый размер изображения.')
@@ -78,9 +97,14 @@ def extract_image(content_type, body):
             normalized.thumbnail((1280, 1280))
             output = BytesIO()
             normalized.save(output, format='JPEG', quality=85)
-            return output.getvalue()
+            return output.getvalue(), profile
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as error:
         raise ValueError('Изображение не удалось прочитать.') from error
+
+
+def extract_image(content_type, body):
+    """Compatibility wrapper for callers that only need a sanitized image."""
+    return extract_request(content_type, body)[0]
 
 
 def result_from_observation(data, model=MODEL):
@@ -140,22 +164,56 @@ def ollama_observation(encoded_image):
     return json.loads(message.get('content') or message.get('thinking', ''))
 
 
-def analyze(image, backend='ollama'):
+def analyze(image, backend='ollama', profile='standard'):
     if backend not in BACKENDS:
         raise ValueError('Unknown local vision backend')
+    if profile not in PROFILES or (backend != 'internvl3' and profile != 'standard'):
+        raise ValueError('Выбранный режим не поддерживается моделью.')
     if not _slot.acquire(blocking=False):
-        raise VisionUnavailable('Модель занята другим кадром. Повторите через минуту.')
+        raise VisionBusy('Модель занята другим кадром. Повторите через несколько секунд.')
     started = time.monotonic()
     try:
         encoded_image = base64.b64encode(image).decode('ascii')
         if backend == 'internvl3':
-            envelope = request_json(INTERNVL_ENDPOINT, {'image': encoded_image}, timeout=100)
+            payload = {'image': encoded_image}
+            if profile != 'standard':
+                payload['profile'] = profile
+            try:
+                envelope = request_json(INTERNVL_ENDPOINT, payload, timeout=100)
+            except HTTPError as error:
+                # Only an explicitly signalled contention is safe to retry.
+                if error.code == 503:
+                    try:
+                        failure = json.loads(error.read(MAX_RESPONSE_BYTES + 1))
+                    except (ValueError, OSError):
+                        failure = {}
+                    if isinstance(failure, dict) and (failure.get('code') == 'vision_busy' or failure.get('error') == 'Local GPU is busy'):
+                        raise VisionBusy('Модель занята другим кадром. Повторите через несколько секунд.') from error
+                raise
             if envelope.get('model') != INTERNVL_MODEL:
                 raise ValueError('Unexpected InternVL model')
             result = result_from_observation(envelope['observation'], model=INTERNVL_MODEL)
+            if 'profile' in envelope:
+                if envelope['profile'] != profile:
+                    raise ValueError('Unexpected model profile')
+                result['profile'] = profile
+            elif profile != 'standard':
+                raise ValueError('Worker does not support the requested profile')
+            if 'observationKind' in envelope:
+                expected_kind = 'template' if profile == 'fast' else 'model'
+                if envelope['observationKind'] != expected_kind:
+                    raise ValueError('Unexpected observation kind')
+                result['observationKind'] = expected_kind
+            if 'metrics' in envelope:
+                metrics = envelope['metrics']
+                names = ('preprocessMs', 'generateMs', 'decodeMs', 'totalMs', 'inputTokens', 'outputTokens', 'patches')
+                if not isinstance(metrics, dict) or any(type(metrics.get(name)) not in (int, float) or
+                        not math.isfinite(metrics[name]) or metrics[name] < 0 for name in names):
+                    raise ValueError('Invalid model timings')
+                result['metrics'] = {name: metrics[name] for name in names}
         else:
             result = result_from_observation(ollama_observation(encoded_image))
-        result['durationSeconds'] = round(time.monotonic() - started, 1)
+        result['durationSeconds'] = round(time.monotonic() - started, 3)
         return result
     except (OSError, HTTPException) as error:
         raise VisionUnavailable('Локальная модель не ответила. Повторите кадр позже.') from error

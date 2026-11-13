@@ -15,6 +15,7 @@ from .demo_data import PASSPORT, SCENARIOS
 from .diagnostics import evaluate
 from . import history
 from . import vision
+from . import inspections
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -59,6 +60,7 @@ def initialize(database):
         ''', ((case['id'], serial, case['label'], json.dumps(case['telemetry']),
                json.dumps(case['vision']), json.dumps(case['zones'])) for case in SCENARIOS))
         history.initialize(connection)
+        inspections.initialize(connection)
 
 
 class BoundedHTTPServer(ThreadingHTTPServer):
@@ -112,14 +114,16 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header('Permissions-Policy', 'camera=(self), microphone=()')
         super().end_headers()
 
-    def send_json(self, data, status=HTTPStatus.OK):
-        self.send_body(json.dumps(data, ensure_ascii=False).encode(), 'application/json; charset=utf-8', status)
+    def send_json(self, data, status=HTTPStatus.OK, *, headers=None):
+        self.send_body(json.dumps(data, ensure_ascii=False).encode(), 'application/json; charset=utf-8', status, headers=headers)
 
-    def send_body(self, body, content_type, status=HTTPStatus.OK):
+    def send_body(self, body, content_type, status=HTTPStatus.OK, *, headers=None):
         self.send_response(status)
         self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(body)))
         self.send_header('Cache-Control', 'no-store')
+        for name, value in (headers or {}).items():
+            self.send_header(name, value)
         self.end_headers()
         self.wfile.write(body)
 
@@ -180,6 +184,25 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         target = urlsplit(self.path)
+        image_match = re.fullmatch(r'/api/analyses/([0-9a-f-]{36})/image', target.path)
+        inspection_match = re.fullmatch(r'/api/inspections/([0-9a-f-]{36})', target.path)
+        if image_match or inspection_match:
+            try:
+                with closing(connect(self.database)) as connection:
+                    if image_match:
+                        self.send_body(inspections.get_analysis(connection, image_match[1], include_image=True), 'image/jpeg')
+                    else:
+                        record = history.get_record(connection, inspection_match[1])
+                        if record is None:
+                            raise inspections.MissingEvidence('Осмотр не найден.')
+                        self.send_json({'record': record})
+            except inspections.MissingEvidence as error:
+                self.error(HTTPStatus.NOT_FOUND, str(error))
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+            except sqlite3.Error:
+                self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'История временно недоступна.')
+            return
         if target.path.startswith('/api/customer/'):
             from server import customer
             try:
@@ -247,7 +270,7 @@ class Handler(SimpleHTTPRequestHandler):
                 self.diagnose_demo(connection, serial, scenario)
             elif target.path == '/api/qr':
                 self.qr(connection, serial)
-            elif target.path == '/api/history':
+            elif target.path in ('/api/history', '/api/inspections'):
                 if self.passport(connection, serial):
                     self.send_json({'records': history.list_records(connection, serial)})
             else:
@@ -255,7 +278,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         route = urlsplit(self.path).path
-        if route not in ('/api/diagnose', '/api/history', '/analyze'):
+        if route not in ('/api/diagnose', '/api/history', '/analyze', '/api/inspections', '/api/inspections/preview'):
             self.error(HTTPStatus.NOT_FOUND, 'Маршрут не найден.')
             return
         origins = self.headers.get_all('Origin', [])
@@ -283,6 +306,9 @@ class Handler(SimpleHTTPRequestHandler):
         if route == '/api/history':
             self.save_history(data)
             return
+        if route in ('/api/inspections', '/api/inspections/preview'):
+            self.camera_inspection(data, preview=route.endswith('/preview'))
+            return
         if not isinstance(data, dict) or not isinstance(data.get('serial'), str) or any(
             not isinstance(data.get(key), dict) for key in ('telemetry', 'vision')
         ):
@@ -293,6 +319,26 @@ class Handler(SimpleHTTPRequestHandler):
             if passport:
                 self.send_json({'source': 'submitted', 'passport': passport,
                                 'findings': evaluate(data['telemetry'], data['vision'], passport['thresholds'])})
+
+    def camera_inspection(self, data, *, preview=False):
+        try:
+            with closing(connect(self.database)) as connection, connection:
+                if preview:
+                    result = inspections.preview(connection, data)
+                    status = HTTPStatus.OK
+                else:
+                    record, created = inspections.save(connection, data)
+                    result = {'record': record, 'created': created}
+                    status = HTTPStatus.CREATED if created else HTTPStatus.OK
+            self.send_json(result, status)
+        except history.IdempotencyConflict as error:
+            self.error(HTTPStatus.CONFLICT, str(error))
+        except (history.UnknownPump, inspections.MissingEvidence, inspections.MissingScenario) as error:
+            self.error(HTTPStatus.NOT_FOUND, str(error))
+        except (ValueError, UnicodeError) as error:
+            self.error(HTTPStatus.BAD_REQUEST, str(error))
+        except sqlite3.Error:
+            self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Не удалось сохранить осмотр. Повторите запрос.')
 
     def save_history(self, data):
         if not isinstance(data, dict) or not isinstance(data.get('serial'), str) or not isinstance(data.get('scenarioId'), str):
@@ -336,14 +382,22 @@ class Handler(SimpleHTTPRequestHandler):
             body = self.rfile.read(length)
             if len(body) != length:
                 raise ValueError('Тело запроса с кадром получено не полностью.')
-            image = vision.extract_image(self.headers.get('Content-Type', ''), body)
-            result = vision.analyze(image, backend=self.vision_backend)
+            image, profile = vision.extract_request(self.headers.get('Content-Type', ''), body)
+            result = vision.analyze(image, backend=self.vision_backend, profile=profile)
+            if result.get('status') in ('defect', 'clear'):
+                with closing(connect(self.database)) as connection, connection:
+                    result = {**result, **inspections.store_analysis(connection, image, result)}
         except TimeoutError:
             self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить кадр за отведённое время.')
         except ValueError as error:
             self.error(HTTPStatus.BAD_REQUEST, str(error))
+        except vision.VisionBusy as error:
+            self.send_json({'error': str(error), 'code': 'vision_busy', 'retryAfterSeconds': 2},
+                           HTTPStatus.SERVICE_UNAVAILABLE, headers={'Retry-After': '2'})
         except (vision.VisionUnavailable, ImportError) as error:
             self.error(HTTPStatus.SERVICE_UNAVAILABLE, str(error))
+        except sqlite3.Error:
+            self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Не удалось сохранить кадр. Повторите проверку.')
         else:
             self.send_json(result)
 

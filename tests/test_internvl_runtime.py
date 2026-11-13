@@ -1,15 +1,19 @@
+import argparse
 import base64
 import json
 import os
 import threading
 import unittest
+from contextlib import nullcontext
 from concurrent.futures import ThreadPoolExecutor
 from http.client import HTTPConnection
 from io import BytesIO
 from pathlib import Path
-from unittest.mock import patch
+from tempfile import TemporaryDirectory
+from unittest.mock import MagicMock, Mock, patch
 
 from vision_runtime import worker
+from vision_runtime import benchmark_profiles
 
 
 OBSERVATION = {
@@ -50,6 +54,28 @@ class RuntimeValidationTest(unittest.TestCase):
             with self.subTest(output=output), self.assertRaises(ValueError):
                 worker.parse_observation(output)
 
+    def test_compact_classification_uses_only_label_templates(self):
+        compact = {key: value for key, value in OBSERVATION.items() if key != 'observation'}
+        for output in (json.dumps(compact), f'```json\n{json.dumps(compact)}\n```'):
+            result = worker.parse_compact(output)
+            self.assertEqual(result, compact | {'observation': 'Корпус насоса: возможные признаки коррозии.'})
+            self.assertNotIn('На корпусе', result['observation'])
+        for fields in ({'component': 'none', 'condition': 'uncertain', 'box': [0, 0, 0, 0]},
+                       compact | {'condition': 'uncertain'}):
+            self.assertEqual(worker.parse_compact(json.dumps(fields)), fields | {'observation': ''})
+        clean = worker.parse_compact(json.dumps(compact | {'condition': 'no_visible_defect'}))
+        self.assertEqual(clean['observation'], 'Корпус насоса: явных внешних дефектов не замечено.')
+
+    def test_compact_rejects_generated_prose_unknown_labels_and_invalid_coordinates(self):
+        compact = {key: value for key, value in OBSERVATION.items() if key != 'observation'}
+        for value in (None, [], {}, OBSERVATION, compact | {'explanation': 'invented'},
+                      compact | {'component': []}, compact | {'condition': 'overheating'},
+                      compact | {'box': [0, 0, 1001, 500]}, compact | {'box': [False, 1, 10, 10]}):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                worker.parse_compact(json.dumps(value))
+        with self.assertRaises(ValueError):
+            worker.parse_compact('Description: ' + json.dumps(compact))
+
     def test_image_rejects_urls_extra_fields_and_invalid_base64(self):
         for payload in (
             {"image": "https://example.invalid/frame.jpg"},
@@ -71,6 +97,21 @@ class RuntimeValidationTest(unittest.TestCase):
                 worker.read_image({"image": image})
         with worker.read_image({"image": encoded_image()}) as image:
             self.assertEqual((image.mode, image.size), ("RGB", (32, 16)))
+
+    def test_profiles_are_optional_bounded_and_do_not_accept_client_generation_options(self):
+        image = encoded_image()
+        self.assertEqual(worker.request_profile({'image': image}), 'standard')
+        for profile in ('standard', 'fast'):
+            payload = {'image': image, 'profile': profile}
+            self.assertEqual(worker.request_profile(payload), profile)
+            with worker.read_image(payload) as decoded:
+                self.assertEqual(decoded.size, (32, 16))
+        for profile in ('', 'FAST', 'custom', None, True, 4, [], {}):
+            with self.subTest(profile=profile), self.assertRaises(ValueError):
+                worker.read_image({'image': image, 'profile': profile})
+        for extra in ({'max_patches': 1}, {'max_new_tokens': 1}, {'prompt': 'override'}):
+            with self.subTest(extra=extra), self.assertRaises(ValueError):
+                worker.read_image({'image': image, **extra})
 
     def test_network_guard_allows_local_addresses_and_rejects_external_dns_and_connect(self):
         for host in ("127.0.0.1", "::1"):
@@ -107,7 +148,96 @@ class RuntimeValidationTest(unittest.TestCase):
             engine.side_effect = load
             worker.main()
         server.assert_called_once_with(("127.0.0.1", 12000), engine.return_value)
+        engine.return_value.warmup.assert_not_called()
         server.return_value.__enter__.return_value.serve_forever.assert_called_once()
+
+    def test_optional_warmup_completes_before_http_server_is_created(self):
+        events = []
+        with (patch.object(worker.sys, 'argv', ['worker', '--warmup']),
+              patch.object(worker.sys, 'addaudithook'),
+              patch.object(worker, 'Engine') as engine,
+              patch.object(worker, 'Server') as server,
+              patch.object(worker, 'print', create=True)):
+            engine.return_value.device = 'fake GPU'
+            engine.return_value.warmup.side_effect = lambda: events.append('warmup') or {'totalMs': 10}
+            server.side_effect = lambda *args: events.append('server') or MagicMock()
+            worker.main()
+        self.assertEqual(events, ['warmup', 'server'])
+
+
+class EngineProfilingTest(unittest.TestCase):
+    def setUp(self):
+        self.engine = worker.Engine.__new__(worker.Engine)
+        self.engine.torch = Mock()
+        self.engine.torch.inference_mode.side_effect = nullcontext
+        self.engine.prompt = 'invariant prompt'
+        self.engine.compact_prompt = 'invariant compact prompt'
+        inputs = MagicMock(spec=['to', 'keys', '__getitem__'])
+        tensors = {'input_ids': Mock(shape=(1, 350)), 'pixel_values': Mock(shape=(5, 3, 448, 448))}
+        inputs.__getitem__.side_effect = tensors.__getitem__
+        inputs.keys.return_value = tensors.keys()
+        inputs.to.return_value = inputs
+        self.engine.processor = Mock(return_value=inputs)
+        self.engine.processor.decode.return_value = json.dumps(OBSERVATION)
+        tokens = MagicMock()
+        tokens.__getitem__.return_value = Mock(shape=(97,))
+        self.engine.model = Mock()
+        self.engine.model.generate.return_value = tokens
+
+    def test_fast_uses_compact_output_without_reducing_image_or_generation_budget(self):
+        image = object()
+        compact = {key: value for key, value in OBSERVATION.items() if key != 'observation'}
+        for profile in ('standard', 'fast'):
+            self.engine.processor.decode.return_value = json.dumps(compact if profile == 'fast' else OBSERVATION)
+            with self.subTest(profile=profile), patch.object(worker.time, 'perf_counter', side_effect=[1, 1.2, 4.2, 4.25]):
+                result = self.engine.infer(image, profile)
+                self.assertEqual({key: result[key] for key in compact}, compact)
+                self.assertEqual(result['observation'], OBSERVATION['observation'] if profile == 'standard'
+                                 else 'Корпус насоса: возможные признаки коррозии.')
+                expected_prompt = 'invariant compact prompt' if profile == 'fast' else 'invariant prompt'
+                self.engine.processor.assert_called_with(text=expected_prompt, images=image, return_tensors='pt',
+                                                         crop_to_patches=True, max_patches=4)
+                options = self.engine.model.generate.call_args.kwargs
+                self.assertEqual(options['max_new_tokens'], 180)
+                self.assertEqual(options['max_time'], 85)
+                self.assertIs(options['do_sample'], False)
+                self.assertIs(options['use_cache'], True)
+                self.assertEqual(self.engine.last_metrics, {
+                    'preprocessMs': 200, 'generateMs': 3000, 'decodeMs': 50, 'totalMs': 3250,
+                    'inputTokens': 350, 'outputTokens': 97, 'patches': 5,
+                })
+        self.engine.processor.apply_chat_template.assert_not_called()
+        self.assertEqual(self.engine.torch.cuda.synchronize.call_count, 6)
+
+    def test_failed_output_does_not_keep_previous_request_metrics(self):
+        self.engine.last_metrics = {'totalMs': 123}
+        self.engine.processor.decode.return_value = '{'
+        with self.assertRaises(ValueError):
+            self.engine.infer(object())
+        self.assertIsNone(self.engine.last_metrics)
+
+    def test_unknown_profile_never_reaches_processor(self):
+        with self.assertRaises(ValueError):
+            self.engine.infer(object(), profile='custom')
+        self.engine.processor.assert_not_called()
+
+    def test_constructor_precomputes_template_once_with_offline_loading(self):
+        torch = Mock()
+        torch.cuda.is_available.return_value = True
+        transformers = Mock()
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'cyber102-manifest.json').write_text(json.dumps({'repository': worker.MODEL, 'revision': worker.REVISION}))
+            with patch.dict(worker.sys.modules, {'torch': torch, 'transformers': transformers}):
+                engine = worker.Engine(root)
+        processor = transformers.AutoProcessor.from_pretrained.return_value
+        self.assertEqual(processor.apply_chat_template.call_count, 2)
+        prompts = [call.args[0][0]['content'][1]['text'] for call in processor.apply_chat_template.call_args_list]
+        self.assertEqual(prompts, [worker.PROMPT, worker.COMPACT_PROMPT])
+        self.assertEqual(engine.prompt, processor.apply_chat_template.return_value)
+        self.assertIsNone(engine.last_metrics)
+        transformers.AutoProcessor.from_pretrained.assert_called_once_with(root, local_files_only=True, trust_remote_code=False)
+        self.assertIs(transformers.AutoModelForImageTextToText.from_pretrained.call_args.kwargs['local_files_only'], True)
 
 
 class FakeEngine:
@@ -119,12 +249,17 @@ class FakeEngine:
         self.finish = threading.Event()
         self.finish.set()
         self.images = []
+        self.profiles = []
+        self.last_metrics = None
 
-    def infer(self, image):
+    def infer(self, image, profile='standard'):
         self.images.append((image.mode, image.size))
+        self.profiles.append(profile)
         self.started.set()
         if not self.finish.wait(3):
             raise RuntimeError("Test did not release inference")
+        self.last_metrics = {'preprocessMs': 1, 'generateMs': 10, 'decodeMs': 1, 'totalMs': 12,
+                             'inputTokens': 400, 'outputTokens': 100, 'patches': worker.PROFILES[profile]}
         return OBSERVATION
 
 
@@ -162,6 +297,11 @@ class RuntimeHTTPTest(unittest.TestCase):
         self.assertEqual(data["observation"], OBSERVATION)
         self.assertEqual(data["model"], worker.MODEL)
         self.assertGreaterEqual(data["durationSeconds"], 0)
+        self.assertEqual(data['profile'], 'standard')
+        self.assertEqual(data['observationKind'], 'model')
+        self.assertEqual(data['metrics'], self.engine.last_metrics)
+        self.assertEqual(health['profiles'], ['standard', 'fast'])
+        self.assertEqual(health['defaultProfile'], 'standard')
         self.assertEqual(self.engine.images, [("RGB", (32, 16))])
 
     def test_bad_uploads_and_browser_origin_do_not_reach_engine(self):
@@ -176,6 +316,18 @@ class RuntimeHTTPTest(unittest.TestCase):
                 self.assertIn("error", self.request("POST", "/analyze", payload, headers, expected=status))
         self.assertIn("error", self.request("POST", "/analyze", {"image": "https://example.invalid/pump.jpg"}, expected=400))
         self.assertEqual(self.engine.images, [])
+
+    def test_explicit_profile_is_reported_and_invalid_profile_never_reaches_engine(self):
+        payload = {'image': encoded_image()}
+        for profile in (None, 'unknown', {}, 1):
+            self.request('POST', '/analyze', payload | {'profile': profile}, expected=400)
+        self.assertEqual(self.engine.images, [])
+        result = self.request('POST', '/analyze', payload | {'profile': 'fast'})
+        self.assertEqual(result['profile'], 'fast')
+        self.assertEqual(result['observationKind'], 'template')
+        self.assertEqual(result['metrics']['patches'], 4)
+        self.assertEqual(result['observation'], OBSERVATION)
+        self.assertEqual(self.engine.profiles, ['fast'])
 
     def test_busy_rejects_second_request_then_accepts_next_frame(self):
         payload = {"image": encoded_image()}
@@ -195,6 +347,37 @@ class RuntimeHTTPTest(unittest.TestCase):
         self.assertIs(self.request("GET", "/health")["busy"], False)
         self.assertEqual(self.request("POST", "/analyze", payload)["observation"], OBSERVATION)
         self.assertEqual(len(self.engine.images), 2)
+
+
+class ProfileBenchmarkTest(unittest.TestCase):
+    def test_only_loopback_endpoint_is_allowed(self):
+        self.assertEqual(benchmark_profiles.local_endpoint('http://127.0.0.1:11436/analyze'), 'http://127.0.0.1:11436/analyze')
+        for endpoint in ('https://example.com/analyze', 'http://192.168.1.1:80/analyze',
+                         'http://user:pass@127.0.0.1:80/analyze', 'http://127.0.0.1:80/analyze?remote=1'):
+            with self.subTest(endpoint=endpoint), self.assertRaises(argparse.ArgumentTypeError):
+                benchmark_profiles.local_endpoint(endpoint)
+
+    def test_warmup_is_excluded_but_errors_are_retained(self):
+        records = [
+            {'profile': 'fast', 'phase': 'warmup', 'seconds': 99, 'result': {}},
+            {'profile': 'fast', 'phase': 'measured', 'seconds': 1, 'result': {}},
+            {'profile': 'fast', 'phase': 'measured', 'seconds': 3, 'result': {}},
+            {'profile': 'fast', 'phase': 'measured', 'seconds': 10, 'error': 'HTTP 502'},
+        ]
+        summary = benchmark_profiles.summarize(records, ['fast'])['fast']
+        self.assertEqual(summary, {'requests': 3, 'successful': 2, 'errors': 1,
+                                  'medianSeconds': 2, 'p95Seconds': 3, 'allRequestP95Seconds': 10})
+
+    def test_comparison_reports_disagreement_not_accuracy(self):
+        a = {'case': 'pump', 'repeat': 0, 'phase': 'measured', 'profile': 'standard', 'status': 'defect',
+             'result': {'observation': OBSERVATION}}
+        b = {**a, 'profile': 'fast', 'status': 'clear',
+             'result': {'observation': OBSERVATION | {'condition': 'no_visible_defect'}}}
+        result, = benchmark_profiles.compare([a, b])
+        self.assertIs(result['conditionChanged'], True)
+        self.assertIs(result['statusChanged'], True)
+        self.assertIs(result['componentChanged'], False)
+        self.assertEqual(result['boxIoU'], 1)
 
 
 if __name__ == "__main__":
