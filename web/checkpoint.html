@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6f3">
+    <title>Диагностика насоса — Cyber102</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="checkpoint.css">
+    <script src="checkpoint.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="/checkpoint.html"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
+        <a class="nav-link" href="index.html">Осмотр камерой</a>
+      </div>
+    </header>
+
+    <main class="page">
+      <header class="intro">
+        <span class="mode"><i aria-hidden="true"></i>Демонстрационные данные</span>
+        <h1>Диагностика насоса</h1>
+        <p>Откройте паспорт по серийному номеру и проверьте выбранный сценарий.</p>
+      </header>
+
+      <div class="dashboard">
+        <div class="inspection-column">
+          <section class="panel" aria-labelledby="passport-title">
+            <div class="panel-heading"><h2 id="passport-title">Паспорт оборудования</h2></div>
+            <div class="section-body">
+              <form id="lookup" class="lookup">
+                <div class="field"><label for="serial">Серийный номер</label><input id="serial" maxlength="80" value="P-102" required autocomplete="off" autocapitalize="characters"></div>
+                <button type="submit" class="button secondary" id="lookup-button">Открыть паспорт</button>
+              </form>
+              <dl class="passport" id="passport" hidden></dl>
+              <details class="qr" id="qr" hidden>
+                <summary>QR для телефона</summary>
+                <img id="qr-image" width="180" height="180" alt="QR-ссылка на паспорт насоса">
+                <p id="qr-error" hidden>QR-код недоступен. Проверьте настройки локального сервера.</p>
+                <button type="button" class="button secondary" id="print-qr" hidden>Распечатать QR</button>
+              </details>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="diagram-title">
+            <div class="panel-heading"><h2 id="diagram-title">Схема узлов</h2><span class="source">Вид сбоку</span></div>
+            <div class="schematic">
+              <canvas id="pump-diagram" width="1000" height="500" role="img" aria-label="Схема насоса и двигателя с муфтой, установленными на общей раме"></canvas>
+              <div class="zones" id="zones" aria-hidden="true"></div>
+            </div>
+            <p id="zone-label" class="zone-label" hidden></p>
+          </section>
+        </div>
+
+        <div class="inspection-column">
+          <section class="panel" aria-labelledby="analysis-title">
+            <div class="panel-heading"><h2 id="analysis-title">Проверка сценария</h2></div>
+            <div class="section-body">
+              <form id="analysis-form" class="lookup scenario-form">
+                <div class="field"><label for="scenario">Сценарий</label><select id="scenario" disabled></select></div>
+                <button type="submit" class="button primary" id="run" disabled>Проверить</button>
+              </form>
+              <p class="message" id="checkpoint-message" role="status"></p>
+              <div id="diagnosis" hidden>
+                <p id="summary" class="result-summary"></p>
+                <div id="findings"></div>
+                <details class="inputs" id="inputs">
+                  <summary>Показания датчиков и признаки осмотра</summary>
+                  <dl class="facts" id="observations"></dl>
+                </details>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
