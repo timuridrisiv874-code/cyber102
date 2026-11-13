@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6f3">
+    <title>Осмотр оборудования</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; media-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+    <link rel="stylesheet" href="/__mobile_inspection/styles.css">
+    <script src="/__mobile_inspection/app.js" defer></script>
+  </head>
+  <body>
+    <main class="page" data-analysis-endpoint="/analyze">
+      <header class="intro">
+        <h1>Осмотр оборудования</h1>
+        <p>Сделайте снимок или начните видеопроверку. Кадры анализирует InternVL3 на подключённом сервере.</p>
+        <p><a href="/checkpoint.html">Паспорт и журнал</a></p>
+      </header>
+
+      <div class="workspace">
+        <section class="capture panel" aria-labelledby="capture-title">
+          <div class="panel-heading">
+            <h2 id="capture-title">Кадр осмотра</h2>
+            <span class="source" id="source"><i aria-hidden="true"></i><span id="source-text">Ожидание кадра</span></span>
+          </div>
+
+          <div class="viewfinder" id="viewfinder">
+            <p class="camera-idle" id="camera-idle">Камера выключена</p>
+            <video id="video" aria-label="Изображение с камеры" muted autoplay playsinline hidden></video>
+            <canvas id="snapshot" role="img" aria-label="Зафиксированный кадр осмотра" hidden></canvas>
+            <div class="finder-guide" id="guide" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+            <button type="button" class="detection" id="detection" aria-controls="result" hidden>
+              <span id="detection-label"></span>
+            </button>
+          </div>
+
+          <div class="capture-footer">
+            <div class="camera-options" id="camera-options" hidden>
+              <label for="camera-mode">Режим</label>
+              <select id="camera-mode">
+                <option value="single">Один кадр</option>
+                <option value="video">Видеопроверка</option>
+              </select>
+              <label for="frame-interval" id="frame-interval-label" hidden>Интервал</label>
+              <select id="frame-interval" hidden>
+                <option value="2000">2 секунды</option>
+                <option value="5000" selected>5 секунд</option>
+                <option value="10000">10 секунд</option>
+              </select>
+            </div>
+            <p class="video-help" id="video-help" hidden>Сервер проверяет кадры по очереди. Рамка относится к последнему полученному результату.</p>
+            <div class="actions">
+              <button class="button primary" id="check" type="button" disabled><i class="scan-icon" aria-hidden="true"></i><span id="check-label">Проверить кадр</span></button>
+              <button class="button primary" id="video-toggle" type="button" hidden><i class="scan-icon" aria-hidden="true"></i><span id="video-toggle-label">Начать проверку</span></button>
+              <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Включить камеру</span></button>
+            </div>
+            <p class="message" id="message" role="status"></p>
+          </div>
+        </section>
+
+        <section class="result panel" id="result" aria-labelledby="result-title">
+          <div class="panel-heading"><h2 id="result-title" tabindex="-1">Результат осмотра</h2></div>
+          <section class="video-summary" id="video-summary" aria-labelledby="video-summary-title" hidden>
+            <h3 id="video-summary-title">Сводка видеопроверки</h3>
+            <p id="summary-state" role="status"></p>
+            <dl class="summary-counts">
+              <div><dt>Проверено</dt><dd id="summary-total">0</dd></div>
+              <div><dt>С признаками дефекта</dt><dd id="summary-defects">0</dd></div>
+              <div><dt>Без видимых признаков</dt><dd id="summary-clear">0</dd></div>
+              <div><dt>Без оценки</dt><dd id="summary-unusable">0</dd></div>
+            </dl>
+            <ul id="summary-findings" hidden></ul>
+          </section>
+          <div class="checked-frame" id="checked-frame" hidden>
+            <p class="source">Последний проверенный кадр</p>
+            <div class="viewfinder checked-viewfinder" id="checked-viewfinder"></div>
+          </div>
+          <div class="empty" id="empty">
+            <div class="empty-icon" aria-hidden="true"><i></i></div>
+            <h3 id="empty-title">Ожидает проверки</h3>
+            <p id="empty-text">После проверки здесь появятся данные узла и рекомендация по обслуживанию.</p>
+          </div>
+
+          <div class="details" id="details" hidden>
+            <span class="finding" id="finding"></span>
+            <h3 id="equipment"></h3>
+            <p class="equipment-id" id="equipment-id"></p>
+            <p class="equipment-id" id="vision-observation" hidden></p>
+            <dl class="facts">
+              <div><dt>Узел</dt><dd id="component"></dd></div>
+            </dl>
+            <div class="recommendation">
+              <h4>Рекомендация</h4>
+              <p id="recommendation"></p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

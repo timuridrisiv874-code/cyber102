@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Брови и ресницы · прототип интерфейса</title>
+<link rel="stylesheet" href="style.css">
+<script src="demo.js" defer></script>
+</head>
+<body>
+<header><div class="wrap mast"><img src="assets/logo.png" alt="Брови и ресницы"><div><strong>Брови и ресницы</strong><span>Осмотр оборудования</span></div></div></header>
+<main class="wrap">
+<p class="demo">Макет · демонстрационные данные</p>
+<nav aria-label="Этапы осмотра">
+<button type="button" data-page="passport" aria-current="step">Паспорт</button>
+<button type="button" data-page="capture">Снимок</button>
+<button type="button" data-page="diagnosis">Датчики</button>
+<button type="button" data-page="history">Журнал</button>
+</nav>
+<section id="passport">
+<h1>Паспорт оборудования</h1>
+<form id="serial-form" class="inline"><label>Серийный номер<input id="serial" value="P-102" autocomplete="off" required></label><button class="primary">Открыть</button></form>
+<p id="serial-status" role="status"></p>
+<article id="pump" class="panel">
+<p class="eyebrow">P-102 · ДЕМО</p><h2>Центробежный насос Д 160-1126</h2>
+<dl><div><dt>Узлы осмотра</dt><dd>Уплотнение, подшипник, муфта, трубопровод</dd></div><div><dt>Интервалы ТО</dt><dd>4 000 / 8 000 / 16 000 моточасов</dd></div><div><dt>Остаточный ресурс</dt><dd>Недостаточно данных</dd></div></dl>
+<button type="button" class="primary" data-page="capture">Перейти к снимку</button>
+</article>
+</section>
+<section id="capture" hidden>
+<h1>Осмотр по кадру</h1>
+<p>Пример того, как приложение показывает ответ модели.</p>
+<div class="photo"><img src="assets/pump.jpg" alt="Демонстрационная фотография насоса"><button type="button" class="frame" id="frame" hidden aria-label="Открыть наблюдение по узлу"></button></div>
+<button id="analyze" type="button" class="primary">Показать пример результата</button>
+<p id="analysis-status" role="status"></p>
+<article id="result" class="panel" tabindex="-1" hidden>
+<p class="eyebrow">ПРЕДВАРИТЕЛЬНОЕ НАБЛЮДЕНИЕ · ДЕМО</p>
+<h2>Трубопровод и фланец</h2><p>Видимые признаки коррозии.</p><p><strong>Рекомендация</strong><br>Осмотреть поверхность узла при хорошем освещении и зафиксировать состояние покрытия.</p>
+<button type="button" data-page="diagnosis">Открыть показания датчиков</button>
+</article>
+</section>
+<section id="diagnosis" hidden>
+<h1>Диагностика по датчикам</h1>
+<p>P-102 · Демонстрационный сценарий</p>
+<label>Сценарий<select id="scenario"><option value="seal_leak">Утечка через уплотнение</option><option value="coupling_guard">Отсутствует кожух муфты</option><option value="healthy">Штатные показания</option></select></label>
+<article class="panel" aria-live="polite"><h2 id="finding"></h2><p id="evidence"></p></article>
+<form id="save-form" class="panel"><label>Заметка<textarea id="note" rows="3" maxlength="500"></textarea></label><button class="primary">Сохранить в демо-журнал</button></form>
+</section>
+<section id="history" hidden><h1>Журнал осмотров</h1><p>Записи текущего сеанса макета.</p><div id="records" aria-live="polite"><p id="empty-history">Записей пока нет.</p></div></section>
+</main>
+</body>
+</html>
