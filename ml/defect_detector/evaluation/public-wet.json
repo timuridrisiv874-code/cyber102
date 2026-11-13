@@ -1,0 +1,102 @@
+[
+  {
+    "file": "water-meter.jpg",
+    "scene": "water-meter",
+    "source": "https://commons.wikimedia.org/wiki/File:BCA_pipe_burst_1_at_water_meter.jpg",
+    "author": "Sarang",
+    "license": "Public domain",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.0,
+          0.69,
+          1.0,
+          1.0
+        ]
+      }
+    ],
+    "note": "Visible runoff below the installation; exact origin not visible.",
+    "sha256": "7e49fee2141c9a921828dd0427762d3e58fdbf49c4d2dae8b762d3f1b4f4679c"
+  },
+  {
+    "file": "urban-line.jpg",
+    "scene": "urban-line",
+    "source": "https://commons.wikimedia.org/wiki/File:Water_dripping_out_of_an_urban_water_supply_pipeline_in_India_20120311.jpg",
+    "author": "Ganesh Dhamodkar/Wikimedia Commons",
+    "license": "CC BY-SA 3.0",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.24,
+          0.23,
+          0.82,
+          1.0
+        ]
+      }
+    ],
+    "note": "Pooled water around the pipe.",
+    "sha256": "446c12de871ce5eaadd01b21bf5d672efd7bb36675cc1194d33f03d5c03bbcb4"
+  },
+  {
+    "file": "roof-drain.jpg",
+    "scene": "roof-drain",
+    "source": "https://commons.wikimedia.org/wiki/File:2003-09-23_Water_dripping_from_pipe_at_UNC.jpg",
+    "author": "Ildar Sagdejev",
+    "license": "CC BY-SA 4.0",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.408,
+          0.515,
+          0.635,
+          0.971
+        ]
+      }
+    ],
+    "note": "Visible liquid at the outlet of a drain; a positive for liquid only.",
+    "sha256": "0bd85953b084054acc8d1246fb4404d3233b8af0d322ff3b6ad98e76f68c5d73"
+  },
+  {
+    "file": "park-pipe.jpg",
+    "scene": "park-pipe",
+    "source": "https://commons.wikimedia.org/wiki/File:2024-12-25_Leaking_pipe_in_Lisi_Park.jpg",
+    "author": "Yuri Samoylov",
+    "license": "CC BY-SA 4.0",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.216,
+          0.391,
+          0.973,
+          0.743
+        ]
+      }
+    ],
+    "note": "Visible jet and spray; excludes the downstream wet ground.",
+    "sha256": "51dc3825b0088598440d8b4b286e4e11f4a252ac71a81ae116dfb3278669665c"
+  },
+  {
+    "file": "rural-pipe.jpg",
+    "scene": "rural-pipe",
+    "source": "https://commons.wikimedia.org/wiki/File:Water_pipeline_leak_%40_Bord_de_Mars_01.jpg",
+    "author": "Rémih",
+    "license": "CC BY-SA 4.0",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.492,
+          0.269,
+          0.614,
+          0.761
+        ]
+      }
+    ],
+    "note": "Visible water jet above the pipe.",
+    "sha256": "dd250591b4ebe474f3e18e4652ede4b7c5a2f4059301770ee4c36967988dce21"
+  }
+]

@@ -1,0 +1,114 @@
+[
+  {
+    "file": "oil_chemical-Level01-Wheeled-002329-001.jpg",
+    "scene": "pump-service",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level01-Wheeled-002329/oil_chemical-Level01-Wheeled-002329-001.json",
+    "sha256": "614bfb4296a530334b9e949cbd297661117b5370dab01cb42e0108d4fc2341ad",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.6140625,
+          0.49166666666666664,
+          0.859375,
+          0.725
+        ],
+        "sourceLabel": "Liquid"
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "license": "CC BY 4.0"
+  },
+  {
+    "file": "oil_chemical-Level01-Wheeled-002330-001.jpg",
+    "scene": "pump-service",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level01-Wheeled-002330/oil_chemical-Level01-Wheeled-002330-001.json",
+    "sha256": "aacf42566213c9cf6036ad40eace857935d44f9865f61bb0c3d82c626f754144",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.58125,
+          0.6555555555555556,
+          0.8328125,
+          0.9472222222222222
+        ],
+        "sourceLabel": "Liquid"
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "license": "CC BY 4.0"
+  },
+  {
+    "file": "oil_chemical-Level01-Wheeled-002331-001.jpg",
+    "scene": "pump-service",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level01-Wheeled-002331/oil_chemical-Level01-Wheeled-002331-001.json",
+    "sha256": "82b398155eeec278f082790e8595ea5575fad1e6f9bc2e0788c78436d623e7bd",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.5609375,
+          0.6472222222222223,
+          0.8265625,
+          0.9472222222222222
+        ],
+        "sourceLabel": "Liquid"
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "license": "CC BY 4.0"
+  },
+  {
+    "file": "oil_chemical-Level02-Wheeled-002388-001.jpg",
+    "scene": "equipment-base",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level02-Wheeled-002388/oil_chemical-Level02-Wheeled-002388-001.json",
+    "sha256": "675643b9ceaa96adf191e9a685c2e863142bedd4afc52e2ec8a68e5323686ec9",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.5484375,
+          0.14444444444444443,
+          0.9859375,
+          0.8583333333333333
+        ],
+        "sourceLabel": "Liquid"
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.044956140350877194,
+          0.10136452241715399,
+          0.36403508771929827,
+          0.27485380116959063
+        ],
+        "sourceLabel": "Liquid"
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "license": "CC BY 4.0",
+    "note": "Two liquid regions from source polygons. Tiny separate droplet polygons on the seam are outside this benchmark."
+  },
+  {
+    "file": "oil_chemical-Level02-Wheeled-002391-001.jpg",
+    "scene": "pump-floor",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level02-Wheeled-002391/oil_chemical-Level02-Wheeled-002391-001.json",
+    "sha256": "231e374ad87c6fb8bdbdcb3f5f86c009fa76673fa9de6127a04f3d55297a0ab1",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.461,
+          0.092,
+          1.0,
+          1.0
+        ],
+        "sourceLabel": "Liquid"
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "license": "CC BY 4.0",
+    "note": "Manually tightened the source box to the visible wet floor on the right of the pump."
+  }
+]
