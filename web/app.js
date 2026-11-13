@@ -57,7 +57,7 @@ function render() {
   byId('guide').hidden = frozen;
   byId('source').dataset.live = String(live);
   byId('source-text').textContent = live ? 'Камера' : frameSource === 'camera' ? 'Кадр с камеры' : 'Пример кадра';
-  byId('mode').textContent = endpoint && (live || frameSource === 'camera') ? 'Серверный анализ' : 'Тестовый режим';
+  byId('mode').textContent = endpoint && (live || frameSource === 'camera') ? 'Локальная модель' : 'Тестовый режим';
   byId('demo-options').hidden = Boolean(stream || openingCamera || frameSource === 'camera');
   demoScenario.disabled = checking;
 
@@ -81,6 +81,8 @@ function render() {
     byId('finding').textContent = result.finding;
     byId('equipment').textContent = result.equipment.name;
     byId('equipment-id').textContent = result.equipment.id;
+    byId('vision-observation').hidden = !result.observation;
+    byId('vision-observation').textContent = result.observation ? `Предварительный осмотр · ${result.model}: ${result.observation}` : '';
     byId('component').textContent = result.component;
     byId('service-life').textContent = result.serviceLife;
     byId('next-service').textContent = result.nextService;
@@ -183,7 +185,7 @@ function freezeFrame() {
 
 async function analyzeFrame(useServer) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
+  const timeout = setTimeout(() => controller.abort(), useServer ? 120000 : 12000);
   try {
     const options = { signal: controller.signal, cache: 'no-store' };
     if (useServer) {
@@ -195,7 +197,10 @@ async function analyzeFrame(useServer) {
     }
     const mockPath = frameSource === 'example' ? demoScenario.selectedOptions[0].dataset.response : 'mock-analysis.json';
     const response = await fetch(useServer ? endpoint : `./${mockPath}`, options);
-    if (!response.ok) throw new Error(`Analysis returned ${response.status}`);
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || `Ошибка анализа: ${response.status}`);
+    }
     return readResult(await response.json());
   } finally {
     clearTimeout(timeout);
@@ -242,12 +247,13 @@ async function checkFrame() {
   checking = true;
   try {
     if (!frameSource) freezeFrame();
+    if (endpoint && frameSource === 'camera') showMessage('Модель анализирует кадр. Первый запуск может занять до двух минут.');
     render();
     result = await analyzeFrame(Boolean(endpoint && frameSource === 'camera'));
     showMessage('Проверка завершена.');
   } catch (error) {
     showMessage(error.name === 'AbortError' ? 'Сервер не ответил вовремя. Повторите проверку.' :
-      'Не удалось проверить кадр. Повторите попытку.', true);
+      (error.message || 'Не удалось проверить кадр. Повторите попытку.'), true);
   } finally {
     checking = false;
     render();

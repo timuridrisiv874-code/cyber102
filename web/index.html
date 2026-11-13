@@ -16,10 +16,10 @@
       </div>
     </header>
 
-    <main class="page" data-analysis-endpoint="">
+    <main class="page" data-analysis-endpoint="/analyze">
       <header class="intro">
         <h1>Осмотр оборудования</h1>
-        <p>Наведите камеру на узел или проверьте пример кадра.</p>
+        <p>Наведите камеру на узел. Кадр анализирует локальная модель на сервере Cyber102; встроенные примеры используют тестовые ответы.</p>
         <p><a href="checkpoint.html">Диагностика насоса</a></p>
       </header>
 
@@ -69,6 +69,7 @@
             <span class="finding" id="finding"></span>
             <h3 id="equipment"></h3>
             <p class="equipment-id" id="equipment-id"></p>
+            <p class="equipment-id" id="vision-observation" hidden></p>
             <dl class="facts">
               <div><dt>Узел</dt><dd id="component"></dd></div>
               <div><dt>Срок службы</dt><dd id="service-life"></dd></div>

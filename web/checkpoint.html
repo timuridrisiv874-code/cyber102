@@ -69,7 +69,23 @@
                   <summary>Показания датчиков и признаки осмотра</summary>
                   <dl class="facts" id="observations"></dl>
                 </details>
+                <form id="save-inspection" class="save-inspection">
+                  <div class="field">
+                    <label for="inspection-note">Заметка к осмотру (необязательно)</label>
+                    <textarea id="inspection-note" maxlength="1000" rows="2"></textarea>
+                  </div>
+                  <button type="submit" class="button secondary" id="save-button">Сохранить осмотр</button>
+                  <p class="message" id="save-message" role="status"></p>
+                </form>
               </div>
+            </div>
+          </section>
+
+          <section class="panel" id="inspection-history" aria-labelledby="history-title" hidden>
+            <div class="panel-heading"><h2 id="history-title">История осмотров</h2><span class="source">Демо</span></div>
+            <div class="section-body">
+              <p class="message history-message" id="history-message" role="status"></p>
+              <ol class="history-list" id="history-records"></ol>
             </div>
           </section>
         </div>

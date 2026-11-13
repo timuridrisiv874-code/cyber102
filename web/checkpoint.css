@@ -8,11 +8,12 @@
 .lookup button { white-space: nowrap; }
 .field { display: grid; gap: 5px; flex: 1; min-width: 0; }
 .field label { color: var(--muted); font-size: 14px; font-weight: 650; }
-.field input, .field select {
+.field input, .field select, .field textarea {
   border: 1px solid #cddbd0; border-radius: 8px; padding: 7px 10px; min-height: 49px;
   min-width: 0; width: 100%; font: inherit; font-size: 16px; color: inherit; background: #fff;
 }
-.field input:focus-visible, .field select:focus-visible, summary:focus-visible { outline: 3px solid #217a58; outline-offset: 2px; }
+.field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible, summary:focus-visible { outline: 3px solid #217a58; outline-offset: 2px; }
+.field textarea { resize: vertical; }
 .passport { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; margin-bottom: 0; }
 .passport dt { font-size: 13px; color: var(--muted); }
 .passport dd { margin-top: 3px; font-weight: 650; overflow-wrap: anywhere; }
@@ -40,12 +41,24 @@
 .inputs { margin-top: 12px; }
 .inputs .facts { margin: 8px 0 0; }
 .inputs dd { overflow-wrap: anywhere; }
+.save-inspection { display: grid; gap: 9px; justify-items: start; margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--line); }
+.save-inspection .field { width: 100%; }
+.save-inspection .message { margin: 0; }
+.save-inspection .message:empty { display: none; }
+.history-message { margin: 0; }
+.history-list { display: grid; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.history-entry { padding: 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+.history-entry time { display: block; margin-bottom: 4px; color: var(--muted); font-size: 13px; }
+.history-entry p { margin-top: 4px; white-space: pre-wrap; }
+.history-entry ul { list-style: none; padding: 0; margin: 6px 0 0; }
+.history-entry li + li { margin-top: 4px; }
 
 @media (max-width: 800px) {
   .dashboard { grid-template-columns: minmax(0, 1fr); gap: 13px; }
   .inspection-column { display: contents; }
   .dashboard section[aria-labelledby="analysis-title"] { order: 1; }
   .dashboard section[aria-labelledby="diagram-title"] { order: 2; }
+  #inspection-history { order: 3; }
   .section-body { padding: 0 14px 14px; }
 }
 

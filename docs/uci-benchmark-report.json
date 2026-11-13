@@ -1,0 +1,270 @@
+{
+  "purpose": "single hydraulic rig benchmark, not field validation",
+  "dataset_doi": "10.24432/C5CW21",
+  "archive_sha256": "24128aad2ee45eea7e6b63ebbd9992cdf25d0483a2cebefbfc13bc69079af1f2",
+  "label": "internal pump leakage, profile.txt column 3",
+  "classes": {
+    "0": "no leakage",
+    "1": "weak leakage",
+    "2": "severe leakage"
+  },
+  "split": "contiguous cycle order, 60/20/20",
+  "partitions": {
+    "train": {
+      "cycles": 1323,
+      "first_cycle": 1,
+      "last_cycle": 1323,
+      "class_counts": {
+        "0": 749,
+        "1": 287,
+        "2": 287
+      }
+    },
+    "validation": {
+      "cycles": 441,
+      "first_cycle": 1324,
+      "last_cycle": 1764,
+      "class_counts": {
+        "0": 277,
+        "1": 82,
+        "2": 82
+      }
+    },
+    "test": {
+      "cycles": 441,
+      "first_cycle": 1765,
+      "last_cycle": 2205,
+      "class_counts": {
+        "0": 195,
+        "1": 123,
+        "2": 123
+      }
+    }
+  },
+  "feature_names": [
+    "PS1_mean",
+    "PS1_std",
+    "PS1_min",
+    "PS1_max",
+    "PS1_q05",
+    "PS1_median",
+    "PS1_q95",
+    "PS1_last_first_5s_mean_diff",
+    "PS2_mean",
+    "PS2_std",
+    "PS2_min",
+    "PS2_max",
+    "PS2_q05",
+    "PS2_median",
+    "PS2_q95",
+    "PS2_last_first_5s_mean_diff",
+    "PS3_mean",
+    "PS3_std",
+    "PS3_min",
+    "PS3_max",
+    "PS3_q05",
+    "PS3_median",
+    "PS3_q95",
+    "PS3_last_first_5s_mean_diff",
+    "PS4_mean",
+    "PS4_std",
+    "PS4_min",
+    "PS4_max",
+    "PS4_q05",
+    "PS4_median",
+    "PS4_q95",
+    "PS4_last_first_5s_mean_diff",
+    "PS5_mean",
+    "PS5_std",
+    "PS5_min",
+    "PS5_max",
+    "PS5_q05",
+    "PS5_median",
+    "PS5_q95",
+    "PS5_last_first_5s_mean_diff",
+    "PS6_mean",
+    "PS6_std",
+    "PS6_min",
+    "PS6_max",
+    "PS6_q05",
+    "PS6_median",
+    "PS6_q95",
+    "PS6_last_first_5s_mean_diff",
+    "EPS1_mean",
+    "EPS1_std",
+    "EPS1_min",
+    "EPS1_max",
+    "EPS1_q05",
+    "EPS1_median",
+    "EPS1_q95",
+    "EPS1_last_first_5s_mean_diff",
+    "FS1_mean",
+    "FS1_std",
+    "FS1_min",
+    "FS1_max",
+    "FS1_q05",
+    "FS1_median",
+    "FS1_q95",
+    "FS1_last_first_5s_mean_diff",
+    "FS2_mean",
+    "FS2_std",
+    "FS2_min",
+    "FS2_max",
+    "FS2_q05",
+    "FS2_median",
+    "FS2_q95",
+    "FS2_last_first_5s_mean_diff",
+    "TS1_mean",
+    "TS1_std",
+    "TS1_min",
+    "TS1_max",
+    "TS1_q05",
+    "TS1_median",
+    "TS1_q95",
+    "TS1_last_first_5s_mean_diff",
+    "TS2_mean",
+    "TS2_std",
+    "TS2_min",
+    "TS2_max",
+    "TS2_q05",
+    "TS2_median",
+    "TS2_q95",
+    "TS2_last_first_5s_mean_diff",
+    "TS3_mean",
+    "TS3_std",
+    "TS3_min",
+    "TS3_max",
+    "TS3_q05",
+    "TS3_median",
+    "TS3_q95",
+    "TS3_last_first_5s_mean_diff",
+    "TS4_mean",
+    "TS4_std",
+    "TS4_min",
+    "TS4_max",
+    "TS4_q05",
+    "TS4_median",
+    "TS4_q95",
+    "TS4_last_first_5s_mean_diff",
+    "VS1_mean",
+    "VS1_std",
+    "VS1_min",
+    "VS1_max",
+    "VS1_q05",
+    "VS1_median",
+    "VS1_q95",
+    "VS1_last_first_5s_mean_diff"
+  ],
+  "fit": {
+    "iterations": 500,
+    "depth": 5,
+    "learning_rate": 0.05,
+    "loss_function": "MultiClass",
+    "eval_metric": "MultiClass",
+    "random_seed": 42,
+    "task_type": "CPU",
+    "thread_count": 2,
+    "allow_writing_files": false,
+    "early_stopping_rounds": 40,
+    "saved_trees": 98
+  },
+  "versions": {
+    "python": "3.10.21",
+    "catboost": "1.2.10",
+    "numpy": "2.2.6"
+  },
+  "metrics": {
+    "validation": {
+      "catboost": {
+        "accuracy": 0.8299319727891157,
+        "macro_f1": 0.7234156820622987,
+        "balanced_accuracy": 0.6951219512195123,
+        "confusion_matrix": [
+          [
+            277,
+            0,
+            0
+          ],
+          [
+            34,
+            48,
+            0
+          ],
+          [
+            0,
+            41,
+            41
+          ]
+        ]
+      },
+      "train_majority_baseline": {
+        "accuracy": 0.6281179138321995,
+        "macro_f1": 0.25719591457753016,
+        "balanced_accuracy": 0.3333333333333333,
+        "confusion_matrix": [
+          [
+            277,
+            0,
+            0
+          ],
+          [
+            82,
+            0,
+            0
+          ],
+          [
+            82,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    "test": {
+      "catboost": {
+        "accuracy": 0.5306122448979592,
+        "macro_f1": 0.36548967355096607,
+        "balanced_accuracy": 0.43902439024390244,
+        "confusion_matrix": [
+          [
+            195,
+            0,
+            0
+          ],
+          [
+            84,
+            39,
+            0
+          ],
+          [
+            0,
+            123,
+            0
+          ]
+        ]
+      },
+      "train_majority_baseline": {
+        "accuracy": 0.4421768707482993,
+        "macro_f1": 0.20440251572327042,
+        "balanced_accuracy": 0.3333333333333333,
+        "confusion_matrix": [
+          [
+            195,
+            0,
+            0
+          ],
+          [
+            123,
+            0,
+            0
+          ],
+          [
+            123,
+            0,
+            0
+          ]
+        ]
+      }
+    }
+  }
+}
