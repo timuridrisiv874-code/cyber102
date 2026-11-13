@@ -5,7 +5,8 @@
 .section-nav a, .material-details summary { color: var(--accent); font-weight: 700; }
 .material-note { color: var(--muted); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
 .catalog-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; margin-top: 12px; }
-.category-field { max-width: 340px; margin-bottom: 10px; }
+.catalog-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 8px; }
+#photo-count { margin-block: 8px; }
 .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 115px), 1fr)); gap: 8px; }
 .photo-option { display: grid; gap: 6px; align-content: start; padding: 5px; border: 1px solid var(--line); border-radius: 8px; color: inherit; background: #fff; cursor: pointer; text-align: left; min-width: 0; }
 .photo-option[aria-pressed="true"] { border-color: #387d5b; box-shadow: 0 0 0 1px #387d5b; }

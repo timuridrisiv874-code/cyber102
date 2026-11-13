@@ -30,7 +30,7 @@ def main():
     for path in files:
         if not path.is_file() or not path.resolve().is_relative_to(ROOT):
             raise ValueError(f'Missing or external package input: {path.name}')
-    manifest = {'version': '1.3', 'prepared': '2026-11-13',
+    manifest = {'version': '1.4', 'prepared': '2026-11-13',
                 'scope': 'Cyber102 documentation, source code, synthetic templates and imported customer example metadata and sensor rows. Original customer files, image previews, model weights and external manuals are excluded.',
                 'files': [{'path': str(f.relative_to(ROOT)), 'bytes': f.stat().st_size,
                            'sha256': sha256(f.read_bytes()).hexdigest()} for f in files]}

@@ -54,6 +54,8 @@
 .history-entry li + li { margin-top: 4px; }
 
 @media (max-width: 800px) {
+  .topbar-inner { flex-wrap: wrap; padding-block: 10px; }
+  .topbar nav { font-size: 13px; line-height: 1.7; }
   .dashboard { grid-template-columns: minmax(0, 1fr); gap: 13px; }
   .inspection-column { display: contents; }
   .dashboard section[aria-labelledby="analysis-title"] { order: 1; }

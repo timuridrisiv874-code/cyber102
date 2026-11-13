@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f6f3">
+  <title>Паспорта и документация — Cyber102</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="checkpoint.css">
+  <link rel="stylesheet" href="workspace.css">
+  <script src="documents.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><div class="topbar-inner">
+    <a class="brand" href="checkpoint.html"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
+    <nav aria-label="Разделы Cyber102"><a class="nav-link" href="index.html">Камера</a> · <a class="nav-link" href="materials.html">Материалы</a> · <a class="nav-link" href="telemetry.html">Телеметрия</a></nav>
+  </div></header>
+  <main class="page workspace-page">
+    <header class="intro">
+      <span class="mode"><i aria-hidden="true"></i>Документация организаторов</span>
+      <h1>Паспорта оборудования</h1>
+      <p>Агрегаты, характеристики и исходные документы с указанием страниц.</p>
+      <p class="workspace-note">Сверяйте серийный номер с табличкой оборудования. Примеры телеметрии пока не привязаны к этим агрегатам.</p>
+      <nav class="workspace-section-nav" aria-label="Разделы документов"><a href="#equipment-title">Оборудование</a><a href="#library-title">Найти документ</a><a href="#requirements-title">Обслуживание</a></nav>
+    </header>
+    <p class="message" id="documents-status" role="status">Загружаем документы…</p>
+    <section class="panel" aria-labelledby="equipment-title">
+      <div class="panel-heading"><h2 id="equipment-title">Оборудование</h2></div>
+      <div class="section-body">
+        <div class="field equipment-filter"><label for="equipment-kind">Тип оборудования</label><select id="equipment-kind"><option value="pump">Насосы</option><option value="all">Все компоненты</option></select></div>
+        <div id="equipment-grid" class="workspace-grid"></div><details class="workspace-details"><summary>Применимость и ограничения</summary><div id="passport-limitations" class="workspace-note"></div></details>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="library-title">
+      <div class="panel-heading"><h2 id="library-title">Библиотека документов</h2><span class="source" id="document-count"></span></div>
+      <div class="section-body">
+        <div class="field"><label for="document-search">Поиск по названию и тексту</label><input type="search" id="document-search" placeholder="Например, смазка или заводской номер" maxlength="160" autocomplete="off"></div>
+        <p class="workspace-note">Поиск по сканам зависит от качества распознавания. Значения и схемы проверяйте в оригинале PDF.</p>
+        <p id="document-results" class="workspace-note" aria-live="polite"></p>
+        <div id="document-list" class="document-list"></div>
+      </div>
+    </section>
+    <section class="panel" id="requirements-panel" aria-labelledby="requirements-title" hidden>
+      <div class="panel-heading"><h2 id="requirements-title">Обслуживание по документации</h2></div>
+      <div class="section-body" id="passport-requirements"></div>
+    </section>
+  </main>
+</body>
+</html>

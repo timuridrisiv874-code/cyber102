@@ -1,5 +1,6 @@
 """Read the supplied examples; expose only indexed, normalized image previews."""
 import json
+from hashlib import sha256
 from pathlib import Path
 import re
 
@@ -9,16 +10,43 @@ ROOT = Path(__file__).resolve().parents[1] / 'data/customer'
 
 
 def load(name, root=ROOT):
-    if name not in ('materials', 'sensors', 'sensor-import-report'):
+    if name not in ('materials', 'sensors', 'sensor-import-report', 'documents', 'equipment-passports'):
         raise ValueError('Unknown dataset')
     root = Path(root).resolve()
     path = (root / f'{name}.json').resolve()
     if not path.is_relative_to(root):
         raise FileNotFoundError('Dataset unavailable')
-    result = json.loads(path.read_text(encoding='utf-8'))
+    result = json.loads(path.read_text(encoding='utf-8'),
+                        parse_constant=lambda _: (_ for _ in ()).throw(ValueError('Non-finite dataset value')))
     if not isinstance(result, dict):
         raise ValueError('Invalid dataset')
+    json.dumps(result, allow_nan=False)
     return result
+
+
+def document(document_id, root=ROOT):
+    """Serve only catalogued, hash-verified PDF originals, never arbitrary paths."""
+    if not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,79}', document_id):
+        raise FileNotFoundError('Unknown document')
+    rows = load('documents', root).get('documents')
+    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+        raise ValueError('Invalid document index')
+    entries = [row for row in rows if row.get('id') == document_id]
+    if len(entries) != 1:
+        raise FileNotFoundError('Unknown document')
+    digest = entries[0].get('sha256', '')
+    if not isinstance(digest, str) or not re.fullmatch(r'[a-f0-9]{64}', digest):
+        raise ValueError('Invalid document digest')
+    root = Path(root).resolve()
+    directory = (root / 'documents').resolve()
+    path = (directory / f'{digest}.pdf').resolve()
+    if (not directory.is_relative_to(root) or not path.is_relative_to(directory)
+            or not path.is_file() or path.stat().st_size > 64 * 1024 * 1024):
+        raise FileNotFoundError('Document unavailable')
+    content = path.read_bytes()
+    if not content.startswith(b'%PDF-') or sha256(content).hexdigest() != digest:
+        raise ValueError('Document checksum mismatch')
+    return content
 
 
 def image(image_id, root=ROOT):

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f6f3">
+  <title>Эмулятор телеметрии — Cyber102</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="checkpoint.css">
+  <link rel="stylesheet" href="workspace.css">
+  <script src="telemetry.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><div class="topbar-inner">
+    <a class="brand" href="checkpoint.html"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
+    <nav aria-label="Разделы Cyber102"><a class="nav-link" href="index.html">Камера</a> · <a class="nav-link" href="materials.html">Материалы</a> · <a class="nav-link" href="documents.html">Паспорта</a></nav>
+  </div></header>
+  <main class="page workspace-page">
+    <header class="intro">
+      <span class="mode"><i aria-hidden="true"></i>Эмулятор · примеры организаторов</span>
+      <h1>Телеметрия оборудования</h1>
+      <p>Проигрывание измерений вибрации и температуры с сервера команды.</p>
+      <p class="workspace-note">Примеры из таблиц организаторов. Серийный номер пока не установлен.</p>
+    </header>
+    <section class="panel" aria-labelledby="playback-title">
+      <div class="panel-heading"><h2 id="playback-title">Воспроизведение</h2><span class="source" id="playback-state">Пауза</span></div>
+      <div class="section-body">
+        <div class="playback-controls">
+          <button type="button" class="button primary" id="replay-play" disabled>Воспроизвести</button>
+          <button type="button" class="button secondary" id="replay-step" disabled>Следующая строка</button>
+          <button type="button" class="button secondary" id="replay-reset" disabled>В начало</button>
+          <div class="field"><label for="replay-speed">Интервал показа строки</label><select id="replay-speed"><option value="1000">1 секунда</option><option value="2000" selected>2 секунды</option><option value="5000">5 секунд</option></select></div>
+        </div>
+        <div class="field replay-position"><label for="replay-position">Позиция в наборе</label><input type="range" id="replay-position" min="0" max="0" value="0" disabled></div>
+        <p class="message" id="replay-message" role="status">Загружаем источник…</p>
+        <dl class="workspace-facts" id="replay-timestamp"></dl>
+        <p class="workspace-note">Один шаг = одна почасовая запись. Скорость показа не меняет время исходных измерений. При уходе со страницы воспроизведение останавливается.</p>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="channels-title">
+      <div class="panel-heading"><h2 id="channels-title">Показания</h2><span class="source">По документированным порогам</span></div>
+      <div class="section-body"><div id="telemetry-channels" class="workspace-grid"></div><p class="workspace-note" id="telemetry-disagreement"></p></div>
+    </section>
+    <section class="panel" aria-labelledby="source-title">
+      <div class="panel-heading"><h2 id="source-title">Источник и доступность данных</h2></div>
+      <div class="section-body">
+        <p>В прототипе сервер отдаёт строки переданных баз. В заводском контуре источник — сервер ввода/вывода (интеграции), соединение по OPC UA или Modbus.</p>
+        <p class="workspace-note">В этих таблицах отсутствуют токи фаз, давление, КПД и наработка. Они остаются неизвестными. Превышение порога не означает, что величина растёт; полная диагностическая связка требует всех её условий.</p>
+        <p class="workspace-note">Распознавание на сервере и связь телефона по внутреннему Wi-Fi соответствуют согласованному сценарию. Сейчас стенд команды размещён на удалённой 3090.</p>
+        <details class="workspace-details"><summary>Происхождение текущей строки</summary><pre id="replay-provenance"></pre></details>
+        <a href="materials.html#manual" class="text-link">Проверить диагностические связки по подтверждённым данным →</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

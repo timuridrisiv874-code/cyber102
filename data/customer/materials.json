@@ -27,6 +27,28 @@
         "title": "Трубопроводы",
         "count": 12
       }
+    ],
+    "scopes": [
+      {
+        "id": "external",
+        "title": "Внешний обход",
+        "count": 31
+      },
+      {
+        "id": "repair",
+        "title": "Ремонтные примеры",
+        "count": 14
+      },
+      {
+        "id": "restricted_access",
+        "title": "Ограниченный доступ",
+        "count": 4
+      },
+      {
+        "id": "unreviewed",
+        "title": "Контекст не установлен",
+        "count": 4
+      }
     ]
   },
   "images": [
@@ -50,6 +72,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "restricted_access",
+        "source": "manual_visible_context_review",
+        "note": "Крышка клеммной коробки снята, видны силовые контакты."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -72,6 +99,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Общий вид агрегата на раме, снаружи видны корпуса и трубные соединения."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -94,6 +126,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Крупный план открытого подшипника с видимыми телами качения."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -116,6 +153,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "unreviewed",
+        "source": "manual_visible_context_review",
+        "note": "Виден торец узла и открытый вал, способ доступа и состояние сборки по кадру неясны."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -138,6 +180,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Снаружи видны опорная плита и анкеры."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -160,6 +207,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Снятое рабочее колесо снято со стороны внутренних поверхностей."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -182,6 +234,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Снаружи видны корпус арматуры, шток и фланцы в трубной обвязке."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -204,6 +261,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Общий вид установленных агрегатов с трубной обвязкой."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -226,6 +288,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "restricted_access",
+        "source": "manual_visible_context_review",
+        "note": "Открытая клеммная коробка с проводами и контактами."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -248,6 +315,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "restricted_access",
+        "source": "manual_visible_context_review",
+        "note": "Виден внутренний объём открытой коробки с проводами."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -270,6 +342,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Внешняя поверхность трубного соединения на корпусе."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -292,6 +369,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Наружный стык трубной обвязки и корпуса."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -314,6 +396,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "unreviewed",
+        "source": "manual_visible_context_review",
+        "note": "Крупный план вала и соседних поверхностей, положение кожуха и условия доступа не видны."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -336,6 +423,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Видны наружные поверхности трубы, отвода и фланцевого соединения."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -358,6 +450,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Виден наружный кожух с соединениями секций."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -380,6 +477,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "restricted_access",
+        "source": "manual_visible_context_review",
+        "note": "Внутренние контакты и провода видны под снятой крышкой коробки."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -402,6 +504,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "unreviewed",
+        "source": "manual_visible_context_review",
+        "note": "Виден участок между корпусами, состояние ограждения и способ доступа по крупному плану неясны."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -424,6 +531,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Наружный стык трубной обвязки и корпуса."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -446,6 +558,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Снаружи виден штуцер в месте соединения с корпусом."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -468,6 +585,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Общий вид корпусов агрегата и рамы."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -490,6 +612,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Крупный план внутреннего кольцевого узла с видимыми деталями."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -512,6 +639,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Показан извлечённый ротор."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -534,6 +666,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Отдельная кольцевая деталь показана со стороны рабочей поверхности."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -556,6 +693,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Видны рёбра наружного корпуса электродвигателя."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -578,6 +720,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Открытый электродвигатель, видны обмотки и ремонтный инструмент."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -600,6 +747,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Снятая крыльчатка показана отдельно от двигателя."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -622,6 +774,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "unreviewed",
+        "source": "manual_visible_context_review",
+        "note": "Виден торец двигателя с открытым центральным отверстием, состояние сборки по изображению неясно."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -644,6 +801,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Показаны отдельно снятые детали электродвигателя."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -666,6 +828,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "В руках видна снятая деталь, показана её рабочая поверхность."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -688,6 +855,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Видны обмотки через открытый корпус двигателя."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -710,6 +882,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Показана внутренняя часть статора с обмотками."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -732,6 +909,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Снаружи видны корпус, маховик и присоединённые трубы."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -754,6 +936,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Снаружи видны корпус арматуры и трубная обвязка."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -776,6 +963,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Видна наружная поверхность корпуса и крышки."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -798,6 +990,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Отдельная арматура показана со стороны проточного отверстия и запирающего элемента."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -820,6 +1017,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Снаружи видны корпус и элементы открытой скобы штока."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -842,6 +1044,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Виден внешний край фланцевого стыка на установленной трубе."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -864,6 +1071,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Наружная поверхность соединения и прилегающей трубы видна снаружи."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -886,6 +1098,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Видны наружные поверхности корпуса, рычага и фланцев в линии."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -908,6 +1125,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Снаружи виден корпус и участок штокового узла."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -930,6 +1152,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "На арматуре показана работа ключом."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -952,6 +1179,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Снаружи видны поверхность трубы и стык."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -974,6 +1206,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Крупный план открытой наружной поверхности шва."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -996,6 +1233,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Виден доступный снаружи участок поверхности трубы."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -1018,6 +1260,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Виден наружный участок трубы на опорах."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -1040,6 +1287,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Показана наружная поверхность трубного участка."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -1062,6 +1314,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "repair",
+        "source": "manual_visible_context_review",
+        "note": "Показана открытая поверхность поперечного сечения образца."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -1084,6 +1341,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Виден внешний слой теплоизоляции трубы."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -1106,6 +1368,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Видна наружная стенка трубного участка."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -1128,6 +1395,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Снаружи видны фланцы и крепёж."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -1150,6 +1422,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Видны внешняя скоба штока и наружные поверхности соединения."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -1172,6 +1449,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Показан внешний стык труб и прилегающие поверхности."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     },
     {
@@ -1194,6 +1476,11 @@
       "annotationStatus": "unreviewed",
       "equipmentSerial": null,
       "defectLabel": null,
+      "inspectionScope": {
+        "id": "external",
+        "source": "manual_visible_context_review",
+        "note": "Снаружи видны фланец, крепёж и труба."
+      },
       "rightsStatus": "supplied_for_case_review_not_verified_for_redistribution"
     }
   ],
@@ -1259,7 +1546,7 @@
       "source": "customer_provided"
     }
   ],
-  "notice": "Материалы заказчика — примеры внешних признаков. Папка задаёт тему, а не подтверждённый класс дефекта. Связь фото с конкретным насосом и Excel не установлена.",
+  "notice": "Материалы заказчика сгруппированы по видимым условиям осмотра. Экспертные метки дефектов отсутствуют. Связь фото с конкретным насосом и Excel не установлена.",
   "qualityNotes": [
     "В наборе встречаются водяные знаки фотобанков и Qwen, а также снимки экранов и похожие копии. Происхождение каждого примера требует проверки перед обучением.",
     "Ни один файл не получает автоматически экспертную метку дефекта или координаты разметки."

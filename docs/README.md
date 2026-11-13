@@ -18,3 +18,5 @@
 
 - [Материалы заказчика: фото и датчики](architecture/customer-data.md).
 - [Покрытие 12 диагностических связок](architecture/customer-rule-mapping.md).
+- [Паспорта и эксплуатационные документы организаторов](architecture/equipment-passports.md).
+- [Эмулятор телеметрии и будущая интеграция OPC UA/Modbus](architecture/telemetry-integration.md).

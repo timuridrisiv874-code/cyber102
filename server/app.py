@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 import sqlite3
 import threading
 from contextlib import closing
@@ -125,24 +126,102 @@ class Handler(SimpleHTTPRequestHandler):
     def error(self, status, message):
         self.send_json({'error': message}, status)
 
+    def send_pdf(self, body, *, head=False):
+        """Support mobile PDF viewers requesting a single byte range."""
+        length, start, end = len(body), 0, len(body) - 1
+        status = HTTPStatus.OK
+        requested = self.headers.get_all('Range', [])
+        if requested and not head:
+            match = re.fullmatch(r'bytes=(\d*)-(\d*)', requested[0]) if len(requested) == 1 else None
+            valid = match and any(match.groups()) and all(len(value) <= 16 for value in match.groups())
+            if valid:
+                first, last = match.groups()
+                if first:
+                    start = int(first)
+                    end = min(int(last), length - 1) if last else length - 1
+                else:
+                    start = max(0, length - int(last))
+                valid = 0 <= start <= end < length
+            if not valid:
+                self.send_response(HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
+                self.send_header('Content-Range', f'bytes */{length}')
+                self.send_header('Content-Length', '0')
+                self.send_header('Cache-Control', 'no-store')
+                self.end_headers()
+                return
+            status = HTTPStatus.PARTIAL_CONTENT
+        self.send_response(status)
+        self.send_header('Content-Type', 'application/pdf')
+        self.send_header('Content-Disposition', 'inline')
+        self.send_header('Accept-Ranges', 'bytes')
+        self.send_header('Content-Length', str(end - start + 1))
+        self.send_header('Cache-Control', 'no-store')
+        if status == HTTPStatus.PARTIAL_CONTENT:
+            self.send_header('Content-Range', f'bytes {start}-{end}/{length}')
+        self.end_headers()
+        if not head:
+            self.wfile.write(body[start:end + 1])
+
+    def do_HEAD(self):
+        target = urlsplit(self.path).path
+        prefix = '/api/customer/documents/'
+        if target.startswith(prefix) and target.endswith('/pdf'):
+            from server import customer
+            try:
+                self.send_pdf(customer.document(target[len(prefix):-len('/pdf')], self.customer_root), head=True)
+            except FileNotFoundError:
+                self.send_error(HTTPStatus.NOT_FOUND)
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+            except (ValueError, KeyError, OSError, RuntimeError):
+                self.send_error(HTTPStatus.SERVICE_UNAVAILABLE)
+        else:
+            super().do_HEAD()
+
     def do_GET(self):
         target = urlsplit(self.path)
         if target.path.startswith('/api/customer/'):
             from server import customer
             try:
                 endpoint = target.path.removeprefix('/api/customer/')
-                if endpoint in ('materials', 'sensors', 'sensor-import-report'):
+                if endpoint in ('materials', 'sensors', 'sensor-import-report', 'documents', 'equipment-passports'):
                     self.send_json(customer.load(endpoint, self.customer_root))
                 elif endpoint == 'rules':
                     self.send_json(customer.rules())
                 elif endpoint.startswith('images/'):
                     self.send_body(customer.image(endpoint.removeprefix('images/'), self.customer_root), 'image/jpeg')
+                elif endpoint.startswith('documents/') and endpoint.endswith('/pdf'):
+                    self.send_pdf(customer.document(endpoint[len('documents/'):-len('/pdf')], self.customer_root))
                 else:
                     self.error(HTTPStatus.NOT_FOUND, 'Материал не найден.')
             except FileNotFoundError:
                 self.error(HTTPStatus.NOT_FOUND, 'Материал не импортирован или недоступен.')
-            except (ValueError, KeyError, OSError):
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+            except (ValueError, KeyError, OSError, RuntimeError):
                 self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Материалы временно недоступны.')
+            return
+        if target.path.startswith('/api/telemetry/'):
+            from server import telemetry
+            try:
+                if target.path == '/api/telemetry/catalog':
+                    self.send_json(telemetry.catalog(self.customer_root))
+                elif target.path == '/api/telemetry/snapshot':
+                    indexes = parse_qs(target.query, keep_blank_values=True).get('index', [])
+                    if len(indexes) != 1 or not indexes[0].isascii() or not indexes[0].isdecimal() or len(indexes[0]) > 8:
+                        self.error(HTTPStatus.BAD_REQUEST, 'Укажите один целый индекс строки: index=0, 1, …')
+                    else:
+                        self.send_json(telemetry.snapshot(int(indexes[0]), root=self.customer_root))
+                else:
+                    self.error(HTTPStatus.NOT_FOUND, 'Источник телеметрии не найден.')
+            except IndexError:
+                self.error(HTTPStatus.BAD_REQUEST, 'Индекс выходит за пределы набора.')
+            except FileNotFoundError:
+                self.error(HTTPStatus.NOT_FOUND, 'Примеры телеметрии не импортированы.')
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+            except (ValueError, KeyError, OSError, RuntimeError):
+                self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Источник телеметрии временно недоступен.')
             return
         if target.path == '/':
             query = f'?{target.query}' if target.query else ''

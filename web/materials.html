@@ -28,28 +28,36 @@
           <a href="#photos">Фото</a>
           <a href="#measurements">Измерения</a>
           <a href="#manual">Проверка связок</a>
+          <a href="documents.html">Паспорта и документы</a>
         </nav>
       </header>
 
       <section class="panel" id="photos" aria-labelledby="photos-title">
-        <div class="panel-heading"><h2 id="photos-title">Фото оборудования</h2></div>
+        <div class="panel-heading"><h2 id="photos-title">Внешний обход оборудования</h2></div>
         <div class="section-body">
+          <p class="material-note">На обходе осматривают доступные наружные поверхности. Снимки снятых деталей и открытых клеммных коробок вынесены в отдельные подборки.</p>
           <p id="catalog-status" class="message" role="status">Загружаем каталог…</p>
           <div class="catalog-layout" id="catalog" hidden>
             <div>
-              <label class="field category-field" for="category">Категория<select id="category"></select></label>
+              <div class="catalog-filters">
+                <label class="field" for="inspection-scope">Условия осмотра<select id="inspection-scope"></select></label>
+                <label class="field" for="category">Категория<select id="category"></select></label>
+              </div>
+              <p id="photo-count" class="material-note" role="status"></p>
               <div class="photo-grid" id="photo-grid"></div>
               <button type="button" class="button secondary" id="more-photos" hidden>Показать ещё</button>
             </div>
             <section class="photo-detail" id="photo-detail" aria-labelledby="photo-title" hidden>
               <h3 id="photo-title" tabindex="-1"></h3>
               <p class="material-note" id="photo-source"></p>
+              <p class="material-note" id="photo-scope"></p>
               <p class="material-note" id="photo-aliases" hidden></p>
               <div class="analysis-image">
                 <img id="selected-image" alt="">
                 <div id="photo-box" aria-hidden="true" hidden></div>
               </div>
               <button type="button" id="analyze-photo" class="button primary" disabled>Проверить фото</button>
+              <p class="material-note">Анализ выполняется на сервере Cyber102, в том числе при размещении в локальной сети предприятия.</p>
               <p class="message" id="photo-status" role="status"></p>
               <div id="photo-result" hidden></div>
             </section>

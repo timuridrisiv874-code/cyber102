@@ -25,12 +25,15 @@ async function api(path, options) {
 
 const photoGrid = byId('photo-grid');
 const categorySelect = byId('category');
+const scopeSelect = byId('inspection-scope');
 const selectedImage = byId('selected-image');
 const analyzePhoto = byId('analyze-photo');
 const photoBox = byId('photo-box');
 const photoResult = byId('photo-result');
 const photoBatchSize = 12;
 let photos = [];
+let categories = [];
+const scopeTitles = new Map();
 let selectedPhoto = null;
 let photoLimit = photoBatchSize;
 let photoAnalysis = null;
@@ -50,7 +53,10 @@ function selectPhoto(photo) {
   resetPhoto();
   selectedPhoto = photo;
   byId('photo-title').textContent = photo.filename;
-  byId('photo-source').textContent = `${photo.categoryTitle} · Фото предоставлено заказчиком · Разметка не проверена`;
+  byId('photo-source').textContent = `${photo.categoryTitle} · Фото предоставлено заказчиком · Экспертной метки дефекта нет`;
+  const scope = photo.inspectionScope;
+  const scopeTitle = scopeTitles.get(scope?.id) ?? 'Контекст не установлен';
+  byId('photo-scope').textContent = [scopeTitle, scope?.note].filter(Boolean).join('. ');
   const aliases = byId('photo-aliases');
   aliases.hidden = !photo.aliases?.length;
   aliases.textContent = aliases.hidden ? '' : `Другие имена: ${photo.aliases.join(', ')}`;
@@ -65,7 +71,8 @@ function selectPhoto(photo) {
 
 function renderPhotos() {
   const category = categorySelect.value;
-  const filtered = photos.filter(photo => !category || photo.category === category);
+  const filtered = photosInScope().filter(photo => !category || photo.category === category);
+  byId('photo-count').textContent = filtered.length ? `Фото по фильтрам: ${filtered.length}` : 'По этим фильтрам фотографий нет.';
   photoGrid.replaceChildren(...filtered.slice(0, photoLimit).map(photo => {
     const button = element('button', undefined, 'photo-option');
     button.type = 'button';
@@ -80,6 +87,21 @@ function renderPhotos() {
     return button;
   }));
   byId('more-photos').hidden = filtered.length <= photoLimit;
+}
+
+function photosInScope() {
+  const scope = scopeSelect.value;
+  return photos.filter(photo => !scope || (photo.inspectionScope?.id ?? 'unreviewed') === scope);
+}
+
+function updateCategories() {
+  const selectedCategory = categorySelect.value;
+  const scoped = photosInScope();
+  categorySelect.replaceChildren(new Option(`Все категории (${scoped.length})`, ''), ...categories.map(({ id, title }) => {
+    const count = scoped.filter(photo => photo.category === id).length;
+    return new Option(`${title} (${count})`, id);
+  }));
+  if (categories.some(({ id }) => id === selectedCategory)) categorySelect.value = selectedCategory;
 }
 
 function renderDocuments(documents) {
@@ -99,8 +121,13 @@ async function loadCatalog() {
   try {
     const data = await api('/api/customer/materials');
     photos = data.images.filter(photo => /^\/api\/customer\/images\/[\w-]+$/.test(photo.url));
-    categorySelect.replaceChildren(new Option('Все категории', ''), ...data.summary.categories.map(
-      ({ id, title, count }) => new Option(`${title} (${count})`, id)));
+    categories = data.summary.categories;
+    const scopes = data.summary.scopes;
+    for (const { id, title } of scopes) scopeTitles.set(id, title);
+    scopeSelect.replaceChildren(...scopes.map(({ id, title, count }) => new Option(`${title} (${count})`, id)),
+      new Option(`Все условия (${photos.length})`, ''));
+    scopeSelect.value = 'external';
+    updateCategories();
     byId('catalog').hidden = !photos.length;
     renderPhotos();
     renderDocuments(data.documents);
@@ -136,10 +163,15 @@ function showPhotoResult(data) {
   message('photo-status', 'Предварительная оценка фотографии.');
 }
 
-categorySelect.addEventListener('change', () => {
+function changePhotoFilter() {
   resetPhoto();
   photoLimit = photoBatchSize;
   renderPhotos();
+}
+categorySelect.addEventListener('change', changePhotoFilter);
+scopeSelect.addEventListener('change', () => {
+  updateCategories();
+  changePhotoFilter();
 });
 byId('more-photos').addEventListener('click', () => {
   photoLimit += photoBatchSize;

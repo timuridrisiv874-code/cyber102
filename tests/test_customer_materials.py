@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 import unicodedata
@@ -5,7 +6,7 @@ from pathlib import Path
 import zipfile
 
 from PIL import Image
-from data_tools.import_customer_materials import build, GROUPS, DOCUMENT, digest
+from data_tools.import_customer_materials import build, GROUPS, DOCUMENT, REVIEW_SOURCE, digest, load_scope_manifest
 
 
 class MaterialImportTest(unittest.TestCase):
@@ -32,12 +33,36 @@ class MaterialImportTest(unittest.TestCase):
             self.assertEqual(digest(output / 'raw' / row['sourcePath']), original_hash)
             self.assertEqual((row['width'], row['height']), (1280, 640))
             self.assertIsNone(row['defectLabel'])
+            self.assertEqual(row['inspectionScope'], {'id': 'unreviewed', 'source': None, 'note': None})
             self.assertEqual(result['documents'][0]['sections'][0]['paragraphs'], ['Описание признака'])
             before = (output / 'materials.json').read_bytes()
             build(source, output)
             self.assertEqual((output / 'materials.json').read_bytes(), before)
             build(output / 'raw', output)
             self.assertEqual((output / 'materials.json').read_bytes(), before)
+
+            manifest = root / 'inspection-scope.json'
+            review = {'schemaVersion': 1, 'source': REVIEW_SOURCE, 'images': {
+                original_hash: {'scope': 'external', 'note': 'Виден наружный корпус.'},
+            }}
+            manifest.write_text(json.dumps(review, ensure_ascii=False), encoding='utf-8')
+            tagged = build(output / 'raw', output, manifest)
+            self.assertEqual(tagged['images'][0]['inspectionScope'], {
+                'id': 'external', 'source': REVIEW_SOURCE, 'note': 'Виден наружный корпус.',
+            })
+            self.assertIsNone(tagged['images'][0]['defectLabel'])
+            self.assertEqual(tagged['images'][0]['annotationStatus'], 'unreviewed')
+            self.assertEqual({scope['id']: scope['count'] for scope in tagged['summary']['scopes']}, {
+                'external': 1, 'repair': 0, 'restricted_access': 0, 'unreviewed': 0,
+            })
+            tagged_before = (output / 'materials.json').read_bytes()
+            build(output / 'raw', output, manifest)
+            self.assertEqual((output / 'materials.json').read_bytes(), tagged_before)
+
+            review['images'][original_hash]['scope'] = 'unexpected'
+            manifest.write_text(json.dumps(review), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'Invalid inspection scope entry'):
+                load_scope_manifest(manifest)
 
 
 if __name__ == '__main__':

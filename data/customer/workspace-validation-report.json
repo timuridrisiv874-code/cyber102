@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "preparedAt": "2026-11-13T11:33:28.803801+00:00",
+  "scope": "Organizer document library, external inspection filters, telemetry replay",
+  "python": {
+    "platform": "macOS",
+    "tests": 103,
+    "result": "passed",
+    "warnings": "error"
+  },
+  "browsers": {
+    "engines": [
+      "Chromium",
+      "WebKit iPhone 13 emulation"
+    ],
+    "result": "passed",
+    "checks": [
+      "22 original PDFs catalog",
+      "16 equipment records and kind filters",
+      "document text search",
+      "same-origin PDF bytes",
+      "500-row replay seek/play/pause/end",
+      "page lifecycle recovery",
+      "stale request cancellation",
+      "source error display",
+      "mobile width"
+    ]
+  },
+  "materialsBrowser": {
+    "engines": [
+      "Chromium",
+      "WebKit"
+    ],
+    "result": "passed",
+    "counts": {
+      "external": 31,
+      "repair": 14,
+      "restricted_access": 4,
+      "unreviewed": 4
+    }
+  },
+  "documents": {
+    "files": 22,
+    "pages": 218,
+    "equipmentRecords": 16,
+    "sourceBytes": 117104207,
+    "localSha256": "all verified",
+    "textPages": 209,
+    "ocrLimitedPages": 11,
+    "pagesWithoutExtractedText": 9
+  },
+  "knowledgeValidation": {
+    "schemas": 2,
+    "negativeCases": 15,
+    "sources": 58,
+    "localMarkdownLinks": 173,
+    "result": "passed"
+  },
+  "limitations": [
+    "Physical iPhone and Android WebView have not been tested.",
+    "Telemetry samples have no confirmed equipment binding.",
+    "Diagnostic applicability to AMS progressive-cavity pumps is not validated.",
+    "OCR is a search aid; structured fields were checked against scanned pages."
+  ]
+}

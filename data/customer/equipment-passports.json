@@ -1,0 +1,2514 @@
+{
+  "schemaVersion": 1,
+  "source": "organizer_provided",
+  "equipmentType": "progressive_cavity",
+  "typeLabel": "Одновинтовой эксцентриковый насосный агрегат",
+  "applicableDiagnostics": "not_validated",
+  "equipment": [
+    {
+      "id": "pump-1",
+      "title": "Насосный агрегат №1 · AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "groupNumber": 1,
+      "kind": "pump",
+      "serial": "21031004-1",
+      "model": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "manufacturer": "ООО «Альтернативные Механические Системы»",
+      "fields": {
+        "serial": {
+          "value": "21031004-1",
+          "unit": null,
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 1,
+            "quote": "Серийный номер 21031004-1"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+          "unit": null,
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 1,
+            "quote": "AMS PCP60S12/3 01 Ex B1 HNBR DTS"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "ООО «Альтернативные Механические Системы»",
+          "unit": null,
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 1,
+            "quote": "ООО «Альтернативные Механические Системы»"
+          },
+          "label": "Изготовитель"
+        },
+        "year": {
+          "value": 2023,
+          "unit": "год",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 1,
+            "quote": "Москва, 2023"
+          },
+          "label": "Год выпуска"
+        },
+        "technical_specification": {
+          "value": "ТУ3631-001-23430200-2015",
+          "unit": null,
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 1,
+            "quote": "ТУ3631-001-23430200-2015"
+          },
+          "label": "Технические условия"
+        },
+        "purpose": {
+          "value": "Перекачивание обводненного нефтепродукта",
+          "unit": null,
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 3,
+            "quote": "перекачивание обводненного нефтепродукта"
+          },
+          "label": "Назначение"
+        },
+        "design_resource_before_writeoff": {
+          "value": 11000,
+          "unit": "ч",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 3,
+            "quote": "РЕСУРС ДО СПИСАНИЯ — не менее 11 000 ч"
+          },
+          "label": "Паспортный ресурс до списания, не менее"
+        },
+        "design_lifetime": {
+          "value": 20,
+          "unit": "лет",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 3,
+            "quote": "СРОК СЛУЖБЫ — 20 лет"
+          },
+          "label": "Паспортный срок службы"
+        },
+        "flow_range": {
+          "value": [
+            5,
+            20
+          ],
+          "unit": "м³/ч",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 4,
+            "quote": "Подача — 5–20 м³/ч"
+          },
+          "label": "Паспортный диапазон подачи"
+        },
+        "product_temperature_max_steaming_pump_off": {
+          "value": 90,
+          "unit": "°C",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 4,
+            "quote": "Макс. температура продукта при проведении пропарки и выключенном насосе — +90 °C"
+          },
+          "label": "Макс. температура продукта при пропарке и выключенном насосе"
+        },
+        "product_density_max": {
+          "value": 1600,
+          "unit": "кг/м³",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 4,
+            "quote": "Макс. плотность — 1600 кг/м³"
+          },
+          "label": "Макс. плотность продукта"
+        },
+        "solid_fraction_max": {
+          "value": 5,
+          "unit": "%",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 4,
+            "quote": "Концентрация твердой фазы — до 5 %"
+          },
+          "label": "Макс. концентрация твёрдой фазы"
+        },
+        "dimensions": {
+          "value": [
+            2742,
+            360,
+            605
+          ],
+          "unit": "мм",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 4,
+            "quote": "Габариты: Длина х Ширина х Высота — 2742х360х605 мм"
+          },
+          "label": "Габариты Д × Ш × В"
+        },
+        "mass": {
+          "value": 430,
+          "unit": "кг",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 4,
+            "quote": "Масса — 430 кг"
+          },
+          "label": "Масса"
+        },
+        "pressure_max": {
+          "value": 10,
+          "unit": "бар",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 4,
+            "quote": "Давление — до 10 бар"
+          },
+          "label": "Давление, до"
+        },
+        "required_npsh": {
+          "value": 2,
+          "unit": "м",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 4,
+            "quote": "Допускаемый кавитационный запас NPSHr — 2 м"
+          },
+          "label": "Допускаемый кавитационный запас NPSHr"
+        },
+        "product_temperature_range": {
+          "value": [
+            5,
+            45
+          ],
+          "unit": "°C",
+          "source": {
+            "documentId": "pump-1-passport",
+            "page": 4,
+            "quote": "Температура продукта — +5…+45 °C"
+          },
+          "label": "Температура продукта"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "pump-1-passport",
+          "page": 1,
+          "quote": "Серийный номер 21031004-1",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 1,
+          "quote": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 1,
+          "quote": "ООО «Альтернативные Механические Системы»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 1,
+          "quote": "Москва, 2023",
+          "field": "year",
+          "label": "Год выпуска"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 1,
+          "quote": "ТУ3631-001-23430200-2015",
+          "field": "technical_specification",
+          "label": "Технические условия"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 3,
+          "quote": "перекачивание обводненного нефтепродукта",
+          "field": "purpose",
+          "label": "Назначение"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 3,
+          "quote": "РЕСУРС ДО СПИСАНИЯ — не менее 11 000 ч",
+          "field": "design_resource_before_writeoff",
+          "label": "Паспортный ресурс до списания, не менее"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 3,
+          "quote": "СРОК СЛУЖБЫ — 20 лет",
+          "field": "design_lifetime",
+          "label": "Паспортный срок службы"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 4,
+          "quote": "Подача — 5–20 м³/ч",
+          "field": "flow_range",
+          "label": "Паспортный диапазон подачи"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 4,
+          "quote": "Макс. температура продукта при проведении пропарки и выключенном насосе — +90 °C",
+          "field": "product_temperature_max_steaming_pump_off",
+          "label": "Макс. температура продукта при пропарке и выключенном насосе"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 4,
+          "quote": "Макс. плотность — 1600 кг/м³",
+          "field": "product_density_max",
+          "label": "Макс. плотность продукта"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 4,
+          "quote": "Концентрация твердой фазы — до 5 %",
+          "field": "solid_fraction_max",
+          "label": "Макс. концентрация твёрдой фазы"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 4,
+          "quote": "Габариты: Длина х Ширина х Высота — 2742х360х605 мм",
+          "field": "dimensions",
+          "label": "Габариты Д × Ш × В"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 4,
+          "quote": "Масса — 430 кг",
+          "field": "mass",
+          "label": "Масса"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 4,
+          "quote": "Давление — до 10 бар",
+          "field": "pressure_max",
+          "label": "Давление, до"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 4,
+          "quote": "Допускаемый кавитационный запас NPSHr — 2 м",
+          "field": "required_npsh",
+          "label": "Допускаемый кавитационный запас NPSHr"
+        },
+        {
+          "documentId": "pump-1-passport",
+          "page": 4,
+          "quote": "Температура продукта — +5…+45 °C",
+          "field": "product_temperature_range",
+          "label": "Температура продукта"
+        }
+      ],
+      "typeLabel": "Одновинтовой эксцентриковый насосный агрегат"
+    },
+    {
+      "id": "motor-1",
+      "title": "Электродвигатель №1 · BRA160M4 FБУ1",
+      "groupNumber": 1,
+      "kind": "motor",
+      "serial": "230201068",
+      "model": "BRA160M4 FБУ1",
+      "manufacturer": "АО «Ярославский электромашиностроительный завод»",
+      "fields": {
+        "serial": {
+          "value": "230201068",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 1,
+            "quote": "Заводской номер 230201068"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "BRA160M4 FБУ1",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 1,
+            "quote": "Двигатель трехфазный асинхронный типа BRA160M4 FБУ1"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "АО «Ярославский электромашиностроительный завод»",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 1,
+            "quote": "Изготовитель — АО «Ярославский электромашиностроительный завод»"
+          },
+          "label": "Изготовитель"
+        },
+        "manufacture_date": {
+          "value": "2023-03-01",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 1,
+            "quote": "Дата изготовления 2023.03.01"
+          },
+          "label": "Дата изготовления"
+        },
+        "protection_rating": {
+          "value": "IP55",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 1,
+            "quote": "Степень защиты IP 55"
+          },
+          "label": "Степень защиты"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-1-passports",
+          "page": 1,
+          "quote": "Заводской номер 230201068",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 1,
+          "quote": "Двигатель трехфазный асинхронный типа BRA160M4 FБУ1",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 1,
+          "quote": "Изготовитель — АО «Ярославский электромашиностроительный завод»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 1,
+          "quote": "Дата изготовления 2023.03.01",
+          "field": "manufacture_date",
+          "label": "Дата изготовления"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 1,
+          "quote": "Степень защиты IP 55",
+          "field": "protection_rating",
+          "label": "Степень защиты"
+        }
+      ]
+    },
+    {
+      "id": "gearbox-1",
+      "title": "Редуктор №1 · WXRF87-AM160-5.30-M1-Ø300",
+      "groupNumber": 1,
+      "kind": "gearbox",
+      "serial": "SAL023020084_001002",
+      "model": "WXRF87-AM160-5.30-M1-Ø300",
+      "manufacturer": "WANSHSIN Seikou (Hunan) Co., Ltd",
+      "fields": {
+        "serial": {
+          "value": "SAL023020084_001002",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 3,
+            "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300 №SAL023020084_001002"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "WXRF87-AM160-5.30-M1-Ø300",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 3,
+            "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "WANSHSIN Seikou (Hunan) Co., Ltd",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 3,
+            "quote": "Производитель WANSHSIN Seikou (Hunan) Co., Ltd"
+          },
+          "label": "Изготовитель"
+        },
+        "ratio": {
+          "value": 5.3,
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 3,
+            "quote": "Передаточное отношение 5,30"
+          },
+          "label": "Передаточное отношение"
+        },
+        "max_output_torque": {
+          "value": 910,
+          "unit": "Н·м",
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 3,
+            "quote": "Максимальный крутящий момент на выходе 910 Нм"
+          },
+          "label": "Макс. крутящий момент на выходе"
+        },
+        "max_radial_shaft_load": {
+          "value": 8980,
+          "unit": "Н",
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 3,
+            "quote": "Максимальная радиальная нагрузка на вал 8980 Н"
+          },
+          "label": "Макс. радиальная нагрузка на вал"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-1-passports",
+          "page": 3,
+          "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300 №SAL023020084_001002",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 3,
+          "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 3,
+          "quote": "Производитель WANSHSIN Seikou (Hunan) Co., Ltd",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 3,
+          "quote": "Передаточное отношение 5,30",
+          "field": "ratio",
+          "label": "Передаточное отношение"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 3,
+          "quote": "Максимальный крутящий момент на выходе 910 Нм",
+          "field": "max_output_torque",
+          "label": "Макс. крутящий момент на выходе"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 3,
+          "quote": "Максимальная радиальная нагрузка на вал 8980 Н",
+          "field": "max_radial_shaft_load",
+          "label": "Макс. радиальная нагрузка на вал"
+        }
+      ]
+    },
+    {
+      "id": "temperature-transmitter-1",
+      "title": "Термопреобразователь №1 · ПТ 0304Ex-ВТ",
+      "groupNumber": 1,
+      "kind": "temperature_transmitter",
+      "serial": "10096664",
+      "model": "ПТ 0304Ex-ВТ",
+      "manufacturer": "НПП «ЭЛЕМЕР»",
+      "fields": {
+        "serial": {
+          "value": "10096664",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 6,
+            "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ заводской номер № 10096664"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "ПТ 0304Ex-ВТ",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 6,
+            "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "НПП «ЭЛЕМЕР»",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 6,
+            "quote": "упакован научно-производственным предприятием «ЭЛЕМЕР»"
+          },
+          "label": "Изготовитель"
+        },
+        "primary_converter_serial": {
+          "value": "10094328",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 6,
+            "quote": "первичный преобразователь (ПП) ПТ 0304-ВТ заводской номер № 10094328"
+          },
+          "label": "Серийный номер первичного преобразователя"
+        },
+        "acceptance_date": {
+          "value": "2023-03-20",
+          "unit": null,
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 6,
+            "quote": "СВИДЕТЕЛЬСТВО О ПРИЕМКЕ — 2023.03.20"
+          },
+          "label": "Дата приёмки"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-1-passports",
+          "page": 6,
+          "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ заводской номер № 10096664",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 6,
+          "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 6,
+          "quote": "упакован научно-производственным предприятием «ЭЛЕМЕР»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 6,
+          "quote": "первичный преобразователь (ПП) ПТ 0304-ВТ заводской номер № 10094328",
+          "field": "primary_converter_serial",
+          "label": "Серийный номер первичного преобразователя"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 6,
+          "quote": "СВИДЕТЕЛЬСТВО О ПРИЕМКЕ — 2023.03.20",
+          "field": "acceptance_date",
+          "label": "Дата приёмки"
+        }
+      ]
+    },
+    {
+      "id": "pump-2",
+      "title": "Насосный агрегат №2 · AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "groupNumber": 2,
+      "kind": "pump",
+      "serial": "21031004-2",
+      "model": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "manufacturer": "ООО «Альтернативные Механические Системы»",
+      "fields": {
+        "serial": {
+          "value": "21031004-2",
+          "unit": null,
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 1,
+            "quote": "Серийный номер 21031004-2"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+          "unit": null,
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 1,
+            "quote": "AMS PCP60S12/3 01 Ex B1 HNBR DTS"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "ООО «Альтернативные Механические Системы»",
+          "unit": null,
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 1,
+            "quote": "ООО «Альтернативные Механические Системы»"
+          },
+          "label": "Изготовитель"
+        },
+        "year": {
+          "value": 2023,
+          "unit": "год",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 1,
+            "quote": "Москва, 2023"
+          },
+          "label": "Год выпуска"
+        },
+        "technical_specification": {
+          "value": "ТУ3631-001-23430200-2015",
+          "unit": null,
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 1,
+            "quote": "ТУ3631-001-23430200-2015"
+          },
+          "label": "Технические условия"
+        },
+        "purpose": {
+          "value": "Перекачивание обводненного нефтепродукта",
+          "unit": null,
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 3,
+            "quote": "перекачивание обводненного нефтепродукта"
+          },
+          "label": "Назначение"
+        },
+        "design_resource_before_writeoff": {
+          "value": 11000,
+          "unit": "ч",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 3,
+            "quote": "РЕСУРС ДО СПИСАНИЯ — не менее 11 000 ч"
+          },
+          "label": "Паспортный ресурс до списания, не менее"
+        },
+        "design_lifetime": {
+          "value": 20,
+          "unit": "лет",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 3,
+            "quote": "СРОК СЛУЖБЫ — 20 лет"
+          },
+          "label": "Паспортный срок службы"
+        },
+        "flow_range": {
+          "value": [
+            5,
+            20
+          ],
+          "unit": "м³/ч",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 4,
+            "quote": "Подача — 5–20 м³/ч"
+          },
+          "label": "Паспортный диапазон подачи"
+        },
+        "product_temperature_max_steaming_pump_off": {
+          "value": 90,
+          "unit": "°C",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 4,
+            "quote": "Макс. температура продукта при проведении пропарки и выключенном насосе — +90 °C"
+          },
+          "label": "Макс. температура продукта при пропарке и выключенном насосе"
+        },
+        "product_density_max": {
+          "value": 1600,
+          "unit": "кг/м³",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 4,
+            "quote": "Макс. плотность — 1600 кг/м³"
+          },
+          "label": "Макс. плотность продукта"
+        },
+        "solid_fraction_max": {
+          "value": 5,
+          "unit": "%",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 4,
+            "quote": "Концентрация твердой фазы — до 5 %"
+          },
+          "label": "Макс. концентрация твёрдой фазы"
+        },
+        "dimensions": {
+          "value": [
+            2742,
+            360,
+            605
+          ],
+          "unit": "мм",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 4,
+            "quote": "Габариты: Длина х Ширина х Высота — 2742х360х605 мм"
+          },
+          "label": "Габариты Д × Ш × В"
+        },
+        "mass": {
+          "value": 430,
+          "unit": "кг",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 4,
+            "quote": "Масса — 430 кг"
+          },
+          "label": "Масса"
+        },
+        "pressure_max": {
+          "value": 10,
+          "unit": "бар",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 4,
+            "quote": "Давление — до 10 бар"
+          },
+          "label": "Давление, до"
+        },
+        "required_npsh": {
+          "value": 2,
+          "unit": "м",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 4,
+            "quote": "Допускаемый кавитационный запас NPSHr — 2 м"
+          },
+          "label": "Допускаемый кавитационный запас NPSHr"
+        },
+        "product_temperature_range": {
+          "value": [
+            5,
+            45
+          ],
+          "unit": "°C",
+          "source": {
+            "documentId": "pump-2-passport",
+            "page": 4,
+            "quote": "Температура продукта — +5…+45 °C"
+          },
+          "label": "Температура продукта"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "pump-2-passport",
+          "page": 1,
+          "quote": "Серийный номер 21031004-2",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 1,
+          "quote": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 1,
+          "quote": "ООО «Альтернативные Механические Системы»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 1,
+          "quote": "Москва, 2023",
+          "field": "year",
+          "label": "Год выпуска"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 1,
+          "quote": "ТУ3631-001-23430200-2015",
+          "field": "technical_specification",
+          "label": "Технические условия"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 3,
+          "quote": "перекачивание обводненного нефтепродукта",
+          "field": "purpose",
+          "label": "Назначение"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 3,
+          "quote": "РЕСУРС ДО СПИСАНИЯ — не менее 11 000 ч",
+          "field": "design_resource_before_writeoff",
+          "label": "Паспортный ресурс до списания, не менее"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 3,
+          "quote": "СРОК СЛУЖБЫ — 20 лет",
+          "field": "design_lifetime",
+          "label": "Паспортный срок службы"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 4,
+          "quote": "Подача — 5–20 м³/ч",
+          "field": "flow_range",
+          "label": "Паспортный диапазон подачи"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 4,
+          "quote": "Макс. температура продукта при проведении пропарки и выключенном насосе — +90 °C",
+          "field": "product_temperature_max_steaming_pump_off",
+          "label": "Макс. температура продукта при пропарке и выключенном насосе"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 4,
+          "quote": "Макс. плотность — 1600 кг/м³",
+          "field": "product_density_max",
+          "label": "Макс. плотность продукта"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 4,
+          "quote": "Концентрация твердой фазы — до 5 %",
+          "field": "solid_fraction_max",
+          "label": "Макс. концентрация твёрдой фазы"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 4,
+          "quote": "Габариты: Длина х Ширина х Высота — 2742х360х605 мм",
+          "field": "dimensions",
+          "label": "Габариты Д × Ш × В"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 4,
+          "quote": "Масса — 430 кг",
+          "field": "mass",
+          "label": "Масса"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 4,
+          "quote": "Давление — до 10 бар",
+          "field": "pressure_max",
+          "label": "Давление, до"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 4,
+          "quote": "Допускаемый кавитационный запас NPSHr — 2 м",
+          "field": "required_npsh",
+          "label": "Допускаемый кавитационный запас NPSHr"
+        },
+        {
+          "documentId": "pump-2-passport",
+          "page": 4,
+          "quote": "Температура продукта — +5…+45 °C",
+          "field": "product_temperature_range",
+          "label": "Температура продукта"
+        }
+      ],
+      "typeLabel": "Одновинтовой эксцентриковый насосный агрегат"
+    },
+    {
+      "id": "motor-2",
+      "title": "Электродвигатель №2 · BRA160M4 FБУ1",
+      "groupNumber": 2,
+      "kind": "motor",
+      "serial": "230201069",
+      "model": "BRA160M4 FБУ1",
+      "manufacturer": "АО «Ярославский электромашиностроительный завод»",
+      "fields": {
+        "serial": {
+          "value": "230201069",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 1,
+            "quote": "Заводской номер 230201069"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "BRA160M4 FБУ1",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 1,
+            "quote": "Двигатель трехфазный асинхронный типа BRA160M4 FБУ1"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "АО «Ярославский электромашиностроительный завод»",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 1,
+            "quote": "Изготовитель — АО «Ярославский электромашиностроительный завод»"
+          },
+          "label": "Изготовитель"
+        },
+        "manufacture_date": {
+          "value": "2023-03-01",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 1,
+            "quote": "Дата изготовления 2023.03.01"
+          },
+          "label": "Дата изготовления"
+        },
+        "protection_rating": {
+          "value": "IP55",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 1,
+            "quote": "Степень защиты IP 55"
+          },
+          "label": "Степень защиты"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-2-passports",
+          "page": 1,
+          "quote": "Заводской номер 230201069",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 1,
+          "quote": "Двигатель трехфазный асинхронный типа BRA160M4 FБУ1",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 1,
+          "quote": "Изготовитель — АО «Ярославский электромашиностроительный завод»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 1,
+          "quote": "Дата изготовления 2023.03.01",
+          "field": "manufacture_date",
+          "label": "Дата изготовления"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 1,
+          "quote": "Степень защиты IP 55",
+          "field": "protection_rating",
+          "label": "Степень защиты"
+        }
+      ]
+    },
+    {
+      "id": "gearbox-2",
+      "title": "Редуктор №2 · WXRF87-AM160-5.30-M1-Ø300",
+      "groupNumber": 2,
+      "kind": "gearbox",
+      "serial": "SAL023020084_001003",
+      "model": "WXRF87-AM160-5.30-M1-Ø300",
+      "manufacturer": "WANSHSIN Seikou (Hunan) Co., Ltd",
+      "fields": {
+        "serial": {
+          "value": "SAL023020084_001003",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 3,
+            "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300 №SAL023020084_001003"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "WXRF87-AM160-5.30-M1-Ø300",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 3,
+            "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "WANSHSIN Seikou (Hunan) Co., Ltd",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 3,
+            "quote": "Производитель WANSHSIN Seikou (Hunan) Co., Ltd"
+          },
+          "label": "Изготовитель"
+        },
+        "ratio": {
+          "value": 5.3,
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 3,
+            "quote": "Передаточное отношение 5,30"
+          },
+          "label": "Передаточное отношение"
+        },
+        "max_output_torque": {
+          "value": 910,
+          "unit": "Н·м",
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 3,
+            "quote": "Максимальный крутящий момент на выходе 910 Нм"
+          },
+          "label": "Макс. крутящий момент на выходе"
+        },
+        "max_radial_shaft_load": {
+          "value": 8980,
+          "unit": "Н",
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 3,
+            "quote": "Максимальная радиальная нагрузка на вал 8980 Н"
+          },
+          "label": "Макс. радиальная нагрузка на вал"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-2-passports",
+          "page": 3,
+          "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300 №SAL023020084_001003",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 3,
+          "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 3,
+          "quote": "Производитель WANSHSIN Seikou (Hunan) Co., Ltd",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 3,
+          "quote": "Передаточное отношение 5,30",
+          "field": "ratio",
+          "label": "Передаточное отношение"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 3,
+          "quote": "Максимальный крутящий момент на выходе 910 Нм",
+          "field": "max_output_torque",
+          "label": "Макс. крутящий момент на выходе"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 3,
+          "quote": "Максимальная радиальная нагрузка на вал 8980 Н",
+          "field": "max_radial_shaft_load",
+          "label": "Макс. радиальная нагрузка на вал"
+        }
+      ]
+    },
+    {
+      "id": "temperature-transmitter-2",
+      "title": "Термопреобразователь №2 · ПТ 0304Ex-ВТ",
+      "groupNumber": 2,
+      "kind": "temperature_transmitter",
+      "serial": "10096661",
+      "model": "ПТ 0304Ex-ВТ",
+      "manufacturer": "НПП «ЭЛЕМЕР»",
+      "fields": {
+        "serial": {
+          "value": "10096661",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 6,
+            "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ заводской номер № 10096661"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "ПТ 0304Ex-ВТ",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 6,
+            "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "НПП «ЭЛЕМЕР»",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 6,
+            "quote": "упакован научно-производственным предприятием «ЭЛЕМЕР»"
+          },
+          "label": "Изготовитель"
+        },
+        "primary_converter_serial": {
+          "value": "10094325",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 6,
+            "quote": "первичный преобразователь (ПП) ПТ 0304-ВТ заводской номер № 10094325"
+          },
+          "label": "Серийный номер первичного преобразователя"
+        },
+        "acceptance_date": {
+          "value": "2023-03-20",
+          "unit": null,
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 6,
+            "quote": "СВИДЕТЕЛЬСТВО О ПРИЕМКЕ — 2023.03.20"
+          },
+          "label": "Дата приёмки"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-2-passports",
+          "page": 6,
+          "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ заводской номер № 10096661",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 6,
+          "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 6,
+          "quote": "упакован научно-производственным предприятием «ЭЛЕМЕР»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 6,
+          "quote": "первичный преобразователь (ПП) ПТ 0304-ВТ заводской номер № 10094325",
+          "field": "primary_converter_serial",
+          "label": "Серийный номер первичного преобразователя"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 6,
+          "quote": "СВИДЕТЕЛЬСТВО О ПРИЕМКЕ — 2023.03.20",
+          "field": "acceptance_date",
+          "label": "Дата приёмки"
+        }
+      ]
+    },
+    {
+      "id": "pump-3",
+      "title": "Насосный агрегат №3 · AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "groupNumber": 3,
+      "kind": "pump",
+      "serial": "21031004-3",
+      "model": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "manufacturer": "ООО «Альтернативные Механические Системы»",
+      "fields": {
+        "serial": {
+          "value": "21031004-3",
+          "unit": null,
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 1,
+            "quote": "Серийный номер 21031004-3"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+          "unit": null,
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 1,
+            "quote": "AMS PCP60S12/3 01 Ex B1 HNBR DTS"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "ООО «Альтернативные Механические Системы»",
+          "unit": null,
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 1,
+            "quote": "ООО «Альтернативные Механические Системы»"
+          },
+          "label": "Изготовитель"
+        },
+        "year": {
+          "value": 2023,
+          "unit": "год",
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 1,
+            "quote": "Москва, 2023"
+          },
+          "label": "Год выпуска"
+        },
+        "technical_specification": {
+          "value": "ТУ3631-001-23430200-2015",
+          "unit": null,
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 1,
+            "quote": "ТУ3631-001-23430200-2015"
+          },
+          "label": "Технические условия"
+        },
+        "purpose": {
+          "value": "Перекачивание обводненного нефтепродукта",
+          "unit": null,
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 3,
+            "quote": "перекачивание обводненного нефтепродукта"
+          },
+          "label": "Назначение"
+        },
+        "design_resource_before_writeoff": {
+          "value": 11000,
+          "unit": "ч",
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 3,
+            "quote": "РЕСУРС ДО СПИСАНИЯ — не менее 11 000 ч"
+          },
+          "label": "Паспортный ресурс до списания, не менее"
+        },
+        "design_lifetime": {
+          "value": 20,
+          "unit": "лет",
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 3,
+            "quote": "СРОК СЛУЖБЫ — 20 лет"
+          },
+          "label": "Паспортный срок службы"
+        },
+        "flow_range": {
+          "value": [
+            5,
+            20
+          ],
+          "unit": "м³/ч",
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 4,
+            "quote": "Подача — 5–20 м³/ч"
+          },
+          "label": "Паспортный диапазон подачи"
+        },
+        "product_temperature_max_steaming_pump_off": {
+          "value": 90,
+          "unit": "°C",
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 4,
+            "quote": "Макс. температура продукта при проведении пропарки и выключенном насосе — +90 °C"
+          },
+          "label": "Макс. температура продукта при пропарке и выключенном насосе"
+        },
+        "product_density_max": {
+          "value": 1600,
+          "unit": "кг/м³",
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 4,
+            "quote": "Макс. плотность — 1600 кг/м³"
+          },
+          "label": "Макс. плотность продукта"
+        },
+        "solid_fraction_max": {
+          "value": 5,
+          "unit": "%",
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 4,
+            "quote": "Концентрация твердой фазы — до 5 %"
+          },
+          "label": "Макс. концентрация твёрдой фазы"
+        },
+        "dimensions": {
+          "value": [
+            2742,
+            360,
+            605
+          ],
+          "unit": "мм",
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 4,
+            "quote": "Габариты: Длина х Ширина х Высота — 2742х360х605 мм"
+          },
+          "label": "Габариты Д × Ш × В"
+        },
+        "mass": {
+          "value": 430,
+          "unit": "кг",
+          "source": {
+            "documentId": "pump-3-passport",
+            "page": 4,
+            "quote": "Масса — 430 кг"
+          },
+          "label": "Масса"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "pump-3-passport",
+          "page": 1,
+          "quote": "Серийный номер 21031004-3",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 1,
+          "quote": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 1,
+          "quote": "ООО «Альтернативные Механические Системы»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 1,
+          "quote": "Москва, 2023",
+          "field": "year",
+          "label": "Год выпуска"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 1,
+          "quote": "ТУ3631-001-23430200-2015",
+          "field": "technical_specification",
+          "label": "Технические условия"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 3,
+          "quote": "перекачивание обводненного нефтепродукта",
+          "field": "purpose",
+          "label": "Назначение"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 3,
+          "quote": "РЕСУРС ДО СПИСАНИЯ — не менее 11 000 ч",
+          "field": "design_resource_before_writeoff",
+          "label": "Паспортный ресурс до списания, не менее"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 3,
+          "quote": "СРОК СЛУЖБЫ — 20 лет",
+          "field": "design_lifetime",
+          "label": "Паспортный срок службы"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 4,
+          "quote": "Подача — 5–20 м³/ч",
+          "field": "flow_range",
+          "label": "Паспортный диапазон подачи"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 4,
+          "quote": "Макс. температура продукта при проведении пропарки и выключенном насосе — +90 °C",
+          "field": "product_temperature_max_steaming_pump_off",
+          "label": "Макс. температура продукта при пропарке и выключенном насосе"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 4,
+          "quote": "Макс. плотность — 1600 кг/м³",
+          "field": "product_density_max",
+          "label": "Макс. плотность продукта"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 4,
+          "quote": "Концентрация твердой фазы — до 5 %",
+          "field": "solid_fraction_max",
+          "label": "Макс. концентрация твёрдой фазы"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 4,
+          "quote": "Габариты: Длина х Ширина х Высота — 2742х360х605 мм",
+          "field": "dimensions",
+          "label": "Габариты Д × Ш × В"
+        },
+        {
+          "documentId": "pump-3-passport",
+          "page": 4,
+          "quote": "Масса — 430 кг",
+          "field": "mass",
+          "label": "Масса"
+        }
+      ],
+      "typeLabel": "Одновинтовой эксцентриковый насосный агрегат"
+    },
+    {
+      "id": "motor-3",
+      "title": "Электродвигатель №3 · BRA160M4 FБУ1",
+      "groupNumber": 3,
+      "kind": "motor",
+      "serial": "230201067",
+      "model": "BRA160M4 FБУ1",
+      "manufacturer": "АО «Ярославский электромашиностроительный завод»",
+      "fields": {
+        "serial": {
+          "value": "230201067",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 3,
+            "quote": "Заводской номер 230201067"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "BRA160M4 FБУ1",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 3,
+            "quote": "Двигатель трехфазный асинхронный типа BRA160M4 FБУ1"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "АО «Ярославский электромашиностроительный завод»",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 3,
+            "quote": "Изготовитель — АО «Ярославский электромашиностроительный завод»"
+          },
+          "label": "Изготовитель"
+        },
+        "manufacture_date": {
+          "value": "2023-03-01",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 3,
+            "quote": "Дата изготовления 2023.03.01"
+          },
+          "label": "Дата изготовления"
+        },
+        "protection_rating": {
+          "value": "IP55",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 3,
+            "quote": "Степень защиты IP 55"
+          },
+          "label": "Степень защиты"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-3-passports",
+          "page": 3,
+          "quote": "Заводской номер 230201067",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 3,
+          "quote": "Двигатель трехфазный асинхронный типа BRA160M4 FБУ1",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 3,
+          "quote": "Изготовитель — АО «Ярославский электромашиностроительный завод»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 3,
+          "quote": "Дата изготовления 2023.03.01",
+          "field": "manufacture_date",
+          "label": "Дата изготовления"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 3,
+          "quote": "Степень защиты IP 55",
+          "field": "protection_rating",
+          "label": "Степень защиты"
+        }
+      ]
+    },
+    {
+      "id": "gearbox-3",
+      "title": "Редуктор №3 · WXRF87-AM160-5.30-M1-Ø300",
+      "groupNumber": 3,
+      "kind": "gearbox",
+      "serial": "SAL023020084_001004",
+      "model": "WXRF87-AM160-5.30-M1-Ø300",
+      "manufacturer": "WANSHSIN Seikou (Hunan) Co., Ltd",
+      "fields": {
+        "serial": {
+          "value": "SAL023020084_001004",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 1,
+            "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300 №SAL023020084_001004"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "WXRF87-AM160-5.30-M1-Ø300",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 1,
+            "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "WANSHSIN Seikou (Hunan) Co., Ltd",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 1,
+            "quote": "Производитель WANSHSIN Seikou (Hunan) Co., Ltd"
+          },
+          "label": "Изготовитель"
+        },
+        "ratio": {
+          "value": 5.3,
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 1,
+            "quote": "Передаточное отношение 5,30"
+          },
+          "label": "Передаточное отношение"
+        },
+        "max_output_torque": {
+          "value": 910,
+          "unit": "Н·м",
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 1,
+            "quote": "Максимальный крутящий момент на выходе 910 Нм"
+          },
+          "label": "Макс. крутящий момент на выходе"
+        },
+        "max_radial_shaft_load": {
+          "value": 8980,
+          "unit": "Н",
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 1,
+            "quote": "Максимальная радиальная нагрузка на вал 8980 Н"
+          },
+          "label": "Макс. радиальная нагрузка на вал"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-3-passports",
+          "page": 1,
+          "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300 №SAL023020084_001004",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 1,
+          "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 1,
+          "quote": "Производитель WANSHSIN Seikou (Hunan) Co., Ltd",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 1,
+          "quote": "Передаточное отношение 5,30",
+          "field": "ratio",
+          "label": "Передаточное отношение"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 1,
+          "quote": "Максимальный крутящий момент на выходе 910 Нм",
+          "field": "max_output_torque",
+          "label": "Макс. крутящий момент на выходе"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 1,
+          "quote": "Максимальная радиальная нагрузка на вал 8980 Н",
+          "field": "max_radial_shaft_load",
+          "label": "Макс. радиальная нагрузка на вал"
+        }
+      ]
+    },
+    {
+      "id": "temperature-transmitter-3",
+      "title": "Термопреобразователь №3 · ПТ 0304Ex-ВТ",
+      "groupNumber": 3,
+      "kind": "temperature_transmitter",
+      "serial": "10096663",
+      "model": "ПТ 0304Ex-ВТ",
+      "manufacturer": "НПП «ЭЛЕМЕР»",
+      "fields": {
+        "serial": {
+          "value": "10096663",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 5,
+            "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ заводской номер № 10096663"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "ПТ 0304Ex-ВТ",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 5,
+            "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "НПП «ЭЛЕМЕР»",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 5,
+            "quote": "упакован научно-производственным предприятием «ЭЛЕМЕР»"
+          },
+          "label": "Изготовитель"
+        },
+        "primary_converter_serial": {
+          "value": "10094327",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 5,
+            "quote": "первичный преобразователь (ПП) ПТ 0304-ВТ заводской номер № 10094327"
+          },
+          "label": "Серийный номер первичного преобразователя"
+        },
+        "acceptance_date": {
+          "value": "2023-03-20",
+          "unit": null,
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 5,
+            "quote": "СВИДЕТЕЛЬСТВО О ПРИЕМКЕ — 2023.03.20"
+          },
+          "label": "Дата приёмки"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-3-passports",
+          "page": 5,
+          "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ заводской номер № 10096663",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 5,
+          "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 5,
+          "quote": "упакован научно-производственным предприятием «ЭЛЕМЕР»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 5,
+          "quote": "первичный преобразователь (ПП) ПТ 0304-ВТ заводской номер № 10094327",
+          "field": "primary_converter_serial",
+          "label": "Серийный номер первичного преобразователя"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 5,
+          "quote": "СВИДЕТЕЛЬСТВО О ПРИЕМКЕ — 2023.03.20",
+          "field": "acceptance_date",
+          "label": "Дата приёмки"
+        }
+      ]
+    },
+    {
+      "id": "pump-4",
+      "title": "Насосный агрегат №4 · AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "groupNumber": 4,
+      "kind": "pump",
+      "serial": "21031004-4",
+      "model": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "manufacturer": "ООО «Альтернативные Механические Системы»",
+      "fields": {
+        "serial": {
+          "value": "21031004-4",
+          "unit": null,
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 1,
+            "quote": "Серийный номер 21031004-4"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+          "unit": null,
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 1,
+            "quote": "AMS PCP60S12/3 01 Ex B1 HNBR DTS"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "ООО «Альтернативные Механические Системы»",
+          "unit": null,
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 1,
+            "quote": "ООО «Альтернативные Механические Системы»"
+          },
+          "label": "Изготовитель"
+        },
+        "year": {
+          "value": 2023,
+          "unit": "год",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 1,
+            "quote": "Москва, 2023"
+          },
+          "label": "Год выпуска"
+        },
+        "technical_specification": {
+          "value": "ТУ3631-001-23430200-2015",
+          "unit": null,
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 1,
+            "quote": "ТУ3631-001-23430200-2015"
+          },
+          "label": "Технические условия"
+        },
+        "purpose": {
+          "value": "Перекачивание обводненного нефтепродукта",
+          "unit": null,
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 2,
+            "quote": "перекачивание обводненного нефтепродукта"
+          },
+          "label": "Назначение"
+        },
+        "design_resource_before_writeoff": {
+          "value": 11000,
+          "unit": "ч",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 2,
+            "quote": "РЕСУРС ДО СПИСАНИЯ — не менее 11 000 ч"
+          },
+          "label": "Паспортный ресурс до списания, не менее"
+        },
+        "design_lifetime": {
+          "value": 20,
+          "unit": "лет",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 2,
+            "quote": "СРОК СЛУЖБЫ — 20 лет"
+          },
+          "label": "Паспортный срок службы"
+        },
+        "flow_range": {
+          "value": [
+            5,
+            20
+          ],
+          "unit": "м³/ч",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 3,
+            "quote": "Подача — 5–20 м³/ч"
+          },
+          "label": "Паспортный диапазон подачи"
+        },
+        "product_temperature_max_steaming_pump_off": {
+          "value": 90,
+          "unit": "°C",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 3,
+            "quote": "Макс. температура продукта при проведении пропарки и выключенном насосе — +90 °C"
+          },
+          "label": "Макс. температура продукта при пропарке и выключенном насосе"
+        },
+        "product_density_max": {
+          "value": 1600,
+          "unit": "кг/м³",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 3,
+            "quote": "Макс. плотность — 1600 кг/м³"
+          },
+          "label": "Макс. плотность продукта"
+        },
+        "solid_fraction_max": {
+          "value": 5,
+          "unit": "%",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 3,
+            "quote": "Концентрация твердой фазы — до 5 %"
+          },
+          "label": "Макс. концентрация твёрдой фазы"
+        },
+        "dimensions": {
+          "value": [
+            2742,
+            360,
+            605
+          ],
+          "unit": "мм",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 3,
+            "quote": "Габариты: Длина х Ширина х Высота — 2742х360х605 мм"
+          },
+          "label": "Габариты Д × Ш × В"
+        },
+        "mass": {
+          "value": 430,
+          "unit": "кг",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 3,
+            "quote": "Масса — 430 кг"
+          },
+          "label": "Масса"
+        },
+        "pressure_max": {
+          "value": 10,
+          "unit": "бар",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 3,
+            "quote": "Давление — до 10 бар"
+          },
+          "label": "Давление, до"
+        },
+        "required_npsh": {
+          "value": 2,
+          "unit": "м",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 3,
+            "quote": "Допускаемый кавитационный запас NPSHr — 2 м"
+          },
+          "label": "Допускаемый кавитационный запас NPSHr"
+        },
+        "product_temperature_range": {
+          "value": [
+            5,
+            45
+          ],
+          "unit": "°C",
+          "source": {
+            "documentId": "pump-4-passport",
+            "page": 3,
+            "quote": "Температура продукта — +5…+45 °C"
+          },
+          "label": "Температура продукта"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "pump-4-passport",
+          "page": 1,
+          "quote": "Серийный номер 21031004-4",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 1,
+          "quote": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 1,
+          "quote": "ООО «Альтернативные Механические Системы»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 1,
+          "quote": "Москва, 2023",
+          "field": "year",
+          "label": "Год выпуска"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 1,
+          "quote": "ТУ3631-001-23430200-2015",
+          "field": "technical_specification",
+          "label": "Технические условия"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 2,
+          "quote": "перекачивание обводненного нефтепродукта",
+          "field": "purpose",
+          "label": "Назначение"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 2,
+          "quote": "РЕСУРС ДО СПИСАНИЯ — не менее 11 000 ч",
+          "field": "design_resource_before_writeoff",
+          "label": "Паспортный ресурс до списания, не менее"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 2,
+          "quote": "СРОК СЛУЖБЫ — 20 лет",
+          "field": "design_lifetime",
+          "label": "Паспортный срок службы"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 3,
+          "quote": "Подача — 5–20 м³/ч",
+          "field": "flow_range",
+          "label": "Паспортный диапазон подачи"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 3,
+          "quote": "Макс. температура продукта при проведении пропарки и выключенном насосе — +90 °C",
+          "field": "product_temperature_max_steaming_pump_off",
+          "label": "Макс. температура продукта при пропарке и выключенном насосе"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 3,
+          "quote": "Макс. плотность — 1600 кг/м³",
+          "field": "product_density_max",
+          "label": "Макс. плотность продукта"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 3,
+          "quote": "Концентрация твердой фазы — до 5 %",
+          "field": "solid_fraction_max",
+          "label": "Макс. концентрация твёрдой фазы"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 3,
+          "quote": "Габариты: Длина х Ширина х Высота — 2742х360х605 мм",
+          "field": "dimensions",
+          "label": "Габариты Д × Ш × В"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 3,
+          "quote": "Масса — 430 кг",
+          "field": "mass",
+          "label": "Масса"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 3,
+          "quote": "Давление — до 10 бар",
+          "field": "pressure_max",
+          "label": "Давление, до"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 3,
+          "quote": "Допускаемый кавитационный запас NPSHr — 2 м",
+          "field": "required_npsh",
+          "label": "Допускаемый кавитационный запас NPSHr"
+        },
+        {
+          "documentId": "pump-4-passport",
+          "page": 3,
+          "quote": "Температура продукта — +5…+45 °C",
+          "field": "product_temperature_range",
+          "label": "Температура продукта"
+        }
+      ],
+      "typeLabel": "Одновинтовой эксцентриковый насосный агрегат"
+    },
+    {
+      "id": "motor-4",
+      "title": "Электродвигатель №4 · BRA160M4 FБУ1",
+      "groupNumber": 4,
+      "kind": "motor",
+      "serial": "230201070",
+      "model": "BRA160M4 FБУ1",
+      "manufacturer": "АО «Ярославский электромашиностроительный завод»",
+      "fields": {
+        "serial": {
+          "value": "230201070",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 1,
+            "quote": "Заводской номер 230201070"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "BRA160M4 FБУ1",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 1,
+            "quote": "Двигатель трехфазный асинхронный типа BRA160M4 FБУ1"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "АО «Ярославский электромашиностроительный завод»",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 1,
+            "quote": "Изготовитель — АО «Ярославский электромашиностроительный завод»"
+          },
+          "label": "Изготовитель"
+        },
+        "manufacture_date": {
+          "value": "2023-03-01",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 1,
+            "quote": "Дата изготовления 2023.03.01"
+          },
+          "label": "Дата изготовления"
+        },
+        "protection_rating": {
+          "value": "IP55",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 1,
+            "quote": "Степень защиты IP 55"
+          },
+          "label": "Степень защиты"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-4-passports",
+          "page": 1,
+          "quote": "Заводской номер 230201070",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 1,
+          "quote": "Двигатель трехфазный асинхронный типа BRA160M4 FБУ1",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 1,
+          "quote": "Изготовитель — АО «Ярославский электромашиностроительный завод»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 1,
+          "quote": "Дата изготовления 2023.03.01",
+          "field": "manufacture_date",
+          "label": "Дата изготовления"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 1,
+          "quote": "Степень защиты IP 55",
+          "field": "protection_rating",
+          "label": "Степень защиты"
+        }
+      ]
+    },
+    {
+      "id": "gearbox-4",
+      "title": "Редуктор №4 · WXRF87-AM160-5.30-M1-Ø300",
+      "groupNumber": 4,
+      "kind": "gearbox",
+      "serial": "SAL023020084_001001",
+      "model": "WXRF87-AM160-5.30-M1-Ø300",
+      "manufacturer": "WANSHSIN Seikou (Hunan) Co., Ltd",
+      "fields": {
+        "serial": {
+          "value": "SAL023020084_001001",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 3,
+            "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300 №SAL023020084_001001"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "WXRF87-AM160-5.30-M1-Ø300",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 3,
+            "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "WANSHSIN Seikou (Hunan) Co., Ltd",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 3,
+            "quote": "Производитель WANSHSIN Seikou (Hunan) Co., Ltd"
+          },
+          "label": "Изготовитель"
+        },
+        "ratio": {
+          "value": 5.3,
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 3,
+            "quote": "Передаточное отношение 5,30"
+          },
+          "label": "Передаточное отношение"
+        },
+        "max_output_torque": {
+          "value": 910,
+          "unit": "Н·м",
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 3,
+            "quote": "Максимальный крутящий момент на выходе 910 Нм"
+          },
+          "label": "Макс. крутящий момент на выходе"
+        },
+        "max_radial_shaft_load": {
+          "value": 8980,
+          "unit": "Н",
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 3,
+            "quote": "Максимальная радиальная нагрузка на вал 8980 Н"
+          },
+          "label": "Макс. радиальная нагрузка на вал"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-4-passports",
+          "page": 3,
+          "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300 №SAL023020084_001001",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 3,
+          "quote": "Редуктор WXRF87-AM160-5.30-M1-Ø300",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 3,
+          "quote": "Производитель WANSHSIN Seikou (Hunan) Co., Ltd",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 3,
+          "quote": "Передаточное отношение 5,30",
+          "field": "ratio",
+          "label": "Передаточное отношение"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 3,
+          "quote": "Максимальный крутящий момент на выходе 910 Нм",
+          "field": "max_output_torque",
+          "label": "Макс. крутящий момент на выходе"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 3,
+          "quote": "Максимальная радиальная нагрузка на вал 8980 Н",
+          "field": "max_radial_shaft_load",
+          "label": "Макс. радиальная нагрузка на вал"
+        }
+      ]
+    },
+    {
+      "id": "temperature-transmitter-4",
+      "title": "Термопреобразователь №4 · ПТ 0304Ex-ВТ",
+      "groupNumber": 4,
+      "kind": "temperature_transmitter",
+      "serial": "10096662",
+      "model": "ПТ 0304Ex-ВТ",
+      "manufacturer": "НПП «ЭЛЕМЕР»",
+      "fields": {
+        "serial": {
+          "value": "10096662",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 6,
+            "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ заводской номер № 10096662"
+          },
+          "label": "Серийный номер"
+        },
+        "model": {
+          "value": "ПТ 0304Ex-ВТ",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 6,
+            "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ"
+          },
+          "label": "Модель"
+        },
+        "manufacturer": {
+          "value": "НПП «ЭЛЕМЕР»",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 6,
+            "quote": "упакован научно-производственным предприятием «ЭЛЕМЕР»"
+          },
+          "label": "Изготовитель"
+        },
+        "primary_converter_serial": {
+          "value": "10094326",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 6,
+            "quote": "первичный преобразователь (ПП) ПТ 0304-ВТ заводской номер № 10094326"
+          },
+          "label": "Серийный номер первичного преобразователя"
+        },
+        "acceptance_date": {
+          "value": "2023-03-20",
+          "unit": null,
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 6,
+            "quote": "СВИДЕТЕЛЬСТВО О ПРИЕМКЕ — 2023.03.20"
+          },
+          "label": "Дата приёмки"
+        }
+      },
+      "sources": [
+        {
+          "documentId": "drive-4-passports",
+          "page": 6,
+          "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ заводской номер № 10096662",
+          "field": "serial",
+          "label": "Серийный номер"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 6,
+          "quote": "Термопреобразователь прецизионный ПТ 0304Ex-ВТ",
+          "field": "model",
+          "label": "Модель"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 6,
+          "quote": "упакован научно-производственным предприятием «ЭЛЕМЕР»",
+          "field": "manufacturer",
+          "label": "Изготовитель"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 6,
+          "quote": "первичный преобразователь (ПП) ПТ 0304-ВТ заводской номер № 10094326",
+          "field": "primary_converter_serial",
+          "label": "Серийный номер первичного преобразователя"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 6,
+          "quote": "СВИДЕТЕЛЬСТВО О ПРИЕМКЕ — 2023.03.20",
+          "field": "acceptance_date",
+          "label": "Дата приёмки"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "title": "Текущий технический осмотр",
+      "text": "Для режима 8 часов в день, 5 суток в неделю руководство АМС указывает еженедельный контроль герметичности и постороннего шума; крепления и затяжку перечисленных монтажных элементов проверяют каждые 3 месяца. Для другого режима нужен согласованный график площадки.",
+      "appliesTo": "Серия одновинтовых эксцентриковых насосов АМС, инструкция § 8.1.1",
+      "sources": [
+        {
+          "documentId": "operation-manual",
+          "page": 7,
+          "quote": "При работе насоса 8 часов в день в течении 5 суток в неделю текущий осмотр подразумевает контроль"
+        }
+      ]
+    },
+    {
+      "title": "Обслуживание торцевого уплотнения",
+      "text": "В разделе об одинарном торцевом уплотнении руководство рекомендует наблюдать за износом пар трения. Раздел о сальниковой набивке относится к другому типу уплотнения.",
+      "appliesTo": "Одинарное торцевое уплотнение, инструкция АМС § 8.1.5",
+      "sources": [
+        {
+          "documentId": "operation-manual",
+          "page": 8,
+          "quote": "Рекомендуется вести наблюдение только за износом пар трения поз.2,6"
+        }
+      ]
+    },
+    {
+      "title": "Масло редуктора",
+      "text": "Перечень проекта указывает синтетическое масло VG220 / Synoil, 3,7 л. Тип и объём относятся к указанному исполнению редуктора.",
+      "appliesTo": "WXRF87-AM160-5.30-M1-Ø300, проект 21031004",
+      "sources": [
+        {
+          "documentId": "lubricants",
+          "page": 1,
+          "quote": "Синтетическое масло VG220 / Synoil — 3,7 л"
+        }
+      ]
+    },
+    {
+      "title": "Смазочные материалы соединения вала и шарниров",
+      "text": "Для соединения вала редуктора с полым валом указан BECHEM Berulub 932 Antiseize Paste. Для двух шарнирных узлов указан Bechem Berutox FE 18 EP. Количество в перечне не указано.",
+      "appliesTo": "Насосные агрегаты проекта 21031004",
+      "sources": [
+        {
+          "documentId": "lubricants",
+          "page": 1,
+          "quote": "BECHEM Berulub 932 Antiseize Paste"
+        },
+        {
+          "documentId": "lubricants",
+          "page": 1,
+          "quote": "Bechem Berutox FE 18 EP"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Номер группы отражает комплектность переданных PDF. Монтажные позиции и замены на площадке не подтверждены.",
+    "Связи паспортов с фотографиями, XLSX телеметрии и демонстрационным P-102 не установлены.",
+    "Ресурс до списания и срок службы приведены из паспорта. Фактическая наработка и остаточный ресурс отсутствуют.",
+    "Диагностические связки и интервалы 4000, 8000 и 16000 ч требуют проверки применимости для этого оборудования.",
+    "У насоса №3 строки давления, NPSHr и рабочего диапазона температуры выцвели, поэтому поля этих параметров оставлены пустыми.",
+    "Цитаты свёрнутых строк таблиц сохраняют значения и единицы. При разночтении используйте указанную страницу оригинала."
+  ]
+}

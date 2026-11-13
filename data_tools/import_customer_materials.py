@@ -18,6 +18,15 @@ GROUPS = {'Насосные агрегаты': ('pump', 'Насосные агр
           'Запорная арматура': ('valve', 'Запорная арматура'),
           'Турбопровод': ('pipe', 'Трубопроводы')}
 DOCUMENT = 'Типы дефектов промышленного оборудования.docx'
+DEFAULT_SCOPE_MANIFEST = ROOT / 'data/customer/inspection-scope.json'
+REVIEW_SOURCE = 'manual_visible_context_review'
+SCOPES = {
+    'external': 'Внешний обход',
+    'repair': 'Ремонтные примеры',
+    'restricted_access': 'Ограниченный доступ',
+    'unreviewed': 'Контекст не установлен',
+}
+UNREVIEWED_SCOPE = {'id': 'unreviewed', 'source': None, 'note': None}
 NS = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
 
 
@@ -47,8 +56,27 @@ def difference_hash(image):
     return f'{sum(int(bit) << i for i, bit in enumerate(bits)):016x}'
 
 
-def build(source, output):
+def load_scope_manifest(path):
+    manifest = json.loads(path.read_text(encoding='utf-8'))
+    if not isinstance(manifest, dict) or manifest.get('schemaVersion') != 1 or manifest.get('source') != REVIEW_SOURCE:
+        raise ValueError('Invalid inspection scope manifest')
+    images = manifest.get('images')
+    if not isinstance(images, dict):
+        raise ValueError('Missing inspection scope entries')
+    scopes = {}
+    for sha, entry in images.items():
+        if not re.fullmatch(r'[a-f0-9]{64}', sha) or not isinstance(entry, dict):
+            raise ValueError(f'Invalid inspection scope entry: {sha}')
+        scope, note = entry.get('scope'), entry.get('note')
+        if not isinstance(scope, str) or scope not in SCOPES or not isinstance(note, str) or not note.strip():
+            raise ValueError(f'Invalid inspection scope entry: {sha}')
+        scopes[sha] = {'id': scope, 'source': REVIEW_SOURCE, 'note': note.strip()}
+    return scopes
+
+
+def build(source, output, scope_manifest=DEFAULT_SCOPE_MANIFEST):
     source, output = source.resolve(), output.resolve()
+    scopes = load_scope_manifest(scope_manifest)
     previews = output / 'previews'
     previews.mkdir(parents=True, exist_ok=True)
     images, by_hash, source_files = [], {}, []
@@ -64,7 +92,7 @@ def build(source, output):
             relative = unicodedata.normalize('NFC', path.relative_to(source).as_posix())
             dest = output / 'raw' / relative
             dest.parent.mkdir(parents=True, exist_ok=True)
-            if path.resolve() != dest.resolve():
+            if not dest.exists() or not path.samefile(dest):
                 shutil.copy2(path, dest)
             source_files.append({'path': relative, 'bytes': path.stat().st_size, 'sha256': sha})
             if sha in by_hash:
@@ -86,6 +114,7 @@ def build(source, output):
                        'previewBytes': preview.stat().st_size, 'differenceHash': dhash,
                        'source': 'customer_provided', 'annotationStatus': 'unreviewed',
                        'equipmentSerial': None, 'defectLabel': None,
+                       'inspectionScope': scopes.get(sha, UNREVIEWED_SCOPE).copy(),
                        'rightsStatus': 'supplied_for_case_review_not_verified_for_redistribution'}
             if row['previewBytes'] > 3 * 1024 * 1024:
                 raise ValueError(f'Preview too large: {relative}')
@@ -95,12 +124,13 @@ def build(source, output):
     if not document.resolve().is_relative_to(source):
         raise ValueError('Document points outside the supplied directory')
     dest = output / 'raw' / DOCUMENT
-    if document.resolve() != dest.resolve():
+    if not dest.exists() or not document.samefile(dest):
         shutil.copy2(document, dest)
     source_files.append({'path': DOCUMENT, 'bytes': document.stat().st_size, 'sha256': digest(document)})
     documents = [{'id': 'external-defect-types', 'title': DOCUMENT, 'sha256': digest(document),
                   'sections': read_docx(document), 'source': 'customer_provided'}]
     counts = Counter(row['category'] for row in images)
+    scope_counts = Counter(row['inspectionScope']['id'] for row in images)
     candidates = []
     for i, first in enumerate(images):
         for second in images[i + 1:]:
@@ -112,9 +142,11 @@ def build(source, output):
               'summary': {'files': len(source_files), 'images': len(source_files) - 1,
                           'uniqueImages': len(images), 'duplicateImages': len(source_files) - 1 - len(images),
                           'categories': [{'id': id_, 'title': title, 'count': counts[id_]}
-                                         for id_, title in GROUPS.values()]},
+                                         for id_, title in GROUPS.values()],
+                          'scopes': [{'id': id_, 'title': title, 'count': scope_counts[id_]}
+                                     for id_, title in SCOPES.items()]},
               'images': images, 'documents': documents,
-              'notice': 'Материалы заказчика — примеры внешних признаков. Папка задаёт тему, а не подтверждённый класс дефекта. Связь фото с конкретным насосом и Excel не установлена.',
+              'notice': 'Материалы заказчика сгруппированы по видимым условиям осмотра. Экспертные метки дефектов отсутствуют. Связь фото с конкретным насосом и Excel не установлена.',
               'qualityNotes': ['В наборе встречаются водяные знаки фотобанков и Qwen, а также снимки экранов и похожие копии. Происхождение каждого примера требует проверки перед обучением.',
                                'Ни один файл не получает автоматически экспертную метку дефекта или координаты разметки.'],
               'possibleNearDuplicates': candidates, 'sources': source_files}
@@ -128,8 +160,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source-root', type=Path, default=ROOT)
     parser.add_argument('--output-root', type=Path, default=ROOT / 'data/customer')
+    parser.add_argument('--scope-manifest', type=Path, default=DEFAULT_SCOPE_MANIFEST)
     args = parser.parse_args()
-    result = build(args.source_root, args.output_root)
+    result = build(args.source_root, args.output_root, args.scope_manifest)
     print(json.dumps({'summary': result['summary'], 'near_duplicate_candidates': len(result['possibleNearDuplicates'])}, ensure_ascii=False))
 
 
