@@ -1,0 +1,146 @@
+[
+  {
+    "file": "cracked-cast-iron.jpg",
+    "scene": "cracked-cast-iron",
+    "source": "https://commons.wikimedia.org/wiki/File:Crack_Pipe.jpg",
+    "author": "ilovebutter",
+    "license": "CC BY 2.0",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.34,
+          0.65,
+          0.53,
+          0.85
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.38,
+          0.36,
+          0.59,
+          0.83
+        ]
+      }
+    ],
+    "sha256": "16d08ea0bef102dd96279df567dce46b81f46801b822476725fd7b497db76c38"
+  },
+  {
+    "file": "damaged-water-pipe.jpg",
+    "scene": "damaged-water-pipe",
+    "source": "https://commons.wikimedia.org/wiki/File:Damaged_pipe_line.jpg",
+    "author": "Asikironalio",
+    "license": "CC BY 4.0",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.46,
+          0.43,
+          0.65,
+          0.57
+        ]
+      }
+    ],
+    "sha256": "4da3707d29c4833a9209fa756c9fb6317cef6d33cbacde279936b996efb3c438"
+  },
+  {
+    "file": "collapsed-pipe.jpg",
+    "scene": "collapsed-pipe",
+    "source": "https://commons.wikimedia.org/wiki/File:Pipeline_Sch%C3%A4den.JPG",
+    "author": "Ceniba",
+    "license": "CC BY-SA 3.0",
+    "objects": [
+      {
+        "class": "pipe_damage",
+        "xyxy": [
+          0.01,
+          0.21,
+          0.85,
+          0.59
+        ]
+      }
+    ],
+    "sha256": "f1f4f196252aebed1a0f85d116fa4ed3f995aef658242d1c715e27de7ab92d8b"
+  },
+  {
+    "file": "leak.jpg",
+    "scene": "rusted-well-pipe",
+    "source": "https://commons.wikimedia.org/wiki/File:Leak_in_rusted_pipe_side_view.jpg",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.22,
+          0.32,
+          0.71,
+          0.68
+        ]
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.44,
+          0.57,
+          0.62,
+          0.73
+        ]
+      }
+    ],
+    "author": "Shamrock Lee",
+    "license": "CC BY 4.0",
+    "sha256": "abc2a753456e76c9eb8f752e722321846b6743e5b55b27895ce54656a3c434fc"
+  },
+  {
+    "file": "burnt-screw.jpg",
+    "scene": "burnt-screw",
+    "source": "https://commons.wikimedia.org/wiki/File:Burnt_terminals.JPG",
+    "author": "Dmitry G",
+    "license": "Public domain",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.275,
+          0.492,
+          0.374,
+          0.62
+        ]
+      }
+    ],
+    "note": "Electrical junction outside the pump domain. An arrow is present in the source photo.",
+    "sha256": "b02c8e7a2f8cd141397581a93ce7394c34fbbfd1bee28cec970173d0bae72f7c"
+  },
+  {
+    "file": "burnt-socket.jpg",
+    "scene": "burnt-socket",
+    "source": "https://commons.wikimedia.org/wiki/File:Toma_de_corriente_quemada.jpg",
+    "author": "Rumaure",
+    "license": "CC BY-SA 4.0",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.392,
+          0.478,
+          0.482,
+          0.579
+        ]
+      }
+    ],
+    "note": "Burnt socket contact area. Electrical hardware outside the pump domain.",
+    "sha256": "1c012c38425342b1ed330f39367f4598f057ca29732542a4bdcfd634a7f267e5"
+  },
+  {
+    "file": "intact-box.jpg",
+    "scene": "intact-box",
+    "source": "https://commons.wikimedia.org/wiki/File:Cable_junction_box_for_maintaining_electrical_functional_integrity_according_to_DIN_4102_Part_12.JPG",
+    "author": "S.J. de Waard",
+    "license": "CC BY 2.5",
+    "objects": [],
+    "note": "Intact electrical junction for checking false alarms.",
+    "sha256": "5cbc2cf289852e37771a94d367863e64328bb278109ab5b3b2d98240c0f38084"
+  }
+]

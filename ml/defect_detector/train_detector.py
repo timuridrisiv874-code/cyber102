@@ -2,6 +2,7 @@ from pathlib import Path
 import argparse
 import hashlib
 import json
+import math
 from collections import Counter
 import yaml
 from ultralytics import YOLO, settings
@@ -45,7 +46,13 @@ def main():
     p.add_argument('--name')
     p.add_argument('--transfer-class-head', action='store_true')
     p.add_argument('--mosaic', type=float, default=.65)
+    p.add_argument('--learning-rate', type=float, help='Use AdamW with this initial learning rate')
+    p.add_argument('--freeze-layers', type=int, default=0, help='Freeze the first N model layers')
     args=p.parse_args()
+    if args.learning_rate is not None and (not math.isfinite(args.learning_rate) or args.learning_rate <= 0):
+        p.error('--learning-rate must be finite and positive')
+    if args.freeze_layers < 0:
+        p.error('--freeze-layers must be non-negative')
     root=Path.cwd()
     dataset=args.data.resolve()
     coverage = dataset / 'coverage.json'
@@ -67,10 +74,17 @@ def main():
     initial_weights = (args.initial_weights or root/model_name).resolve(strict=True)
     run_name = args.name or args.role
     model=YOLO(str(initial_weights),task='detect')
+    if args.freeze_layers >= len(model.model.model):
+        p.error('--freeze-layers must leave at least the detection head trainable')
+    optimizer = {}
+    if args.learning_rate is not None:
+        optimizer = {'optimizer': 'AdamW', 'lr0': args.learning_rate,
+                     'warmup_epochs': 1.0, 'warmup_bias_lr': 0.0}
     model.train(trainer=ClassTransferTrainer if args.transfer_class_head else None,
                       data=str(config),imgsz=resolution,epochs=args.epochs,patience=15,batch=batch,workers=0,
                       device=0,project=str(root/'runs'),name=run_name,exist_ok=False,seed=102,
-                      plots=False,cache=False,amp=False,mosaic=args.mosaic,fliplr=.5,close_mosaic=5)
+                      plots=False,cache=False,amp=False,mosaic=args.mosaic,fliplr=.5,close_mosaic=5,
+                      freeze=args.freeze_layers, **optimizer)
     checkpoint=Path(model.trainer.best)
     trained=YOLO(str(checkpoint),task='detect')
     exported=Path(trained.export(format='onnx',imgsz=resolution,opset=17,dynamic=False,simplify=False,device='cpu'))
