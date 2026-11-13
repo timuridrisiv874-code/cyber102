@@ -86,10 +86,11 @@ class BoundedHTTPServer(ThreadingHTTPServer):
 
 
 class Handler(SimpleHTTPRequestHandler):
-    def __init__(self, *args, database, public_url, vision_enabled=False, **kwargs):
+    def __init__(self, *args, database, public_url, vision_enabled=False, vision_backend='ollama', **kwargs):
         self.database = database
         self.public_url = public_url
         self.vision_enabled = vision_enabled
+        self.vision_backend = vision_backend
         super().__init__(*args, directory=str(WEB), **kwargs)
 
     def list_directory(self, path):
@@ -159,8 +160,9 @@ class Handler(SimpleHTTPRequestHandler):
         if route not in ('/api/diagnose', '/api/history', '/analyze'):
             self.error(HTTPStatus.NOT_FOUND, 'Маршрут не найден.')
             return
-        origin = self.headers.get('Origin')
-        if origin and origin not in (self.public_url, f'http://{self.headers.get("Host")}'):
+        origins = self.headers.get_all('Origin', [])
+        if origins and (len(origins) != 1 or not origins[0] or
+                        origins[0] not in (self.public_url, f'http://{self.headers.get("Host")}')):
             self.error(HTTPStatus.FORBIDDEN, 'Запрос разрешён только с адреса приложения.')
             return
         if route == '/analyze':
@@ -221,17 +223,31 @@ class Handler(SimpleHTTPRequestHandler):
         if not self.vision_enabled:
             self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Локальное зрение не включено на этом сервере.')
             return
+        lengths = self.headers.get_all('Content-Length', [])
+        if self.headers.get_all('Transfer-Encoding') or len(lengths) != 1:
+            self.error(HTTPStatus.BAD_REQUEST, 'Укажите одну длину тела запроса в Content-Length.')
+            return
         try:
-            length = int(self.headers.get('Content-Length', '0'))
+            length_header = lengths[0].strip()
+            if not length_header.isascii() or not length_header.isdecimal():
+                raise ValueError('Некорректное значение Content-Length.')
+            length = int(length_header)
             if not 0 < length <= vision.MAX_IMAGE_BYTES + 8192:
                 self.error(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, 'Кадр должен занимать не более 3 МБ.')
                 return
-            image = vision.extract_image(self.headers.get('Content-Type', ''), self.rfile.read(length))
-            self.send_json(vision.analyze(image))
+            body = self.rfile.read(length)
+            if len(body) != length:
+                raise ValueError('Тело запроса с кадром получено не полностью.')
+            image = vision.extract_image(self.headers.get('Content-Type', ''), body)
+            result = vision.analyze(image, backend=self.vision_backend)
+        except TimeoutError:
+            self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить кадр за отведённое время.')
         except ValueError as error:
             self.error(HTTPStatus.BAD_REQUEST, str(error))
         except (vision.VisionUnavailable, ImportError) as error:
             self.error(HTTPStatus.SERVICE_UNAVAILABLE, str(error))
+        else:
+            self.send_json(result)
 
     def passport(self, connection, serial):
         row = connection.execute('SELECT passport_json FROM pumps WHERE serial = ?', (serial,)).fetchone()
@@ -290,7 +306,9 @@ def main():
     parser.add_argument('--port', type=int, default=8000)
     parser.add_argument('--database', type=Path, default=ROOT / 'var' / 'cyber102.sqlite3')
     parser.add_argument('--public-url', default='', help='HTTPS-адрес вебки для QR, без пути')
-    parser.add_argument('--vision', action='store_true', help='Анализ кадров локальной Qwen3-VL в Ollama на 127.0.0.1:11435')
+    parser.add_argument('--vision', action='store_true', help='Включить локальный анализ кадров')
+    parser.add_argument('--vision-backend', choices=vision.BACKENDS, default='ollama',
+                        help='Локальный сервис анализа кадров (по умолчанию ollama)')
     args = parser.parse_args()
     public_url = args.public_url.rstrip('/')
     if public_url:
@@ -298,7 +316,8 @@ def main():
         if url.scheme != 'https' or not url.hostname or url.username or url.password or url.path or url.query or url.fragment:
             parser.error('--public-url должен быть HTTPS-адресом без пути, параметров и учётных данных')
     initialize(args.database)
-    handler = partial(Handler, database=args.database, public_url=public_url, vision_enabled=args.vision)
+    handler = partial(Handler, database=args.database, public_url=public_url,
+                      vision_enabled=args.vision, vision_backend=args.vision_backend)
     with BoundedHTTPServer((args.bind, args.port), handler) as server:
         print(f'Cyber102 · http://{args.bind}:{server.server_port}/', flush=True)
         try:

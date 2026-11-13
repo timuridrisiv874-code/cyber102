@@ -49,16 +49,36 @@
                 <option value="no_marker" data-image="demo-pump.jpg" data-response="mock-analysis-no-marker.json">Кадр без метки</option>
               </select>
             </div>
+            <div class="camera-options" id="camera-options" hidden>
+              <label for="camera-mode">Режим</label>
+              <select id="camera-mode">
+                <option value="single">Один кадр</option>
+                <option value="video">Видеопроверка</option>
+              </select>
+              <label for="frame-interval" id="frame-interval-label" hidden>Интервал</label>
+              <select id="frame-interval" hidden>
+                <option value="2000">2 секунды</option>
+                <option value="5000" selected>5 секунд</option>
+                <option value="10000">10 секунд</option>
+              </select>
+            </div>
+            <p class="video-help" id="video-help" hidden>Проверяем отдельные кадры с камеры. Рамка относится к последнему проверенному кадру.</p>
             <div class="actions">
               <button class="button primary" id="check" type="button" disabled><i class="scan-icon" aria-hidden="true"></i><span id="check-label">Проверить кадр</span></button>
+              <button class="button primary" id="video-toggle" type="button" hidden><i class="scan-icon" aria-hidden="true"></i><span id="video-toggle-label">Начать проверку</span></button>
               <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Включить камеру</span></button>
             </div>
             <p class="message" id="message" role="status"></p>
+            <p class="video-metrics" id="video-metrics" hidden></p>
           </div>
         </section>
 
         <section class="result panel" id="result" aria-labelledby="result-title">
           <div class="panel-heading"><h2 id="result-title" tabindex="-1">Результат осмотра</h2></div>
+          <div class="checked-frame" id="checked-frame" hidden>
+            <p class="source">Последний проверенный кадр</p>
+            <div class="viewfinder checked-viewfinder" id="checked-viewfinder"></div>
+          </div>
           <div class="empty" id="empty">
             <div class="empty-icon" aria-hidden="true"><i></i></div>
             <h3 id="empty-title">Ожидает проверки</h3>

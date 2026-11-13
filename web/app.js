@@ -8,7 +8,14 @@ const detection = byId('detection');
 const checkButton = byId('check');
 const cameraButton = byId('camera');
 const demoScenario = byId('demo-scenario');
+const cameraMode = byId('camera-mode');
+const intervalSelect = byId('frame-interval');
+const videoToggle = byId('video-toggle');
+const checkedViewfinder = byId('checked-viewfinder');
+const videoMetrics = byId('video-metrics');
 const endpoint = document.querySelector('main').dataset.analysisEndpoint.trim();
+const latencyFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 });
+const rateFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
 
 const unavailableResults = {
   no_marker: ['Оборудование не распознано', 'Метка не видна. Наведите камеру на метку и сделайте новый кадр.'],
@@ -21,6 +28,9 @@ let openingCamera = false;
 let checking = false;
 let result = null;
 let cameraRequest = 0;
+let analysisController = null;
+let videoRun = null;
+let videoStats = null;
 
 function showMessage(text = '', error = false) {
   const message = byId('message');
@@ -32,7 +42,7 @@ function positionDetection() {
   if (!result?.box || detection.hidden) return;
 
   // The still image is letterboxed by object-fit: contain.
-  const { width, height } = viewfinder.getBoundingClientRect();
+  const { width, height } = snapshot.parentElement.getBoundingClientRect();
   const scale = Math.min(width / snapshot.width, height / snapshot.height);
   const frameWidth = snapshot.width * scale;
   const frameHeight = snapshot.height * scale;
@@ -45,22 +55,42 @@ function positionDetection() {
 }
 
 function render() {
+  const videoMode = cameraMode.value === 'video';
   const frozen = frameSource !== null;
-  const live = Boolean(stream && !frozen);
-  const frameReady = live ? video.readyState >= 2 && video.videoWidth > 0 :
+  const live = Boolean(stream && (videoMode || !frozen));
+  const cameraReady = video.readyState >= 2 && video.videoWidth > 0;
+  const frameReady = live ? cameraReady :
     example.complete && example.currentSrc === example.src && example.naturalWidth > 0;
   example.hidden = live || frozen;
   video.hidden = !live;
   snapshot.hidden = !frozen;
-  viewfinder.dataset.portrait = String(frozen ? snapshot.height > snapshot.width :
-    live && video.videoHeight > video.videoWidth);
-  byId('guide').hidden = frozen;
+  viewfinder.dataset.portrait = String(live ? video.videoHeight > video.videoWidth : frozen && snapshot.height > snapshot.width);
+  checkedViewfinder.dataset.portrait = String(frozen && snapshot.height > snapshot.width);
+  byId('checked-frame').hidden = !videoMode || !frozen;
+  byId('guide').hidden = !videoMode && frozen;
   byId('source').dataset.live = String(live);
   byId('source-text').textContent = live ? 'Камера' : frameSource === 'camera' ? 'Кадр с камеры' : 'Пример кадра';
   byId('mode').textContent = endpoint && (live || frameSource === 'camera') ? 'Локальная модель' : 'Тестовый режим';
   byId('demo-options').hidden = Boolean(stream || openingCamera || frameSource === 'camera');
   demoScenario.disabled = checking;
+  byId('camera-options').hidden = !stream || !endpoint;
+  cameraMode.disabled = openingCamera || checking || Boolean(videoRun) || Boolean(analysisController);
+  byId('frame-interval-label').hidden = !videoMode;
+  intervalSelect.hidden = !videoMode;
+  intervalSelect.disabled = Boolean(videoRun);
+  byId('video-help').hidden = !videoMode;
+  videoToggle.hidden = !videoMode;
+  videoToggle.disabled = !videoRun && (!stream || !cameraReady || openingCamera || Boolean(analysisController));
+  byId('video-toggle-label').textContent = videoRun ? 'Остановить проверку' : 'Начать проверку';
+  videoMetrics.hidden = !videoMode || !videoStats;
+  if (videoStats) {
+    const { count, latency, rate } = videoStats;
+    videoMetrics.textContent = count ?
+      `Проверено кадров: ${count} · Задержка: ${latencyFormat.format(latency)} с${count > 1 ? ` · Темп: ${rateFormat.format(rate)} кадра/с` : ''}` :
+      'Проверено кадров: 0';
+  }
 
+  checkButton.hidden = videoMode;
   checkButton.disabled = openingCamera || checking || (!frozen && !frameReady);
   cameraButton.disabled = checking && !stream;
   byId('check-label').textContent = checking ? 'Проверяем…' :
@@ -101,6 +131,17 @@ function render() {
 function stopCamera() {
   cameraRequest += 1;
   openingCamera = false;
+  stopVideoRun();
+  analysisController?.abort();
+  if (cameraMode.value === 'video') {
+    cameraMode.value = 'single';
+    videoStats = null;
+    viewfinder.append(snapshot, detection);
+    frameSource = null;
+    result = null;
+  } else if (checking && frameSource === 'camera') {
+    frameSource = null;
+  }
   const previousStream = stream;
   stream = null;
   video.srcObject = null;
@@ -170,27 +211,33 @@ async function toggleCamera() {
   }
 }
 
-function freezeFrame() {
-  const source = stream ? video : example;
-  const width = stream ? video.videoWidth : example.naturalWidth;
-  const height = stream ? video.videoHeight : example.naturalHeight;
-  if (!width || !height || (stream && video.readyState < 2)) throw new Error('Frame unavailable');
+function drawFrame(canvas, source) {
+  const fromCamera = source === video;
+  const width = fromCamera ? video.videoWidth : example.naturalWidth;
+  const height = fromCamera ? video.videoHeight : example.naturalHeight;
+  if (!width || !height || (fromCamera && video.readyState < 2)) {
+    throw new Error('Кадр недоступен. Дождитесь изображения с камеры.');
+  }
 
   const scale = Math.min(1, 1280 / Math.max(width, height));
-  snapshot.width = Math.max(1, Math.round(width * scale));
-  snapshot.height = Math.max(1, Math.round(height * scale));
-  snapshot.getContext('2d').drawImage(source, 0, 0, snapshot.width, snapshot.height);
-  frameSource = stream ? 'camera' : 'example';
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
 }
 
-async function analyzeFrame(useServer) {
+async function analyzeFrame(useServer, frame) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), useServer ? 120000 : 12000);
+  analysisController = controller;
+  let timedOut = false;
+  const timeout = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, useServer ? 120000 : 12000);
   try {
     const options = { signal: controller.signal, cache: 'no-store' };
     if (useServer) {
-      const image = await new Promise((resolve) => snapshot.toBlob(resolve, 'image/jpeg', 0.85));
-      if (!image) throw new Error('JPEG unavailable');
+      const image = await new Promise((resolve) => frame.toBlob(resolve, 'image/jpeg', 0.85));
+      if (!image) throw new Error('Не удалось подготовить кадр.');
       const body = new FormData();
       body.append('file', image, 'frame.jpg');
       Object.assign(options, { method: 'POST', body });
@@ -202,8 +249,12 @@ async function analyzeFrame(useServer) {
       throw new Error(error.error || `Ошибка анализа: ${response.status}`);
     }
     return readResult(await response.json());
+  } catch (error) {
+    if (timedOut) throw new Error('Сервер не ответил вовремя. Повторите проверку.');
+    throw error;
   } finally {
     clearTimeout(timeout);
+    analysisController = null;
   }
 }
 
@@ -222,7 +273,7 @@ function readResult(data) {
 }
 
 async function checkFrame() {
-  if (openingCamera || checking) return;
+  if (openingCamera || checking || videoRun || analysisController) return;
   showMessage();
 
   if (result && frameSource === 'camera') {
@@ -246,22 +297,96 @@ async function checkFrame() {
   result = null;
   checking = true;
   try {
-    if (!frameSource) freezeFrame();
+    if (!frameSource) {
+      drawFrame(snapshot, stream ? video : example);
+      frameSource = stream ? 'camera' : 'example';
+    }
     if (endpoint && frameSource === 'camera') showMessage('Модель анализирует кадр. Первый запуск может занять до двух минут.');
     render();
-    result = await analyzeFrame(Boolean(endpoint && frameSource === 'camera'));
+    result = await analyzeFrame(Boolean(endpoint && frameSource === 'camera'), snapshot);
     showMessage('Проверка завершена.');
   } catch (error) {
-    showMessage(error.name === 'AbortError' ? 'Сервер не ответил вовремя. Повторите проверку.' :
-      (error.message || 'Не удалось проверить кадр. Повторите попытку.'), true);
+    if (error.name !== 'AbortError') showMessage(error.message || 'Не удалось проверить кадр. Повторите попытку.', true);
   } finally {
     checking = false;
     render();
   }
 }
 
+function changeCameraMode() {
+  const target = cameraMode.value === 'video' ? checkedViewfinder : viewfinder;
+  target.append(snapshot, detection);
+  frameSource = null;
+  result = null;
+  videoStats = null;
+  showMessage();
+  render();
+}
+
+function stopVideoRun() {
+  if (!videoRun) return;
+  clearTimeout(videoRun.timer);
+  videoRun = null;
+  analysisController?.abort();
+}
+
+async function checkVideoFrame(run) {
+  const started = performance.now();
+  try {
+    drawFrame(run.frame, video);
+    const nextResult = await analyzeFrame(true, run.frame);
+    if (videoRun !== run) return;
+
+    snapshot.width = run.frame.width;
+    snapshot.height = run.frame.height;
+    snapshot.getContext('2d').drawImage(run.frame, 0, 0);
+    frameSource = 'camera';
+    result = nextResult;
+    const completed = performance.now();
+    const count = videoStats.count + 1;
+    if (count === 1) run.firstCompleted = completed;
+    videoStats = {
+      count,
+      latency: (completed - started) / 1000,
+      rate: count > 1 ? (count - 1) * 1000 / (completed - run.firstCompleted) : null,
+    };
+    if (count === 1) showMessage('Видеопроверка идёт.');
+    run.timer = setTimeout(() => checkVideoFrame(run), Math.max(0, run.interval - (completed - started)));
+  } catch (error) {
+    if (videoRun !== run) return;
+    stopVideoRun();
+    showMessage(error.message || 'Не удалось проверить кадр. Запустите проверку ещё раз.', true);
+  } finally {
+    render();
+  }
+}
+
+function toggleVideoRun() {
+  if (videoRun) {
+    stopVideoRun();
+    showMessage('Видеопроверка остановлена.');
+    render();
+    return;
+  }
+  if (!stream || openingCamera || checking || analysisController || document.hidden) return;
+  frameSource = null;
+  result = null;
+  videoStats = { count: 0 };
+  videoRun = {
+    frame: document.createElement('canvas'),
+    firstCompleted: null,
+    interval: Number(intervalSelect.value),
+    timer: null,
+  };
+  showMessage('Модель анализирует первый кадр.');
+  render();
+  checkVideoFrame(videoRun);
+}
+
 cameraButton.addEventListener('click', toggleCamera);
 checkButton.addEventListener('click', checkFrame);
+cameraMode.addEventListener('change', changeCameraMode);
+videoToggle.addEventListener('click', toggleVideoRun);
 function updateDemoExample() {
   const { image } = demoScenario.selectedOptions[0].dataset;
   frameSource = null;
@@ -282,7 +407,7 @@ detection.addEventListener('click', () => {
   byId('result').scrollIntoView({ block: 'nearest' });
 });
 function releaseCamera() {
-  if (!stream && !openingCamera) return;
+  if (!stream && !openingCamera && !analysisController) return;
   stopCamera();
   showMessage();
   render();
@@ -290,10 +415,12 @@ function releaseCamera() {
 
 window.addEventListener('pagehide', releaseCamera);
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && stream) releaseCamera();
+  if (document.hidden) releaseCamera();
 });
 if ('ResizeObserver' in window) {
-  new ResizeObserver(positionDetection).observe(viewfinder);
+  const observer = new ResizeObserver(positionDetection);
+  observer.observe(viewfinder);
+  observer.observe(checkedViewfinder);
 } else {
   window.addEventListener('resize', positionDetection);
 }

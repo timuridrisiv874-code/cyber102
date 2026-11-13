@@ -1,0 +1,126 @@
+{
+  "date": "2026-11-13",
+  "scope": "Real deployed HTTPS and GPU; synthetic camera stream. Not physical phone acceptance.",
+  "reports": [
+    {
+      "engine": "chromium",
+      "synthetic_camera": true,
+      "real_gpu": true,
+      "metrics": "Проверено кадров: 3 · Задержка: 4 с · Темп: 0,24 кадра/с",
+      "records": [
+        {
+          "status": 200,
+          "body": {
+            "status": "defect",
+            "source": "local_vision",
+            "model": "OpenGVLab/InternVL3-2B-hf",
+            "preliminary": true,
+            "equipment": {
+              "id": "Серийный номер не подтверждён",
+              "name": "Оборудование на снимке"
+            },
+            "component": "Корпус насоса",
+            "finding": "Возможные признаки коррозии",
+            "box": {
+              "x": 0.1,
+              "y": 0.1,
+              "width": 0.5,
+              "height": 0.5
+            },
+            "serviceLife": "Нужны паспорт и история узла",
+            "nextService": "По регламенту оборудования",
+            "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+            "observation": "Помповая установка с видимым коррозионным разрушением.",
+            "durationSeconds": 5.4
+          }
+        },
+        {
+          "status": 200,
+          "body": {
+            "status": "defect",
+            "source": "local_vision",
+            "model": "OpenGVLab/InternVL3-2B-hf",
+            "preliminary": true,
+            "equipment": {
+              "id": "Серийный номер не подтверждён",
+              "name": "Оборудование на снимке"
+            },
+            "component": "Корпус насоса",
+            "finding": "Возможные признаки коррозии",
+            "box": {
+              "x": 0.1,
+              "y": 0.1,
+              "width": 0.5,
+              "height": 0.5
+            },
+            "serviceLife": "Нужны паспорт и история узла",
+            "nextService": "По регламенту оборудования",
+            "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+            "observation": "Visible rust on the pump's coupling.",
+            "durationSeconds": 4
+          }
+        },
+        {
+          "status": 200,
+          "body": {
+            "status": "defect",
+            "source": "local_vision",
+            "model": "OpenGVLab/InternVL3-2B-hf",
+            "preliminary": true,
+            "equipment": {
+              "id": "Серийный номер не подтверждён",
+              "name": "Оборудование на снимке"
+            },
+            "component": "Корпус насоса",
+            "finding": "Возможные признаки коррозии",
+            "box": {
+              "x": 0.1,
+              "y": 0.1,
+              "width": 0.5,
+              "height": 0.5
+            },
+            "serviceLife": "Нужны паспорт и история узла",
+            "nextService": "По регламенту оборудования",
+            "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+            "observation": "Visible rust on the pump's coupling.",
+            "durationSeconds": 3.9
+          }
+        }
+      ]
+    },
+    {
+      "engine": "webkit",
+      "synthetic_camera": true,
+      "real_gpu": true,
+      "metrics": "Проверено кадров: 1 · Задержка: 5,2 с",
+      "records": [
+        {
+          "status": 200,
+          "body": {
+            "status": "defect",
+            "source": "local_vision",
+            "model": "OpenGVLab/InternVL3-2B-hf",
+            "preliminary": true,
+            "equipment": {
+              "id": "Серийный номер не подтверждён",
+              "name": "Оборудование на снимке"
+            },
+            "component": "Корпус насоса",
+            "finding": "Возможные признаки коррозии",
+            "box": {
+              "x": 0.1,
+              "y": 0.1,
+              "width": 0.4,
+              "height": 0.4
+            },
+            "serviceLife": "Нужны паспорт и история узла",
+            "nextService": "По регламенту оборудования",
+            "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+            "observation": "Помповая установка с видимым коррозионным разрушением.",
+            "durationSeconds": 4.9
+          }
+        }
+      ]
+    }
+  ]
+}

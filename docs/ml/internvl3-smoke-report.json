@@ -1,0 +1,231 @@
+{
+  "backend": "internvl3",
+  "scope": "Functional smoke on synthetic and licensed unlabelled reference frames. No field labels or accuracy claim.",
+  "records": [
+    {
+      "case": "demo-pump.jpg",
+      "source": "synthetic_demo",
+      "repeat": 0,
+      "seconds": 5.703,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.5,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Помеха из-за коррозии на корпусе.",
+        "durationSeconds": 5.7
+      }
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "source": "synthetic_demo",
+      "repeat": 0,
+      "seconds": 5.11,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Помповая установка с видимым коррозионным повреждением.",
+        "durationSeconds": 5.1
+      }
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "source": "licensed_unlabelled_reference",
+      "repeat": 0,
+      "seconds": 4.969,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.5,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Помповая насосная станция с видимым коррозионным повреждением.",
+        "durationSeconds": 5.0
+      }
+    },
+    {
+      "case": "blank",
+      "source": "synthetic_negative",
+      "repeat": 0,
+      "seconds": 2.469,
+      "result": {
+        "status": "unusable",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "durationSeconds": 2.5
+      }
+    },
+    {
+      "case": "text_only",
+      "source": "synthetic_negative",
+      "repeat": 0,
+      "seconds": 3.421,
+      "result": {
+        "status": "unusable",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "durationSeconds": 3.4
+      }
+    },
+    {
+      "case": "demo-pump.jpg",
+      "source": "synthetic_demo",
+      "repeat": 1,
+      "seconds": 4.391,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.5,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Помеха из-за коррозии на корпусе.",
+        "durationSeconds": 4.4
+      }
+    },
+    {
+      "case": "demo-pump-clean.jpg",
+      "source": "synthetic_demo",
+      "repeat": 1,
+      "seconds": 4.75,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.7,
+          "height": 0.5
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Помповая установка с видимым коррозионным повреждением.",
+        "durationSeconds": 4.8
+      }
+    },
+    {
+      "case": "File:Warman centrifugal pump.jpg",
+      "source": "licensed_unlabelled_reference",
+      "repeat": 1,
+      "seconds": 5.094,
+      "result": {
+        "status": "defect",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "preliminary": true,
+        "equipment": {
+          "id": "Серийный номер не подтверждён",
+          "name": "Оборудование на снимке"
+        },
+        "component": "Корпус насоса",
+        "finding": "Возможные признаки коррозии",
+        "box": {
+          "x": 0.1,
+          "y": 0.1,
+          "width": 0.5,
+          "height": 0.3
+        },
+        "serviceLife": "Нужны паспорт и история узла",
+        "nextService": "По регламенту оборудования",
+        "recommendation": "Подтвердить коррозию при осмотре, проверить покрытие и состояние поверхности по регламенту объекта.",
+        "observation": "Помповая насосная станция с видимым коррозионным повреждением.",
+        "durationSeconds": 5.1
+      }
+    },
+    {
+      "case": "blank",
+      "source": "synthetic_negative",
+      "repeat": 1,
+      "seconds": 2.469,
+      "result": {
+        "status": "unusable",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "durationSeconds": 2.5
+      }
+    },
+    {
+      "case": "text_only",
+      "source": "synthetic_negative",
+      "repeat": 1,
+      "seconds": 4.156,
+      "result": {
+        "status": "unusable",
+        "source": "local_vision",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "durationSeconds": 4.2
+      }
+    }
+  ],
+  "successful": 10,
+  "requests": 10,
+  "median_seconds": 4.5705
+}

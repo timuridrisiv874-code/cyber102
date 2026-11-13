@@ -1,13 +1,17 @@
 import json
+import socket
 import tempfile
 import threading
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from http.client import HTTPConnection
+from io import BytesIO
 from pathlib import Path
+from unittest.mock import patch
 
 from server.app import BoundedHTTPServer, Handler, initialize
+from server import vision
 
 
 class ApiTest(unittest.TestCase):
@@ -19,8 +23,8 @@ class ApiTest(unittest.TestCase):
         self.addCleanup(directory.cleanup)
         database = Path(directory.name) / "test.sqlite3"
         initialize(database)
-        handler = partial(Handler, database=database, public_url=self.public_url)
-        self.server = BoundedHTTPServer(("127.0.0.1", 0), handler)
+        self.handler = partial(Handler, database=database, public_url=self.public_url)
+        self.server = BoundedHTTPServer(("127.0.0.1", 0), self.handler)
         self.addCleanup(self.server.server_close)
         thread = threading.Thread(target=self.server.serve_forever, kwargs={"poll_interval": 0.01})
         thread.start()
@@ -143,6 +147,67 @@ class ApiTest(unittest.TestCase):
             with self.subTest(origin=origin):
                 self.json_request("POST", "/api/history", 201, body=valid, headers={"Origin": origin})
         self.assertEqual(len(self.json_request("GET", "/api/history?serial=P-102")["records"]), 2)
+
+    def test_frame_analysis_disabled_by_default(self):
+        with patch.object(vision, "analyze") as analyze:
+            self.json_request("POST", "/analyze", 503, body=b"frame")
+            analyze.assert_not_called()
+
+    def test_frame_analysis_rejects_invalid_origin_and_upload(self):
+        self.handler.keywords["vision_enabled"] = True
+        with patch.object(vision, "analyze") as analyze:
+            for status, headers in (
+                (403, {"Origin": "https://elsewhere.example.test"}),
+                (403, {"Origin": ""}),
+                (400, {"Content-Type": "multipart/form-data; boundary=missing"}),
+                (400, {"Content-Type": "image/jpeg"}),
+                (400, {"Transfer-Encoding": "chunked", "Content-Length": "5"}),
+                (400, {"Content-Length": "+5"}),
+                (413, {"Content-Length": str(vision.MAX_IMAGE_BYTES + 8193)}),
+            ):
+                with self.subTest(headers=headers):
+                    self.json_request("POST", "/analyze", status, body=b"frame", headers=headers)
+            analyze.assert_not_called()
+
+    def test_short_upload_is_rejected_before_image_decoding(self):
+        self.handler.keywords["vision_enabled"] = True
+        connection = HTTPConnection("127.0.0.1", self.server.server_port, timeout=3)
+        try:
+            with patch.object(vision, "extract_image") as decode:
+                connection.request("POST", "/analyze", b"frame", {"Content-Length": "30"})
+                connection.sock.shutdown(socket.SHUT_WR)
+                response = connection.getresponse()
+                self.assertEqual(response.status, 400)
+                self.assertIn("не полностью", json.loads(response.read())["error"])
+                decode.assert_not_called()
+        finally:
+            connection.close()
+
+    def test_both_backends_keep_the_frame_analysis_contract(self):
+        self.handler.keywords["vision_enabled"] = True
+        observation = {"component": "pump", "condition": "corrosion",
+                       "box": [100, 100, 900, 800], "observation": "Следы коррозии на корпусе."}
+        try:
+            from PIL import Image
+        except ImportError:
+            self.skipTest("requires the optional Pillow vision dependency")
+        jpeg = BytesIO()
+        Image.new("RGB", (32, 32), "red").save(jpeg, "JPEG")
+        body = (b'--frame\r\nContent-Disposition: form-data; name="file"; filename="frame.jpg"\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + jpeg.getvalue() + b'\r\n--frame--\r\n')
+        headers = {"Content-Type": "multipart/form-data; boundary=frame", "Origin": self.public_url}
+        for backend, model, envelope in (
+            ("ollama", vision.MODEL, {"message": {"content": json.dumps(observation)}}),
+            ("internvl3", vision.INTERNVL_MODEL, {"model": vision.INTERNVL_MODEL, "observation": observation}),
+        ):
+            with self.subTest(backend=backend), patch.object(vision, "build_opener") as build:
+                self.handler.keywords["vision_backend"] = backend
+                build.return_value.open.return_value = BytesIO(json.dumps(envelope).encode())
+                card = self.json_request("POST", "/analyze", body=body, headers=headers)
+                self.assertGreaterEqual(card.pop("durationSeconds"), 0)
+                self.assertEqual(card, vision.result_from_observation(observation, model=model))
+                build.return_value.open.side_effect = TimeoutError("worker timed out")
+                self.json_request("POST", "/analyze", 503, body=body, headers=headers)
 
 
 if __name__ == "__main__":

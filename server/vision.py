@@ -1,17 +1,22 @@
-"""Preliminary visual observations using a local, preinstalled Ollama vision model."""
+"""Preliminary visual observations using local vision services."""
 import base64
 import json
 import threading
 import time
 from email import policy
 from email.parser import BytesParser
+from http.client import HTTPException
 from io import BytesIO
 from urllib.error import URLError
 from urllib.request import Request, ProxyHandler, HTTPRedirectHandler, build_opener
 
 MODEL = 'qwen3-vl:8b'
 ENDPOINT = 'http://127.0.0.1:11435/api/chat'
+INTERNVL_MODEL = 'OpenGVLab/InternVL3-2B-hf'
+INTERNVL_ENDPOINT = 'http://127.0.0.1:11436/analyze'
+BACKENDS = ('ollama', 'internvl3')
 MAX_IMAGE_BYTES = 3 * 1024 * 1024
+MAX_RESPONSE_BYTES = 128 * 1024
 _slot = threading.BoundedSemaphore(1)
 COMPONENTS = {'pump': 'Корпус насоса', 'motor': 'Электродвигатель', 'coupling': 'Муфта или кожух',
               'pipe': 'Трубопровод или фланец', 'bearing': 'Подшипниковый узел'}
@@ -37,6 +42,7 @@ Do not infer internal wear, vibration, temperature, current, cavitation, service
 Choose corrosion only for visible rust, wet_patch only for visible liquid evidence, visible_damage only for visible physical damage.
 When evidence is ambiguous return uncertain. A clean visible surface may be no_visible_defect; this is NOT a safety clearance.
 Box must cover the selected component as [left,top,right,bottom] on a 0..1000 image coordinate grid.
+Use box=[0,0,0,0] when no component is visible.
 Write a concise factual observation in Russian. Return only JSON matching this schema: ''' + json.dumps(SCHEMA)
 
 
@@ -54,7 +60,7 @@ def extract_image(content_type, body):
         raise ValueError('Ожидается JPEG или PNG в multipart-поле file.')
     message = BytesParser(policy=policy.default).parsebytes(
         b'Content-Type: ' + content_type.encode('ascii') + b'\r\nMIME-Version: 1.0\r\n\r\n' + body)
-    if not message.is_multipart():
+    if not message.is_multipart() or message.defects:
         raise ValueError('Некорректная форма загрузки.')
     files = [part for part in message.iter_parts() if part.get_param('name', header='content-disposition') == 'file']
     if len(files) != 1:
@@ -76,25 +82,30 @@ def extract_image(content_type, body):
         raise ValueError('Изображение не удалось прочитать.') from error
 
 
-def result_from_observation(data):
-    if not isinstance(data, dict):
+def result_from_observation(data, model=MODEL):
+    if not isinstance(data, dict) or set(data) != set(SCHEMA['required']):
         raise ValueError('Invalid model object')
-    component, condition = data.get('component'), data.get('condition')
-    if component == 'none' or condition == 'uncertain':
-        return {'status': 'unusable', 'source': 'local_vision', 'model': MODEL}
-    box, observation = data.get('box'), data.get('observation')
-    if component not in COMPONENTS or condition not in CONDITIONS or not isinstance(observation, str) or not observation.strip():
+    component, condition = data['component'], data['condition']
+    box, observation = data['box'], data['observation']
+    if (component not in SCHEMA['properties']['component']['enum']
+            or condition not in SCHEMA['properties']['condition']['enum']
+            or not isinstance(observation, str)):
         raise ValueError('Invalid model classification')
     observation.encode('utf-8')
     if not isinstance(box, list) or len(box) != 4 or any(type(v) is not int for v in box):
         raise ValueError('Invalid model box')
     left, top, right, bottom = box
-    if not (0 <= left < right <= 1000 and 0 <= top < bottom <= 1000):
+    usable_box = 0 <= left < right <= 1000 and 0 <= top < bottom <= 1000
+    if (component == 'none' or condition == 'uncertain') and (usable_box or box == [0, 0, 0, 0]):
+        return {'status': 'unusable', 'source': 'local_vision', 'model': model}
+    if not usable_box:
         raise ValueError('Model box outside image')
+    if not observation.strip():
+        raise ValueError('Empty model observation')
     finding, recommendation = CONDITIONS[condition]
     return {
         'status': 'clear' if condition == 'no_visible_defect' else 'defect',
-        'source': 'local_vision', 'model': MODEL, 'preliminary': True,
+        'source': 'local_vision', 'model': model, 'preliminary': True,
         'equipment': {'id': 'Серийный номер не подтверждён', 'name': 'Оборудование на снимке'},
         'component': COMPONENTS[component], 'finding': finding,
         'box': {'x': left / 1000, 'y': top / 1000, 'width': (right-left)/1000, 'height': (bottom-top)/1000},
@@ -103,35 +114,51 @@ def result_from_observation(data):
     }
 
 
-def analyze(image):
+def request_json(endpoint, payload, timeout):
+    request = Request(endpoint, json.dumps(payload).encode(), {'Content-Type': 'application/json'})
+    # Ignore host proxy settings: images must travel only to the local model service.
+    with build_opener(ProxyHandler({}), NoRedirects()).open(request, timeout=timeout) as response:
+        body = response.read(MAX_RESPONSE_BYTES + 1)
+    if len(body) > MAX_RESPONSE_BYTES:
+        raise ValueError('Local vision response is too large')
+    envelope = json.loads(body)
+    if not isinstance(envelope, dict):
+        raise ValueError('Invalid local vision response')
+    return envelope
+
+
+def ollama_observation(encoded_image):
+    payload = {'model': MODEL, 'stream': False, 'think': False, 'format': SCHEMA,
+               'keep_alive': '5m', 'options': {'temperature': 0, 'num_predict': 400, 'num_ctx': 4096},
+               'messages': [{'role': 'user', 'content': PROMPT, 'images': [encoded_image]}]}
+    message = request_json(ENDPOINT, payload, timeout=110)['message']
+    if not isinstance(message, dict):
+        raise ValueError('Invalid Ollama message')
+    # Some Ollama/Qwen versions put the constrained JSON in the secondary field.
+    # The shared validator accepts only the complete schema, never free-form prose.
+    return json.loads(message.get('content') or message.get('thinking', ''))
+
+
+def analyze(image, backend='ollama'):
+    if backend not in BACKENDS:
+        raise ValueError('Unknown local vision backend')
     if not _slot.acquire(blocking=False):
         raise VisionUnavailable('Модель занята другим кадром. Повторите через минуту.')
     started = time.monotonic()
     try:
-        payload = {'model': MODEL, 'stream': False, 'think': False, 'format': SCHEMA,
-                   'keep_alive': '5m', 'options': {'temperature': 0, 'num_predict': 400, 'num_ctx': 4096},
-                   'messages': [{'role': 'user', 'content': PROMPT, 'images': [base64.b64encode(image).decode()]}]}
-        request = Request(ENDPOINT, json.dumps(payload).encode(), {'Content-Type': 'application/json'})
-        # Ignore host proxy settings: images must travel only to the local model service.
-        with build_opener(ProxyHandler({}), NoRedirects()).open(request, timeout=110) as response:
-            envelope = json.loads(response.read(128 * 1024))
-        message = envelope['message']
-        content = message.get('content')
-        # Some Ollama/Qwen template versions put the constrained JSON in the
-        # secondary output field even with think=False. Accept only an entire
-        # schema-shaped JSON object there; never expose free-form reasoning.
-        if not content:
-            structured = json.loads(message.get('thinking', ''))
-            if not isinstance(structured, dict) or set(structured) != set(SCHEMA['required']):
-                raise ValueError('Missing structured model result')
+        encoded_image = base64.b64encode(image).decode('ascii')
+        if backend == 'internvl3':
+            envelope = request_json(INTERNVL_ENDPOINT, {'image': encoded_image}, timeout=100)
+            if envelope.get('model') != INTERNVL_MODEL:
+                raise ValueError('Unexpected InternVL model')
+            result = result_from_observation(envelope['observation'], model=INTERNVL_MODEL)
         else:
-            structured = json.loads(content)
-        result = result_from_observation(structured)
+            result = result_from_observation(ollama_observation(encoded_image))
         result['durationSeconds'] = round(time.monotonic() - started, 1)
         return result
-    except (URLError, TimeoutError, OSError) as error:
+    except (OSError, HTTPException) as error:
         raise VisionUnavailable('Локальная модель не ответила. Повторите кадр позже.') from error
-    except (ValueError, KeyError, TypeError) as error:
+    except (ValueError, KeyError, TypeError, RecursionError) as error:
         raise VisionUnavailable('Модель вернула неоднозначный ответ. Попробуйте снять узел крупнее.') from error
     finally:
         _slot.release()

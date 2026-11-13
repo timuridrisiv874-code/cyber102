@@ -132,8 +132,9 @@ def validate_sources(formats):
 def validate_local_links():
     count = 0
     files = [ROOT / 'README.md', *DOCS.rglob('*.md')]
-    for directory in ('ml', 'data', 'data_tools', 'tools', 'TIMUR', 'output'):
-        files.extend((ROOT / directory).glob('*.md'))
+    for directory in ('ml', 'data', 'data_tools', 'tools', 'TIMUR', 'output', 'vision_runtime'):
+        files.extend((ROOT / directory).rglob('*.md'))
+    files.extend((ROOT / 'tests/browser').glob('*.md'))
     for file in sorted(files):
         for line_number, line in enumerate(file.read_text(encoding='utf-8').splitlines(), start=1):
             for match in INLINE_LINK.finditer(line):

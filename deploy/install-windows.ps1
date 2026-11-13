@@ -33,8 +33,13 @@ if (Test-Path "$root\wheelhouse") {
     & $python -m pip install --disable-pip-version-check --timeout 15 --retries 1 -r "$root\requirements.txt"
 }
 if ($LASTEXITCODE -ne 0) { throw 'dependency installation failed' }
-& $python -m unittest discover -s "$root\tests" -v
-if ($LASTEXITCODE -ne 0) { throw 'tests failed' }
+Push-Location -LiteralPath $root
+try {
+    & $python -m unittest discover -s tests -v
+    if ($LASTEXITCODE -ne 0) { throw 'tests failed' }
+} finally {
+    Pop-Location
+}
 # LOCAL SERVICE may read program files and write only the runtime directory.
 & icacls $root /grant '*S-1-5-19:(OI)(CI)(RX)' | Out-Null
 & icacls "$root\var" /grant '*S-1-5-19:(OI)(CI)(M)' | Out-Null
@@ -75,5 +80,27 @@ if ($LASTEXITCODE -ne 0) {
     & $caddy reload --config $config --adapter caddyfile
     throw 'Caddy reload failed; original configuration restored'
 }
-Write-Output 'Cyber102 backend healthy; Caddy reloaded; startup task installed.'
+Write-Output 'Cyber102 web API ready; Caddy reloaded; startup task installed.'
+$visionBackend = 'internvl3'
+$visionBackendFile = "$root\var\vision-backend.txt"
+try {
+    if (Test-Path -LiteralPath $visionBackendFile) {
+        $visionBackend = [IO.File]::ReadAllText($visionBackendFile, [Text.Encoding]::UTF8).Trim()
+    }
+    $visionReady = $false
+    if ($visionBackend -ceq 'internvl3') {
+        $visionHealth = Invoke-RestMethod 'http://127.0.0.1:11436/health' -TimeoutSec 3
+        $visionReady = $visionHealth.status -ceq 'ok' -and $visionHealth.model -ceq 'OpenGVLab/InternVL3-2B-hf' -and $visionHealth.revision -ceq 'cb57a075cb75a2e6d1b668b128d48bb00ae321d2'
+    } elseif ($visionBackend -ceq 'ollama') {
+        $visionHealth = Invoke-RestMethod 'http://127.0.0.1:11435/api/tags' -TimeoutSec 3
+        $visionReady = @($visionHealth.models | Where-Object { $_.model -ceq 'qwen3-vl:8b' -or $_.name -ceq 'qwen3-vl:8b' }).Count -gt 0
+    }
+    if ($visionReady) {
+        Write-Output "Cyber102 vision service ready ($visionBackend). Verify inference with a camera frame."
+    } else {
+        Write-Warning 'Cyber102 vision is not ready. Check the selected backend and expected model; the web API is ready.'
+    }
+} catch {
+    Write-Warning 'Cyber102 vision is not ready. The configured service did not respond or its configuration could not be read; the web API is ready.'
+}
 Get-ScheduledTask -TaskName $task | Select-Object TaskName,State | ConvertTo-Json

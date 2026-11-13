@@ -2,7 +2,7 @@ import base64
 import json
 import unittest
 from io import BytesIO
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from urllib.error import URLError
 
 from server import vision
@@ -21,6 +21,10 @@ def response(data, *, thinking=None):
     if thinking is not None:
         message["thinking"] = thinking
     return BytesIO(json.dumps({"message": message}).encode())
+
+
+def internvl_response(data):
+    return BytesIO(json.dumps({"model": vision.INTERNVL_MODEL, "observation": data}).encode())
 
 
 def multipart(*fields):
@@ -101,6 +105,55 @@ class VisionTest(unittest.TestCase):
                 vision.analyze(b"two")
             self.assertEqual(vision.analyze(b"three")["status"], "defect")
 
+    def test_internvl_sends_only_normalized_image_to_its_local_worker(self):
+        with patch.object(vision, "build_opener") as build:
+            opener = build.return_value
+            opener.open.return_value = internvl_response(OBSERVATION)
+            result = vision.analyze(b"sanitized JPEG", backend="internvl3")
+            request, = opener.open.call_args.args
+            self.assertEqual(request.full_url, "http://127.0.0.1:11436/analyze")
+            self.assertEqual(request.get_method(), "POST")
+            self.assertEqual(opener.open.call_args.kwargs, {"timeout": 100})
+            self.assertEqual(json.loads(request.data), {"image": base64.b64encode(b"sanitized JPEG").decode()})
+            self.assertEqual(build.call_args.args[0].proxies, {})
+            self.assertIsInstance(build.call_args.args[1], vision.NoRedirects)
+        self.assertGreaterEqual(result.pop("durationSeconds"), 0)
+        self.assertEqual(result, vision.result_from_observation(OBSERVATION, model=vision.INTERNVL_MODEL))
+
+    def test_internvl_abstention_returns_only_status_and_attribution(self):
+        with patch.object(vision, "build_opener") as build:
+            build.return_value.open.return_value = internvl_response({
+                "component": "none", "condition": "uncertain", "box": [0, 0, 0, 0], "observation": "",
+            })
+            result = vision.analyze(b"frame", backend="internvl3")
+        result.pop("durationSeconds")
+        self.assertEqual(result, {"status": "unusable", "source": "local_vision", "model": vision.INTERNVL_MODEL})
+
+    def test_internvl_rejects_invalid_envelopes_without_falling_back(self):
+        for envelope in (
+            {"model": vision.MODEL, "observation": OBSERVATION},
+            {"model": vision.INTERNVL_MODEL},
+            {"model": vision.INTERNVL_MODEL, "observation": OBSERVATION | {"box": [0, 0, 1001, 1000]}},
+            {"model": vision.INTERNVL_MODEL, "observation": {"component": "none"}},
+            {"message": {"content": json.dumps(OBSERVATION)}},
+            None,
+        ):
+            with self.subTest(envelope=envelope), patch.object(vision, "build_opener") as build:
+                opener = build.return_value
+                opener.open.return_value = BytesIO(json.dumps(envelope).encode())
+                with self.assertRaisesRegex(vision.VisionUnavailable, "неоднозначный"):
+                    vision.analyze(b"frame", backend="internvl3")
+                opener.open.assert_called_once()
+
+    def test_local_response_has_explicit_limit_even_after_valid_json(self):
+        with patch.object(vision, "build_opener") as build:
+            oversized = response(OBSERVATION).getvalue() + b" " * vision.MAX_RESPONSE_BYTES
+            reply = Mock(wraps=BytesIO(oversized))
+            build.return_value.open.return_value.__enter__.return_value = reply
+            with self.assertRaisesRegex(vision.VisionUnavailable, "неоднозначный"):
+                vision.analyze(b"frame")
+            reply.read.assert_called_once_with(vision.MAX_RESPONSE_BYTES + 1)
+
     def test_constrained_json_is_accepted_when_content_is_empty(self):
         with patch.object(vision, "build_opener") as build:
             build.return_value.open.return_value = response(None, thinking=json.dumps(OBSERVATION))
@@ -136,7 +189,7 @@ class VisionTest(unittest.TestCase):
 
             def open_first(*args, **kwargs):
                 with self.assertRaisesRegex(vision.VisionUnavailable, "занята"):
-                    vision.analyze(b"second frame")
+                    vision.analyze(b"second frame", backend="internvl3")
                 return response(OBSERVATION)
 
             opener.open.side_effect = open_first

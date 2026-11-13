@@ -1,0 +1,22 @@
+{
+  "model_repository": "ggml-org/InternVL3-2B-Instruct-GGUF",
+  "model_revision": "f763aa88f2ad2dbd5246350660fec7d50a20a7b0",
+  "model_files": {
+    "InternVL3-2B-Instruct-Q4_K_M.gguf": "dc36eddc05ff1db5e11e0aa38efe7a5063b045aa5350c3b1a2510f3ff9107179",
+    "mmproj-InternVL3-2B-Instruct-f16.gguf": "e4e6f0663d591169e8ddd2f415262cef2a5a994705658841e56c09401a54deb3"
+  },
+  "runtime_release": "b12345",
+  "runtime_commit": "2a4daf0e0",
+  "runtime_files": {
+    "llama-b12345-bin-win-cuda-12.4-x64.zip": "724c5be43f02b2f908b47e509ffd76eae68416095aeae9959f6712839e8b8e00",
+    "cudart-llama-bin-win-cuda-12.4-x64.zip": "8c79a9b226de4b3cacfd1f83d24f962d0773be79f1e7b75c6af4ded7e32ae1d6"
+  },
+  "runtime_flags": ["--host", "127.0.0.1", "--port", "11437", "--alias", "internvl3-2b-gguf", "-ngl", "99", "-c", "4096", "-np", "1", "--no-ui"],
+  "request_options": {
+    "temperature": 0,
+    "max_tokens": 180,
+    "stream": false,
+    "cache_prompt": false
+  },
+  "warman_file": "013103909e448de7f7aa43d188b58bdc1a229813ff7ebba3708406344f8abd75.jpg"
+}

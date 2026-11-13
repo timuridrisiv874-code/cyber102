@@ -1,0 +1,1166 @@
+{
+  "date": "2026-11-13",
+  "purpose": "Isolated Windows CUDA smoke benchmark of quantized InternVL3-2B",
+  "device": "NVIDIA GeForce RTX 3090 Ti",
+  "driver": "610.88",
+  "runtime": {
+    "model_repository": "ggml-org/InternVL3-2B-Instruct-GGUF",
+    "model_revision": "f763aa88f2ad2dbd5246350660fec7d50a20a7b0",
+    "model_files": {
+      "InternVL3-2B-Instruct-Q4_K_M.gguf": "dc36eddc05ff1db5e11e0aa38efe7a5063b045aa5350c3b1a2510f3ff9107179",
+      "mmproj-InternVL3-2B-Instruct-f16.gguf": "e4e6f0663d591169e8ddd2f415262cef2a5a994705658841e56c09401a54deb3"
+    },
+    "runtime_release": "b12345",
+    "runtime_commit": "2a4daf0e0",
+    "runtime_files": {
+      "llama-b12345-bin-win-cuda-12.4-x64.zip": "724c5be43f02b2f908b47e509ffd76eae68416095aeae9959f6712839e8b8e00",
+      "cudart-llama-bin-win-cuda-12.4-x64.zip": "8c79a9b226de4b3cacfd1f83d24f962d0773be79f1e7b75c6af4ded7e32ae1d6"
+    },
+    "runtime_flags": [
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "11437",
+      "--alias",
+      "internvl3-2b-gguf",
+      "-ngl",
+      "99",
+      "-c",
+      "4096",
+      "-np",
+      "1",
+      "--no-ui"
+    ],
+    "request_options": {
+      "temperature": 0,
+      "max_tokens": 180,
+      "stream": false,
+      "cache_prompt": false
+    },
+    "warman_file": "013103909e448de7f7aa43d188b58bdc1a229813ff7ebba3708406344f8abd75.jpg"
+  },
+  "model_load_seconds_approx": 1.9,
+  "measurement": "Single serial loopback HTTP requests after model load. JPEG preparation and phone transport excluded.",
+  "fixtures": {
+    "pump": {
+      "filename": "demo-pump.jpg",
+      "sha256": "038ebfc6e131cca27290dcf12017e2759f345e0bb8de71a6b1d7c563e740d61f",
+      "reference": "equipment_present_condition_unlabelled"
+    },
+    "clean": {
+      "filename": "demo-pump-clean.jpg",
+      "sha256": "4745b98e985387514d626d4e3ae2f43be0df8b8b79946258a7165058816fdb78",
+      "reference": "equipment_present_condition_unlabelled"
+    },
+    "blank": {
+      "filename": "blank.jpg",
+      "sha256": "0e4f06f21a1391084da3eb01c3b68ddbb9ce593789ab6a9602f35512cabc02a7",
+      "reference": "negative_no_equipment"
+    },
+    "text_only": {
+      "filename": "text-only.jpg",
+      "sha256": "d9868df04806d7a7497649e0c41ce1d6a58b762fc64d8bcdf557d9d621f32e45",
+      "reference": "negative_no_equipment"
+    },
+    "person": {
+      "filename": "person.jpg",
+      "sha256": "25634aba02ac3f372ee93b9b3e6b7855b8f1fb5871a2f72ed0e3ac4150f740ed",
+      "reference": "negative_no_equipment"
+    },
+    "furniture": {
+      "filename": "furniture.jpg",
+      "sha256": "e0da5c50cff74d2086d34b07e24e8464cd0ce4170c27688efe86664501823d84",
+      "reference": "negative_no_equipment"
+    },
+    "warman": {
+      "filename": "013103909e448de7f7aa43d188b58bdc1a229813ff7ebba3708406344f8abd75.jpg",
+      "sha256": "013103909e448de7f7aa43d188b58bdc1a229813ff7ebba3708406344f8abd75",
+      "reference": "equipment_present_condition_unlabelled"
+    }
+  },
+  "runs": [
+    {
+      "id": "five_frames_two_repetitions",
+      "variant": "baseline",
+      "summary": {
+        "responses_valid": 10,
+        "requests": 10,
+        "valid_response_latency_seconds": {
+          "min": 0.451,
+          "median": 0.6245,
+          "max": 0.926
+        },
+        "negative_cases": 4,
+        "negative_abstentions": 2
+      },
+      "observations": [
+        {
+          "run": 1,
+          "fixture": "pump",
+          "seconds": 0.926,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              400,
+              400
+            ],
+            "observation": "Visible rust on the pump's body."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2084,
+            "prompt_ms": 676.716,
+            "prompt_per_token_ms": 0.3247197696737044,
+            "prompt_per_second": 3079.578434675698,
+            "predicted_n": 42,
+            "predicted_ms": 147.627,
+            "predicted_per_token_ms": 3.600658536585366,
+            "predicted_per_second": 277.7269740630101
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "clean",
+          "seconds": 0.62,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              400,
+              500
+            ],
+            "observation": "Visible rust on the pump's body."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2084,
+            "prompt_ms": 355.626,
+            "prompt_per_token_ms": 0.1706458733205374,
+            "prompt_per_second": 5860.088969872844,
+            "predicted_n": 42,
+            "predicted_ms": 143.864,
+            "predicted_per_token_ms": 3.508878048780488,
+            "predicted_per_second": 284.9913807484847
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "blank",
+          "seconds": 0.465,
+          "status": "defect",
+          "raw": {
+            "component": "motor",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              200,
+              200
+            ],
+            "observation": "Motor casing shows visible rust."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1572,
+            "prompt_ms": 270.103,
+            "prompt_per_token_ms": 0.17182124681933844,
+            "prompt_per_second": 5820.001999237327,
+            "predicted_n": 39,
+            "predicted_ms": 133.016,
+            "predicted_per_token_ms": 3.500421052631579,
+            "predicted_per_second": 285.6799182053287
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "text_only",
+          "seconds": 0.458,
+          "status": "unusable",
+          "raw": {
+            "component": "pump",
+            "condition": "uncertain",
+            "box": [
+              200,
+              100,
+              400,
+              300
+            ],
+            "observation": "uncertain"
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1572,
+            "prompt_ms": 270.686,
+            "prompt_per_token_ms": 0.17219211195928752,
+            "prompt_per_second": 5807.466954330849,
+            "predicted_n": 35,
+            "predicted_ms": 119.636,
+            "predicted_per_token_ms": 3.518705882352941,
+            "predicted_per_second": 284.1953926911632
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "warman",
+          "seconds": 0.799,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              300,
+              300
+            ],
+            "observation": "Corrosion visible on the pump's casing."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2852,
+            "prompt_ms": 508.302,
+            "prompt_per_token_ms": 0.178226507713885,
+            "prompt_per_second": 5610.837651632297,
+            "predicted_n": 44,
+            "predicted_ms": 154.887,
+            "predicted_per_token_ms": 3.6020232558139536,
+            "predicted_per_second": 277.6217500500365
+          },
+          "valid": true
+        },
+        {
+          "run": 2,
+          "fixture": "pump",
+          "seconds": 0.655,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              400,
+              400
+            ],
+            "observation": "Visible rust on the pump's body."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2084,
+            "prompt_ms": 359.33,
+            "prompt_per_token_ms": 0.1724232245681382,
+            "prompt_per_second": 5799.682742882587,
+            "predicted_n": 42,
+            "predicted_ms": 148.196,
+            "predicted_per_token_ms": 3.6145365853658538,
+            "predicted_per_second": 276.66063861372777
+          },
+          "valid": true
+        },
+        {
+          "run": 2,
+          "fixture": "clean",
+          "seconds": 0.629,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              400,
+              500
+            ],
+            "observation": "Visible rust on the pump's body."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2084,
+            "prompt_ms": 356.841,
+            "prompt_per_token_ms": 0.171228886756238,
+            "prompt_per_second": 5840.136083017366,
+            "predicted_n": 42,
+            "predicted_ms": 145.809,
+            "predicted_per_token_ms": 3.5563170731707316,
+            "predicted_per_second": 281.1897756654253
+          },
+          "valid": true
+        },
+        {
+          "run": 2,
+          "fixture": "blank",
+          "seconds": 0.496,
+          "status": "defect",
+          "raw": {
+            "component": "motor",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              200,
+              200
+            ],
+            "observation": "Motor casing shows visible rust."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1572,
+            "prompt_ms": 265.837,
+            "prompt_per_token_ms": 0.16910750636132316,
+            "prompt_per_second": 5913.398059713283,
+            "predicted_n": 39,
+            "predicted_ms": 135.457,
+            "predicted_per_token_ms": 3.564657894736842,
+            "predicted_per_second": 280.53182928899946
+          },
+          "valid": true
+        },
+        {
+          "run": 2,
+          "fixture": "text_only",
+          "seconds": 0.451,
+          "status": "unusable",
+          "raw": {
+            "component": "pump",
+            "condition": "uncertain",
+            "box": [
+              200,
+              100,
+              400,
+              300
+            ],
+            "observation": "uncertain"
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1572,
+            "prompt_ms": 264.207,
+            "prompt_per_token_ms": 0.1680706106870229,
+            "prompt_per_second": 5949.8802075645235,
+            "predicted_n": 35,
+            "predicted_ms": 118.287,
+            "predicted_per_token_ms": 3.479029411764706,
+            "predicted_per_second": 287.43648921690465
+          },
+          "valid": true
+        },
+        {
+          "run": 2,
+          "fixture": "warman",
+          "seconds": 0.81,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              300,
+              300
+            ],
+            "observation": "Corrosion visible on the pump's casing."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2852,
+            "prompt_ms": 493.531,
+            "prompt_per_token_ms": 0.17304733520336607,
+            "prompt_per_second": 5778.765670241585,
+            "predicted_n": 44,
+            "predicted_ms": 153.628,
+            "predicted_per_token_ms": 3.5727441860465112,
+            "predicted_per_second": 279.8968937954019
+          },
+          "valid": true
+        }
+      ]
+    },
+    {
+      "id": "five_frames_unconstrained",
+      "variant": "unconstrained",
+      "summary": {
+        "responses_valid": 5,
+        "requests": 5,
+        "valid_response_latency_seconds": {
+          "min": 0.463,
+          "median": 0.631,
+          "max": 0.78
+        },
+        "negative_cases": 2,
+        "negative_abstentions": 1
+      },
+      "observations": [
+        {
+          "run": 1,
+          "fixture": "pump",
+          "seconds": 0.78,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              400,
+              400
+            ],
+            "observation": "Visible rust on the pump's body."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2084,
+            "prompt_ms": 485.638,
+            "prompt_per_token_ms": 0.23303166986564297,
+            "prompt_per_second": 4291.262215889202,
+            "predicted_n": 42,
+            "predicted_ms": 143.55,
+            "predicted_per_token_ms": 3.501219512195122,
+            "predicted_per_second": 285.61476837338904
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "clean",
+          "seconds": 0.631,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              400,
+              500
+            ],
+            "observation": "Visible rust on the pump's body."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2084,
+            "prompt_ms": 355.08,
+            "prompt_per_token_ms": 0.17038387715930903,
+            "prompt_per_second": 5869.0999211445305,
+            "predicted_n": 42,
+            "predicted_ms": 145.351,
+            "predicted_per_token_ms": 3.545146341463415,
+            "predicted_per_second": 282.07580271205563
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "blank",
+          "seconds": 0.465,
+          "status": "defect",
+          "raw": {
+            "component": "motor",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              200,
+              200
+            ],
+            "observation": "Motor casing shows visible rust."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1572,
+            "prompt_ms": 264.334,
+            "prompt_per_token_ms": 0.16815139949109414,
+            "prompt_per_second": 5947.021571194019,
+            "predicted_n": 39,
+            "predicted_ms": 134.513,
+            "predicted_per_token_ms": 3.539815789473684,
+            "predicted_per_second": 282.50057615249085
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "text_only",
+          "seconds": 0.463,
+          "status": "unusable",
+          "raw": {
+            "component": "pump",
+            "condition": "uncertain",
+            "box": [
+              200,
+              100,
+              400,
+              300
+            ],
+            "observation": "uncertain"
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1572,
+            "prompt_ms": 280.023,
+            "prompt_per_token_ms": 0.17813167938931299,
+            "prompt_per_second": 5613.824578695321,
+            "predicted_n": 35,
+            "predicted_ms": 120.525,
+            "predicted_per_token_ms": 3.5448529411764707,
+            "predicted_per_second": 282.09914955403445
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "warman",
+          "seconds": 0.766,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              300,
+              300
+            ],
+            "observation": "Corrosion visible on the pump's casing."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2852,
+            "prompt_ms": 488.668,
+            "prompt_per_token_ms": 0.1713422159887798,
+            "prompt_per_second": 5836.273298026471,
+            "predicted_n": 44,
+            "predicted_ms": 149.181,
+            "predicted_per_token_ms": 3.469325581395349,
+            "predicted_per_second": 288.2404595759514
+          },
+          "valid": true
+        }
+      ]
+    },
+    {
+      "id": "five_frames_conservative",
+      "variant": "conservative",
+      "summary": {
+        "responses_valid": 4,
+        "requests": 5,
+        "valid_response_latency_seconds": {
+          "min": 0.551,
+          "median": 0.695,
+          "max": 0.723
+        },
+        "negative_cases": 2,
+        "negative_abstentions": 2
+      },
+      "observations": [
+        {
+          "run": 1,
+          "fixture": "pump",
+          "seconds": 0.669,
+          "status": "clear",
+          "raw": {
+            "component": "pump",
+            "condition": "no_visible_defect",
+            "box": [
+              0,
+              0,
+              1000,
+              1000
+            ],
+            "observation": "Труба и насос видны."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2105,
+            "prompt_ms": 351.8,
+            "prompt_per_token_ms": 0.16712589073634204,
+            "prompt_per_second": 5983.513359863558,
+            "predicted_n": 61,
+            "predicted_ms": 205.202,
+            "predicted_per_token_ms": 3.4200333333333335,
+            "predicted_per_second": 292.39481096675473
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "clean",
+          "seconds": 0.721,
+          "status": "clear",
+          "raw": {
+            "component": "pump",
+            "condition": "no_visible_defect",
+            "box": [
+              0,
+              0,
+              1000,
+              1000
+            ],
+            "observation": "Такой вид оборудования не соответствует ни pump, ни motor, ни coupling, ни pipe, ни bearing."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2105,
+            "prompt_ms": 351.759,
+            "prompt_per_token_ms": 0.1671064133016627,
+            "prompt_per_second": 5984.2107806765425,
+            "predicted_n": 75,
+            "predicted_ms": 257.75,
+            "predicted_per_token_ms": 3.483108108108108,
+            "predicted_per_second": 287.09990300678953
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "blank",
+          "seconds": 0.551,
+          "status": "unusable",
+          "raw": {
+            "component": "none",
+            "condition": "uncertain",
+            "box": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "observation": "На белом кадре виден пустой лист с текстом, не виден ни насос, мотор, муфта, труба или подшипник."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1593,
+            "prompt_ms": 262.829,
+            "prompt_per_token_ms": 0.16498995605775268,
+            "prompt_per_second": 6060.975006563202,
+            "predicted_n": 63,
+            "predicted_ms": 218.239,
+            "predicted_per_token_ms": 3.519983870967742,
+            "predicted_per_second": 284.09221083307744
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "text_only",
+          "seconds": 0.723,
+          "status": "unusable",
+          "raw": {
+            "component": "pump",
+            "condition": "uncertain",
+            "box": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "observation": "На белом кадре, листе с текстом или кадре без оборудования верни {'component': 'none', 'condition': 'uncertain', 'box': [0, 0, 0, 0], 'observation': ''}. Слово «насос» на бумаге не является насосом."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1593,
+            "prompt_ms": 259.99,
+            "prompt_per_token_ms": 0.1632077840552417,
+            "prompt_per_second": 6127.158736874495,
+            "predicted_n": 114,
+            "predicted_ms": 381.321,
+            "predicted_per_token_ms": 3.3745221238938057,
+            "predicted_per_second": 296.3382556953328
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "warman",
+          "seconds": 0.771,
+          "valid": false,
+          "error": "Model box outside image",
+          "raw": "{\"component\":\"pump\",\"condition\":\"no_visible_defect\",\"box\":[0,0,0,0],\"observation\":\"На белом кадре виден насос.\"}"
+        }
+      ]
+    },
+    {
+      "id": "seven_frames_baseline",
+      "variant": "baseline",
+      "summary": {
+        "responses_valid": 7,
+        "requests": 7,
+        "valid_response_latency_seconds": {
+          "min": 0.463,
+          "median": 0.469,
+          "max": 0.795
+        },
+        "negative_cases": 4,
+        "negative_abstentions": 2
+      },
+      "observations": [
+        {
+          "run": 1,
+          "fixture": "pump",
+          "seconds": 0.777,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              400,
+              400
+            ],
+            "observation": "Visible rust on the pump's body."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2084,
+            "prompt_ms": 468.484,
+            "prompt_per_token_ms": 0.2248003838771593,
+            "prompt_per_second": 4448.390980268269,
+            "predicted_n": 42,
+            "predicted_ms": 144.069,
+            "predicted_per_token_ms": 3.5138780487804877,
+            "predicted_per_second": 284.5858581651848
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "clean",
+          "seconds": 0.635,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              400,
+              500
+            ],
+            "observation": "Visible rust on the pump's body."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2084,
+            "prompt_ms": 348.685,
+            "prompt_per_token_ms": 0.16731525911708253,
+            "prompt_per_second": 5976.74118473694,
+            "predicted_n": 42,
+            "predicted_ms": 141.722,
+            "predicted_per_token_ms": 3.4566341463414636,
+            "predicted_per_second": 289.2987680106123
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "blank",
+          "seconds": 0.463,
+          "status": "defect",
+          "raw": {
+            "component": "motor",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              200,
+              200
+            ],
+            "observation": "Motor casing shows visible rust."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1572,
+            "prompt_ms": 264.103,
+            "prompt_per_token_ms": 0.16800445292620866,
+            "prompt_per_second": 5952.2231856510525,
+            "predicted_n": 39,
+            "predicted_ms": 133.248,
+            "predicted_per_token_ms": 3.5065263157894733,
+            "predicted_per_second": 285.1825168107589
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "text_only",
+          "seconds": 0.469,
+          "status": "unusable",
+          "raw": {
+            "component": "pump",
+            "condition": "uncertain",
+            "box": [
+              200,
+              100,
+              400,
+              300
+            ],
+            "observation": "uncertain"
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1572,
+            "prompt_ms": 261.718,
+            "prompt_per_token_ms": 0.16648727735368957,
+            "prompt_per_second": 6006.464973750372,
+            "predicted_n": 35,
+            "predicted_ms": 122.013,
+            "predicted_per_token_ms": 3.5886176470588236,
+            "predicted_per_second": 278.6588314359945
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "person",
+          "seconds": 0.463,
+          "status": "defect",
+          "raw": {
+            "component": "motor",
+            "condition": "corrosion",
+            "box": [
+              200,
+              100,
+              400,
+              300
+            ],
+            "observation": "Motor casing shows visible rust."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1572,
+            "prompt_ms": 263.384,
+            "prompt_per_token_ms": 0.16754707379134862,
+            "prompt_per_second": 5968.471888953011,
+            "predicted_n": 39,
+            "predicted_ms": 131.05,
+            "predicted_per_token_ms": 3.448684210526316,
+            "predicted_per_second": 289.9656619610835
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "furniture",
+          "seconds": 0.468,
+          "status": "unusable",
+          "raw": {
+            "component": "motor",
+            "condition": "uncertain",
+            "box": [
+              200,
+              100,
+              400,
+              300
+            ],
+            "observation": "Motor appears to be clean but no visible defects."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1572,
+            "prompt_ms": 266.384,
+            "prompt_per_token_ms": 0.1694554707379135,
+            "prompt_per_second": 5901.255330650489,
+            "predicted_n": 42,
+            "predicted_ms": 143.353,
+            "predicted_per_token_ms": 3.496414634146342,
+            "predicted_per_second": 286.00726877009896
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "warman",
+          "seconds": 0.795,
+          "status": "defect",
+          "raw": {
+            "component": "pump",
+            "condition": "corrosion",
+            "box": [
+              100,
+              100,
+              300,
+              300
+            ],
+            "observation": "Corrosion visible on the pump's casing."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2852,
+            "prompt_ms": 490.897,
+            "prompt_per_token_ms": 0.17212377279102384,
+            "prompt_per_second": 5809.772722180009,
+            "predicted_n": 44,
+            "predicted_ms": 155.119,
+            "predicted_per_token_ms": 3.607418604651163,
+            "predicted_per_second": 277.20653175948786
+          },
+          "valid": true
+        }
+      ]
+    },
+    {
+      "id": "seven_frames_conservative",
+      "variant": "conservative",
+      "summary": {
+        "responses_valid": 6,
+        "requests": 7,
+        "valid_response_latency_seconds": {
+          "min": 0.495,
+          "median": 0.6345,
+          "max": 0.74
+        },
+        "negative_cases": 4,
+        "negative_abstentions": 4
+      },
+      "observations": [
+        {
+          "run": 1,
+          "fixture": "pump",
+          "seconds": 0.705,
+          "status": "clear",
+          "raw": {
+            "component": "pump",
+            "condition": "no_visible_defect",
+            "box": [
+              0,
+              0,
+              1000,
+              1000
+            ],
+            "observation": "Труба и насос видны."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2105,
+            "prompt_ms": 354.882,
+            "prompt_per_token_ms": 0.16859002375296914,
+            "prompt_per_second": 5931.549078285176,
+            "predicted_n": 61,
+            "predicted_ms": 206.69,
+            "predicted_per_token_ms": 3.4448333333333334,
+            "predicted_per_second": 290.2898059896463
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "clean",
+          "seconds": 0.715,
+          "status": "clear",
+          "raw": {
+            "component": "pump",
+            "condition": "no_visible_defect",
+            "box": [
+              0,
+              0,
+              1000,
+              1000
+            ],
+            "observation": "Такой вид оборудования не соответствует ни pump, ни motor, ни coupling, ни pipe, ни bearing."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2105,
+            "prompt_ms": 352.424,
+            "prompt_per_token_ms": 0.16742232779097385,
+            "prompt_per_second": 5972.91898395115,
+            "predicted_n": 75,
+            "predicted_ms": 255.628,
+            "predicted_per_token_ms": 3.4544324324324323,
+            "predicted_per_second": 289.4831552099144
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "blank",
+          "seconds": 0.564,
+          "status": "unusable",
+          "raw": {
+            "component": "none",
+            "condition": "uncertain",
+            "box": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "observation": "На белом кадре виден пустой лист с текстом, не виден ни насос, мотор, муфта, труба или подшипник."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1593,
+            "prompt_ms": 264.257,
+            "prompt_per_token_ms": 0.16588637790332705,
+            "prompt_per_second": 6028.222525798748,
+            "predicted_n": 63,
+            "predicted_ms": 212.882,
+            "predicted_per_token_ms": 3.4335806451612902,
+            "predicted_per_second": 291.2411570729324
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "text_only",
+          "seconds": 0.74,
+          "status": "unusable",
+          "raw": {
+            "component": "pump",
+            "condition": "uncertain",
+            "box": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "observation": "На белом кадре, листе с текстом или кадре без оборудования верни {'component': 'none', 'condition': 'uncertain', 'box': [0, 0, 0, 0], 'observation': ''}. Слово «насос» на бумаге не является насосом."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1593,
+            "prompt_ms": 266.034,
+            "prompt_per_token_ms": 0.16700188323917137,
+            "prompt_per_second": 5987.9564266221605,
+            "predicted_n": 114,
+            "predicted_ms": 391.95,
+            "predicted_per_token_ms": 3.46858407079646,
+            "predicted_per_second": 288.30207934685546
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "person",
+          "seconds": 0.495,
+          "status": "unusable",
+          "raw": {
+            "component": "none",
+            "condition": "uncertain",
+            "box": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "observation": "На белом кадре виден корпус насоса, но детали не видны."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1593,
+            "prompt_ms": 263.622,
+            "prompt_per_token_ms": 0.16548775894538606,
+            "prompt_per_second": 6042.743018412727,
+            "predicted_n": 44,
+            "predicted_ms": 149.016,
+            "predicted_per_token_ms": 3.465488372093023,
+            "predicted_per_second": 288.5596177591668
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "furniture",
+          "seconds": 0.544,
+          "status": "unusable",
+          "raw": {
+            "component": "none",
+            "condition": "uncertain",
+            "box": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "observation": "На белом кадре виден лист с текстом, но не видно насос, мотор, муфта, труба или подшипник."
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 1593,
+            "prompt_ms": 266.215,
+            "prompt_per_token_ms": 0.1671155053358443,
+            "prompt_per_second": 5983.8852055669295,
+            "predicted_n": 60,
+            "predicted_ms": 203.397,
+            "predicted_per_token_ms": 3.4474067796610166,
+            "predicted_per_second": 290.0731082562673
+          },
+          "valid": true
+        },
+        {
+          "run": 1,
+          "fixture": "warman",
+          "seconds": 0.771,
+          "valid": false,
+          "error": "Model box outside image",
+          "raw": "{\"component\":\"pump\",\"condition\":\"no_visible_defect\",\"box\":[0,0,0,0],\"observation\":\"На белом кадре виден насос.\"}"
+        }
+      ]
+    }
+  ],
+  "decision": {
+    "promoted": false,
+    "candidate_listener_stopped": true,
+    "active_backend": "OpenGVLab/InternVL3-2B-hf",
+    "findings": [
+      "Baseline and unconstrained generation hallucinated motor corrosion on a blank frame.",
+      "Expanded baseline hallucinated motor corrosion on the synthetic person as well.",
+      "Conservative expanded run abstained on all four negative inputs. Both demo pump photos received full-frame boxes and Warman received an invalid zero-area box.",
+      "The file named clean is not a ground-truth defect label."
+    ]
+  },
+  "native_negative_controls": {
+    "model": "OpenGVLab/InternVL3-2B-hf",
+    "revision": "cb57a075cb75a2e6d1b668b128d48bb00ae321d2",
+    "measurement": "Two sequential loopback calls to active worker /analyze with built-in native prompt and shared response validator.",
+    "observations": [
+      {
+        "fixture": "person",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "status": "unusable",
+        "seconds": 3.298,
+        "durationSeconds": 3.281,
+        "raw": {
+          "component": "motor",
+          "condition": "uncertain",
+          "box": [
+            200,
+            100,
+            400,
+            300
+          ],
+          "observation": "не видно явных дефектов"
+        }
+      },
+      {
+        "fixture": "furniture",
+        "model": "OpenGVLab/InternVL3-2B-hf",
+        "status": "unusable",
+        "seconds": 2.214,
+        "durationSeconds": 2.219,
+        "raw": {
+          "component": "none",
+          "condition": "uncertain",
+          "box": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "observation": "Нет видимых деталей или оборудования."
+        }
+      }
+    ]
+  }
+}

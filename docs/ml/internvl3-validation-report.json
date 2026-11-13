@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-13",
+  "scope": "Cyber102 sampled-frame video and native InternVL deployment; not field accuracy or physical phone acceptance",
+  "selected_backend": "internvl3",
+  "model": "OpenGVLab/InternVL3-2B-hf",
+  "revision": "cb57a075cb75a2e6d1b668b128d48bb00ae321d2",
+  "server": "Windows 11 Pro, NVIDIA GeForce RTX 3090 Ti 24GB",
+  "unit_tests": {
+    "macos_passed": 62,
+    "windows_passed": 62,
+    "warnings_as_errors": true,
+    "command": "python -W error -m unittest discover -s tests -v"
+  },
+  "powershell_scripts_parsed": true,
+  "browser_mock_api": {
+    "engines": [
+      "Chromium",
+      "WebKit mobile profile"
+    ],
+    "synthetic_camera": true,
+    "checks": [
+      "multipart JPEG",
+      "one in-flight request under delay",
+      "abort on stop/pagehide",
+      "stale response discarded",
+      "box on analyzed still image",
+      "single-frame mode",
+      "503 stops loop",
+      "no horizontal overflow"
+    ]
+  },
+  "browser_real_gpu": {
+    "report": "internvl3-browser-report.json",
+    "synthetic_camera": true,
+    "chromium_responses": 3,
+    "webkit_responses": 1,
+    "status": 200
+  },
+  "after_deploy": {
+    "https_authenticated_health": 200,
+    "https_unauthenticated_page": 401,
+    "web_task": "Running",
+    "native_vision_task": "Running",
+    "previous_ollama_task": "Disabled",
+    "loopback_worker_health": "ok"
+  },
+  "process_network_isolation": {
+    "python_offline_flags": true,
+    "python_audit_hook": true,
+    "windows_outbound_block_programs": [
+      "C:\\cyber102\\.venv-internvl\\Scripts\\python.exe",
+      "C:\\cyber102\\runtime\\python.exe"
+    ],
+    "external_https_result": "Blocked: WinError 10013",
+    "loopback_inference_after_block": "Passed"
+  },
+  "not_verified": [
+    "Physical iPhone Safari camera permissions and orientation",
+    "Android WebView wrapper permissions and auth",
+    "LAN-only operation with WAN disconnected",
+    "Defect class accuracy and bounding-box IoU on expert-labelled factory data",
+    "Joint temporal reasoning across video frames"
+  ],
+  "gguf_candidate": {
+    "report": "gguf-experiment-report.json",
+    "selected": false,
+    "reason": "False findings on negative frames or unsuitable boxes across three prompt variants",
+    "process_stopped": true
+  }
+}

@@ -6,8 +6,8 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE = ROOT / 'output/cyber102-research-pack.zip'
-ALLOWED = ('docs', 'ml', 'server', 'web', 'tests', 'deploy', 'data_tools', 'tools')
-SUFFIXES = {'.md', '.json', '.py', '.mjs', '.txt', '.ps1', '.html', '.js', '.css', '.jpg'}
+ALLOWED = ('docs', 'ml', 'server', 'web', 'tests', 'deploy', 'data_tools', 'tools', 'vision_runtime')
+SUFFIXES = {'.md', '.json', '.py', '.mjs', '.cjs', '.txt', '.ps1', '.html', '.js', '.css', '.jpg'}
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
     for path in files:
         if not path.is_file() or not path.resolve().is_relative_to(ROOT):
             raise ValueError(f'Missing or external package input: {path.name}')
-    manifest = {'version': '1.0', 'prepared': '2026-11-13',
+    manifest = {'version': '1.2', 'prepared': '2026-11-13',
                 'scope': 'Original Cyber102 documentation, synthetic templates and source code. External manuals and raw datasets are linked, not republished.',
                 'files': [{'path': str(f.relative_to(ROOT)), 'bytes': f.stat().st_size,
                            'sha256': sha256(f.read_bytes()).hexdigest()} for f in files]}

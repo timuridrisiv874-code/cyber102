@@ -5,9 +5,9 @@
 | Раздел | Материалы |
 | --- | --- |
 | Архитектура | [База данных и API](architecture/database.md), [локальное зрение](architecture/vision.md) |
-| Работа стенда | [Развёртывание на 3090, запуск и телефоны](operations/deployment.md) |
+| Работа стенда | [Развёртывание на 3090](operations/deployment.md), [удалённый доступ и будущий локальный Wi-Fi](operations/local-network.md) |
 | Чекпоинты | [Первый чекпоинт и сценарий показа](checkpoints/checkpoint-1.md) |
-| ML | [Исследование CatBoost и AutoGluon](ml/ml-research.md), [эксперимент UCI](ml/benchmark-uci.md), [его фактические метрики](ml/uci-benchmark-report.json) |
+| ML | [InternVL3](ml/internvl3-research.md), [CatBoost и AutoGluon](ml/ml-research.md), [эксперимент UCI](ml/benchmark-uci.md), [его фактические метрики](ml/uci-benchmark-report.json) |
 | Инженерный пакет | [Оглавление](research/README.md), [главы](research/chapters/), [первоисточники](research/sources/README.md), [каталог данных](research/datasets/catalog.json) |
 | Контракты данных | [Схема телеметрии](research/schemas/telemetry-schema.json), [схема разметки](research/schemas/annotation-schema.json) |
 | Готовые материалы | [Word, PDF и ZIP](../output/README.md), [результаты проверки пакета](research/validation-report.json) |
