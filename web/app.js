@@ -217,6 +217,9 @@ function render() {
     byId('empty-text').textContent = checking ? '' : description;
   }
   if (!offlineMode) window.CyberCamera.renderTiming(result);
+  const settings = byId('analysis-settings');
+  if (settings) settings.hidden = offlineMode || (byId('camera-options').hidden &&
+    byId('analysis-timing').hidden && (!videoMetrics || videoMetrics.hidden));
   window.CyberInspection.update(result, clipBusy || checking || Boolean(videoRun));
   clipReview?.update();
   if (offlineMode) window.CyberOffline.render(result, checking);
@@ -645,7 +648,6 @@ async function loadCapabilities() {
       option.hidden = option.disabled;
     }
     if (!profiles.includes(profileSelect.value)) profileSelect.value = 'standard';
-    if (!profiles.includes('fast')) byId('profile-help').textContent = 'Для подключённого движка доступен подробный анализ.';
     render();
   } catch (_) {
     // Discovery is optional: camera and file selection never wait for this request.

@@ -61,10 +61,14 @@ async function run(browser, engine, android) {
   });
   try {
     await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
-    await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
+    if (android) {
+      await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
+    } else {
+      assert.equal(await page.locator('#analysis-settings').isVisible(), false, 'Analysis settings stay hidden before a source is ready');
+    }
     await page.locator('#media-file').setInputFiles(photo);
     await page.locator('#message').getByText('Фото открыто.', { exact: false }).waitFor();
-    if (!android) await page.getByText('Настройки анализа', {exact:true}).click();
+    if (!android) await page.locator('#analysis-settings > summary').click();
     await page.locator('#analysis-profile').selectOption('fast');
     await page.locator('#check').click();
     await page.locator('#message').getByText('Проверка завершена.', { exact: true }).waitFor();

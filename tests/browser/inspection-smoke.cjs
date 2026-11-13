@@ -86,8 +86,10 @@ async function run(browser, engine, state, server, android) {
   page.setDefaultTimeout(10000);
   try {
     await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
-    await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
-    if (!android) {
+    if (android) {
+      await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
+    } else {
+      assert.equal(await page.locator('#analysis-settings').isVisible(), false, 'Analysis settings stay hidden before a source is ready');
       assert.equal(await page.locator('#check').isVisible(), false, 'No analysis action before selecting a source');
       await page.locator('#demo-options > summary').click();
       await page.locator('#show-example').click();
@@ -97,6 +99,8 @@ async function run(browser, engine, state, server, android) {
     }
     await camera(page);
     await page.locator('#camera').click();
+    await page.locator('#video').waitFor();
+    if (!android) await page.locator('#analysis-settings > summary').click();
     await page.locator('#analysis-profile').selectOption('fast');
     await page.locator('#check').click();
     await page.locator('#inspection-preview:not([disabled])').waitFor();

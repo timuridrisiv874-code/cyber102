@@ -145,11 +145,31 @@
 }
 @media print { .app-sidebar, .skip-link { display: none; } .page { margin: 0; } }
 
-.telemetry-chart { min-height: 180px; width: 100%; }
+.telemetry-chart { min-height: 240px; width: 100%; touch-action: pan-y pinch-zoom; user-select: none; border-radius: 8px; cursor: crosshair; }
 .telemetry-chart svg { width: 100%; display: block; height: auto; }
 .telemetry-chart text { fill: #64756a; font-size: 11px; font-variant-numeric: tabular-nums; }
 .trend-grid { stroke: #e0e7e1; stroke-width: 1; }
 .trend-series { fill: none; stroke: #397b55; stroke-width: 2; vector-effect: non-scaling-stroke; }
-.trend-cursor { stroke: #8eaa98; stroke-width: 1; stroke-dasharray: 3 4; }
+.trend-isolated { fill: #397b55; }
+.trend-cursor { stroke: #4a755a; stroke-width: 1; }
 .trend-current { fill: #1b5e3e; stroke: #fff; stroke-width: 2; }
-@media (max-width: 740px) { .telemetry-chart { min-height: 120px; } .telemetry-chart svg { min-height: 140px; } }
+.trend-missing { stroke: #1b5e3e; stroke-width: 2; }
+.trend-preview-line { stroke: #809486; stroke-width: 1; stroke-dasharray: 3 4; }
+.trend-preview-point { fill: #fff; stroke: #397b55; stroke-width: 2; }
+.trend-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-bottom: 12px; }
+.trend-readout { display: grid; gap: 2px; min-width: 0; font-variant-numeric: tabular-nums; }
+.trend-readout strong { font-size: 24px; line-height: 1.2; color: var(--ink); }
+.trend-readout span { font-size: 12px; color: var(--muted); }
+.trend-zoom { display: flex; flex-wrap: wrap; gap: 8px; }
+.trend-zoom .button { min-width: 44px; padding-inline: 12px; }
+.trend-zoom .button:not(:last-child) { font-size: 20px; }
+.trend-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+.trend-footer > span { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.trend-window { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.trend-window label { font-size: 12px; }
+.trend-window input { flex: 1; min-width: 0; min-height: 44px; }
+@media (max-width: 480px) {
+  .trend-toolbar { gap: 16px; }
+  .trend-zoom { width: 100%; }
+  .trend-zoom .button:last-child { flex: 1; }
+}

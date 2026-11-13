@@ -7,8 +7,8 @@
   <title>Показания оборудования — Cyber102</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="checkpoint.css">
-  <link rel="stylesheet" href="workspace.css">
-  <script src="telemetry.js" defer></script>
+  <link rel="stylesheet" href="workspace.css?v=interactive-20261113">
+  <script src="telemetry.js?v=interactive-20261113" defer></script>
   <script src="shell.js" defer></script>
 </head>
 <body data-page="readings">
@@ -38,7 +38,18 @@
     </section>
     <section class="panel telemetry-trend" aria-labelledby="trend-title">
       <div class="panel-heading"><h2 id="trend-title">Общая вибрация</h2><span class="source">RMS · мм/с</span></div>
-      <div class="section-body"><div id="telemetry-trend-chart" class="telemetry-chart" role="img" aria-label="График общей вибрации по записям организаторов"></div><p id="telemetry-trend-status" class="message" role="status">Загружаем график…</p></div>
+      <div class="section-body">
+        <div class="trend-toolbar">
+          <div class="trend-readout"><strong id="trend-value">—</strong><span id="trend-time"></span><span id="trend-record"></span></div>
+          <div class="trend-zoom" role="group" aria-label="Масштаб графика"><button type="button" class="button secondary" id="trend-zoom-out" aria-label="Уменьшить масштаб" title="Уменьшить масштаб" disabled>−</button><button type="button" class="button secondary" id="trend-zoom-in" aria-label="Увеличить масштаб" title="Увеличить масштаб" disabled>+</button><button type="button" class="button secondary" id="trend-zoom-reset" disabled>Весь период</button></div>
+        </div>
+        <div id="telemetry-trend-chart" class="telemetry-chart" role="group" tabindex="0" aria-label="График общей вибрации" aria-describedby="trend-keyboard-help"></div>
+        <p class="sr-only" id="trend-keyboard-help">Стрелки выбирают точку, Enter открывает запись. Home и End — первая и последняя запись. Плюс и минус меняют масштаб.</p>
+        <p class="sr-only" id="trend-announcement" role="status" aria-live="polite" aria-atomic="true"></p>
+        <div class="trend-footer"><span id="trend-range"></span><button type="button" class="button secondary" id="trend-select" disabled>Открыть запись</button></div>
+        <div class="trend-window" id="trend-window-control" hidden><label for="trend-window">Период</label><input type="range" id="trend-window" min="0" max="0" value="0" step="1"></div>
+        <p id="telemetry-trend-status" class="message" role="status">Загружаем график…</p>
+      </div>
     </section>
     <section class="panel" aria-labelledby="channels-title">
       <div class="panel-heading"><h2 id="channels-title">Измерительные каналы</h2><span class="source">Пороги из описаний баз</span></div>

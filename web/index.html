@@ -6,13 +6,13 @@
   <meta name="theme-color" content="#f1f2ef">
   <title>Осмотр оборудования — Cyber102</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="workspace.css">
+  <link rel="stylesheet" href="workspace.css?v=interactive-20261113">
   <script src="offline.js" defer></script>
   <script src="analysis-jobs.js" defer></script>
   <script src="inspection.js" defer></script>
   <script src="media.js" defer></script>
   <script src="video-review.js" defer></script>
-  <script src="app.js" defer></script>
+  <script src="app.js?v=interactive-20261113" defer></script>
   <script src="shell.js" defer></script>
 </head>
 <body data-page="inspection">
@@ -57,10 +57,9 @@
             <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Включить камеру</span></button>
           </div>
           <div class="media-picker">
-            <div class="field"><label for="media-file">Фото или видео</label><input id="media-file" type="file" accept="image/*,video/*" aria-describedby="media-help"></div>
+            <div class="field"><label for="media-file">Фото или видео</label><input id="media-file" type="file" accept="image/*,video/*"></div>
             <button id="media-clear" class="button secondary" type="button" hidden>Убрать файл</button>
           </div>
-          <p class="video-help" id="media-help">Фото до 20 МБ · видео до 150 МБ, 2 минут</p>
           <p class="message" id="message" role="status"></p>
           <p class="video-metrics" id="media-progress" role="status" hidden></p>
 
@@ -74,7 +73,7 @@
           </section>
           </div>
 
-          <details class="capture-settings">
+          <details class="capture-settings" id="analysis-settings" hidden>
             <summary>Настройки анализа</summary>
             <div class="camera-options" id="camera-options" hidden>
               <label for="camera-mode" id="camera-mode-label">Проверка</label>
@@ -85,7 +84,6 @@
               <select id="frame-interval" hidden><option value="2000">2 секунды</option><option value="5000" selected>5 секунд</option><option value="10000">10 секунд</option></select>
             </div>
             <p class="video-help" id="video-help" hidden>Проверяем отдельные кадры. Рамка относится к последнему проверенному кадру.</p>
-            <p class="video-help" id="profile-help">Быстрый режим возвращает короткое наблюдение.</p>
 
             <p class="video-metrics" id="analysis-timing" hidden></p><p class="video-metrics" id="video-metrics" hidden></p>
           </details>

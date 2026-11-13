@@ -131,7 +131,6 @@ async function run(browser, name, options, mock) {
 
   try {
     await page.goto(`http://127.0.0.1:${mock.server.address().port}/index.html`);
-    await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
     await page.locator('#demo-options > summary').click();
     await page.locator('#show-example').click();
     await installTestCamera(page);
@@ -142,6 +141,7 @@ async function run(browser, name, options, mock) {
 
     await cameraOn.click();
     await video.waitFor();
+    await page.locator('#analysis-settings > summary').click();
     await page.locator('#camera-mode').selectOption('video');
     const interval = page.getByLabel('Интервал');
     assert.equal(await interval.inputValue(), '5000');
