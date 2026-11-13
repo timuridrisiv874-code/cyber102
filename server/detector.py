@@ -6,6 +6,7 @@ import re
 import threading
 import time
 from http.client import HTTPException
+from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import ProxyHandler, Request, build_opener
 
@@ -13,7 +14,9 @@ from .vision import COMPONENTS, CONDITIONS, NoRedirects, VisionBusy, VisionUnava
 
 MODEL = 'team-detector'
 ENDPOINT = 'http://127.0.0.1:11437/analyze'
-CLASSES = frozenset(('corrosion', 'wet_patch', 'visible_damage'))
+_catalog_path = Path(__file__).resolve().parents[1] / 'ml' / 'defect_detector' / 'classes.json'
+CLASS_NAMES = {row['id']: row['ru'] for row in json.loads(_catalog_path.read_text(encoding='utf-8'))['labels']}
+CLASSES = frozenset(CONDITIONS.keys() - {'no_visible_defect'} | CLASS_NAMES.keys())
 MAX_DETECTIONS = 64
 MAX_IMAGE_BYTES = 3 * 1024 * 1024
 MAX_RESPONSE_BYTES = 128 * 1024
@@ -84,7 +87,12 @@ def result_from_envelope(data):
     if not detections:
         return {**result, 'status': 'unusable', 'reason': 'no_supported_detections'}
     primary = detections[0]
-    finding, recommendation = CONDITIONS[primary['class']]
+    key = primary['class']
+    if key in CONDITIONS:
+        finding, recommendation = CONDITIONS[key]
+    else:
+        finding = f'Возможный признак: {CLASS_NAMES[key].lower()}'
+        recommendation = 'Сверьте выделенную область с исходным снимком и передайте результат на проверку специалисту.'
     component = COMPONENTS.get(primary['component'], 'Узел не определён')
     return {**result, 'status': 'defect', 'component': component, 'box': dict(primary['box']),
             'finding': finding, 'recommendation': recommendation,

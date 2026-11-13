@@ -58,6 +58,14 @@ class DetectorContractTest(unittest.TestCase):
         self.assertNotIn('box', result)
         self.assertNotIn('finding', result)
 
+    def test_trained_defect_labels_preserve_specific_findings(self):
+        for label, wording in [('crack', 'трещина'), ('terminal_damage', 'клеммы'),
+                               ('weld_porosity', 'пористость')]:
+            with self.subTest(label=label):
+                result = detector.result_from_envelope(envelope([detection(**{'class': label})]))
+                self.assertEqual(result['detections'][0]['class'], label)
+                self.assertIn(wording, result['finding'])
+
     def test_envelope_class_version_count_and_keys_are_strict(self):
         for changes in ({'schemaVersion': True}, {'schemaVersion': 2}, {'model': 'other'},
                         {'modelVersion': ''}, {'modelVersion': 'version with spaces'}, {'modelVersion': 'x' * 81},
