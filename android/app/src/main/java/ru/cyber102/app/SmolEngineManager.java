@@ -30,7 +30,7 @@ final class SmolEngineManager {
     interface Listener { void onEvent(JSONObject event); }
     private static final int MAX_IMAGE_BYTES = 1536 * 1024;
     private static final int MAX_IMAGE_BASE64 = 4 * ((MAX_IMAGE_BYTES + 2) / 3);
-    private static final String PROMPT = "Which one best describes the physical condition shown? Normal or unclear; electrical wires or contacts damaged; irregular split or hole; heavy surface rust; or liquid dripping. Answer with one phrase.";
+    private static final String PROMPT = "Inspect the visible equipment.";
     private final Context context;
     private final Listener listener;
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -168,7 +168,7 @@ final class SmolEngineManager {
                 JSONObject result;
                 Trace.beginSection("Cyber102.smol.inference");
                 try {
-                    result = new JSONObject(SmolNative.analyze(image.getAbsolutePath(), PROMPT, 32, epoch));
+                    result = new JSONObject(SmolNative.analyze(image.getAbsolutePath(), PROMPT, 1, epoch));
                 } finally {
                     Trace.endSection();
                 }
@@ -176,7 +176,8 @@ final class SmolEngineManager {
                 if (result.optBoolean("cancelled")) throw new IOException("Операция отменена.");
                 String text = result.optString("text", "").trim();
                 if (text.isEmpty() || text.length() > 4000) throw new IOException("Модель не вернула пригодное наблюдение. Попробуйте другой кадр.");
-                emit(json("type", "result", "requestId", requestId, "result", result, "model", modelId, "modelVersion", revision));
+                emit(json("type", "result", "requestId", requestId, "result", result, "model", modelId,
+                        "modelVersion", revision + ".findings-v1"));
                 status("ready", "Наблюдение готово. Проверьте его по изображению.", 100);
             } catch (Exception error) {
                 emit(json("type", "error", "requestId", requestId, "code", token != generation.get() ? "cancelled" : "inference_failed",

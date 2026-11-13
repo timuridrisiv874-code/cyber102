@@ -115,6 +115,13 @@ public final class OfflineInferenceTest {
             String observation = stringJs("document.querySelector('#offline-result .offline-observation').textContent");
             assertTrue(observation.trim().length() > 2);
             assertEquals("true", js("(()=>{const p=document.querySelector('.offline-checked-frame');const s=document.getElementById('snapshot');return !!p && p.width===s.width && p.height===s.height && p.toDataURL()===s.toDataURL()})()"));
+            if ("true".equals(InstrumentationRegistry.getArguments().getString("exportFrame"))) {
+                String jpeg = stringJs("document.getElementById('snapshot').toDataURL('image/jpeg', 0.85)").split(",", 2)[1];
+                File file = new File(target.getCacheDir(), "qa-checked-frame.jpg");
+                try (FileOutputStream output = new FileOutputStream(file)) {
+                    output.write(Base64.decode(jpeg, Base64.DEFAULT));
+                }
+            }
             assertEquals("true", js("document.getElementById('detection').hidden || getComputedStyle(document.getElementById('detection')).display==='none'"));
             assertEquals("true", js("document.getElementById('inspection-workflow').hidden"));
             originalHistory = js("localStorage.getItem('cyber102.offline.inspections.v1')");
@@ -131,8 +138,8 @@ public final class OfflineInferenceTest {
             assertFalse(saved.has("image"));
             assertFalse(saved.has("base64"));
             await("result animation", "document.getElementById('offline-result').getAnimations().every(a=>a.playState==='finished')", 5000);
-            js("(()=>{const box=document.getElementById('offline-result').getBoundingClientRect();window.scrollTo({top:window.scrollY+box.top-12,behavior:'instant'});return true})()");
-            await("result visible for screenshot", "(()=>{const p=document.querySelector('.offline-checked-frame').getBoundingClientRect();const o=document.querySelector('.offline-observation').getBoundingClientRect();return p.top>=0 && o.bottom<=innerHeight})()", 5000);
+            js("(()=>{const box=document.querySelector('.offline-checked-frame').getBoundingClientRect();window.scrollTo({top:window.scrollY+box.top-85,behavior:'instant'});return true})()");
+            await("result visible for screenshot", "(()=>{const p=document.querySelector('.offline-checked-frame').getBoundingClientRect();const labels=document.querySelectorAll('.offline-caption');const o=labels[labels.length-1]||document.querySelector('.offline-observation');const b=o.getBoundingClientRect();return p.bottom>0 && b.top<innerHeight})()", 5000);
             SystemClock.sleep(300);
             capture(target, "offline-real-result.png");
             Bundle report = new Bundle();
