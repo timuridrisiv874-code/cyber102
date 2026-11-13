@@ -18,7 +18,7 @@ async function loadAfterPageRestore(page, pathname, endpoints, ready) {
       const attempt = ++gate.attempts;
       if (attempt === 1) await gate.wait;
       try {
-        await route.continue();
+        await route.fallback();
       } catch (error) {
         if (attempt !== 1) throw error;
       }
@@ -46,6 +46,16 @@ async function loadAfterPageRestore(page, pathname, endpoints, ready) {
 
 async function run(browser, options, name) {
   const context = await browser.newContext({...options, ...(credentials ? {httpCredentials:{username:credentials.username,password:credentials.password,origin}} : {})});
+  if (credentials) {
+    const authorization = 'Basic ' + Buffer.from(credentials.username + ':' + credentials.password).toString('base64');
+    await context.route(new URL(origin).origin + '/**', async route => {
+      try { await route.continue({headers:{...route.request().headers(),authorization}}); }
+      catch (error) {
+        // A held page route can reach this handler after the lifecycle check aborts it.
+        if (!/Route is already handled|Target page, context or browser has been closed/.test(error.message)) throw error;
+      }
+    });
+  }
   const page = await context.newPage();
   page.setDefaultTimeout(12_000);
   const errors = [];
@@ -107,7 +117,7 @@ async function run(browser, options, name) {
     const paused = snapshots.length;
     await hold(1250);
     assert.equal(snapshots.length,paused);
-    await page.route('**/api/telemetry/snapshot?index=400', async route => {await hold(700);try {await route.continue();}catch {}});
+    await page.route('**/api/telemetry/snapshot?index=400', async route => {await hold(700);try {await route.fallback();}catch {}});
     await seek(400); await seek(401);
     await page.getByText('Строка 402 из 500 · эмулятор',{exact:true}).waitFor();
     await hold(850);

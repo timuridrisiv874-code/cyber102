@@ -61,5 +61,26 @@
     "Telemetry samples have no confirmed equipment binding.",
     "Diagnostic applicability to AMS progressive-cavity pumps is not validated.",
     "OCR is a search aid; structured fields were checked against scanned pages."
-  ]
+  ],
+  "serverValidation": {
+    "platform": "Windows 11 / RTX 3090 Ti",
+    "tests": 103,
+    "result": "passed",
+    "pdfSha256Verified": 22,
+    "releaseFilesVerified": 144,
+    "applicationHealth": "ok",
+    "modelHealth": "ok",
+    "modelOffline": true
+  },
+  "httpsBrowsers": {
+    "origin": "https://cyber102.94.41.87.102.sslip.io",
+    "engines": [
+      "Chromium",
+      "WebKit iPhone 13 emulation"
+    ],
+    "result": "passed",
+    "authentication": "Explicit HTTP Basic header restricted to this origin; WebKit automation httpCredentials alone returned 401.",
+    "physicalPhonesTested": false
+  },
+  "verifiedAt": "2026-11-13T11:39:33.815188+00:00"
 }
