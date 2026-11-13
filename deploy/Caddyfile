@@ -7,11 +7,47 @@ https://cyber102.94.41.87.102.sslip.io {
         max_size 12MiB
     }
     encode gzip
-    reverse_proxy 127.0.0.1:8102 {
-        header_up -Authorization
-        transport http {
-            dial_timeout 3s
-            response_header_timeout 180s
+    # Exact APK routes retain the site's Basic Auth and stream through Caddy.
+    # No directory listing or other files from output/android are exposed.
+    handle /cyber102-0.7-offline.apk {
+        root * C:/cyber102/output/android
+        rewrite * /Cyber102_0.7-offline.apk
+        header Content-Type application/vnd.android.package-archive
+        header Content-Disposition "attachment; filename=Cyber102_0.7-offline.apk"
+        header Cache-Control "private, no-cache"
+        file_server
+    }
+    handle /cyber102-0.7-test.apk {
+        root * C:/cyber102/output/android
+        rewrite * /Cyber102_0.7-test.apk
+        header Content-Type application/vnd.android.package-archive
+        header Content-Disposition "attachment; filename=Cyber102_0.7-test.apk"
+        header Cache-Control "private, no-cache"
+        file_server
+    }
+    handle /cyber102-0.8-offline.apk {
+        root * C:/cyber102/output/android
+        rewrite * /Cyber102_0.8-offline.apk
+        header Content-Type application/vnd.android.package-archive
+        header Content-Disposition "attachment; filename=Cyber102_0.8-offline.apk"
+        header Cache-Control "private, no-cache"
+        file_server
+    }
+    handle /cyber102-0.8-test.apk {
+        root * C:/cyber102/output/android
+        rewrite * /Cyber102_0.8-test.apk
+        header Content-Type application/vnd.android.package-archive
+        header Content-Disposition "attachment; filename=Cyber102_0.8-test.apk"
+        header Cache-Control "private, no-cache"
+        file_server
+    }
+    handle {
+        reverse_proxy 127.0.0.1:8102 {
+            header_up -Authorization
+            transport http {
+                dial_timeout 3s
+                response_header_timeout 180s
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-// Files are decoded locally. Only normalized JPEG frames reach /analyze.
+// Files are decoded locally. Only normalized JPEG frames reach the local analysis API.
 (() => {
   const abortError = () => new DOMException('Операция отменена', 'AbortError');
   function waitFor(element, event, signal, ready, timeout = 20000) {
@@ -30,6 +30,7 @@
       }
       const state = {
         get kind() { return kind; }, get loading() { return loading; },
+        get version() { return generation; },
         get element() { return kind === 'uploaded_video' ? video : image; },
         get ready() { return !loading && (kind === 'uploaded_video' ? video.readyState >= 2 && video.videoWidth > 0 : kind === 'uploaded_photo' && image.complete && image.naturalWidth > 0); },
         clear,
@@ -73,7 +74,13 @@
           }
           if (token !== generation) return;
           loading = false; loader = null;
-          message(kind === 'uploaded_video' ? 'Видео открыто. Выберите кадр или включите видеопроверку по интервалу. На сервер отправляются только выбранные кадры.' : 'Фото открыто. Нажмите «Проверить кадр»: снимок обработает серверная модель.');
+          message(window.CyberOffline?.enabled
+            ? kind === 'uploaded_video'
+              ? 'Видео открыто. Выберите кадр и нажмите «Проверить кадр». Анализ выполняется на телефоне.'
+              : 'Фото открыто. Нажмите «Проверить кадр»: снимок обработает SmolVLM на телефоне.'
+            : kind === 'uploaded_video'
+              ? 'Видео открыто. Выберите кадр или включите видеопроверку по интервалу. На сервер отправляются только выбранные кадры.'
+              : 'Фото открыто. Нажмите «Проверить кадр»: снимок обработает серверная модель.');
         } catch (error) {
           if (token !== generation) return;
           clear();

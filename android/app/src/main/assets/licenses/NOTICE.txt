@@ -1,0 +1,3 @@
+On-device model: HuggingFaceTB SmolVLM, official ggml-org GGUF conversion. Apache License 2.0.
+Native runtime: ggml-org/llama.cpp, MIT License.
+Model and runtime revisions are pinned in model-manifest.json and cpp/CMakeLists.txt.

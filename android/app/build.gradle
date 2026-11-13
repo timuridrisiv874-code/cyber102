@@ -1,21 +1,74 @@
 plugins { id 'com.android.application' }
+def bundledSmol = providers.gradleProperty('bundleSmolModel').orElse('false').get().toBoolean()
+def smolAssets = layout.buildDirectory.dir('generated/smol-assets')
 android {
     namespace 'ru.cyber102.app'
     compileSdk 36
     buildToolsVersion "36.0.0"
+    ndkVersion '28.2.13676358'
     defaultConfig {
         applicationId 'ru.cyber102.app'
         minSdk 26
         targetSdk 36
-        versionCode 6
-        versionName '0.6-test'
+        versionCode 8
+        versionName bundledSmol ? '0.8-offline' : '0.8-test'
+        ndk { abiFilters 'arm64-v8a' }
+        externalNativeBuild {
+            cmake { arguments '-DCMAKE_BUILD_TYPE=Release', '-DANDROID_STL=c++_static' }
+        }
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+    externalNativeBuild { cmake { path file('src/main/cpp/CMakeLists.txt'); version '3.22.1' } }
+    androidResources { noCompress += ['gguf'] }
+    if (bundledSmol) { sourceSets.main.assets.srcDir(smolAssets) }
 }
 
 dependencies {
     implementation "androidx.activity:activity:1.10.1"
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+}
+
+if (bundledSmol) {
+    def prepareSmol = tasks.register('prepareBundledSmol') {
+        def manifest = file('src/main/assets/models/model-manifest.json')
+        def weights = rootProject.file('../var/models/smolvlm')
+        inputs.file(manifest)
+        inputs.dir(weights)
+        outputs.dir(smolAssets)
+        doLast {
+            def catalog = new groovy.json.JsonSlurper().parse(manifest)
+            // A model change must not leave older GGUFs inside the next APK.
+            delete(smolAssets.get().asFile)
+            catalog.files.each { entry ->
+                def source = new File(weights, entry.fileName as String)
+                if (!source.isFile() || source.length() != (entry.size as long)) {
+                    throw new GradleException("Missing model file: ${source}. Run tools/prepare_android_models.py first.")
+                }
+                def digest = java.security.MessageDigest.getInstance('SHA-256')
+                source.withInputStream { input ->
+                    byte[] buffer = new byte[1024 * 1024]
+                    int count
+                    while ((count = input.read(buffer)) != -1) digest.update(buffer, 0, count)
+                }
+                if (digest.digest().encodeHex().toString() != entry.sha256) {
+                    throw new GradleException("Model checksum mismatch: ${source.name}")
+                }
+                def destination = new File(smolAssets.get().asFile, 'models/' + entry.fileName)
+                destination.parentFile.mkdirs()
+                // Large pinned assets need not occupy another 1.7 GB in the
+                // generated source set. Cross-filesystem builds fall back to copy.
+                try {
+                    java.nio.file.Files.createLink(destination.toPath(), source.toPath())
+                } catch (java.io.IOException | UnsupportedOperationException ignored) {
+                    java.nio.file.Files.copy(source.toPath(), destination.toPath())
+                }
+            }
+        }
+    }
+    tasks.named('preBuild').configure { dependsOn prepareSmol }
 }

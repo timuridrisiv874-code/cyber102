@@ -131,9 +131,10 @@ async function run(browser, name, options, mock) {
 
   try {
     await page.goto(`http://127.0.0.1:${mock.server.address().port}/index.html`);
-    await installTestCamera(page);
+    await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
     await page.locator('#demo-options > summary').click();
     await page.locator('#show-example').click();
+    await installTestCamera(page);
     await check.click();
     await page.locator('#viewfinder #detection').waitFor();
     assert.equal(frameCount(), 0, 'Demo example must use its local JSON fixture');
@@ -141,8 +142,7 @@ async function run(browser, name, options, mock) {
 
     await cameraOn.click();
     await video.waitFor();
-    await page.getByText('Настройки анализа', {exact:true}).click();
-    await page.getByLabel('Проверка', {exact:true}).selectOption('video');
+    await page.locator('#camera-mode').selectOption('video');
     const interval = page.getByLabel('Интервал');
     assert.equal(await interval.inputValue(), '5000');
     await interval.selectOption('2000');
@@ -201,8 +201,7 @@ async function run(browser, name, options, mock) {
     assert.equal(await video.isVisible(), false);
     await page.getByRole('button', { name: 'Новый кадр' }).click();
     await video.waitFor();
-    await page.getByText('Настройки анализа', {exact:true}).click();
-    await page.getByLabel('Проверка', {exact:true}).selectOption('video');
+    await page.locator('#camera-mode').selectOption('video');
     const unavailable = await startFrame(start);
     unavailable.reply(503, { error: 'Локальная модель занята.' });
     await page.getByText('Локальная модель занята.').waitFor();

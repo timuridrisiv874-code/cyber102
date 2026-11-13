@@ -33,6 +33,7 @@ const reports=[];
   const capabilities=(await capsResponse.json()).vision;
   assert.equal(capabilities.enabled,true);assert.equal(typeof capabilities.model,'string');
   assert.match(capabilities.revision,/^[a-f0-9]{40}$/);
+  await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
   await page.locator('#example').evaluate(img=>img.decode());
   await page.evaluate(()=>{
    Object.defineProperty(navigator,'mediaDevices',{value:{getUserMedia:async()=>{
@@ -45,8 +46,7 @@ const reports=[];
   });
   await page.getByRole('button',{name:'Включить камеру'}).click();
   await page.locator('#video').waitFor();
-  await page.getByText('Настройки анализа',{exact:true}).click();
-  await page.getByLabel('Проверка',{exact:true}).selectOption('video');
+  await page.locator('#camera-mode').selectOption('video');
   await page.getByLabel('Интервал').selectOption('2000');
   await page.getByRole('button',{name:'Начать проверку'}).click();
   const count=engine==='chromium'?3:1;

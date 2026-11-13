@@ -8,11 +8,15 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import android.content.ActivityNotFoundException;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.os.Trace;
+import android.util.Log;
 import android.provider.Settings;
 import android.view.View;
 import android.webkit.*;
@@ -26,6 +30,9 @@ import android.graphics.drawable.GradientDrawable;
 import android.content.res.ColorStateList;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.HashMap;
+import java.util.Map;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -38,6 +45,7 @@ import javax.net.ssl.HttpsURLConnection;
 /** Small Android host for the team's shared inspection screen. */
 public final class MainActivity extends ComponentActivity {
     private static final String DEMO = "https://appassets.androidplatform.net/index.html";
+    private static final String OFFLINE = "https://appassets.androidplatform.net/offline/index.html";
     private static final int CAMERA_REQUEST = 20;
     private static final int BACKGROUND = 0xfff4f6f5;
     private static final int INK = 0xff192a28;
@@ -45,13 +53,16 @@ public final class MainActivity extends ComponentActivity {
     private static final int ACCENT = 0xff176451;
     private static final int OUTLINE = 0xffd6e1de;
     private static final int MAX_RECENT = 4;
+    private static final ExecutorService PREFERENCES_IO = Executors.newSingleThreadExecutor(
+            task -> new Thread(task, "Cyber102-prefs"));
     private LinearLayout root;
     private FrameLayout content;
-    private WebView web;
+    private volatile WebView web;
     private TextView status;
     private ProgressBar progress;
     private PermissionRequest pendingCamera;
-    private volatile String activeUrl;
+    private volatile String activeUrl = DEMO;
+    private List<String> recent = new ArrayList<>();
     private boolean foreground;
     private boolean failed;
     private final ExecutorService network = Executors.newSingleThreadExecutor();
@@ -62,6 +73,18 @@ public final class MainActivity extends ComponentActivity {
     private OnBackPressedCallback webBackCallback;
     private ValueCallback<Uri[]> pendingFileChooser;
     private boolean filePickerActive;
+    private SmolEngineManager offline;
+    private boolean modelPickerActive;
+    private String modelPickerRole;
+    private final ActivityResultLauncher<Intent> modelPicker = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                modelPickerActive = false;
+                String role = modelPickerRole;
+                modelPickerRole = null;
+                if (!isOffline() || role == null || result.getResultCode() != RESULT_OK || result.getData() == null) return;
+                Uri uri = result.getData().getData();
+                if (uri != null && "content".equals(uri.getScheme())) offline.importFile(uri, role);
+            });
     private final ActivityResultLauncher<Intent> filePicker = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 filePickerActive = false;
@@ -83,6 +106,7 @@ public final class MainActivity extends ComponentActivity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        offline = new SmolEngineManager(this, this::onOfflineEvent);
         // AndroidX forwards both legacy Back and Android 13+ predictive Back.
         // Intercept only while WebView has history; otherwise the system owns
         // back-to-home navigation and its predictive animation.
@@ -118,12 +142,12 @@ public final class MainActivity extends ComponentActivity {
         iconSize.setMarginEnd(dp(10));
         bar.addView(icon, iconSize);
         TextView brand = new TextView(this);
-        brand.setText("Брови и ресницы");
+        brand.setText("Cyber102");
         brand.setTextSize(16);
         brand.setTextColor(INK);
         brand.setTypeface(null, android.graphics.Typeface.BOLD);
         bar.addView(brand, new LinearLayout.LayoutParams(0, -2, 1));
-        Button settings = button("Сервер", this::showSettings);
+        Button settings = button("Режим", this::showSettings);
         bar.addView(settings);
         root.addView(bar);
         status = new TextView(this);
@@ -137,9 +161,33 @@ public final class MainActivity extends ComponentActivity {
         content = new FrameLayout(this);
         root.addView(content, new LinearLayout.LayoutParams(-1, 0, 1));
         setContentView(root);
-        activeUrl = getPreferences(MODE_PRIVATE).getString("address", DEMO);
-        if (isDemo()) showWelcome();
-        else load(activeUrl);
+        settings.setEnabled(false);
+        status.setText("Открываем настройки…");
+        Context app = getApplicationContext();
+        String preferencesName = getLocalClassName();
+        PREFERENCES_IO.execute(() -> {
+            String savedAddress = DEMO;
+            List<String> savedRecent = new ArrayList<>();
+            Trace.beginSection("Cyber102.preferences.read");
+            try {
+                SharedPreferences preferences = app.getSharedPreferences(preferencesName, MODE_PRIVATE);
+                savedAddress = preferences.getString("address", DEMO);
+                savedRecent = parseRecentServers(preferences.getString("recent_servers", "[]"));
+            } catch (IllegalStateException | ClassCastException error) {
+                Log.w("Cyber102", "Unable to read saved settings", error);
+            } finally {
+                Trace.endSection();
+            }
+            String address = savedAddress;
+            List<String> servers = savedRecent;
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                recent = servers;
+                settings.setEnabled(true);
+                if (DEMO.equals(address)) showWelcome();
+                else load(address);
+            });
+        });
     }
 
     private void showWelcome() {
@@ -151,13 +199,13 @@ public final class MainActivity extends ComponentActivity {
         card.setBackground(panel(Color.WHITE, OUTLINE, 16));
         card.setPadding(dp(24), dp(24), dp(24), dp(20));
         TextView title = new TextView(this);
-        title.setText("Подключение к серверу");
+        title.setText("Выберите режим анализа");
         title.setTextColor(INK);
         title.setTextSize(25);
         title.setTypeface(null, android.graphics.Typeface.BOLD);
         card.addView(title);
         TextView description = new TextView(this);
-        description.setText("Укажите IP-адрес или имя сервера, чтобы открыть рабочие данные и осмотр оборудования.");
+        description.setText("Работайте с сервером предприятия или анализируйте отдельные кадры прямо на телефоне без сети.");
         description.setTextColor(MUTED);
         description.setTextSize(16);
         description.setPadding(0, dp(10), 0, dp(16));
@@ -167,6 +215,7 @@ public final class MainActivity extends ComponentActivity {
         connect.setBackground(panel(ACCENT, ACCENT, 10));
         connect.setTextColor(Color.WHITE);
         card.addView(connect, new LinearLayout.LayoutParams(-1, dp(48)));
+        card.addView(button("Офлайн на телефоне", () -> saveAndLoad(OFFLINE)), new LinearLayout.LayoutParams(-1, dp(48)));
 
         FrameLayout center = new FrameLayout(this);
         center.setPadding(dp(20), dp(24), dp(20), dp(24));
@@ -205,11 +254,25 @@ public final class MainActivity extends ComponentActivity {
         CookieManager.getInstance().setAcceptThirdPartyCookies(web, false);
         WebView.setWebContentsDebuggingEnabled(false);
         settings.setGeolocationEnabled(false);
+        final WebView owner = web;
+        if (isOffline()) {
+            // This bridge exists only in a separate offline WebView. That view
+            // admits only packaged files and blocks network/frames/navigation.
+            settings.setBlockNetworkLoads(true);
+            web.addJavascriptInterface(new OfflineBridge(owner), "CyberSmolNative");
+        }
         web.setWebViewClient(new WebViewClient() {
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 if (!sameOrigin(uri, Uri.parse(activeUrl))) return missingAsset();
                 String path = uri.getPath();
+                if (isOffline()) {
+                    if (!"GET".equals(request.getMethod()) || path == null) return missingAsset();
+                    String asset = path.startsWith("/offline/") ? path.substring("/offline/".length()) :
+                            path.startsWith("/__mobile_inspection/") ? path.substring("/__mobile_inspection/".length()) : null;
+                    if (!inspectionAssetAllowed(asset) || (request.isForMainFrame() && !"index.html".equals(asset))) return missingAsset();
+                    return offlineAsset("inspection/" + asset);
+                }
                 if (isDemo()) {
                     if (path == null || path.contains("..")) return missingAsset();
                     return bundledAsset(path.substring(1));
@@ -217,6 +280,10 @@ public final class MainActivity extends ComponentActivity {
                 if (!"GET".equals(request.getMethod()) || path == null) return null;
                 if (request.isForMainFrame() && "/index.html".equals(path)) {
                     return bundledAsset("inspection/index.html");
+                }
+                if (path.startsWith("/__mobile_inspection/")) {
+                    String asset = path.substring("/__mobile_inspection/".length());
+                    return inspectionAssetAllowed(asset) ? bundledAsset("inspection/" + asset) : missingAsset();
                 }
                 switch (path) {
                     case "/__mobile_inspection/app.js":
@@ -232,6 +299,12 @@ public final class MainActivity extends ComponentActivity {
                 }
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (isOffline()) {
+                    if (sameOrigin(request.getUrl(), Uri.parse(OFFLINE)) && "/offline/index.html".equals(request.getUrl().getPath())) return false;
+                    if (request.isForMainFrame()) Toast.makeText(MainActivity.this,
+                            "Этот раздел доступен через сервер. Переключите режим кнопкой сверху.", Toast.LENGTH_LONG).show();
+                    return true;
+                }
                 if (sameOrigin(request.getUrl(), Uri.parse(activeUrl))) return false;
                 if (request.isForMainFrame()) {
                     new AlertDialog.Builder(MainActivity.this).setTitle("Другой адрес")
@@ -254,7 +327,10 @@ public final class MainActivity extends ComponentActivity {
             @Override public void onPageFinished(WebView view, String url) {
                 updateBackNavigation();
                 progress.setVisibility(View.GONE);
-                if (!failed && sameOrigin(Uri.parse(url), Uri.parse(activeUrl))) status.setText(isDemo() ? "Демо · ответы заданы заранее" : "Сервер · " + Uri.parse(activeUrl).getHost());
+                if (!failed && sameOrigin(Uri.parse(url), Uri.parse(activeUrl))) {
+                    status.setText(isOffline() ? "На телефоне · SmolVLM · без сети" : isDemo() ? "Демо · ответы заданы заранее" : "Сервер · " + Uri.parse(activeUrl).getHost());
+                    if (isOffline()) onOfflineEvent(offline.snapshot());
+                }
             }
             @Override public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 if (!request.isForMainFrame()) return;
@@ -267,7 +343,7 @@ public final class MainActivity extends ComponentActivity {
             @Override public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
                 Uri configured = Uri.parse(activeUrl);
                 Uri page = Uri.parse(view.getUrl() == null ? activeUrl : view.getUrl());
-                if (isDemo() || !sameOrigin(configured, page) || !host.equalsIgnoreCase(configured.getHost())) {
+                if (isDemo() || isOffline() || !sameOrigin(configured, page) || !host.equalsIgnoreCase(configured.getHost())) {
                     handler.cancel();
                     return;
                 }
@@ -284,6 +360,7 @@ public final class MainActivity extends ComponentActivity {
             }
             @Override public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
                 cancelCamera();
+                if (isOffline()) offline.unload();
                 content.removeView(view);
                 view.destroy();
                 web = null;
@@ -340,6 +417,8 @@ public final class MainActivity extends ComponentActivity {
     private WebResourceResponse bundledAsset(String name) {
         String mime = name.endsWith(".js") ? "application/javascript" :
                 name.endsWith(".css") ? "text/css" :
+                name.endsWith(".json") ? "application/json" :
+                name.endsWith(".svg") ? "image/svg+xml" :
                 name.endsWith(".jpg") ? "image/jpeg" :
                 name.endsWith(".png") ? "image/png" : "text/html";
         try {
@@ -347,6 +426,19 @@ public final class MainActivity extends ComponentActivity {
         } catch (IOException error) {
             return missingAsset();
         }
+    }
+    private static boolean inspectionAssetAllowed(String name) {
+        return name != null && name.matches("[A-Za-z0-9][A-Za-z0-9._-]*\\.(html|js|css|jpg|jpeg|png|json|svg|webp)") &&
+                (!name.endsWith(".html") || name.equals("index.html"));
+    }
+    private WebResourceResponse offlineAsset(String name) {
+        WebResourceResponse response = bundledAsset(name);
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob:; media-src 'self' blob:; connect-src 'none'; frame-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'");
+        headers.put("X-Content-Type-Options", "nosniff");
+        headers.put("Cache-Control", "no-store");
+        response.setResponseHeaders(headers);
+        return response;
     }
     private static WebResourceResponse missingAsset() {
         return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", null,
@@ -357,7 +449,8 @@ public final class MainActivity extends ComponentActivity {
                 a.getHost() != null && a.getHost().equalsIgnoreCase(b.getHost()) && port(a) == port(b);
     }
     private static int port(Uri uri) { return uri.getPort() == -1 ? 443 : uri.getPort(); }
-    private boolean isDemo() { return activeUrl.equals(DEMO); }
+    private boolean isDemo() { return DEMO.equals(activeUrl); }
+    private boolean isOffline() { return OFFLINE.equals(activeUrl); }
     private void grantCamera() {
         PermissionRequest request = pendingCamera;
         pendingCamera = null;
@@ -385,9 +478,11 @@ public final class MainActivity extends ComponentActivity {
         int generation = ++loadGeneration;
         releaseCamera();
         cancelCamera();
+        cancelFileChooser();
+        if (isOffline() && !OFFLINE.equals(url)) offline.unload();
         if (web != null) {
             web.stopLoading();
-            if (!sameOrigin(Uri.parse(url), Uri.parse(activeUrl))) {
+            if (!sameOrigin(Uri.parse(url), Uri.parse(activeUrl)) || isOffline() != OFFLINE.equals(url)) {
                 content.removeView(web);
                 web.destroy();
                 web = null;
@@ -401,9 +496,9 @@ public final class MainActivity extends ComponentActivity {
         else content.addView(web, new FrameLayout.LayoutParams(-1, -1));
         if (web == null) return;
         web.setVisibility(View.VISIBLE);
-        status.setText(isDemo() ? "Демо · ответы заданы заранее" : "Подключение к серверу…");
+        status.setText(isOffline() ? "Открываем офлайн-анализ…" : isDemo() ? "Демо · ответы заданы заранее" : "Подключение к серверу…");
         progress.setVisibility(View.VISIBLE);
-        if (isDemo()) {
+        if (isDemo() || isOffline()) {
             web.loadUrl(activeUrl);
             return;
         }
@@ -481,6 +576,7 @@ public final class MainActivity extends ComponentActivity {
         actions.setPadding(dp(24), dp(24), dp(24), dp(24));
         actions.addView(error);
         actions.addView(button("Повторить", () -> load(activeUrl)));
+        actions.addView(button("Офлайн на телефоне", () -> saveAndLoad(OFFLINE)));
         actions.addView(button("Открыть встроенное демо", () -> saveAndLoad(DEMO)));
         ScrollView scroll = new ScrollView(this);
         scroll.addView(actions);
@@ -491,6 +587,7 @@ public final class MainActivity extends ComponentActivity {
     private void showSettings() {
         releaseCamera();
         cancelCamera();
+        if (isOffline()) offline.cancel();
         LinearLayout form = new LinearLayout(this);
         form.setOrientation(LinearLayout.VERTICAL);
         form.setPadding(dp(24), dp(8), dp(24), 0);
@@ -499,15 +596,19 @@ public final class MainActivity extends ComponentActivity {
         hint.setTextColor(MUTED);
         hint.setPadding(0, 0, 0, dp(12));
         form.addView(hint);
+        form.addView(button("Офлайн на телефоне", () -> {
+            if (settingsDialog != null) settingsDialog.dismiss();
+            saveAndLoad(OFFLINE);
+        }));
         EditText address = input("IP-адрес или домен", android.text.InputType.TYPE_TEXT_VARIATION_URI);
-        address.setText(isDemo() ? "" : origin(Uri.parse(activeUrl)));
+        address.setText(isDemo() || isOffline() ? "" : origin(Uri.parse(activeUrl)));
         form.addView(address);
         EditText user = input("Имя пользователя", android.text.InputType.TYPE_TEXT_VARIATION_NORMAL);
         user.setText(login);
         form.addView(user);
         EditText secret = input("Пароль", android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
         form.addView(secret);
-        List<String> recent = recentServers();
+        List<String> recent = new ArrayList<>(this.recent);
         if (!recent.isEmpty()) form.addView(button("Недавние серверы", () ->
                 new AlertDialog.Builder(this).setTitle("Недавние серверы")
                         .setItems(recent.toArray(new String[0]), (d, which) -> {
@@ -515,7 +616,7 @@ public final class MainActivity extends ComponentActivity {
                             user.setText("");
                             secret.setText("");
                         }).show()));
-        if (!isDemo()) form.addView(button("Открыть ссылку из QR", () -> {
+        if (!isDemo() && !isOffline()) form.addView(button("Открыть ссылку из QR", () -> {
             if (settingsDialog != null) settingsDialog.dismiss();
             openPassportLink();
         }));
@@ -587,9 +688,8 @@ public final class MainActivity extends ComponentActivity {
     private static String origin(Uri url) {
         return "https://" + url.getEncodedAuthority();
     }
-    private List<String> recentServers() {
+    private static List<String> parseRecentServers(String saved) {
         List<String> items = new ArrayList<>();
-        String saved = getPreferences(MODE_PRIVATE).getString("recent_servers", "[]");
         try {
             JSONArray addresses = new JSONArray(saved);
             for (int i = 0; i < addresses.length() && items.size() < MAX_RECENT; i++) {
@@ -602,12 +702,28 @@ public final class MainActivity extends ComponentActivity {
         return items;
     }
     private void rememberServer(String target) {
-        List<String> items = recentServers();
         String address = origin(Uri.parse(target));
-        items.remove(address);
-        items.add(0, address);
-        JSONArray saved = new JSONArray(items.subList(0, Math.min(items.size(), MAX_RECENT)));
-        getPreferences(MODE_PRIVATE).edit().putString("recent_servers", saved.toString()).apply();
+        recent.remove(address);
+        recent.add(0, address);
+        if (recent.size() > MAX_RECENT) recent.remove(MAX_RECENT);
+        writePreference("recent_servers", new JSONArray(recent).toString());
+    }
+    private void writePreference(String key, String value) {
+        Context app = getApplicationContext();
+        String name = getLocalClassName();
+        // commit runs on our executor. A pending apply would be drained by
+        // Android on the main thread during a lifecycle transition.
+        PREFERENCES_IO.execute(() -> {
+            Trace.beginSection("Cyber102.preferences.write");
+            try {
+                boolean saved = app.getSharedPreferences(name, MODE_PRIVATE).edit().putString(key, value).commit();
+                if (!saved) Log.w("Cyber102", "Unable to save preference: " + key);
+            } catch (IllegalStateException error) {
+                Log.w("Cyber102", "Unable to save preference: " + key, error);
+            } finally {
+                Trace.endSection();
+            }
+        });
     }
     private static String validatedUrl(String value) {
         try {
@@ -626,11 +742,11 @@ public final class MainActivity extends ComponentActivity {
         }
     }
     private void saveAndLoad(String url) {
-        if (DEMO.equals(url)) {
+        if (DEMO.equals(url) || OFFLINE.equals(url)) {
             login = null;
             password = null;
         }
-        getPreferences(MODE_PRIVATE).edit().putString("address", url).apply();
+        writePreference("address", url);
         load(url);
     }
     private Button button(String label, Runnable action) {
@@ -662,14 +778,67 @@ public final class MainActivity extends ComponentActivity {
     }
     @Override protected void onStop() {
         releaseCamera(); cancelCamera();
+        if (isOffline() && !filePickerActive && !modelPickerActive) offline.unload();
         if (web != null) web.onPause();
         super.onStop();
     }
+    @Override public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (offline != null && level >= TRIM_MEMORY_RUNNING_CRITICAL && !filePickerActive && !modelPickerActive) offline.unload();
+    }
     @Override protected void onDestroy() {
         network.shutdownNow();
+        if (offline != null) offline.close();
         cancelCamera();
         cancelFileChooser();
         if (web != null) { content.removeView(web); web.destroy(); web = null; }
         super.onDestroy();
+    }
+
+    private void onOfflineEvent(JSONObject event) {
+        if (!isOffline() || web == null || isFinishing() || isDestroyed()) return;
+        web.evaluateJavascript("window.CyberOffline && window.CyberOffline.onNativeEvent(" + event.toString() + ");", null);
+        if ("imported".equals(event.optString("type"))) {
+            if ("model".equals(event.optString("role"))) chooseModelFile("projector");
+            else offline.load();
+        }
+    }
+
+    private void chooseModelFile(String role) {
+        if (!isOffline() || !foreground || modelPickerActive || filePickerActive) return;
+        new AlertDialog.Builder(this).setTitle(role.equals("model") ? "Файл языковой модели" : "Файл визуального проектора")
+                .setMessage("Выберите " + offline.importFileName(role) + ". Приложение сверит размер и SHA-256 с комплектом этой сборки.")
+                .setNegativeButton("Отмена", null).setPositiveButton("Выбрать файл", (dialog, which) -> {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE); intent.setType("*/*");
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    modelPickerRole = role; modelPickerActive = true;
+                    try { modelPicker.launch(intent); }
+                    catch (ActivityNotFoundException | IllegalStateException error) {
+                        modelPickerRole = null; modelPickerActive = false;
+                        Toast.makeText(this, "Не удалось открыть выбор файла", Toast.LENGTH_LONG).show();
+                    }
+                }).show();
+    }
+
+    public final class OfflineBridge {
+        private final WebView owner;
+        OfflineBridge(WebView owner) { this.owner = owner; }
+        private boolean allowed() { return isOffline() && web == owner && !failed && !isFinishing() && !isDestroyed(); }
+        @JavascriptInterface public String state() {
+            return allowed() ? offline.snapshot().toString() : "{}";
+        }
+        @JavascriptInterface public void load() {
+            runOnUiThread(() -> { if (allowed() && foreground) offline.load(); });
+        }
+        @JavascriptInterface public void analyze(String requestId, String base64Jpeg) {
+            runOnUiThread(() -> { if (allowed() && foreground) offline.analyze(requestId, base64Jpeg); });
+        }
+        @JavascriptInterface public void cancel() {
+            runOnUiThread(() -> { if (allowed()) offline.cancel(); });
+        }
+        @JavascriptInterface public void importModel() {
+            runOnUiThread(() -> { if (allowed() && foreground) chooseModelFile("model"); });
+        }
     }
 }

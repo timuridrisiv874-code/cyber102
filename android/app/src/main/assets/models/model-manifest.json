@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "modelId": "SmolVLM2-2.2B-Instruct",
+  "repository": "ggml-org/SmolVLM2-2.2B-Instruct-GGUF",
+  "revision": "1bc3c9f74ceafd4c8d4411cc9cf188bba3798f91",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "asset": "models/SmolVLM2-2.2B-Instruct-Q4_K_M.gguf",
+      "name": "model.gguf",
+      "fileName": "SmolVLM2-2.2B-Instruct-Q4_K_M.gguf",
+      "role": "model",
+      "size": 1112602656,
+      "sha256": "0cf76814555b8665149075b74ab6b5c1d428ea1d3d01c1918c12012e8d7c9f58"
+    },
+    {
+      "asset": "models/mmproj-SmolVLM2-2.2B-Instruct-Q8_0.gguf",
+      "name": "projector.gguf",
+      "fileName": "mmproj-SmolVLM2-2.2B-Instruct-Q8_0.gguf",
+      "role": "projector",
+      "size": 592523200,
+      "sha256": "ae07ea1facd07dd3230c4483b63e8cda96c6944ad2481f33d531f79e892dd024"
+    }
+  ]
+}

@@ -86,6 +86,7 @@ async function run(browser, engine, state, server, android) {
   page.setDefaultTimeout(10000);
   try {
     await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
+    await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
     if (!android) {
       assert.equal(await page.locator('#check').isVisible(), false, 'No analysis action before selecting a source');
       await page.locator('#demo-options > summary').click();
@@ -96,7 +97,6 @@ async function run(browser, engine, state, server, android) {
     }
     await camera(page);
     await page.locator('#camera').click();
-    if (!android) await page.getByText('Настройки анализа', {exact:true}).click();
     await page.locator('#analysis-profile').selectOption('fast');
     await page.locator('#check').click();
     await page.locator('#inspection-preview:not([disabled])').waitFor();
@@ -131,7 +131,11 @@ async function run(browser, engine, state, server, android) {
     assert.equal(payload.confirmedVision.seal_leak, null);
     assert.deepEqual(payload.telemetrySource, { kind: 'demo_scenario', scenarioId: 'healthy' });
     await page.locator('#inspection-diagnosis-source').getByText('демонстрационная телеметрия', { exact: false }).waitFor();
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'Functional form must fit mobile width');
+    const layout = await page.evaluate(() => ({ width: innerWidth, content: document.documentElement.scrollWidth,
+      overflowing: [...document.querySelectorAll('body *')].filter(node => node.getBoundingClientRect().right + scrollX > innerWidth + 1 || node.scrollWidth > node.clientWidth + 1)
+        .slice(0, 15).map(node => ({ tag: node.tagName, id: node.id, class: node.className, right: node.getBoundingClientRect().right, scroll: node.scrollWidth, client: node.clientWidth })) }));
+    if (layout.content > layout.width) await page.screenshot({ path: '/private/tmp/cyber102-inspection-design-overflow.png', fullPage: true });
+    assert.equal(layout.content <= layout.width, true, `Functional form must fit mobile width: ${JSON.stringify(layout)}`);
     await page.locator('#inspection-save').click();
     await page.getByRole('button', { name: 'Повторить сохранение' }).waitFor();
     await page.locator('#inspection-save').click();
@@ -175,6 +179,7 @@ async function run(browser, engine, state, server, android) {
       [chromium, 'Chromium', process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}],
       [webkit, 'WebKit', {}],
     ]) {
+      if (process.env.BROWSER_ENGINE && process.env.BROWSER_ENGINE !== name) continue;
       const browser = await engine.launch(options);
       try { for (const android of [false, true]) await run(browser, name, state, server, android); }
       finally { await browser.close(); }
