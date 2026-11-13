@@ -15,16 +15,22 @@ def overlap(a, b):
     return intersection / union if union > 0 else 0
 
 
-def count_matches(predictions, boxes, iou):
-    remaining = list(boxes)
-    matched = 0
+def match_indices(predictions, boxes, iou):
+    remaining = list(enumerate(boxes))
+    matched = set()
     for prediction in sorted(predictions, key=lambda item: -item['score']):
-        scores = [overlap(prediction['xyxy'], box) for box in remaining]
-        best = max(scores, default=0)
+        if not remaining:
+            break
+        scores = [overlap(prediction['xyxy'], box) for _, box in remaining]
+        best = max(scores)
         if best >= iou:
-            remaining.pop(scores.index(best))
-            matched += 1
+            index, _ = remaining.pop(scores.index(best))
+            matched.add(index)
     return matched
+
+
+def count_matches(predictions, boxes, iou):
+    return len(match_indices(predictions, boxes, iou))
 
 
 def measurements(rows, predictions, labels, threshold, iou):
@@ -52,19 +58,27 @@ def localization_errors(rows, predictions, threshold=.25, iou=.5):
     errors = []
     for frame in rows:
         ranked = sorted(predictions[frame['file']], key=lambda item: -item['score'])
-        for expected in frame['objects']:
+        matched = set()
+        for label in {obj['class'] for obj in frame['objects']}:
+            indexed = [(index, obj['xyxy']) for index, obj in enumerate(frame['objects']) if obj['class'] == label]
+            candidates = [p for p in ranked if p['class'] == label and p['score'] >= threshold]
+            matched.update(indexed[index][0] for index in match_indices(
+                candidates, [box for _, box in indexed], iou))
+        for index, expected in enumerate(frame['objects']):
+            if index in matched:
+                continue
             matching = [(prediction, overlap(prediction['xyxy'], expected['xyxy'])) for prediction in ranked]
             aligned = [(prediction, score) for prediction, score in matching if score >= iou]
-            if any(prediction['class'] == expected['class'] and prediction['score'] >= threshold
-                   for prediction, _ in aligned):
-                continue
-            low_score = next(((prediction, score) for prediction, score in aligned
-                              if prediction['class'] == expected['class']), None)
-            candidate = low_score or next(iter(aligned), None)
+            same_class = next(((prediction, score) for prediction, score in aligned
+                               if prediction['class'] == expected['class']), None)
+            candidate = same_class or next(iter(aligned), None)
             error = {'file': frame['file'], 'scene': frame['scene'], 'expected': expected['class']}
             if candidate:
                 prediction, score = candidate
-                error.update({'reason': 'low_score' if low_score else 'wrong_class',
+                reason = 'wrong_class'
+                if same_class:
+                    reason = 'shared_box' if prediction['score'] >= threshold else 'low_score'
+                error.update({'reason': reason,
                               'predicted': prediction['class'], 'score': prediction['score'], 'iou': score})
             else:
                 error.update({'reason': 'no_overlapping_box',
