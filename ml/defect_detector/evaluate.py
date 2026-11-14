@@ -125,8 +125,22 @@ def merge_boxes(predictions, iou=.5):
     return kept
 
 
-def infer(model, images, device, size, tiles=False):
-    from PIL import Image
+def strip_tiles(width, height):
+    """Cover the long axis with overlapping windows without cropping the short axis."""
+    long_side, short_side = max(width, height), min(width, height)
+    window = 2 * short_side
+    if long_side <= window:
+        return []
+    distance = long_side - window
+    steps = (distance + short_side - 1) // short_side
+    starts = [round(index * distance / steps) for index in range(steps + 1)]
+    if width >= height:
+        return [(x, 0, x + window, height) for x in starts]
+    return [(0, y, width, y + window) for y in starts]
+
+
+def infer(model, images, device, size, tiles=False, preprocess=None, strips=False):
+    from PIL import Image, ImageOps
 
     def detect(image, offset_x=0, offset_y=0, fraction_x=1, fraction_y=1):
         result = model.predict(image, device=device, imgsz=size, conf=.01, verbose=False, max_det=100)[0]
@@ -141,17 +155,27 @@ def infer(model, images, device, size, tiles=False):
     predictions, timings = {}, {}
     for file in images:
         started = time.perf_counter()
-        predictions[file.name] = detect(file)
-        if tiles:
+        if preprocess is None:
+            predictions[file.name] = detect(file)
+        else:
             with Image.open(file) as photo:
-                photo = photo.convert('RGB')
+                predictions[file.name] = detect(preprocess(ImageOps.exif_transpose(photo)))
+        if tiles or strips:
+            with Image.open(file) as photo:
+                photo = ImageOps.exif_transpose(photo).convert('RGB')
                 width, height = photo.size
-                tile_width, tile_height = round(width * .65), round(height * .65)
-                for x in (0, width - tile_width):
-                    for y in (0, height - tile_height):
-                        tile = photo.crop((x, y, x + tile_width, y + tile_height))
-                        predictions[file.name].extend(detect(tile, x / width, y / height,
-                                                             tile_width / width, tile_height / height))
+                if strips:
+                    windows = strip_tiles(width, height)
+                else:
+                    tile_width, tile_height = round(width * .65), round(height * .65)
+                    windows = [(x, y, x + tile_width, y + tile_height)
+                               for x in (0, width - tile_width) for y in (0, height - tile_height)]
+                for x, y, right, bottom in windows:
+                    tile = photo.crop((x, y, right, bottom))
+                    if preprocess is not None:
+                        tile = preprocess(tile)
+                    predictions[file.name].extend(detect(tile, x / width, y / height,
+                                                         (right - x) / width, (bottom - y) / height))
             predictions[file.name] = merge_boxes(predictions[file.name])
         timings[file.name] = round((time.perf_counter() - started) * 1000, 3)
     return predictions, timings
@@ -165,7 +189,9 @@ def main():
     parser.add_argument('output', type=Path)
     parser.add_argument('--size', type=int, required=True)
     parser.add_argument('--device', default='0')
-    parser.add_argument('--tiles', action='store_true')
+    patches = parser.add_mutually_exclusive_group()
+    patches.add_argument('--tiles', action='store_true')
+    patches.add_argument('--strips', action='store_true', help='Include overlapping windows along a long radiograph')
     parser.add_argument('--labels', nargs='+', help='Classes exhaustively annotated in this benchmark')
     args = parser.parse_args()
     from ultralytics import YOLO, settings
@@ -175,13 +201,14 @@ def main():
     if args.labels and labels - set(args.labels):
         parser.error('--labels must include all annotated classes')
     images = [args.images / row['file'] for row in rows]
-    predictions, timings = infer(YOLO(str(args.weights.resolve(strict=True))), images, args.device, args.size, args.tiles)
+    predictions, timings = infer(YOLO(str(args.weights.resolve(strict=True))), images,
+                                 args.device, args.size, tiles=args.tiles, strips=args.strips)
     if args.labels:
         labels = set(args.labels)
     else:
         labels.update(p['class'] for items in predictions.values() for p in items)
     labels = sorted(labels)
-    report = {'weights': str(args.weights), 'size': args.size, 'tiles': args.tiles,
+    report = {'weights': str(args.weights), 'size': args.size, 'tiles': args.tiles, 'strips': args.strips,
               'median_ms': statistics.median(timings.values()), 'timings_ms': timings,
               'support_by_scene': dict(Counter(row['scene'] for row in rows)),
               'metrics': {f'{confidence:.2f}/{iou:.2f}': measurements(rows, predictions, labels, confidence, iou)
