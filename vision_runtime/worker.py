@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MODEL = 'OpenGVLab/InternVL3_5-2B-HF'
 REVISION = '3f301ffcf3dcbb47893afae6650ea3e78d96fb6d'
 MAX_IMAGE_BYTES = 3 * 1024 * 1024
-MAX_BODY = 4 * ((MAX_IMAGE_BYTES + 2) // 3) + 1024
+MAX_BODY = 4 * ((MAX_IMAGE_BYTES + 2) // 3) + 8192
 MAX_VIDEO_FRAMES = 8
 MAX_VIDEO_SECONDS = 120
 MAX_VIDEO_BODY = MAX_VIDEO_FRAMES * MAX_BODY + 4096
@@ -148,12 +148,23 @@ def parse_compact(text):
 
 def request_profile(payload):
     if (not isinstance(payload, dict) or 'image' not in payload
-            or set(payload) - {'image', 'profile'} or not isinstance(payload['image'], str)):
+            or set(payload) - {'image', 'profile', 'context'} or not isinstance(payload['image'], str)):
         raise ValueError('Expected one base64 image and an optional supported profile')
     profile = payload.get('profile', 'standard')
     if not isinstance(profile, str) or profile not in OBSERVATION_KINDS:
         raise ValueError('Unsupported inference profile')
+    if 'context' in payload and profile != 'standard':
+        raise ValueError('Unsupported inference profile with equipment context')
+    validate_context(payload)
     return profile
+
+
+def validate_context(payload):
+    if 'context' in payload:
+        from server.knowledge import MAX_CONTEXT
+        context = payload['context']
+        if not isinstance(context, str) or not 0 < len(context) <= MAX_CONTEXT:
+            raise ValueError('Invalid equipment context')
 
 
 def read_image(payload):
@@ -176,8 +187,9 @@ def read_image(payload):
 
 def video_request(payload):
     """Validate the clip envelope before decoding bounded local image bytes."""
-    if not isinstance(payload, dict) or set(payload) - {'frames', 'durationSeconds'}:
+    if not isinstance(payload, dict) or set(payload) - {'frames', 'durationSeconds', 'context'}:
         raise ValueError('Expected frames and an optional clip duration')
+    validate_context(payload)
     frames = payload.get('frames')
     if not isinstance(frames, list) or not 1 <= len(frames) <= MAX_VIDEO_FRAMES:
         raise ValueError('Expected 1 to 8 sampled frames')
@@ -251,7 +263,7 @@ class Engine:
         self.compact_prompt = self.processor.apply_chat_template(compact_conversation, tokenize=False, add_generation_prompt=True)
         self.last_metrics = None
 
-    def infer(self, image, profile='standard'):
+    def infer(self, image, profile='standard', *, context=None):
         if not isinstance(profile, str) or profile not in PROFILES:
             raise ValueError('Unsupported inference profile')
         self.last_metrics = None
@@ -259,6 +271,11 @@ class Engine:
         self.torch.cuda.synchronize()
         started = time.perf_counter()
         prompt = self.compact_prompt if profile == 'fast' else self.prompt
+        if context:
+            from server.knowledge import contextual_prompt
+            conversation = [{'role': 'system', 'content': SYSTEM_PROMPT}, {'role': 'user', 'content': [
+                {'type': 'image'}, {'type': 'text', 'text': contextual_prompt(PROMPT, context)}]}]
+            prompt = self.processor.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
         inputs = self.processor(text=prompt, images=image, return_tensors='pt',
                                 crop_to_patches=True, max_patches=PROFILES[profile]).to('cuda', dtype=self.torch.bfloat16)
         self.torch.cuda.synchronize()
@@ -291,7 +308,7 @@ class Engine:
             self.infer(image)
         return self.last_metrics
 
-    def infer_video(self, images, timestamps):
+    def infer_video(self, images, timestamps, *, context=None):
         """One multi-image context, never a disguised loop of photo requests."""
         if not 1 <= len(images) <= MAX_VIDEO_FRAMES or len(images) != len(timestamps):
             raise ValueError('Invalid sampled frame count')
@@ -305,7 +322,8 @@ class Engine:
             f'The ONLY allowed frameIndex values, in order, are {list(range(len(images)))}. '
             'The time values are seconds, NOT frame indices or a count of images. '
             'Never create observations for unsupplied frames or intermediate seconds.')
-        content.append({'type': 'text', 'text': VIDEO_PROMPT + frame_contract})
+        from server.knowledge import contextual_prompt
+        content.append({'type': 'text', 'text': contextual_prompt(VIDEO_PROMPT + frame_contract, context)})
         prompt = self.processor.apply_chat_template([{'role': 'system', 'content': SYSTEM_PROMPT},
                                                      {'role': 'user', 'content': content}],
                                                      tokenize=False, add_generation_prompt=True)
@@ -404,7 +422,8 @@ class Handler(BaseHTTPRequestHandler):
                 with ExitStack() as stack:
                     images = [stack.enter_context(read_image({'image': frame['image']})) for frame in frames]
                     try:
-                        result = self.server.engine.infer_video(images, timestamps)
+                        options = {'context': payload['context']} if 'context' in payload else {}
+                        result = self.server.engine.infer_video(images, timestamps, **options)
                     except (ValueError, KeyError, TypeError):
                         status = 502
                         response = {'error': 'Model did not return valid observations for every frame'}
@@ -426,7 +445,8 @@ class Handler(BaseHTTPRequestHandler):
                                 raise ValueError('Liquid localization is unavailable for this model')
                             result = {'liquidBoxes': find_liquid(image)}
                         else:
-                            result = {'observation': self.server.engine.infer(image, profile=profile)}
+                            options = {'context': payload['context']} if 'context' in payload else {}
+                            result = {'observation': self.server.engine.infer(image, profile=profile, **options)}
                 except (ValueError, KeyError, TypeError):
                     status = 502
                     response = {'error': 'Model did not return a valid observation'}

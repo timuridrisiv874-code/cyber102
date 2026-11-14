@@ -65,6 +65,10 @@
         inspect.setAttribute('aria-label', `${action} ${item.serial}`);
         card.append(inspect);
       }
+      const knowledge = node('button', 'Поиск по оборудованию', 'button secondary');
+      knowledge.type = 'button';
+      knowledge.onclick = () => selectKnowledge(item.serial);
+      card.append(knowledge);
       $('equipment-grid').append(card);
     }
     if (!equipment.length) $('equipment-grid').append(node('p', 'Проверенные паспортные данные пока не добавлены.'));
@@ -114,6 +118,118 @@
   window.addEventListener('pageshow', () => { if (!loaded && !controller) initialize(); });
   $('document-search').addEventListener('input', renderDocuments);
   $('equipment-kind').addEventListener('change', () => renderEquipment(currentPassports));
+  function external(source) {
+    const link = node('a', source.title || 'Источник', 'source-link');
+    if (!/^https:\/\/(?:knz\.ru|am-systems\.ru)\//.test(source.url)) return node('span', link.textContent);
+    link.href = source.url; link.target = '_blank'; link.rel = 'noopener';
+    return link;
+  }
+
+  let knowledgeRequest;
+  async function searchKnowledge() {
+    knowledgeRequest?.abort();
+    const request = new AbortController();
+    knowledgeRequest = request;
+    const selected = $('knowledge-target').value;
+    if (!selected) return;
+    const component = $('knowledge-component');
+    const params = new URLSearchParams({q: $('knowledge-query').value.trim()});
+    if (selected.startsWith('serial:')) {
+      params.set('serial', selected.slice(7));
+      if (component.value) params.set('component', component.value);
+    } else params.set('model', selected.slice(6));
+    const results = $('knowledge-results');
+    results.replaceChildren(node('p', 'Поиск в документации…'));
+    try {
+      const response = await fetch('/api/equipment/knowledge?' + params, {signal: request.signal, cache: 'no-store'});
+      if (!response.ok) throw new Error();
+      const data = await response.json();
+      if (request.signal.aborted) return;
+      const value = component.value;
+      component.replaceChildren(new Option('Основной', ''), ...(data.availableComponents || []).map(item => new Option(item.label, item.key)));
+      component.value = [...component.options].some(option => option.value === value) ? value : '';
+      component.disabled = !data.availableComponents?.length;
+      results.replaceChildren();
+      if (data.relatedEquipment?.length) {
+        const line = node('div', null, 'document-item');
+        line.append(node('h3', 'Компоненты паспортной группы'));
+        for (const item of data.relatedEquipment) {
+          const button = node('button', item.model + ' · ' + item.serial, 'button secondary');
+          button.type = 'button';
+          button.onclick = () => selectKnowledge(item.serial);
+          line.append(button);
+        }
+        results.append(line);
+      }
+      if (data.telemetry) {
+        const link = node('a', data.equipment.kind === 'pump' ? 'Открыть насос и эмулятор' : 'Открыть архив показаний', 'source-link');
+        link.href = data.equipment.kind === 'pump' ? '/index.html?' + new URLSearchParams({serial: data.equipment.serial}) : data.telemetry.url;
+        results.append(link, node('p', data.telemetry.message, 'workspace-note'));
+      }
+      if (!data.matches.length) results.append(node('p', 'По этой теме в документации выбранного оборудования совпадений нет.'));
+      for (const item of data.matches) {
+        const card = node('article', null, 'document-item');
+        card.append(node('h3', item.title), node('p', item.text));
+        card.append(item.source.documentId
+          ? sourceLink(item.source.documentId, item.source.page, item.source.title + ' · стр. ' + item.source.page)
+          : external(item.source));
+        results.append(card);
+      }
+    } catch (error) {
+      if (!request.signal.aborted) results.replaceChildren(node('p', 'Не удалось загрузить справку. Повторите поиск.'));
+    }
+  }
+  function selectKnowledge(serial) {
+    $('knowledge-target').value = 'serial:' + serial;
+    $('knowledge-component').value = '';
+    $('knowledge-panel').scrollIntoView();
+    searchKnowledge();
+  }
+  $('knowledge-form').addEventListener('submit', event => { event.preventDefault(); searchKnowledge(); });
+  $('knowledge-target').addEventListener('change', () => { $('knowledge-component').value = ''; searchKnowledge(); });
+  $('knowledge-component').addEventListener('change', searchKnowledge);
+
+  function renderKnowledge(catalog, passports) {
+    $('knowledge-target').replaceChildren(...(passports?.equipment || []).map(item =>
+      new Option(item.title + ' · ' + item.serial, 'serial:' + item.serial)));
+    const models = $('manufacturer-models');
+    models.replaceChildren();
+    for (const row of catalog?.models || []) {
+      $('knowledge-target').append(new Option(row.model + ' · каталог', 'model:' + row.id));
+      const card = node('article', null, 'workspace-card');
+      card.append(node('h3', row.model), node('p', row.typeLabel), node('p', row.manufacturer));
+      const facts = node('dl', null, 'workspace-facts');
+      for (const [label, value] of Object.entries(row.fields)) facts.append(node('dt', label), node('dd', value));
+      if (row.photo) {
+        const photo = node('img', null, 'pump-reference-photo');
+        photo.src = row.photo.image; photo.alt = row.photo.title; photo.loading = 'lazy';
+        card.append(photo, node('p', row.photo.title, 'workspace-note'));
+      }
+      card.append(facts, external(row.source), external(row.manual));
+      models.append(card);
+    }
+    $('pump-gallery')?.remove();
+    if (catalog?.photos?.length) {
+      const gallery = node('details', null, 'workspace-card');
+      gallery.id = 'pump-gallery';
+      gallery.append(node('summary', 'Фотографии серии AMS PCP'),
+                     node('p', 'Исполнение и серийные номера на фотографиях не подтверждены.', 'workspace-note'));
+      for (const photo of catalog.photos) {
+        const illustration = node('img', null, 'pump-reference-photo');
+        illustration.src = photo.image; illustration.alt = photo.title; illustration.loading = 'lazy';
+        const figure = node('figure', null, 'pump-photo-figure');
+        const caption = node('figcaption');
+        caption.append(external(photo));
+        if (photo.originalUrl) caption.append(external({title: 'Оригинал фото', url: photo.originalUrl}));
+        figure.append(illustration, caption);
+        gallery.append(figure);
+      }
+      gallery.open = true;
+      $('equipment-grid').before(gallery);
+    }
+    $('knowledge-panel').hidden = !$('knowledge-target').options.length;
+  }
+
   function initialize() {
     const active = new AbortController(); controller = active;
     const current = ++generation;
@@ -126,12 +242,12 @@
     $('document-list').replaceChildren();
     $('documents-status').textContent = 'Загружаем документы…';
     $('documents-status').dataset.error = 'false';
-    Promise.allSettled(['/api/customer/documents', '/api/customer/equipment-passports'].map(async url => {
+    Promise.allSettled(['/api/customer/documents', '/api/customer/equipment-passports', '/api/equipment/models'].map(async url => {
     const response = await fetch(url, {signal: active.signal, cache: 'no-store'});
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Документы недоступны.');
     return data;
-  })).then(([catalogResult, passportsResult]) => {
+  })).then(([catalogResult, passportsResult, knowledgeResult]) => {
     if (current !== generation) return;
     const catalog = catalogResult.status === 'fulfilled' && Array.isArray(catalogResult.value?.documents) ? catalogResult.value : null;
     const passports = passportsResult.status === 'fulfilled' && Array.isArray(passportsResult.value?.equipment) ? passportsResult.value : null;
@@ -149,6 +265,7 @@
       $('equipment-grid').replaceChildren(node('p', 'Паспортные данные не загрузились.'));
       $('passport-limitations').replaceChildren(); $('requirements-panel').hidden = true;
     }
+    renderKnowledge(knowledgeResult.status === 'fulfilled' ? knowledgeResult.value : null, passports);
     $('equipment-kind').disabled = !passports;
     renderDocuments();
     $('document-count').textContent = catalogReady ? `${documents.length} PDF` : 'Недоступно';

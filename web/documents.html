@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="checkpoint.css">
   <link rel="stylesheet" href="workspace.css?v=field-20261114">
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
-  <script src="documents.js?v=motor-resource-1" defer></script>
+  <script src="documents.js?v=knowledge-1" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
 </head>
 <body data-page="equipment">
@@ -29,6 +29,19 @@
 
         <div class="field equipment-filter"><label for="equipment-kind">Тип оборудования</label><select id="equipment-kind"><option value="pump">Насосы</option><option value="all">Все компоненты</option></select></div>
         <div id="equipment-grid" class="workspace-grid"></div><details class="workspace-details"><summary>О данных</summary><p class="workspace-note">Сверьте серийный номер с табличкой. Примеры измерений не привязаны к этим агрегатам.</p><div id="passport-limitations" class="workspace-note"></div></details>
+      </div>
+    </section>
+    <section class="panel" id="knowledge-panel" aria-labelledby="knowledge-title" hidden>
+      <div class="panel-heading"><h2 id="knowledge-title">База знаний оборудования</h2></div>
+      <div class="section-body">
+        <form id="knowledge-form">
+          <div class="field"><label for="knowledge-target">Агрегат или модель</label><select id="knowledge-target" required></select></div>
+          <div class="field"><label for="knowledge-component">Узел</label><select id="knowledge-component" disabled><option value="">Основной</option></select></div>
+          <div class="field"><label for="knowledge-query">Тема</label><input id="knowledge-query" type="search" maxlength="160" placeholder="Например, давление на входе"></div>
+          <button type="submit" class="button secondary">Найти в документации</button>
+        </form>
+        <div id="knowledge-results" class="document-list" aria-live="polite"></div>
+        <div id="manufacturer-models" class="workspace-grid"></div>
       </div>
     </section>
     <section class="panel" aria-labelledby="library-title">

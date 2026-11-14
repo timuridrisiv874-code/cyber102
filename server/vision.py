@@ -94,16 +94,20 @@ def extract_request(content_type, body, *, include_metadata=False):
         raise ValueError('Передайте ровно одно изображение в поле file.')
     profiles = [part for part in parts if part.get_param('name', header='content-disposition') == 'profile']
     names = [part.get_param('name', header='content-disposition') for part in parts]
-    if len(names) != len(set(names)) or set(names) - {'file', 'profile', 'captureSource', 'videoTimeSeconds'}:
+    if len(names) != len(set(names)) or set(names) - {'file', 'profile', 'captureSource', 'videoTimeSeconds', 'equipmentSerial'}:
         raise ValueError('Недопустимые или повторные поля загрузки.')
     metadata = {'captureSource': 'camera', 'declaredBy': 'client'}
     for part in parts:
         name = part.get_param('name', header='content-disposition')
-        if name not in ('captureSource', 'videoTimeSeconds'):
+        if name not in ('captureSource', 'videoTimeSeconds', 'equipmentSerial'):
             continue
         try:
-            value = part.get_payload(decode=True).decode('ascii')
-            if name == 'captureSource':
+            value = part.get_payload(decode=True).decode('utf-8')
+            if name == 'equipmentSerial':
+                if not value or len(value) > 100 or value != value.strip() or not value.isprintable():
+                    raise ValueError('Некорректный серийный номер.')
+                metadata[name] = value
+            elif name == 'captureSource':
                 if value not in ('camera', 'uploaded_photo', 'uploaded_video'):
                     raise ValueError('Неизвестный источник кадра.')
                 metadata[name] = value
@@ -229,10 +233,11 @@ def request_json(endpoint, payload, timeout):
     return envelope
 
 
-def ollama_observation(encoded_image):
+def ollama_observation(encoded_image, context=None):
+    from .knowledge import contextual_prompt
     payload = {'model': MODEL, 'stream': False, 'think': False, 'format': SCHEMA,
                'keep_alive': '5m', 'options': {'temperature': 0, 'num_predict': 400, 'num_ctx': 4096},
-               'messages': [{'role': 'user', 'content': PROMPT, 'images': [encoded_image]}]}
+               'messages': [{'role': 'user', 'content': contextual_prompt(PROMPT, context), 'images': [encoded_image]}]}
     message = request_json(ENDPOINT, payload, timeout=110)['message']
     if not isinstance(message, dict):
         raise ValueError('Invalid Ollama message')
@@ -241,7 +246,7 @@ def ollama_observation(encoded_image):
     return json.loads(message.get('content') or message.get('thinking', ''))
 
 
-def analyze(image, backend='ollama', profile='standard'):
+def analyze(image, backend='ollama', profile='standard', *, context=None):
     if backend not in BACKENDS:
         raise ValueError('Unknown local vision backend')
     if profile not in supported_profiles(backend):
@@ -259,6 +264,8 @@ def analyze(image, backend='ollama', profile='standard'):
             payload = {'image': encoded_image}
             if profile != 'standard':
                 payload['profile'] = profile
+            if context:
+                payload['context'] = context
             try:
                 envelope = request_json(INTERNVL_ENDPOINT, payload, timeout=100)
             except HTTPError as error:
@@ -300,7 +307,8 @@ def analyze(image, backend='ollama', profile='standard'):
                     raise ValueError('Invalid model timings')
                 result['metrics'] = {name: metrics[name] for name in names}
         else:
-            result = result_from_observation(ollama_observation(encoded_image))
+            options = {'context': context} if context else {}
+            result = result_from_observation(ollama_observation(encoded_image, **options))
         result['durationSeconds'] = round(time.monotonic() - started, 3)
         return result
     except (OSError, HTTPException) as error:

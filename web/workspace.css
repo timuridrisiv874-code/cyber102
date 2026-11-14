@@ -294,3 +294,12 @@ body[data-inspection-layout=capture] #result { display: none; }
 #closeup-measures { margin-top: 8px; }
 #closeup-length { margin-inline-start: 4px; font-variant-numeric: tabular-nums; }
 #closeup-open { margin-top: 12px; }
+
+.pump-reference-photo { display: block; width: min(100%, 480px); height: auto; margin: 12px 0 4px; border-radius: 12px; }
+#pump-gallery { margin: 12px 0; }
+#knowledge-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+#knowledge-results, #manufacturer-models { margin-top: 16px; }
+#manufacturer-models a { display: block; }
+
+.pump-photo-figure { display: inline-block; vertical-align: top; width: min(100%, 480px); margin: 0 16px 8px 0; }
+.pump-photo-figure figcaption { display: flex; flex-wrap: wrap; gap: 6px 16px; }
