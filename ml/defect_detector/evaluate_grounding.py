@@ -6,7 +6,7 @@ from pathlib import Path
 import statistics
 import time
 
-from evaluate import measurements, merge_boxes
+from evaluate import class_negative_frames, measurements, merge_boxes, scene_coverage
 
 
 PHRASES = {
@@ -15,11 +15,15 @@ PHRASES = {
     'terminal_damage': ('damaged electrical terminal', 'burned wire connector'),
     'wet_patch': ('leaking liquid', 'wet patch'),
 }
+INSULATION_PHRASES = {
+    'insulation_hole': ('hole in pipe insulation jacket', 'puncture in metal cladding'),
+    'insulation_open': ('open pipe insulation jacket', 'exposed insulation on pipe elbow'),
+}
 
 
-def query(tokenizer):
+def query(tokenizer, phrases=PHRASES):
     text, spans = '', []
-    for label, candidates in PHRASES.items():
+    for label, candidates in phrases.items():
         for candidate in candidates:
             spans.append((label, len(text), len(text) + len(candidate)))
             text += candidate + '. '
@@ -54,8 +58,9 @@ def main():
     parser.add_argument('output', type=Path)
     parser.add_argument('--device', default='cpu')
     parser.add_argument('--threads', type=int, default=4)
+    parser.add_argument('--target', choices=('inspection', 'pipe-insulation'), default='inspection')
     args = parser.parse_args()
-    from PIL import Image
+    from PIL import Image, ImageOps
     import torch
     from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor
 
@@ -63,7 +68,8 @@ def main():
     processor = AutoProcessor.from_pretrained(args.model, local_files_only=True)
     model = AutoModelForZeroShotObjectDetection.from_pretrained(
         args.model, local_files_only=True, use_safetensors=True).to(args.device).eval()
-    text, positions = query(processor.tokenizer)
+    phrases = INSULATION_PHRASES if args.target == 'pipe-insulation' else PHRASES
+    text, positions = query(processor.tokenizer, phrases)
     predict(model, processor, Image.new('RGB', (420, 420)), text, positions, args.device, .05)
 
     timings, predictions = {}, {}
@@ -71,17 +77,21 @@ def main():
     for row in rows:
         name = row['file']
         with Image.open(args.images / name) as source:
-            frame = source.convert('RGB')
+            frame = ImageOps.exif_transpose(source).convert('RGB')
         start = time.perf_counter()
         predictions[name] = predict(model, processor, frame, text, positions, args.device, .05)
         timings[name] = round((time.perf_counter() - start) * 1000, 2)
         print(f"{name} {timings[name]} ms, {len(predictions[name])} boxes", flush=True)
-    report = {'weights': str(args.model), 'phrases': PHRASES, 'device': args.device,
+    report = {'weights': str(args.model), 'phrases': phrases, 'device': args.device,
               'median_ms': statistics.median(timings.values()), 'timings_ms': timings,
               'support_by_scene': dict(Counter(row['scene'] for row in rows)),
-              'metrics': {f'{confidence:.2f}/{iou:.2f}': measurements(rows, predictions, sorted(PHRASES), confidence, iou)
+              'metrics': {f'{confidence:.2f}/{iou:.2f}': measurements(rows, predictions, sorted(phrases), confidence, iou)
                           for confidence in (.05, .10, .15, .25, .40) for iou in (.30, .50)},
+              'class_negative_frames_at_0.25': class_negative_frames(rows, predictions, sorted(phrases), .25),
               'predictions': predictions}
+    if all('site' in row for row in rows):
+        site_rows = [dict(row, scene=row['site']) for row in rows]
+        report['site_coverage_at_0.25/0.50'] = scene_coverage(site_rows, predictions, sorted(phrases), .25, .50)
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
 
 

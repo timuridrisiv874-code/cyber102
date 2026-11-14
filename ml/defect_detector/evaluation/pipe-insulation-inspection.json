@@ -1,0 +1,232 @@
+[
+  {
+    "file": "outlook-fig-01.jpg",
+    "site": "outlook-refinery",
+    "scene": "sound-jacketing-banded",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_01.jpg",
+    "sha256": "d236bd43a227b5371fb64607be4b2d47e0afa937162eafccf8ebdc906c896503",
+    "objects": [],
+    "note": "Banded intact jackets and removable blanket."
+  },
+  {
+    "file": "outlook-fig-02.jpg",
+    "site": "outlook-refinery",
+    "scene": "sound-flange-clearance",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_02.jpg",
+    "sha256": "feecf56510b559987d7371b17b9f2c7a6f23de440d0b90cc51b97b63c3692ea6",
+    "objects": [],
+    "note": "Exposed flange clearance is intentional and the removable jacket is intact."
+  },
+  {
+    "file": "outlook-fig-04.jpg",
+    "site": "outlook-refinery",
+    "scene": "sound-jacketing-wide",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_04.jpg",
+    "sha256": "5e3a218d80755a1039d859e1a71f02880f0346484500bec88da579564600e92a",
+    "objects": [],
+    "note": "Wide view of intact pipe and vessel jackets."
+  },
+  {
+    "file": "outlook-fig-06.jpg",
+    "site": "outlook-refinery",
+    "scene": "elbow-displaced",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_06.jpg",
+    "sha256": "62b01f3419307e49baa95cd25666942e8cecfba4fdcdf1cff8094d303be77059",
+    "objects": [
+      {
+        "class": "insulation_open",
+        "xyxy": [
+          0.355,
+          0.07,
+          0.755,
+          0.685
+        ]
+      }
+    ],
+    "note": "Displaced elbow jacketing exposes an extended section of lagging."
+  },
+  {
+    "file": "outlook-fig-07.jpg",
+    "site": "outlook-refinery",
+    "scene": "elbow-missing-section",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_07.jpg",
+    "sha256": "471743df0937be30223a0addf24a4f6d93744cabf5b5139e4d5841d7f9f21907",
+    "objects": [
+      {
+        "class": "insulation_open",
+        "xyxy": [
+          0.53,
+          0.15,
+          0.86,
+          0.441
+        ]
+      }
+    ],
+    "note": "Deteriorated insulation with a missing section on the elbow."
+  },
+  {
+    "file": "outlook-fig-08.jpg",
+    "site": "outlook-refinery",
+    "scene": "support-clearance",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_08.jpg",
+    "sha256": "8fc349aef55398da3a68d83acb65eab2eff240e3b4f4a9709ea4b18cb266cc57",
+    "objects": [],
+    "note": "Jacket terminates at the pipe support. Design leaves a water ingress route; this is not a puncture or displaced jacket."
+  },
+  {
+    "file": "outlook-fig-09.jpg",
+    "site": "outlook-refinery",
+    "scene": "corroded-covering",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_09.jpg",
+    "sha256": "01ba30d1abf009107c708d8d08252351518c104c5d3c15061b5d1c46f8fc2631",
+    "objects": [],
+    "note": "The jacket is corroded, with no clearly visible hole or displaced section."
+  },
+  {
+    "file": "outlook-fig-10.jpg",
+    "site": "outlook-refinery",
+    "scene": "temporary-wrap",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_10.jpg",
+    "sha256": "5f28e966805e80100380a082a2ec1f9083c2c3257fab28618113476aaa3c283c",
+    "objects": [],
+    "note": "Temporary wrap is a different construction. The photo does not establish a breach in a pipe jacket."
+  },
+  {
+    "file": "outlook-fig-11.jpg",
+    "site": "outlook-refinery",
+    "scene": "dented-elbow",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_11.jpg",
+    "sha256": "e888aafce046bb03cfbe1b0d723f896e9826f2adacc4eaa4c8bebed9fd412e0b",
+    "objects": [],
+    "note": "Large dents are visible without a clearly exposed insulation layer in this view."
+  },
+  {
+    "file": "outlook-fig-12.jpg",
+    "site": "outlook-refinery",
+    "scene": "sound-elbows",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_12.jpg",
+    "sha256": "b6a4754e3ffcbdc9278a09d96dbc51564fdc749acb27361b214930eab25f2b6d",
+    "objects": [],
+    "note": "Intact insulated run containing several fittings and banded seams."
+  },
+  {
+    "file": "outlook-fig-13.jpg",
+    "site": "outlook-refinery",
+    "scene": "sound-elbow",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_13.jpg",
+    "sha256": "dc39265fe4d272aa22a86a9e0edc7cabb9c2c57602ccabf583bbe97c31200f31",
+    "objects": [],
+    "note": "Intact banded elbow with a textured metal finish."
+  },
+  {
+    "file": "outlook-fig-15.jpg",
+    "site": "outlook-refinery",
+    "scene": "jacket-gouge",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "asset": "https://insulation.org/io/wp-content/uploads/sites/3/2016/10/IO140802_15.jpg",
+    "sha256": "2e1b1bbfb8057ce6b66e867dc7a69a7e96780c0b9e38eb67d499b4ab1927a349",
+    "objects": [
+      {
+        "class": "insulation_hole",
+        "xyxy": [
+          0.29,
+          0.34,
+          0.781,
+          0.609
+        ]
+      }
+    ],
+    "note": "Bounded gouge in the jacket exposes the material beneath."
+  },
+  {
+    "file": "chilled-water-photo-09.jpg",
+    "site": "construction-specifier-chilled-water",
+    "scene": "chilled-water-breach",
+    "source": "https://www.constructionspecifier.com/construction-related-failures-in-plumbing-pipe/photo-9-mechanically-damaged-insulation-on-chilled-water-pipe/",
+    "asset": null,
+    "sha256": "a5f51cc8f99b81c86d9db183321ef2cafe1c413c662debd49877514294f45982",
+    "objects": [
+      {
+        "class": "insulation_hole",
+        "xyxy": [
+          0.267,
+          0.242,
+          0.728,
+          0.741
+        ]
+      }
+    ],
+    "note": "Reference photo present in the organizer materials. Locally torn jacket exposes yellow insulation."
+  },
+  {
+    "file": "maintain-03.jpg",
+    "site": "maintenance-fig03",
+    "scene": "wide-chilled-water",
+    "source": "https://insulation.org/io/articles/maintain-insulation-jacketing-to-ensure-mechanical-insulation-performance/",
+    "asset": "https://insulation.org/wp-content/uploads/2017/06/IO080701_03.jpg",
+    "sha256": "4baf7f39ef924fdaa7f779c131b90fce94ab84113040d3f3fc502e4a5e124fc6",
+    "objects": [],
+    "note": "Intact jacketing with broad overlap seams."
+  },
+  {
+    "file": "maintain-07.jpg",
+    "site": "maintenance-fig07",
+    "scene": "glossy-pvc-jackets",
+    "source": "https://insulation.org/io/articles/maintain-insulation-jacketing-to-ensure-mechanical-insulation-performance/",
+    "asset": "https://insulation.org/wp-content/uploads/2017/06/IO080701_07.jpg",
+    "sha256": "64f755a265c18fe66e61ac8711533d1df2dbd91416b072700c159ac83c6b1b7d",
+    "objects": [],
+    "note": "Intact bright PVC jackets with reflections and intersecting pipe runs."
+  },
+  {
+    "file": "maintain-09.jpg",
+    "site": "maintenance-fig09",
+    "scene": "roof-insulated-pipe",
+    "source": "https://insulation.org/io/articles/maintain-insulation-jacketing-to-ensure-mechanical-insulation-performance/",
+    "asset": "https://insulation.org/wp-content/uploads/2017/06/IO080701_09.jpg",
+    "sha256": "2dbea043605bc303912976fc51c7af65863498ec756a661946d70ec59274a5ae",
+    "objects": [],
+    "note": "Banded seams on outdoor jackets with capped fittings."
+  },
+  {
+    "file": "maintain-11.jpg",
+    "site": "maintenance-fig11",
+    "scene": "pulled-back-jacket",
+    "source": "https://insulation.org/io/articles/maintain-insulation-jacketing-to-ensure-mechanical-insulation-performance/",
+    "asset": "https://insulation.org/wp-content/uploads/2017/06/IO080701_11.jpg",
+    "sha256": "129f1df8620fbde9aad99a364d6b15f0717bd059fae6e2a59eb298d7487283a7",
+    "objects": [
+      {
+        "class": "insulation_open",
+        "xyxy": [
+          0.736,
+          0.313,
+          0.948,
+          0.72
+        ]
+      }
+    ],
+    "note": "Right-hand pipe shows an obviously torn and displaced jacket section. The newly jacketed left pipe is a contrast within the same frame."
+  },
+  {
+    "file": "brown-11.jpg",
+    "site": "brown-campus-tunnel",
+    "scene": "after-insulation-replacement",
+    "source": "https://insulation.org/io/articles/case-study-replacement-of-district-energy-chilled-water-and-high-temperature-hot-water-distribution-line-insulation/",
+    "asset": "https://insulation.org/wp-content/uploads/2017/06/IO101203_11.jpg",
+    "sha256": "49c10b8f3b57824d764b817f98c3cdf14337c69e699e22ff96956312b29c78e8",
+    "objects": [],
+    "note": "Replacement jacketing in a confined, poorly lit tunnel."
+  }
+]
