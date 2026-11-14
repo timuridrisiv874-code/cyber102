@@ -92,6 +92,7 @@ def main():
     labels = tuple(label for label in LABELS if label in original.get('labels', LABELS))
     if not labels:
         raise ValueError('No supported classes in the recorded proposal run')
+    tracked = original.get('mode') == 'tracked-candidates'
     sys.path.insert(0, str(args.repo.resolve(strict=True)))
     from PIL import Image, ImageOps
     from vision_runtime.qwen_worker import Engine, VIDEO_MAX_PIXELS
@@ -122,15 +123,17 @@ def main():
             decisions = verify_frame(engine, frame, boxes, _parse_json, VIDEO_MAX_PIXELS)
         except (ValueError, TypeError) as error:
             errors[name] = str(error)
-            # An invalid verification must not silently discard or confirm any proposal.
-            decisions = [True] * len(boxes)
+            # Direct detections remain available. Inferred positions need an affirmative result.
+            decisions = [not tracked] * len(boxes)
         finally:
             frame.close()
         timing[name] = round((time.perf_counter() - started) * 1000, 3)
         checked[name] = [box for box, accepted in zip(boxes, decisions, strict=True) if accepted]
         verdicts[name] = None if name in errors else decisions
         print(f'{name}: {len(checked[name])}/{len(boxes)} proposals, {timing[name]:.0f} ms', flush=True)
-    if 'timings_ms' in original:
+    if tracked:
+        baseline_times = None
+    elif 'timings_ms' in original:
         baseline_times = original['timings_ms']
     else:
         baseline_times = {name: sum(ms for phase, ms in record['timingsMs'].items() if phase != 'overview')
@@ -143,7 +146,10 @@ def main():
               'proposalMode': original.get('mode', 'component-transfer-proposals'), 'labels': labels,
               **metrics,
               'medianExtraMs': statistics.median(timing.values()),
-              'medianTotalMs': statistics.median(baseline_times[name] + extra for name, extra in timing.items()),
+              'medianActiveExtraMs': statistics.median(timing[name] for name, boxes in proposals.items() if boxes)
+              if any(proposals.values()) else None,
+              'medianTotalMs': statistics.median(baseline_times[name] + extra for name, extra in timing.items())
+              if baseline_times is not None else None,
               'verificationMs': timing, 'verificationErrors': errors, 'verificationDecisions': verdicts,
               'predictions': checked}
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
