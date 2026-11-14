@@ -146,7 +146,7 @@
     const findingsHelp = panel.querySelector('.mesh-findings-help');
     const markButton = panel.querySelector('#mesh-mark-mode');
     const initialView = { yaw: 0, pitch: 0,
-      zoom: window.matchMedia('(max-width: 640px)').matches ? 1.2 : 1 };
+      zoom: window.matchMedia('(max-width: 640px)').matches ? .9 : 1 };
     const view = { ...initialView };
     let render, drag, meta, buffer, currentFile, sourceUrl, busy = false, marking = false;
     const marks = [];
