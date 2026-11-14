@@ -142,6 +142,8 @@
     const findings = panel.querySelector('.mesh-findings');
     const findingList = panel.querySelector('.mesh-findings-list');
     const sourceVideo = panel.querySelector('.mesh-source-video');
+    const sourceDetails = panel.querySelector('.mesh-source');
+    const findingsHelp = panel.querySelector('.mesh-findings-help');
     const markButton = panel.querySelector('#mesh-mark-mode');
     const initialView = { yaw: 0, pitch: 0,
       zoom: window.matchMedia('(max-width: 640px)').matches ? 1.2 : 1 };
@@ -177,6 +179,20 @@
           const label = document.createElement('span');
           label.textContent = mark.label;
           row.append(label);
+          if (mark.auto) {
+            const evidence = document.createElement('button');
+            evidence.type = 'button';
+            evidence.textContent = `Кадр ${mark.time.toFixed(2)} с`;
+            evidence.setAttribute('aria-label', `Открыть исходное видео на ${mark.time.toFixed(2)} секунде`);
+            evidence.addEventListener('click', () => {
+              sourceDetails.open = true;
+              const seek = () => { sourceVideo.currentTime = mark.time; };
+              if (sourceVideo.readyState >= 1) seek();
+              else sourceVideo.addEventListener('loadedmetadata', seek, { once: true });
+              sourceDetails.scrollIntoView({ block: 'nearest' });
+            });
+            row.append(evidence);
+          }
           const remove = document.createElement('button');
           remove.type = 'button';
           remove.textContent = 'Убрать';
@@ -224,13 +240,13 @@
         findingList.append(row);
       }
     }
-    function addMark(point) {
+    function addMark(point, label = '', time = null) {
       if (!point || marks.length >= 8) return;
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'mesh-marker';
       markerLayer.append(button);
-      const mark = { point, label: '', button };
+      const mark = { point, label, time, auto: Boolean(label) && Number.isFinite(time), button };
       marks.push(mark);
       button.addEventListener('click', () => findingList.children[marks.indexOf(mark)]?.scrollIntoView({ block: 'nearest' }));
       marking = false;
@@ -258,8 +274,8 @@
 
     toolbar.addEventListener('click', event => {
       const action = event.target.closest('button')?.dataset.action;
-      if (action === 'left') view.yaw -= .3;
-      if (action === 'right') view.yaw += .3;
+      if (action === 'left') view.yaw += .3;
+      if (action === 'right') view.yaw -= .3;
       if (action === 'zoom-in') view.zoom = Math.min(2, view.zoom + .2);
       if (action === 'zoom-out') view.zoom = Math.max(.75, view.zoom - .2);
       if (action === 'reset') Object.assign(view, initialView);
@@ -275,7 +291,7 @@
       if (drag?.id !== event.pointerId) return;
       if (Math.abs(event.clientX - drag.startX) + Math.abs(event.clientY - drag.startY) > 4) drag.moved = true;
       if (marking) return;
-      view.yaw += (event.clientX - drag.x) * .009;
+      view.yaw -= (event.clientX - drag.x) * .009;
       view.pitch = Math.max(-1.15, Math.min(1.15, view.pitch + (event.clientY - drag.y) * .009));
       drag.x = event.clientX;
       drag.y = event.clientY;
@@ -344,6 +360,17 @@
         if (sourceUrl) URL.revokeObjectURL(sourceUrl);
         sourceUrl = URL.createObjectURL(file);
         sourceVideo.src = sourceUrl;
+        const suggestions = Array.isArray(job.autoMarks) ? job.autoMarks.slice(0, 5) : [];
+        for (const item of suggestions) {
+          if (!item || !Array.isArray(item.point) || item.point.length !== 3 ||
+              item.point.some(value => !Number.isFinite(value) || Math.abs(value) > 3) ||
+              typeof item.label !== 'string' || item.label.length > 100 ||
+              !Number.isFinite(item.time) || item.time < 0 || item.time > 30) continue;
+          addMark(item.point, item.label, item.time);
+        }
+        findingsHelp.textContent = marks.length
+          ? 'Метки предложены моделью. Сверьте их с исходным кадром.'
+          : 'Модель не подтвердила точных повреждений. При необходимости добавьте точку вручную.';
         Object.assign(view, initialView);
         activate();
       } catch (error) {

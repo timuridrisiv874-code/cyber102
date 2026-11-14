@@ -16,6 +16,11 @@ from urllib.parse import urlsplit
 import numpy as np
 import trimesh
 
+if __package__:
+    from . import mesh_annotations
+else:
+    import mesh_annotations
+
 UPLOAD_LIMIT = 40 * 1024 * 1024
 RETENTION = 7200
 ROUTE = '/api/mesh-jobs'
@@ -46,7 +51,7 @@ def run(command, log, timeout, *, env=None):
         raise ValueError('Не удалось обработать видео. Проверьте файл и ракурсы съёмки.')
 
 
-def export_mesh(work, ffmpeg):
+def export_mesh(work, ffmpeg, detections=()):
     result = work / 'publish'
     obj = result / 'texturedMesh.obj'
     mtl = result / 'texturedMesh.mtl'
@@ -74,11 +79,13 @@ def export_mesh(work, ffmpeg):
     mesh = trimesh.util.concatenate(parts)
     if len(mesh.faces) < 100 or len(mesh.faces) > 1_000_000:
         raise ValueError('Модель не подходит для просмотра. Попробуйте короче снять один объект.')
-    xyz = np.asarray(mesh.vertices, dtype=np.float32)
+    raw_xyz = np.asarray(mesh.vertices, dtype=np.float32)
+    xyz = raw_xyz.copy()
     center = np.median(xyz, axis=0)
     radius = np.quantile(np.linalg.norm(xyz - center, axis=1), .95)
     # Frame the subject seen near the center of multiple shots instead of the full floor.
     camera_file = next((work / 'cache' / 'StructureFromMotion').glob('*/cameras.sfm'), None)
+    data = None
     if camera_file:
         data = json.loads(camera_file.read_text(encoding='utf-8'))
         poses = {item['poseId']: item['pose']['transform'] for item in data['poses']}
@@ -116,7 +123,14 @@ def export_mesh(work, ffmpeg):
     with (work / 'mesh.bin').open('wb') as output:
         for array in (positions, faces, colors):
             output.write(array.tobytes())
-    return {'vertices': len(positions), 'triangles': len(faces), 'indexBytes': 4}
+    auto_marks = []
+    if data and detections:
+        try:
+            auto_marks = mesh_annotations.project_detections(raw_xyz, positions, mesh.faces, data, detections)
+        except (KeyError, ValueError, TypeError, IndexError, FloatingPointError):
+            logging.exception('Could not project model findings onto 3D mesh')
+    return {'vertices': len(positions), 'triangles': len(faces), 'indexBytes': 4,
+            'autoMarks': auto_marks}
 
 
 class Jobs:
@@ -190,7 +204,8 @@ class Jobs:
             run([self.meshroom, '--input', work / 'frames', '--output', work / 'publish',
                  '--cache', work / 'cache'], work / 'meshroom.log', 1200, env=env)
             self.set(token, 'exporting', profile=profile, framesUsed=frame_count)
-            meta = export_mesh(work, self.ffmpeg)
+            detected = mesh_annotations.detect_samples(work / 'frames', frame_count, fps)
+            meta = export_mesh(work, self.ffmpeg, detected)
             self.set(token, 'ready', **meta, profile=profile, framesUsed=frame_count,
                      processingSeconds=round(time.monotonic() - started))
         except (ValueError, OSError, KeyError) as error:

@@ -380,7 +380,7 @@ body[data-capture-source=mesh] .capture > .panel-heading { padding: 16px 20px; }
 .mesh-start { text-align: center; max-width: 390px; padding: 22px; }
 .mesh-start h3 { font-weight: 650; }
 .mesh-start p { margin: 8px 0 14px; color: var(--muted); }
-.mesh-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; cursor: grab; }
+.mesh-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
 .mesh-stage canvas:active { cursor: grabbing; }
 .mesh-markers { position: absolute; inset: 0; pointer-events: none; }
 .mesh-marker {
