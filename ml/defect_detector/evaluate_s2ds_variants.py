@@ -9,8 +9,8 @@ import torch
 from ultralytics import YOLO, settings
 import yaml
 
+from calibrate_thresholds import apply, fit, labeled_frames
 from evaluate import class_negative_frames, infer, measurements
-from prepare_core_rgb import read_labels
 
 
 def metrics(metric, names):
@@ -21,27 +21,36 @@ def metrics(metric, names):
     return {'mAP50': float(metric.map50), 'mAP50to95': float(metric.map), 'classes': classes}
 
 
-def box_reference(model, reference):
+def box_reference(model, reference, calibrate=False):
     config = yaml.safe_load(reference.read_text(encoding='utf-8'))
     if config['names'] != model.names or config['test'] != 'images/test':
         raise ValueError('Expected the original S2DS test configuration')
     root = Path(config['path'])
-    images = sorted((root / config['test']).glob('*.jpg'))
-    rows = []
-    for image in images:
-        objects = []
-        for name, (x, y, w, h) in read_labels(root / 'labels' / 'test' / image.with_suffix('.txt').name,
-                                              model.names):
-            objects.append({'class': name, 'xyxy': [x - w / 2, y - h / 2, x + w / 2, y + h / 2]})
-        rows.append({'file': image.name, 'scene': image.name, 'objects': objects})
-    predictions, timings = infer(model, images, 'cpu', 768)
+    rows, images, test_hashes = labeled_frames(root, 'test', model.names)
+    for row in rows:
+        row['scene'] = row['file']
     labels = tuple(model.names.values())
-    return {'images': len(images), 'medianMs': statistics.median(timings.values()),
-            'at0.25/0.50': measurements(rows, predictions, labels, .25, .5),
-            'negativeFramesAt0.25': class_negative_frames(rows, predictions, labels, .25)}
+    baseline_threshold = .25
+    thresholds = None
+    if calibrate:
+        validation, validation_images, _ = labeled_frames(root, 'val', model.names, excluded=test_hashes)
+        validation_predictions, _ = infer(model, validation_images, 'cpu', 768)
+        thresholds = fit(validation, validation_predictions, labels, min_instances=10, iou=.50)
+    predictions, timings = infer(model, images, 'cpu', 768)
+    report = {'images': len(images), 'medianMs': statistics.median(timings.values()),
+              'at0.25/0.50': measurements(rows, predictions, labels, baseline_threshold, .50),
+              'negativeFramesAt0.25': class_negative_frames(rows, predictions, labels, baseline_threshold)}
+    if thresholds is not None:
+        calibrated = apply(predictions, thresholds, baseline_threshold)
+        report['calibration'] = {
+            'validationImages': len(validation_images), 'thresholds': thresholds,
+            'at0.50': measurements(rows, calibrated, labels, 0, .50),
+            'negativeFrames': class_negative_frames(rows, calibrated, labels, 0),
+        }
+    return report
 
 
-def measure(weights, dataset, output, reference=None):
+def measure(weights, dataset, output, reference=None, calibrate=False):
     settings.update({'sync': False})
     torch.set_num_threads(4)
     model = YOLO(str(weights))
@@ -59,7 +68,7 @@ def measure(weights, dataset, output, reference=None):
     if model.task == 'segment':
         report['mask'] = metrics(result.seg, model.names)
     if reference:
-        report['commonBoxReference'] = box_reference(model, reference)
+        report['commonBoxReference'] = box_reference(model, reference, calibrate)
     output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
 
 
@@ -69,5 +78,9 @@ if __name__ == '__main__':
     parser.add_argument('config', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--box-reference', type=Path)
+    parser.add_argument('--calibrate-reference', action='store_true',
+                        help='Fit confidence thresholds on reference validation images and evaluate on the test split')
     args = parser.parse_args()
-    measure(args.weights, args.config, args.output, args.box_reference)
+    if args.calibrate_reference and not args.box_reference:
+        parser.error('--calibrate-reference requires --box-reference')
+    measure(args.weights, args.config, args.output, args.box_reference, args.calibrate_reference)
