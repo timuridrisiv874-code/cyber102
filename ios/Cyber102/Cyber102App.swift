@@ -43,7 +43,7 @@ struct OnlineInspectionScreen: View {
     @State private var reload = UUID()
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
+        ZStack(alignment: .topTrailing) {
             InspectionWebsite(failed: $failed, serial: serial)
                 .id(reload)
                 .ignoresSafeArea(edges: .bottom)
@@ -60,12 +60,12 @@ struct OnlineInspectionScreen: View {
                 .background(.background)
             }
             Button(action: onOffline) {
-                Label("Без сети", systemImage: "iphone")
+                Label("Офлайн", systemImage: "iphone")
                     .font(.subheadline.weight(.semibold))
                     .padding(.horizontal, 12).padding(.vertical, 9)
                     .background(.regularMaterial, in: Capsule())
             }
-            .padding(.bottom, 18).padding(.trailing, 12)
+            .padding(.top, 8).padding(.trailing, 12)
         }
     }
 }
