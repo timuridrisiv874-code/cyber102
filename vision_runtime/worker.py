@@ -225,6 +225,9 @@ def parse_video_observations(text, timestamps):
 
 
 class Engine:
+    model_id = MODEL
+    revision = REVISION
+
     def __init__(self, directory):
         import torch
         from transformers import AutoProcessor, AutoModelForImageTextToText
@@ -360,7 +363,8 @@ class Handler(BaseHTTPRequestHandler):
         if self.path != '/health':
             self.reply(404, {'error': 'Not found'})
             return
-        self.reply(200, {'status': 'ok', 'model': MODEL, 'revision': REVISION,
+        self.reply(200, {'status': 'ok', 'model': getattr(self.server.engine, 'model_id', MODEL),
+                         'revision': getattr(self.server.engine, 'revision', REVISION),
                          'device': self.server.engine.device, 'busy': self.server.engine.lock.locked(),
                          'offline': True, 'profiles': list(PROFILES), 'defaultProfile': 'standard',
                          'video': {'enabled': True, 'mode': 'sampled_multi_image',
@@ -405,7 +409,8 @@ class Handler(BaseHTTPRequestHandler):
                         response = {'error': 'Model did not return valid observations for every frame'}
                     else:
                         status = 200
-                        response = {'model': MODEL, 'revision': REVISION, **result,
+                        response = {'model': getattr(self.server.engine, 'model_id', MODEL),
+                                    'revision': getattr(self.server.engine, 'revision', REVISION), **result,
                                     'durationSeconds': round(time.monotonic() - started, 3),
                                     'clipDurationSeconds': clip_duration,
                                     'metrics': self.server.engine.last_metrics}
@@ -420,7 +425,8 @@ class Handler(BaseHTTPRequestHandler):
                     response = {'error': 'Model did not return a valid observation'}
                 else:
                     status = 200
-                    response = {'model': MODEL, 'revision': REVISION, 'observation': observation,
+                    response = {'model': getattr(self.server.engine, 'model_id', MODEL),
+                                'revision': getattr(self.server.engine, 'revision', REVISION), 'observation': observation,
                                 'profile': profile, 'metrics': self.server.engine.last_metrics,
                                 'observationKind': OBSERVATION_KINDS[profile],
                                 'durationSeconds': round(time.monotonic() - started, 3)}
@@ -464,8 +470,10 @@ class Server(ThreadingHTTPServer):
 
 
 def main():
+    from server.vision_models import DEFAULT_MODEL, MODELS, model_spec
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--model-directory', type=Path, default=ROOT / 'models/internvl3_5-2b-hf')
+    parser.add_argument('--model', choices=tuple(MODELS), default=DEFAULT_MODEL)
+    parser.add_argument('--model-directory', type=Path)
     parser.add_argument('--port', type=int, default=11436)
     parser.add_argument('--warmup', action='store_true', help='Warm CUDA with a synthetic image before accepting requests')
     args = parser.parse_args()
@@ -473,10 +481,15 @@ def main():
         os.environ[key] = '1'
     os.environ['TOKENIZERS_PARALLELISM'] = 'false'
     sys.addaudithook(deny_external_connections)
-    engine = Engine(args.model_directory)
+    spec = model_spec(args.model)
+    engine_class = Engine
+    if args.model == 'qwen3_vl_4b':
+        from .qwen_worker import Engine as engine_class
+    engine = engine_class(args.model_directory or ROOT / 'models' / spec.directory)
     if args.warmup:
         print(json.dumps({'event': 'warmup', 'profile': 'standard', 'metrics': engine.warmup()}), flush=True)
-    print(json.dumps({'event': 'ready', 'model': MODEL, 'revision': REVISION, 'device': engine.device}), flush=True)
+    print(json.dumps({'event': 'ready', 'model': spec.model_id, 'revision': spec.revision, 'device': engine.device}),
+          flush=True)
     with Server(('127.0.0.1', args.port), engine) as server:
         try:
             server.serve_forever()
