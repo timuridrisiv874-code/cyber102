@@ -1,0 +1,96 @@
+[
+  {
+    "file": "busbar-006.jpg",
+    "scene": "terminal-additional-busbar",
+    "sha256": "3c77bb70964c35809d58cfffd76d6969ffa8fc5103b71debbfd7e185ccb6d118",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt4b054576793b7783/672bca02877505c459c496ec/II-1676974-2024_%28_44599%29.pdf#page=4",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.24,
+          0.235,
+          0.81,
+          0.48
+        ]
+      }
+    ],
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "note": "Three burnt bus-bar connections whose damage forms a continuous region."
+  },
+  {
+    "file": "knife-007.jpg",
+    "scene": "terminal-additional-knife",
+    "sha256": "43425f3d5a64eb723d47c622f47889e3a8c451c7954653616267b464a2e79a97",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/bltd93d0d5415ab99ef/66d0fb74f6c3d1de4cf29373/II-1464040-2022_%2830333%29.pdf#page=5",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.47,
+          0.085,
+          0.62,
+          0.255
+        ]
+      },
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.181,
+          0.648,
+          0.318,
+          0.845
+        ]
+      }
+    ],
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "note": "Failed connector region at upper right and melted lower-left contact."
+  },
+  {
+    "file": "knife-009.jpg",
+    "scene": "terminal-additional-knife",
+    "sha256": "8af3c4f4ced68f539b829fde1c8232e0eb5b646491cf9a1daf2f47240cfcd6bc",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/bltd93d0d5415ab99ef/66d0fb74f6c3d1de4cf29373/II-1464040-2022_%2830333%29.pdf#page=6",
+    "objects": [],
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "note": "Separate comparable transfer switch in the source investigation."
+  },
+  {
+    "file": "solar-223.jpg",
+    "scene": "terminal-additional-solar",
+    "sha256": "6c7592daa1d44f8554b3d3a985bdc0e59dfbd69b9aa722ac027fc021a0038f32",
+    "source": "https://assets.publishing.service.gov.uk/media/5a81d3c340f0b62302699602/fire-solar-pv-systems-investigations-evidence.pdf#page=27",
+    "objects": [],
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "note": "Intact MC4 connectors, shown coupled and separated."
+  },
+  {
+    "file": "solar-224.jpg",
+    "scene": "terminal-additional-solar",
+    "sha256": "23e8f0719c1d8bf99cd6e325d5bff9a3b6d856a5f35f8e10a04a964a4ed9e94e",
+    "source": "https://assets.publishing.service.gov.uk/media/5a81d3c340f0b62302699602/fire-solar-pv-systems-investigations-evidence.pdf#page=27",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.684,
+          0.395,
+          0.932,
+          0.673
+        ]
+      }
+    ],
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "note": "The melted right-hand contact identified in the source caption."
+  }
+]
