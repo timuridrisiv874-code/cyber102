@@ -139,6 +139,7 @@
     const status = panel.querySelector('.mesh-status');
     const toolbar = panel.querySelector('.mesh-toolbar');
     const markerLayer = panel.querySelector('.mesh-markers');
+    const tooltip = panel.querySelector('.mesh-tooltip');
     const findings = panel.querySelector('.mesh-findings');
     const findingList = panel.querySelector('.mesh-findings-list');
     const sourceVideo = panel.querySelector('.mesh-source-video');
@@ -149,7 +150,35 @@
       zoom: window.matchMedia('(max-width: 640px)').matches ? .9 : 1 };
     const view = { ...initialView };
     let render, drag, meta, buffer, currentFile, sourceUrl, busy = false, marking = false;
+    let hoveredMark = null;
     const marks = [];
+    function positionTooltip() {
+      if (!hoveredMark || !render || hoveredMark.button.hidden || !hoveredMark.label) {
+        hoveredMark = null;
+        tooltip.hidden = true;
+        return;
+      }
+      const point = render.project(hoveredMark.point, view);
+      tooltip.textContent = hoveredMark.label;
+      tooltip.hidden = false;
+      const gap = 20, edge = 8;
+      let left = point.x + gap;
+      if (left + tooltip.offsetWidth > canvas.clientWidth - edge) {
+        left = point.x - tooltip.offsetWidth - gap;
+      }
+      tooltip.style.left = `${Math.max(edge, Math.min(left, canvas.clientWidth - tooltip.offsetWidth - edge))}px`;
+      tooltip.style.top = `${Math.max(edge, Math.min(point.y - tooltip.offsetHeight / 2,
+        canvas.clientHeight - tooltip.offsetHeight - edge))}px`;
+    }
+    function showTooltip(mark) {
+      hoveredMark = mark;
+      positionTooltip();
+    }
+    function hideTooltip(mark) {
+      if (hoveredMark !== mark) return;
+      hoveredMark = null;
+      tooltip.hidden = true;
+    }
     function draw() {
       render?.draw(view);
       if (!render) return;
@@ -162,6 +191,7 @@
         mark.button.textContent = String(index + 1);
         mark.button.setAttribute('aria-label', `Повреждение ${index + 1}: ${mark.label || 'без описания'}`);
       }
+      positionTooltip();
     }
     const message = (text, error = false) => {
       status.textContent = text;
@@ -171,33 +201,32 @@
       findingList.replaceChildren();
       for (const [index, mark] of marks.entries()) {
         const row = document.createElement('li');
+        row.className = 'mesh-finding-row';
         const number = document.createElement('span');
         number.className = 'mesh-finding-number';
         number.textContent = String(index + 1);
         row.append(number);
         if (mark.label) {
           const label = document.createElement('span');
+          label.className = 'mesh-finding-label';
           label.textContent = mark.label;
           row.append(label);
           if (mark.auto) {
             const evidence = document.createElement('button');
             evidence.type = 'button';
+            evidence.className = 'mesh-evidence-link';
             evidence.textContent = `Кадр ${mark.time.toFixed(2)} с`;
             evidence.setAttribute('aria-label', `Открыть исходное видео на ${mark.time.toFixed(2)} секунде`);
-            evidence.addEventListener('click', () => {
-              sourceDetails.open = true;
-              const seek = () => { sourceVideo.currentTime = mark.time; };
-              if (sourceVideo.readyState >= 1) seek();
-              else sourceVideo.addEventListener('loadedmetadata', seek, { once: true });
-              sourceDetails.scrollIntoView({ block: 'nearest' });
-            });
+            evidence.addEventListener('click', () => seekSource(mark.time, true));
             row.append(evidence);
           }
           const remove = document.createElement('button');
           remove.type = 'button';
+          remove.className = 'mesh-remove-mark';
           remove.textContent = 'Убрать';
           remove.setAttribute('aria-label', `Убрать повреждение ${index + 1}`);
           remove.addEventListener('click', () => {
+            hideTooltip(mark);
             marks.splice(marks.indexOf(mark), 1);
             mark.button.remove();
             syncFindings();
@@ -205,6 +234,7 @@
           });
           row.append(remove);
         } else {
+          row.classList.add('mesh-finding-draft');
           const input = document.createElement('input');
           input.type = 'text';
           input.maxLength = 100;
@@ -217,6 +247,7 @@
           cancel.type = 'button';
           cancel.textContent = 'Отмена';
           const removeDraft = () => {
+            hideTooltip(mark);
             marks.splice(marks.indexOf(mark), 1);
             mark.button.remove();
             syncFindings();
@@ -240,6 +271,13 @@
         findingList.append(row);
       }
     }
+    function seekSource(time, scroll = false) {
+      sourceDetails.open = true;
+      const seek = () => { sourceVideo.currentTime = time; };
+      if (sourceVideo.readyState >= 1) seek();
+      else sourceVideo.addEventListener('loadedmetadata', seek, { once: true });
+      if (scroll) sourceDetails.scrollIntoView({ block: 'nearest' });
+    }
     function addMark(point, label = '', time = null) {
       if (!point || marks.length >= 8) return;
       const button = document.createElement('button');
@@ -248,7 +286,16 @@
       markerLayer.append(button);
       const mark = { point, label, time, auto: Boolean(label) && Number.isFinite(time), button };
       marks.push(mark);
-      button.addEventListener('click', () => findingList.children[marks.indexOf(mark)]?.scrollIntoView({ block: 'nearest' }));
+      button.addEventListener('click', () => {
+        if (window.matchMedia('(hover: none)').matches) { showTooltip(mark); return; }
+        findingList.children[marks.indexOf(mark)]?.scrollIntoView({ block: 'nearest' });
+      });
+      button.addEventListener('pointerenter', () => showTooltip(mark));
+      button.addEventListener('pointerleave', event => {
+        if (event.pointerType !== 'touch') hideTooltip(mark);
+      });
+      button.addEventListener('focus', () => showTooltip(mark));
+      button.addEventListener('blur', () => hideTooltip(mark));
       marking = false;
       markButton.setAttribute('aria-pressed', 'false');
       message('');
@@ -265,7 +312,7 @@
         render = renderer(canvas, meta, buffer);
         upload.hidden = true;
         canvas.hidden = toolbar.hidden = markerLayer.hidden = findings.hidden = false;
-        message(meta.framesUsed ? `Готово за ${meta.processingSeconds} с · ${meta.framesUsed} кадров` : '3D-модель готова.');
+        message('');
         draw();
       } catch {
         message('Этот браузер не смог открыть 3D. Попробуйте другой браузер.', true);
@@ -329,6 +376,8 @@
       }
       busy = true;
       input.disabled = true;
+      hoveredMark = null;
+      tooltip.hidden = true;
       canvas.hidden = toolbar.hidden = markerLayer.hidden = findings.hidden = true;
       upload.hidden = false;
       render = null;
@@ -355,6 +404,8 @@
         meta = job;
         currentFile = file;
         marks.splice(0);
+        hoveredMark = null;
+        tooltip.hidden = true;
         markerLayer.replaceChildren();
         syncFindings();
         if (sourceUrl) URL.revokeObjectURL(sourceUrl);
@@ -369,8 +420,13 @@
           addMark(item.point, item.label, item.time);
         }
         findingsHelp.textContent = marks.length
-          ? 'Метки предложены моделью. Сверьте их с исходным кадром.'
-          : 'Модель не подтвердила точных повреждений. При необходимости добавьте точку вручную.';
+          ? 'Сверьте метки с исходным видео.'
+          : 'Повреждения не найдены. При необходимости добавьте точку.';
+        sourceDetails.open = false;
+        if (window.matchMedia('(min-width: 1450px)').matches) {
+          if (marks[0]?.auto) seekSource(marks[0].time);
+          else sourceDetails.open = true;
+        }
         Object.assign(view, initialView);
         activate();
       } catch (error) {
@@ -387,6 +443,9 @@
       build(file);
     });
     panel.querySelector('#mesh-replace').addEventListener('click', () => input.click());
+    panel.addEventListener('pointerdown', event => {
+      if (!event.target.closest('.mesh-marker') && hoveredMark) hideTooltip(hoveredMark);
+    });
     return { get busy() { return busy; }, open(file) { draw(); build(file); } };
   }
 

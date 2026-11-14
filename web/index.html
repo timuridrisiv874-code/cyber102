@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=eye-1" sizes="180x180">
   <link rel="preload" href="vendor/fonts/ibm-plex-sans-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css?v=field-20261114">
-  <link rel="stylesheet" href="workspace.css?v=mesh-auto-1">
+  <link rel="stylesheet" href="workspace.css?v=mesh-layout-1">
   <link rel="stylesheet" href="region-review.css?v=field-20261114">
   <link rel="stylesheet" href="inspection-tools.css?v=motor-resource-1">
   <link rel="stylesheet" href="interface.css?v=library-20261114">
@@ -22,7 +22,7 @@
   <script src="inspection-library.js?v=1" defer></script>
   <script src="video-review.js?v=video-defaults-20261114" defer></script>
   <script src="region-review.js?v=field-20261114" defer></script>
-  <script src="inspection-mesh.js?v=mesh-auto-1" defer></script>
+  <script src="inspection-mesh.js?v=mesh-layout-1" defer></script>
   <script src="app.js?v=library-20261114" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
   <script src="equipment-qr.js?v=motor-resource-1" defer></script>
@@ -127,6 +127,7 @@
             <div class="mesh-stage">
               <canvas aria-label="Вращаемая 3D-модель из загруженного видео" hidden></canvas>
               <div class="mesh-markers" aria-label="Отмеченные точки повреждений" hidden></div>
+              <div class="mesh-tooltip" role="tooltip" hidden></div>
               <div class="mesh-start">
                 <h3>3D из видео</h3>
                 <p>Загрузите обход оборудования. MP4, MOV или WebM, 2–30 секунд, до 40 МБ.</p>
@@ -147,8 +148,8 @@
             </div>
             <p class="message mesh-status" role="status"></p>
             <section class="mesh-findings" hidden aria-labelledby="mesh-findings-title">
-              <h3 id="mesh-findings-title">Повреждения на 3D</h3>
-              <p class="mesh-findings-help">Отметьте видимое повреждение на модели и сверьте с видео.</p>
+              <h3 id="mesh-findings-title">Повреждения</h3>
+              <p class="mesh-findings-help">Сверьте метки с исходным видео.</p>
               <ol class="mesh-findings-list"></ol>
               <details class="mesh-source"><summary>Исходное видео</summary>
                 <video class="mesh-source-video" controls playsinline preload="metadata" aria-label="Исходное видео для сверки повреждений"></video>

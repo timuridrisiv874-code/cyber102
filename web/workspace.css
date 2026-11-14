@@ -382,7 +382,7 @@ body[data-capture-source=mesh] .capture > .panel-heading { padding: 16px 20px; }
 .mesh-start p { margin: 8px 0 14px; color: var(--muted); }
 .mesh-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
 .mesh-stage canvas:active { cursor: grabbing; }
-.mesh-markers { position: absolute; inset: 0; pointer-events: none; }
+.mesh-markers { position: absolute; z-index: 1; inset: 0; pointer-events: none; }
 .mesh-marker {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -396,6 +396,23 @@ body[data-capture-source=mesh] .capture > .panel-heading { padding: 16px 20px; }
   box-shadow: 0 2px 8px #0008;
   pointer-events: auto;
 }
+.mesh-marker:is(:hover, :focus-visible) { outline: 2px solid #fff; outline-offset: 2px; }
+.mesh-tooltip {
+  position: absolute;
+  z-index: 2;
+  max-width: min(260px, calc(100% - 16px));
+  padding: 9px 12px;
+  border: 1px solid #a9b9bf;
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+  box-shadow: 0 4px 14px #0004;
+  font-size: 14px;
+  line-height: 1.35;
+  text-align: left;
+  pointer-events: none;
+}
+.mesh-tooltip[hidden] { display: none; }
 .mesh-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .mesh-toolbar button {
   min-width: 44px;
@@ -407,22 +424,56 @@ body[data-capture-source=mesh] .capture > .panel-heading { padding: 16px 20px; }
   border-radius: 6px;
 }
 .mesh-toolbar #mesh-mark-mode[aria-pressed=true] { background: #ffc84a; border-color: #b77600; }
+.mesh-status:empty { display: none; }
 .mesh-findings { margin-top: 18px; }
-.mesh-findings h3 { margin: 0 0 5px; font-size: 18px; }
-.mesh-findings-help { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+.mesh-findings h3 { margin: 0 0 6px; font-size: 22px; font-weight: 500; }
+.mesh-findings-help { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
 .mesh-findings-list { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
-.mesh-findings-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 44px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; }
+.mesh-findings-list li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: start; gap: 4px 8px; min-height: 64px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
 .mesh-finding-number { display: grid; place-items: center; flex: 0 0 26px; height: 26px; border-radius: 50%; background: #ffc84a; color: #172529; font-weight: 750; }
+.mesh-finding-label { grid-column: 2; grid-row: 1; line-height: 1.35; overflow-wrap: anywhere; }
+.mesh-evidence-link { grid-column: 2; grid-row: 2; justify-self: start; }
+.mesh-remove-mark { grid-column: 3; grid-row: 1 / span 2; justify-self: end; }
+.mesh-findings-list li.mesh-finding-draft { display: flex; flex-wrap: wrap; align-items: center; }
 .mesh-findings-list input { flex: 1 1 220px; min-width: 0; padding: 7px; border: 1px solid var(--line); border-radius: 5px; }
-.mesh-findings-list button { margin-left: auto; padding: 6px 8px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; }
-.mesh-source { margin-top: 12px; }
-.mesh-source summary { cursor: pointer; color: var(--accent); }
-.mesh-source-video { display: block; max-width: 100%; max-height: 45vh; margin-top: 8px; background: #172529; }
+.mesh-findings-list button { padding: 6px 8px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; font-size: 13px; }
+.mesh-finding-draft button { margin-left: auto; }
+.mesh-source { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--line); }
+.mesh-source summary { display: flex; align-items: center; min-height: 40px; cursor: pointer; color: var(--accent); font-size: 14px; }
+.mesh-source-video { display: block; width: 100%; max-width: 100%; max-height: min(38svh, 460px); margin-top: 8px; background: #172529; object-fit: contain; }
+
+@media (min-width: 641px) {
+  .mesh-stage:has(canvas:not([hidden])) { width: 100%; height: min(68svh, 760px); max-height: none; aspect-ratio: auto; }
+}
+
+@media (min-width: 1450px) {
+  body[data-capture-source=mesh] .page { width: calc(100% - var(--rail)); max-width: none; margin-left: var(--rail); margin-right: 0; }
+  #inspection-mesh:has(.mesh-findings:not([hidden])) {
+    display: grid;
+    max-width: 1800px;
+    margin-inline: auto;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+    column-gap: 32px;
+    align-items: start;
+  }
+  #inspection-mesh:has(.mesh-findings:not([hidden])) #mesh-library-home { grid-column: 1 / -1; }
+  #inspection-mesh:has(.mesh-findings:not([hidden])) .mesh-stage { grid-column: 1; grid-row: 2; }
+  #inspection-mesh:has(.mesh-findings:not([hidden])) .mesh-toolbar { grid-column: 1; grid-row: 3; }
+  #inspection-mesh:has(.mesh-findings:not([hidden])) .mesh-status { grid-column: 1; grid-row: 4; }
+  #inspection-mesh:has(.mesh-findings:not([hidden])) .mesh-findings {
+    grid-column: 2;
+    grid-row: 2 / span 3;
+    margin: 0;
+    padding-left: 24px;
+    border-left: 1px solid var(--line);
+  }
+}
 
 @media (max-width: 640px) {
   #inspection-mesh { padding-inline: 12px; }
   body[data-capture-source=mesh] .capture > .panel-heading { padding-inline: 16px; }
   .mesh-stage { max-height: 50svh; }
+  .mesh-source-video { max-height: 55svh; }
 }
 @media (max-width: 430px) {
   .inspection-modes { width: 100%; }

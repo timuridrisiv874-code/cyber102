@@ -34,6 +34,7 @@ async function main() {
       <input id="media-file"><span id="media-file-label"></span>
       <div id="inspection-mesh" hidden>
         <div class="mesh-stage"><canvas hidden></canvas><div class="mesh-markers" hidden></div>
+          <div class="mesh-tooltip" role="tooltip" hidden></div>
           <div class="mesh-start"><input id="mesh-video-file" type="file"></div></div>
         <div class="mesh-toolbar" hidden>
           <button data-action="right">Повернуть</button><button id="mesh-mark-mode" aria-pressed="false">Отметить повреждение</button>
@@ -64,10 +65,16 @@ async function main() {
     }));
     await page.locator('[data-mode=mesh]').click();
     await page.locator('#mesh-video-file').setInputFiles({ name: 'test.mov', mimeType: 'video/quicktime', buffer: Buffer.from('video') });
-    await page.locator('.mesh-status').getByText(/20 кадров/).waitFor();
+    await page.locator('.mesh-marker').first().waitFor();
     assert.equal(uploadHeaders['x-cyber102-mesh-profile'], 'fast');
     assert.equal(await page.locator('.mesh-marker').count(), 1);
+    assert.equal(await page.locator('.mesh-status').innerText(), '');
     assert.match(await page.locator('.mesh-findings-list').innerText(), /Признаки коррозии бака/);
+    await page.locator('.mesh-marker').hover();
+    assert.equal(await page.locator('.mesh-tooltip').innerText(), 'Признаки коррозии бака');
+    assert.equal(await page.locator('.mesh-tooltip').isVisible(), true);
+    await page.mouse.move(10, 10);
+    assert.equal(await page.locator('.mesh-tooltip').isVisible(), false);
     const before = Number.parseFloat(await page.locator('.mesh-marker').first().evaluate(el => el.style.left));
     await page.locator('[data-action=right]').click();
     const after = Number.parseFloat(await page.locator('.mesh-marker').first().evaluate(el => el.style.left));
