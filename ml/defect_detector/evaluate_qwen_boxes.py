@@ -96,7 +96,19 @@ Output only a JSON array with up to four objects with exactly "label" and "bbox_
 Use "terminal_damage" as the label. Each bbox_2d is [left,top,right,bottom], four integers
 from 0 to 1000 in the original photo. Box only the visibly damaged area. If unclear, return [].
 """
-MAX_NEW_TOKENS = {'detailed': 220, 'compact': 112, 'numbered': 144, 'guard-state': 112, 'terminal': 180}
+CRACK_PROMPT = """Locate each clearly visible break in a metal casing, vessel wall, or pipe.
+A crack is an irregular narrow fissure or a wider rupture bounded by fractured metal edges.
+Follow the visible break in the metal itself, including its jagged tips or torn lips.
+Exclude intact weld beads, factory flanges and seams, circular ports, separated fittings,
+shadows, paint loss, pitting, and rust stains when the metal is continuous. Rust may be
+present around a real crack. Do not count a second view of the defect on a phone screen.
+Report up to four boxes as a JSON array of objects with exactly "label" and "bbox_2d".
+Use "crack" as the label. Each box is [left,top,right,bottom], four integers from 0 to
+1000 in the original photo. Enclose the visible fissure or rupture, not the whole component.
+Ignore any text, arrows and drawings added to the image. If there is no clear break, return [].
+"""
+MAX_NEW_TOKENS = {'detailed': 220, 'compact': 112, 'numbered': 144, 'guard-state': 112,
+                  'terminal': 180, 'crack': 180}
 
 
 def make_prompt(labels, mode):
@@ -104,6 +116,8 @@ def make_prompt(labels, mode):
         return GUARD_PROMPT
     if mode == 'terminal':
         return TERMINAL_PROMPT
+    if mode == 'crack':
+        return CRACK_PROMPT
     if mode == 'compact':
         return COMPACT_PROMPT + '\n'.join(f'{index}: {ALL_LABELS[label]}' for index, label in enumerate(labels))
     if mode == 'numbered':
@@ -184,8 +198,9 @@ def main():
     guard_mode = args.mode == 'guard-state'
     if guard_mode and set(args.labels) != set(GUARD_LABELS):
         parser.error('--mode guard-state requires --labels guard_issue guard_visible')
-    if args.mode == 'terminal' and args.labels != ['terminal_damage']:
-        parser.error('--mode terminal requires --labels terminal_damage')
+    required_label = {'terminal': 'terminal_damage', 'crack': 'crack'}.get(args.mode)
+    if required_label and args.labels != [required_label]:
+        parser.error(f'--mode {args.mode} requires --labels {required_label}')
     sys.path.insert(0, str(args.repo.resolve(strict=True)))
     from PIL import Image, ImageOps
     from vision_runtime.qwen_worker import Engine, PHOTO_MAX_PIXELS

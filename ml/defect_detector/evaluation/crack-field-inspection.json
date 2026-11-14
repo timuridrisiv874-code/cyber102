@@ -1,0 +1,143 @@
+[
+  {
+    "file": "chevron-flanged-pipe.jpg",
+    "scene": "chevron-richmond-2007",
+    "source": "https://www.csb.gov/assets/1/20/chevron_interim_report_final_2013-04-17.pdf?14940=#page=29",
+    "sourceSha256": "a628a399429e9dd5c97671fa368c7bc94b5bede0a5bb260e61c9419c92d45bcf",
+    "sha256": "afe8538743b574a3f7ca80c1d09501cd5eccbb1821fb412de29d696b423e576b",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.4031413612565445,
+          0.4877384196185286,
+          0.6910994764397905,
+          0.779291553133515
+        ]
+      }
+    ],
+    "note": "Left panel of Figure 13. The visible irregular gap and lower fissure are annotated. The round flange opening is outside the annotation.",
+    "sourceImage": "chevron-img-000.jpg",
+    "sourceCrop": [
+      18,
+      16,
+      209,
+      383
+    ]
+  },
+  {
+    "file": "pes-ruptured-elbow.jpg",
+    "scene": "pes-2019",
+    "source": "https://www.csb.gov/assets/1/20/pes_final_report_published_october_2022_r1.pdf#page=34",
+    "sourceSha256": "90f675c53f9c36204cb0e5f562ff030ca68b4c9142fd2f03da68387b5d12a799",
+    "sha256": "24f81531f82cc37b52b88ee32aad1eccfad7799b8abc0f104c66c38a93e2f53c",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.15114709851551958,
+          0.4351145038167939,
+          0.835357624831309,
+          0.8519083969465648
+        ]
+      }
+    ],
+    "note": "Right panel of Figure 22. Wide rupture between torn lips of the elbow. Round measurement stickers are outside the annotation.",
+    "sourceImage": "pes-img-001.jpg",
+    "sourceCrop": [
+      727,
+      2,
+      1468,
+      657
+    ]
+  },
+  {
+    "file": "tpc-torn-suction-pipe.jpg",
+    "scene": "tpc-port-neches-2019",
+    "source": "https://www.csb.gov/file.aspx?DocumentId=6203#page=27",
+    "sourceSha256": "cfb4d583c5eee8ef7eeeb5a8c2467626cbd6cd053b122d8bfb584cffd4119a53",
+    "sha256": "1a5630c567a780450a966114e47500ad0510b3f886f886042613702ef20c6b70",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.2930591259640103,
+          0.3088803088803089,
+          0.7994858611825193,
+          0.7142857142857143
+        ]
+      }
+    ],
+    "note": "Lower-right panel of Figure 18. The photo has a red report callout pointing to the visible rupture. Kept with the report artwork disclosed.",
+    "sourceImage": "tpc27-img-001.jpg",
+    "sourceCrop": [
+      816,
+      394,
+      1205,
+      653
+    ]
+  },
+  {
+    "file": "outlook-fig-09.jpg",
+    "scene": "outlook-refinery",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "sourceSha256": "01ba30d1abf009107c708d8d08252351518c104c5d3c15061b5d1c46f8fc2631",
+    "sha256": "01ba30d1abf009107c708d8d08252351518c104c5d3c15061b5d1c46f8fc2631",
+    "objects": [],
+    "note": "Corrosion and coating loss on metal insulation cladding without a visible break."
+  },
+  {
+    "file": "outlook-fig-13.jpg",
+    "scene": "outlook-refinery",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "sourceSha256": "dc39265fe4d272aa22a86a9e0edc7cabb9c2c57602ccabf583bbe97c31200f31",
+    "sha256": "dc39265fe4d272aa22a86a9e0edc7cabb9c2c57602ccabf583bbe97c31200f31",
+    "objects": [],
+    "note": "Banded elbow and overlapping factory joints."
+  },
+  {
+    "file": "maintain-09.jpg",
+    "scene": "maintenance-fig09",
+    "source": "https://insulation.org/io/articles/maintain-insulation-jacketing-to-ensure-mechanical-insulation-performance/",
+    "sourceSha256": "2dbea043605bc303912976fc51c7af65863498ec756a661946d70ec59274a5ae",
+    "sha256": "2dbea043605bc303912976fc51c7af65863498ec756a661946d70ec59274a5ae",
+    "objects": [],
+    "note": "Reflective outdoor cladding with intentional seams and joints."
+  },
+  {
+    "file": "patterson-orange-cover.jpg",
+    "scene": "patterson-coupling",
+    "source": "https://www.uniguardmgc.com/machine-guarding-solution-for-patterson-pump/",
+    "sourceSha256": "a98838565baee1a277aa6cae6d01a41482ceb23e199a1511df3656e4d03194a6",
+    "sha256": "a98838565baee1a277aa6cae6d01a41482ceb23e199a1511df3656e4d03194a6",
+    "objects": [],
+    "note": "Visible perforations are manufactured openings in a coupling guard."
+  },
+  {
+    "file": "transformer-oxidized-plate.jpg",
+    "scene": "transformer-oxidized-plate",
+    "source": "https://zenodo.org/records/22771088",
+    "sourceSha256": "e685b0a1dff8a9da43bdc0858e3c126ad93bf0902c5025dfa6af189706555514",
+    "sha256": "e685b0a1dff8a9da43bdc0858e3c126ad93bf0902c5025dfa6af189706555514",
+    "objects": [],
+    "note": "Dark oxidation on the plate without a visible fissure."
+  },
+  {
+    "file": "sault-covered.jpg",
+    "scene": "sault-coupling",
+    "source": "https://machineguard.com/coupling-guards-pump-motor-assembly/",
+    "sourceSha256": "6b3777909a6ec25b862912a10c39d4892aec166b348c4d2882cff15c07a0b9b4",
+    "sha256": "6b3777909a6ec25b862912a10c39d4892aec166b348c4d2882cff15c07a0b9b4",
+    "objects": [],
+    "note": "Intact coupling cover and rusty mounting metal."
+  },
+  {
+    "file": "commons-ksb.jpg",
+    "scene": "commons-ksb",
+    "source": "https://commons.wikimedia.org/wiki/File:KSB_09_Etanorm_mit_Motor_und_Frequenzumrichter.jpg",
+    "sourceSha256": "d0ffb7ffc34824430a6e3823e53a65733777b3714f733d0b4247de6580b0ddc9",
+    "sha256": "d0ffb7ffc34824430a6e3823e53a65733777b3714f733d0b4247de6580b0ddc9",
+    "objects": [],
+    "note": "Machined flange and intact motor-pump joint."
+  }
+]
