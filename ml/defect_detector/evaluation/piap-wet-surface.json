@@ -1,0 +1,401 @@
+[
+  {
+    "file": "frame_000004.PNG",
+    "sha256": "74a0c8a5e36892564df3591649aa485566c712213ac6468fbdd222fa175939bc",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.6484375,
+          0.6416666666666667,
+          0.72421875,
+          0.7638888888888888
+        ],
+        "areaPx": 5389.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.78125,
+          0.5930555555555556,
+          0.79921875,
+          0.6208333333333333
+        ],
+        "areaPx": 337.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000014.PNG",
+    "sha256": "b1f1359afe4c8c2c23f2968ce3f77cadf9c052873ab8e09e481e7b0633bc0cd4",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.0,
+          0.0,
+          0.1140625,
+          0.09027777777777778
+        ],
+        "areaPx": 6502.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000016.PNG",
+    "sha256": "eb7021eb635098ed26b9ecdaa4a20331c0e5f57f8990b32b0dc9ad1a824e0a1e",
+    "objects": [],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000021.PNG",
+    "sha256": "a7debf5e35c63284221927f15c5ff38d69f0a4b9f13d40914e695350269fa711",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.3484375,
+          0.6944444444444444,
+          0.60390625,
+          0.9472222222222222
+        ],
+        "areaPx": 25487.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.45703125,
+          0.8958333333333334,
+          0.4859375,
+          0.95
+        ],
+        "areaPx": 1166.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000035.PNG",
+    "sha256": "fce8447ecf24212462c80343071eb945bbd7324bcb91da7f62cf693f00bda543",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.4625,
+          0.20833333333333334,
+          0.54140625,
+          0.4875
+        ],
+        "areaPx": 11648.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000042.PNG",
+    "sha256": "e60aa6a5383d4b3c9b3d613ca5b130192a8474ce259bcdb12f9e7542a49f31bd",
+    "objects": [],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000049.PNG",
+    "sha256": "45f0d6523b53bb118a6fcfccd793d457e64040e2abfcbbf6fbcdfcd399421fc6",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.38671875,
+          0.27361111111111114,
+          0.5609375,
+          0.40694444444444444
+        ],
+        "areaPx": 12628.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000056.PNG",
+    "sha256": "922bd7a78e9708e20a3082fd255a80fd89428393c649cc7b2390bc656c0d477f",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.58203125,
+          0.5347222222222222,
+          0.753828125,
+          0.7722222222222223
+        ],
+        "areaPx": 26088.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.612109375,
+          0.48686111111111113,
+          0.63971875,
+          0.5443194444444445
+        ],
+        "areaPx": 590.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.6171875,
+          0.35,
+          0.6375,
+          0.3861111111111111
+        ],
+        "areaPx": 518.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000064.PNG",
+    "sha256": "a4e8a34fc7f27d2293e858fc1288da60b88d29f5b4957990d65285b1326160cb",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.378125,
+          0.4111111111111111,
+          0.53046875,
+          0.6513888888888889
+        ],
+        "areaPx": 19792.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.5125,
+          0.625,
+          0.53828125,
+          0.7069444444444445
+        ],
+        "areaPx": 1456.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.5421875,
+          0.7333333333333333,
+          0.56953125,
+          0.7819444444444444
+        ],
+        "areaPx": 933.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.53515625,
+          0.7604166666666666,
+          0.55,
+          0.8027777777777778
+        ],
+        "areaPx": 382.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000076.PNG",
+    "sha256": "bf56bb0112d0b93ed4e65ee84e2e70d76e740df3ba7b0212ec2d1994736303f8",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.4484375,
+          0.4513888888888889,
+          0.46796875,
+          0.4986111111111111
+        ],
+        "areaPx": 597.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.52421875,
+          0.5819444444444445,
+          0.5515625,
+          0.625
+        ],
+        "areaPx": 880.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.253125,
+          0.30277777777777776,
+          0.46875,
+          0.5169444444444444
+        ],
+        "areaPx": 27689.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000084.PNG",
+    "sha256": "725f8ab76aa6bc8b2c7caf3c3d7347fa5d77ec6db2237e1bb5644d2e71ce89c3",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.22109375,
+          0.24305555555555555,
+          0.403125,
+          0.4166666666666667
+        ],
+        "areaPx": 19082.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.33203125,
+          0.6555555555555556,
+          0.35859375,
+          0.7013888888888888
+        ],
+        "areaPx": 896.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.43671875,
+          0.4652777777777778,
+          0.46484375,
+          0.5055555555555555
+        ],
+        "areaPx": 809.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000091.PNG",
+    "sha256": "f04845ee817e05ac2884ebe3434c7c6f1044db8e041e75c03d09741676ff93d7",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.409375,
+          0.475,
+          0.53046875,
+          0.6833333333333333
+        ],
+        "areaPx": 18343.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000103.PNG",
+    "sha256": "0496d491eed588931b79767130141e83162ce7b33fb51900dea24cd4179780ef",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.49921875,
+          0.6458333333333334,
+          0.51796875,
+          0.6819444444444445
+        ],
+        "areaPx": 518.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.37890625,
+          0.5375,
+          0.49765625,
+          0.7013888888888888
+        ],
+        "areaPx": 11293.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  },
+  {
+    "file": "frame_000108.PNG",
+    "sha256": "81da90fa622fc7522c1e5481334be751ee037d9db90b75058c557eab9705e04d",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.05703125,
+          0.34444444444444444,
+          0.08046875,
+          0.38055555555555554
+        ],
+        "areaPx": 597.0
+      },
+      {
+        "class": "wet_patch",
+        "liquidType": "wet_surface",
+        "xyxy": [
+          0.0,
+          0.26666666666666666,
+          0.0546875,
+          0.4083333333333333
+        ],
+        "areaPx": 4204.0
+      }
+    ],
+    "scene": "piap-indoor-floor",
+    "source": "https://mgv.sggw.edu.pl/article/view/9817",
+    "note": "Controlled PIAP indoor spill sequence. Related frames are grouped as one scene."
+  }
+]
