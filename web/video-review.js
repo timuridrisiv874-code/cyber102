@@ -60,28 +60,30 @@
   }
 
   function summarize(grouped, detailKinds = []) {
-    const names = {crack: 'трещины', terminal_damage: 'повреждения клеммы или проводки'};
+    const names = {corrosion: 'коррозия', wet_patch: 'следы жидкости', visible_damage: 'видимые повреждения',
+      crack: 'признаки трещины', terminal_damage: 'признаки повреждения клеммы или проводки'};
     const kinds = new Set(detailKinds);
-    const findings = Object.keys(names).filter(kind => kinds.has(kind)).map(kind => names[kind]);
-    const base = sampledSummary(grouped);
-    if (!findings.length) return base;
+    const findings = [...new Set(grouped.groups.map(group => names[group.condition]))];
+    for (const kind of ['crack', 'terminal_damage']) if (kinds.has(kind)) findings.push(names[kind]);
+    if (!findings.length) {
+      if (grouped.mode === 'empty') return 'Не удалось проверить видео. Повторите попытку.';
+      if (grouped.mode === 'uncertain') return 'Не удалось оценить состояние. Снимите оборудование крупнее и при хорошем освещении.';
+      if (grouped.mode === 'partial') return 'Часть видео не удалось оценить. Снимите эти участки крупнее.';
+      return 'На проверенных кадрах видимых дефектов не обнаружено.';
+    }
     const list = new Intl.ListFormat('ru', {type: 'conjunction'}).format(findings);
-    const detail = `При уточнении отмечены признаки ${list}.`;
-    return grouped.groups.length ? `${base} ${detail}` : detail;
+    const summary = list[0].toLocaleUpperCase('ru') + list.slice(1) + '.';
+    return grouped.uncertainCount ? `${summary} Часть видео не удалось оценить. Снимите эти участки крупнее.` : summary;
   }
 
-  function sampledSummary(grouped) {
-    const { mode, groups, frameCount, clearCount, uncertainCount } = grouped;
-    if (mode === 'empty') return 'Нет проверенных кадров.';
-    if (mode === 'uncertain') return 'Ни один из выбранных кадров не позволил оценить состояние узла.';
-    if (mode === 'clear') return 'На выбранных кадрах явных внешних дефектов не замечено.';
-    if (mode === 'partial') return `Явных дефектов не замечено на ${clearCount} из ${frameCount} кадров. Остальные оценить не удалось.`;
-    const withFindings = frameCount - clearCount - uncertainCount;
-    const labels = { corrosion: 'коррозию', wet_patch: 'следы жидкости', visible_damage: 'видимые повреждения' };
-    const findings = [...new Set(groups.map(group => labels[group.condition]))];
-    const list = new Intl.ListFormat('ru', {type: 'conjunction'}).format(findings);
-    const counts = `Модель отметила ${list} на ${withFindings} из ${frameCount} выбранных кадров.`;
-    return uncertainCount ? `${counts} Кадров без оценки: ${uncertainCount}.` : counts;
+  function observationText(value, heading, row = {}) {
+    if (typeof value !== 'string') return '';
+    const normalized = text => text.toLocaleLowerCase('ru').replace(/[^а-яёa-z0-9]+/gu, ' ').trim();
+    if (normalized(value) === normalized(heading)) return '';
+    const component = row.component === 'other' ? 'Другой промышленный узел' : COMPONENTS[row.component];
+    if (component && CONDITIONS[row.condition] &&
+        normalized(value) === normalized(`${component}: ${CONDITIONS[row.condition]}`)) return '';
+    return value.trim();
   }
 
   function evidenceTime(seconds) {
@@ -184,7 +186,7 @@
     return gallery;
   }
 
-  if (typeof module !== 'undefined' && module.exports) module.exports = { groupObservations, summarize, evidenceTime, galleryEpisodes };
+  if (typeof module !== 'undefined' && module.exports) module.exports = { groupObservations, summarize, observationText, evidenceTime, galleryEpisodes };
   if (typeof window === 'undefined') return;
 
   window.CyberVideoReview = {
@@ -199,12 +201,13 @@
       const results = document.getElementById('video-review-results');
       let busy = false, generation = 0, controller = null, seekController = null, sourceVersion = media.version;
       let available = true;
-      const idleMessage = () => available ? 'Восемь кадров по всей длительности видео.'
-        : 'Разбор видео недоступен. Проверку отдельного кадра можно выбрать в дополнительных режимах.';
+      const idleMessage = () => available ? ''
+        : 'Проверка видео временно недоступна. Можно проверить отдельный кадр.';
       const ready = () => media.kind === 'uploaded_video' && media.ready && !media.loading;
       const message = (value, error = false) => {
         if (!status) return;
         status.textContent = value;
+        status.hidden = media.kind !== 'uploaded_video' || !value;
         status.classList.toggle('is-error', error);
       };
       const active = token => token === generation && sourceVersion === media.version;
@@ -232,7 +235,7 @@
         controller?.abort(); controller = null; busy = false;
         if (clear && results) { results.replaceChildren(); results.hidden = true; }
         if (clear) message(idleMessage());
-        else if (wasBusy) message('Разбор видео отменён.');
+        else if (wasBusy) message('Проверка отменена.');
         syncButtons();
         if (announce && wasBusy) onBusyChange();
       }
@@ -267,18 +270,18 @@
         canvas.width = Math.max(1, Math.round(video.videoWidth * scale));
         canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
         const context = canvas.getContext('2d');
-        if (!context) throw new Error('Браузер не смог подготовить кадры видео.');
+        if (!context) throw new Error('Не удалось открыть видео. Попробуйте другой файл.');
         const frames = [];
         let batchBytes = 0;
+        message('Подготавливаем видео…');
         for (let index = 0; index < FRAME_COUNT; index += 1) {
           if (!active(token) || signal.aborted) throw aborted();
           const timestamp = duration * (index + 0.5) / FRAME_COUNT;
-          message(`Подготавливаем кадр ${index + 1} из ${FRAME_COUNT} · ${window.CyberMedia.time(timestamp)}`);
           await media.seek(timestamp, signal);
           if (!active(token) || signal.aborted) throw aborted();
           context.drawImage(video, 0, 0, canvas.width, canvas.height);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
-          if (!dataUrl.startsWith('data:image/jpeg;base64,')) throw new Error('Не удалось подготовить JPEG-кадр.');
+          if (!dataUrl.startsWith('data:image/jpeg;base64,')) throw new Error('Не удалось открыть видео. Попробуйте другой файл.');
           const image = dataUrl.slice(dataUrl.indexOf(',') + 1);
           const bytes = decodedSize(image);
           batchBytes += bytes;
@@ -319,16 +322,16 @@
       }
 
       async function renderResult(data, captured, token) {
-        if (Array.isArray(data?.observations) && !data.observations.length) throw new Error('Модель не вернула наблюдений по отправленным кадрам. Повторите разбор.');
+        if (Array.isArray(data?.observations) && !data.observations.length) throw new Error('Не удалось получить результат. Повторите проверку.');
         if (!data || typeof data.summary !== 'string' || typeof data.model !== 'string'
             || !Array.isArray(data.observations) || data.observations.length !== captured.frames.length) {
-          throw new Error('Сервер вернул неполный разбор видео. Повторите попытку.');
+          throw new Error('Не удалось получить полный результат. Повторите проверку.');
         }
         for (let index = 0; index < data.observations.length; index += 1) {
           const observation = data.observations[index];
           const frame = captured.frames[index];
           if (!observation || observation.frameIndex !== index || observation.timestampSeconds !== frame.timestampSeconds) {
-            throw new Error('Позиции наблюдений не совпали с кадрами. Результат не показан.');
+            throw new Error('Не удалось сопоставить результат с видео. Повторите проверку.');
           }
         }
         const grouped = groupObservations(data.observations);
@@ -338,7 +341,7 @@
         const context = data.equipmentContext;
         if (context?.references?.length) {
           const sources = document.createElement('details');
-          sources.append(text('summary', '', 'Источники контекста · ' + context.serial));
+          sources.append(text('summary', '', 'Документы · ' + context.serial));
           for (const item of context.references) {
             const url = item.source?.url;
             const local = typeof url === 'string' && /^\/api\/customer\/documents\/[a-z0-9-]+\/pdf#page=\d+$/.test(url);
@@ -361,7 +364,7 @@
               !['defect', 'clear'].includes(representative.status) ||
               representative.status !== data.observations[index].status || !representative.analysisId ||
               representative.videoReview?.sampledFrameCount !== captured.frames.length) {
-            throw new Error('Не удалось связать обзор с опорным кадром. Повторите разбор.');
+            throw new Error('Не удалось подготовить осмотр. Повторите проверку.');
           }
           const image = new Image();
           image.src = frame.dataUrl;
@@ -380,26 +383,17 @@
         const detailBoxes = new Map();
         if (Array.isArray(data.defectDetails)) {
           const kinds = new Set();
-          if (data.defectDetails.length !== captured.frames.length) throw new Error('Сервер вернул неполную повторную проверку.');
+          if (data.defectDetails.length !== captured.frames.length) throw new Error('Не удалось получить полный результат. Повторите проверку.');
           for (const [index, row] of data.defectDetails.entries()) {
             if (row?.frameIndex !== index || row.timestampSeconds !== captured.frames[index].timestampSeconds
                 || !Array.isArray(row.boxes)) {
-              throw new Error('Позиции рамок дефектов не совпали с кадрами.');
+              throw new Error('Не удалось сопоставить результат с видео. Повторите проверку.');
             }
             const boxes = row.boxes.filter(item => Object.hasOwn(DETAIL_NAMES, item.kind));
             if (boxes.length) detailBoxes.set(index, boxes);
             for (const item of boxes) kinds.add(item.kind);
           }
           if (kinds.size) summary.textContent = summarize(grouped, kinds);
-          const inspected = data.defectDetails.filter(row => row.status !== 'skipped').length;
-          if (inspected < captured.frames.length) {
-            fragment.append(text('p', 'video-review-meta', `Повторно проверено ${inspected} из ${captured.frames.length} кадров.`));
-          }
-          const incomplete = data.defectDetails.filter(row => row.status === 'partial' || row.status === 'unavailable').length;
-          if (incomplete) fragment.append(text('p', 'video-review-meta', `Повторная проверка неполная на ${incomplete} кадрах.`));
-        }
-        if (grouped.groups.some(group => group.observations.some(row => /[\u3400-\u9fff\u3040-\u30ff]/u.test(row.observation)))) {
-          fragment.append(text('p', 'video-review-meta', 'В описании модели есть языковые ошибки. Сверяйте наблюдения с кадрами.'));
         }
         const previews = new Map();
         function preview(row) {
@@ -464,6 +458,7 @@
           const seekButton = document.createElement('button'); seekButton.type = 'button'; seekButton.className = 'video-review-seek';
           const image = document.createElement('img'); image.draggable = false;
           const caption = text('span', 'video-review-time', '');
+          caption.hidden = rows.length > 1;
           const observation = text('p', 'video-review-observation', '');
           seekButton.append(image, caption);
           card.append(seekButton, observation);
@@ -475,11 +470,10 @@
             const frame = captured.frames[row.frameIndex];
             image.src = url; image.alt = `${name} · ${time}`;
             image.width = frame.width; image.height = frame.height;
-            caption.textContent = `Кадр ${time}`;
+            caption.textContent = time;
             seekButton.setAttribute('aria-label', `Открыть кадр ${time} в видео. ${name}`);
-            observation.textContent = row.observation;
-            const normalized = value => value.toLocaleLowerCase('ru').replace(/[^а-яёa-z0-9]+/gu, ' ').trim();
-            observation.hidden = !row.observation || normalized(row.observation) === normalized(name);
+            observation.textContent = observationText(row.observation, name, row);
+            observation.hidden = !observation.textContent;
             for (const [index, button] of buttons) {
               if (index === row.frameIndex) button.setAttribute('aria-current', 'true');
               else button.removeAttribute('aria-current');
@@ -507,26 +501,28 @@
         const uncertain = grouped.uncertainFrames.filter(row => !detailBoxes.has(row.frameIndex));
         if (clear.length || uncertain.length) {
           const other = document.createElement('details'); other.className = 'video-review-more video-review-evidence';
-          const label = clear.length && uncertain.length ? 'Кадры без находок и без оценки'
-            : clear.length ? 'Кадры без явных дефектов' : 'Кадры без оценки';
+          const label = clear.length && uncertain.length ? 'Остальные кадры'
+            : clear.length ? 'Без видимых дефектов' : 'Нужно переснять';
           other.append(text('summary', '', label));
           const otherButtons = [];
           let selected = null;
           const inspect = onInspectFrame ? inspectButton(() => selected) : null;
           if (inspect) inspect.hidden = true;
           const selectedText = text('p', 'video-review-observation', '');
+          selectedText.hidden = true;
           selectedText.setAttribute('aria-live', 'polite');
-          for (const [label, rows] of [['Без явных дефектов', clear], ['Не удалось оценить', uncertain]]) {
+          for (const [label, rows] of [['Без видимых дефектов', clear], ['Нужно переснять', uncertain]]) {
             if (!rows.length) continue;
             const line = document.createElement('div'); line.className = 'video-review-times';
-            line.append(text('span', 'video-review-episode-label', `${label} (${rows.length})`));
+            if (clear.length && uncertain.length) line.append(text('span', 'video-review-episode-label', label));
             for (const row of rows) {
               const button = timeButton(row, next => navigate(next, () => {
                 selected = next;
                 if (inspect) inspect.hidden = false;
                 for (const item of otherButtons) item.removeAttribute('aria-current');
                 button.setAttribute('aria-current', 'true');
-                selectedText.textContent = `${evidenceTime(next.timestampSeconds)} · ${label}${next.observation ? '. ' + next.observation : ''}`;
+                selectedText.textContent = observationText(next.observation, CONDITIONS[next.condition] || label, next);
+                selectedText.hidden = !selectedText.textContent;
               }), label);
               otherButtons.push(button); line.append(button);
             }
@@ -555,7 +551,7 @@
         try {
           const captured = await captureFrames(token, signal);
           if (!active(token) || signal.aborted) throw aborted();
-          message('Сопоставляем кадры и готовим общий вывод… Видео остаётся на устройстве.');
+          message('Проверяем видео…');
           timer = setTimeout(() => { timedOut = true; controller?.abort(); }, 13 * 60 * 1000);
           const request = window.CyberAnalysisJobs?.request || fetch;
           const serial = document.getElementById('active-equipment')?.value.trim();
@@ -570,13 +566,16 @@
           clearTimeout(timer);
           if (!active(token) || signal.aborted) throw aborted();
           if (!response.ok) throw new Error(data.code === 'vision_busy'
-            ? 'Модель занята другим осмотром. Повторите через несколько секунд.'
+            ? 'Сервис занят. Повторите через несколько секунд.'
             : typeof data.error === 'string' ? data.error : 'Не удалось разобрать видео. Повторите попытку.');
           await renderResult(data, captured, token);
           if (active(token)) message('');
         } catch (error) {
-          if (active(token)) message(timedOut ? 'Модель не ответила вовремя. Повторите разбор позже.'
-            : error.name === 'AbortError' ? 'Разбор видео отменён.' : error.message || 'Не удалось разобрать видео.', error.name !== 'AbortError' || timedOut);
+          if (active(token)) message(timedOut ? 'Проверка заняла слишком много времени. Повторите позже.'
+            : error.name === 'AbortError' ? 'Проверка отменена.'
+            : error.name === 'TypeError' ? 'Не удалось связаться с сервисом. Проверьте подключение и повторите попытку.'
+            : error.name === 'SyntaxError' ? 'Не удалось получить результат. Повторите проверку.'
+            : error.message || 'Не удалось проверить видео. Повторите попытку.', error.name !== 'AbortError' || timedOut);
         } finally {
           clearTimeout(timer);
           if (active(token)) { busy = false; controller = null; syncButtons(); onBusyChange(); }

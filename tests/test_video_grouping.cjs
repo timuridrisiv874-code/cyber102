@@ -10,10 +10,10 @@ function frame(index, component = 'pipe', condition = 'corrosion', status = 'def
 test('overview names just the confirmed refinement classes once, alongside distinct primary findings', () => {
   const grouped = groupObservations([frame(0)]);
   assert.equal(summarize(grouped, ['terminal_damage', 'crack', 'crack', 'unrecognized']),
-    'Модель отметила коррозию на 1 из 1 выбранных кадров. При уточнении отмечены признаки трещины и повреждения клеммы или проводки.');
+    'Коррозия, признаки трещины и признаки повреждения клеммы или проводки.');
   const clear = groupObservations([frame(0, 'pipe', 'no_visible_defect', 'clear')]);
-  assert.equal(summarize(clear, ['terminal_damage']), 'При уточнении отмечены признаки повреждения клеммы или проводки.');
-  assert.equal(summarize(clear, []), 'На выбранных кадрах явных внешних дефектов не замечено.');
+  assert.equal(summarize(clear, ['terminal_damage']), 'Признаки повреждения клеммы или проводки.');
+  assert.equal(summarize(clear, []), 'На проверенных кадрах видимых дефектов не обнаружено.');
   assert.equal(summarize(clear, ['unrecognized']), summarize(clear));
 });
 
@@ -71,7 +71,7 @@ test('one finding can recur after clean, uncertain or other findings; all actual
   const result = groupObservations(rows);
   assert.deepEqual(result.groups.map(group => group.episodes.map(episode => episode.map(row => row.frameIndex))),
     [[[0, 1], [3], [5], [7]], [[6]]]);
-  assert.equal(summarize(result), 'Модель отметила коррозию и следы жидкости на 6 из 8 выбранных кадров. Кадров без оценки: 1.');
+  assert.equal(summarize(result), 'Коррозия и следы жидкости. Часть видео не удалось оценить. Снимите эти участки крупнее.');
   assert.deepEqual(result.clearFrames, [rows[2]]);
   assert.deepEqual(result.uncertainFrames, [rows[4]]);
 });
@@ -82,7 +82,8 @@ test('empty response, every frame unusable and partially assessable footage have
   assert.equal(groupObservations([]).mode, 'empty');
   const summaries = [[], [unclear], [clear], [clear, unclear]].map(rows => summarize(groupObservations(rows)));
   assert.equal(new Set(summaries).size, 4);
-  assert.match(summaries[3], /1 из 2/);
+  assert.match(summaries[3], /Часть видео не удалось оценить/);
+  assert.doesNotMatch(summaries[3], /дефектов не обнаружено/);
 });
 
 test('short clip timecodes keep distinct fractional moments and minute rounding', () => {

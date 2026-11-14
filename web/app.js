@@ -240,7 +240,7 @@ function render() {
     byId('source-text').textContent = frozen && frameMetadata ? sourceLabel(frameMetadata) : media.kind ? sourceLabel(media.metadata()) : live ? 'Камера' : demoActive ? 'Сохранённый пример' : '';
   }
   if (byId('mode')) byId('mode').textContent = offlineMode ? 'На телефоне · без сервера' :
-    endpoint && (live || frameSource === 'camera' || media.kind) ? 'Модель на сервере' : demoActive ? 'Тестовый пример' : 'Готово к осмотру';
+    endpoint && (live || frameSource === 'camera' || media.kind) ? 'Готово к проверке' : demoActive ? 'Тестовый пример' : 'Готово к осмотру';
   if (demoScenario) {
     byId('demo-options').hidden = !examplesRequested || !example || Boolean(stream || openingCamera || frameSource === 'camera' || media.kind);
     demoScenario.disabled = checking;
@@ -252,13 +252,13 @@ function render() {
   byId('frame-interval-label').hidden = !videoMode;
   intervalSelect.hidden = !videoMode;
   intervalSelect.disabled = cameraMode.disabled;
-  byId('video-help').hidden = !videoMode || media.kind === 'uploaded_video';
-  byId('video-help').textContent = 'Проверяем отдельные кадры с камеры. Рамка относится к последнему проверенному кадру.';
+  byId('video-help').hidden = true;
+  byId('video-help').textContent = '';
   videoToggle.hidden = !videoMode;
   videoToggle.disabled = clipBusy || (!videoRun && ((!stream && media.kind !== 'uploaded_video') || !frameReady || openingCamera || Boolean(analysisController)));
   byId('video-toggle-label').textContent = videoRun ? 'Остановить проверку' : videoOverview ? 'Проверить по интервалу' : 'Начать проверку';
   if (videoMetrics) {
-    videoMetrics.hidden = !videoMode || !videoStats;
+    videoMetrics.hidden = true;
     if (videoStats) videoMetrics.textContent = `Проверено кадров: ${videoStats.count}`;
   }
   if (byId('video-summary')) renderVideoSummary();
@@ -689,8 +689,6 @@ async function checkVideoFrame(run) {
     if (run.times) {
       await media.seek(run.times[run.index], run.controller.signal);
       if (videoRun !== run) return;
-      mediaProgress = `Кадр ${run.index + 1} из ${run.times.length} · ${window.CyberMedia.time(media.element.currentTime)}`;
-      render();
     }
     drawFrame(run.frame, run.times ? media.element : video);
     const metadata = captureMetadata();
@@ -707,13 +705,13 @@ async function checkVideoFrame(run) {
     recordVideoResult(nextResult);
     if (run.times) {
       run.index += 1;
-      mediaProgress = `Проверено ${run.index} из ${run.times.length} кадров · последний ${window.CyberMedia.time(metadata.videoTimeSeconds)}`;
+      mediaProgress = '';
       if (run.index >= run.times.length) {
         stopVideoRun();
-        showMessage('Проверка выбранных кадров завершена. Промежутки между кадрами не анализировались.');
+        showMessage();
         return;
       }
-    } else if (videoStats.count === 1) showMessage('Видеопроверка идёт.');
+    }
     run.timer = setTimeout(() => checkVideoFrame(run), run.times ? 0 : Math.max(0, run.interval - (completed - started)));
   } catch (error) {
     if (videoRun !== run) return;
@@ -740,7 +738,7 @@ function toggleVideoRun() {
   }
   videoRun = { frame: document.createElement('canvas'), interval,
     timer: null, controller: new AbortController(), times, index: 0 };
-  showMessage('Модель анализирует первый кадр.'); render(); checkVideoFrame(videoRun);
+  showMessage('Проверяем видео…'); render(); checkVideoFrame(videoRun);
 }
 
 cameraButton.addEventListener('click', toggleCamera);

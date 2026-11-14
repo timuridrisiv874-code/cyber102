@@ -105,11 +105,13 @@ async function run(browser, engine, android) {
     await page.locator('#uploaded-video').evaluate(async (el, position) => { await new Promise(resolve => { el.addEventListener('seeked', resolve, { once: true }); el.currentTime = position; }); }, android ? 0 : 4.7);
     const firstVideo = state.posts.length;
     await page.locator('#video-toggle').click();
-    await page.locator('#message').getByText('Проверка выбранных кадров завершена.', { exact: false }).waitFor();
+    if (android) await page.locator('#message').getByText('Проверка выбранных кадров завершена.', { exact: false }).waitFor();
+    else await page.locator('#video-toggle-label').getByText('Проверить по интервалу', {exact:true}).waitFor();
     assert.deepEqual(state.posts.slice(firstVideo).map(post => Number(post.time)), [0, 2, 4]);
     assert.equal(state.maxActive, 1, 'Video requests must be sequential');
     assert.equal(new Set(state.posts.slice(firstVideo).map(post => createHash('sha256').update(post.image).digest('hex'))).size, 3, 'Seeking must produce distinct actual frames, not repeated snapshots');
-    assert.match(await page.locator('#media-progress').textContent(), /3 из 3/);
+    if (android) assert.match(await page.locator('#media-progress').textContent(), /3 из 3/);
+    else assert.equal(await page.locator('#media-progress').isVisible(), false);
     assert.equal(state.mocks, 0);
 
     // Replacing an input during a request aborts that run; its late response must not replace the new file.
@@ -141,7 +143,8 @@ async function run(browser, engine, android) {
     await page.locator('#frame-interval').selectOption('2000');
     const beforeBounded = state.posts.length;
     await page.locator('#video-toggle').click();
-    await page.locator('#message').getByText('Проверка выбранных кадров завершена.', { exact: false }).waitFor();
+    if (android) await page.locator('#message').getByText('Проверка выбранных кадров завершена.', { exact: false }).waitFor();
+    else await page.locator('#video-toggle-label').getByText('Проверить по интервалу', {exact:true}).waitFor();
     assert.equal(state.posts.length - beforeBounded, 20, 'Uploaded video is bounded to 20 frames per run');
     assert.equal(Number(state.posts.at(-1).time), 38);
     await page.locator('#media-file').setInputFiles(longClip);

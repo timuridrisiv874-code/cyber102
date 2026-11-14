@@ -123,7 +123,8 @@ async function run(browser, name, options, mock) {
   const snapshot = checkedFrame.locator('#snapshot');
   const marker = checkedFrame.locator('#detection');
   const metrics = page.locator('#video-metrics');
-  const checkCount = count => metrics.getByText(`Проверено кадров: ${count}`, { exact: false }).waitFor();
+  const checkCount = count => page.waitForFunction(count =>
+    document.getElementById('video-metrics').textContent === `Проверено кадров: ${count}`, count);
   const startFrame = async button => {
     const [frame] = await Promise.all([mock.nextFrame(), button.click()]);
     return frame;
@@ -173,7 +174,8 @@ async function run(browser, name, options, mock) {
     const thirdPending = mock.nextFrame();
     second.reply(200, { status: 'unusable', source: 'local_vision', model });
     await checkCount(2);
-    assert.equal(await metrics.innerText(), 'Проверено кадров: 2');
+    assert.equal(await metrics.textContent(), 'Проверено кадров: 2');
+    if (!android) assert.equal(await metrics.isVisible(), false);
     await page.getByText('Не удалось оценить узел').waitFor();
     assert.equal(await marker.isVisible(), false);
     assert.notEqual(await snapshot.evaluate(canvas => canvas.toDataURL()), firstImage);

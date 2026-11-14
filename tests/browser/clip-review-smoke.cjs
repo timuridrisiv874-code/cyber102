@@ -182,7 +182,7 @@ async function run(browser, engine, android) {
     if (!android) {
       assert.equal(await page.locator('#camera-mode').inputValue(), 'video', 'A whole-video review must retain the selected video mode');
       assert.equal(await page.locator('#frame-interval').inputValue(), '10000');
-      assert.doesNotMatch(resultText, /Длительность|Промежутки между ними не проверялись/);
+      assert.doesNotMatch(resultText, /Длительность|Модель отметила|выбранных кадров|Повторно проверено|Повторная проверка|Промежутки между ними не проверялись/);
     }
     if (android) assert.match(resultText, /не сохранён в историю/);
     else assert.doesNotMatch(resultText, /не сохранён в историю/);
@@ -259,14 +259,14 @@ async function run(browser, engine, android) {
       assert.equal(await page.locator('#details').isVisible(), false);
       const residual=page.locator('.video-review-evidence');
       await residual.locator('summary').press('Enter');
-      await residual.getByRole('button',{name:/Не удалось оценить/}).press('Enter');
+      await residual.getByRole('button',{name:/Нужно переснять/}).press('Enter');
       await residual.locator('.video-review-inspect').waitFor();
       assert.equal(state.photoPosts.length,2);
       state.mode='separated-details';
       await page.locator('#video-review-run').click();
       await gallery.waitFor();
       const headline = await page.locator('.video-review-summary').innerText();
-      assert.match(headline, /При уточнении отмечены признаки трещины\./);
+      assert.match(headline, /признаки трещины\./);
       assert.doesNotMatch(headline, /проводки/);
       const pages = [], total = Number((await position.innerText()).split(' из ')[1]);
       assert.ok(total >= 5 && total <= 7);
@@ -287,11 +287,11 @@ async function run(browser, engine, android) {
       assert.equal(await gallery.locator('.video-review-gallery-nav').count(), 0);
       state.mode = 'clear';
       await page.locator('#video-review-run').click();
-      await page.locator('.video-review-summary').getByText(/явных внешних дефектов не замечено/i).waitFor();
+      await page.locator('.video-review-summary').getByText(/видимых дефектов не обнаружено/i).waitFor();
       assert.equal(await gallery.count(), 0);
       state.mode='empty';
       await page.locator('#video-review-run').click();
-      await page.locator('#video-review-status').getByText('Модель не вернула наблюдений',{exact:false}).waitFor();
+      await page.locator('#video-review-status').getByText('Не удалось получить результат.',{exact:false}).waitFor();
       assert.equal(await page.locator('#video-review-results').isVisible(),false);
     }
 
@@ -308,7 +308,7 @@ async function run(browser, engine, android) {
     }
     state.mode = 'mismatch';
     await page.locator('#video-review-run').click();
-    await page.locator('#video-review-status').getByText('Позиции наблюдений не совпали', { exact: false }).waitFor();
+    await page.locator('#video-review-status').getByText(android ? 'Позиции наблюдений не совпали' : 'Не удалось сопоставить результат с видео.', { exact: false }).waitFor();
     assert.equal(await page.locator('#video-review-results').isVisible(), false, 'A timestamp mismatch must not show misleading frame results');
 
     state.mode = 'hold';
@@ -316,7 +316,7 @@ async function run(browser, engine, android) {
     await page.locator('#video-review-cancel').click();
     state.pending.shift()(); await delay(100);
     assert.equal(await page.locator('#video-review-results').isVisible(), false, 'Late cancelled results are ignored');
-    assert.match(await page.locator('#video-review-status').textContent(), /отменён/);
+    assert.match(await page.locator('#video-review-status').textContent(), /отмен[ёе]н/);
     if (!android) {
       await page.locator('#video-review-run').click(); await until(() => state.pending.length === 1);
       await page.locator('#media-file').setInputFiles(path.join(root,'web/demo-pump.jpg'));
@@ -336,7 +336,7 @@ async function run(browser, engine, android) {
     await page.waitForFunction(() => document.querySelector('#uploaded-video').readyState >= 2);
     assert.equal(await page.locator('#video-review-run').isDisabled(), true);
     if (!android) {
-      await page.locator('#video-review-status').getByText(/Разбор видео недоступен/).waitFor();
+      await page.locator('#video-review-status').getByText(/Проверка видео временно недоступна/).waitFor();
       assert.equal(await page.locator('#check').isVisible(), false);
     }
     assert.equal(requests.includes('/api/inspections'), false);
