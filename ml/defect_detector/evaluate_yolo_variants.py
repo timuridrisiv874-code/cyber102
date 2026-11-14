@@ -1,0 +1,113 @@
+"""Measure YOLO checkpoints on reviewed images at several input sizes and thresholds."""
+import argparse
+from collections import Counter
+from hashlib import file_digest
+import json
+from pathlib import Path
+from statistics import median
+
+from evaluate import class_negative_frames, infer, localization_errors, measurements
+
+THRESHOLDS = (.01, .05, .15, .25)
+
+
+def load_datasets(specifications, exclusions):
+    datasets = {}
+    for name, folder, *manifests in specifications:
+        if name in datasets:
+            raise ValueError(f'Duplicate dataset name: {name}')
+        annotations = [row for path in manifests for row in json.loads(Path(path).read_bytes())]
+        rows, paths, names = [], [], set()
+        for row in annotations:
+            filename = row['file']
+            if not filename or Path(filename).name != filename or filename in names:
+                raise ValueError(f'Expected unique image basenames: {filename}')
+            names.add(filename)
+            if filename in exclusions.get(name, ()):
+                continue
+            path = Path(folder) / filename
+            with path.open('rb') as image:
+                if file_digest(image, 'sha256').hexdigest() != row['sha256']:
+                    raise ValueError(f'Image contents differ from annotations: {path}')
+            rows.append(row)
+            paths.append(path)
+        if not set(exclusions.get(name, ())) <= names or not rows:
+            raise ValueError(f'Unknown exclusion or empty dataset: {name}')
+        datasets[name] = (rows, paths)
+    if not set(exclusions) <= datasets.keys():
+        raise ValueError('Exclusions refer to an unknown dataset')
+    return datasets
+
+
+def summarize(rows, predictions, labels):
+    report = {}
+    for label in labels:
+        scoped = [{**r, 'objects': [box for box in r['objects'] if box['class'] == label]}
+                  for r in rows
+                  if label in r.get('reviewedLabels', labels)]
+        if not scoped:
+            continue
+        errors = localization_errors(scoped, predictions, .01, .5)
+        report[label] = {
+            'thresholds': {f'{floor:.2f}': measurements(scoped, predictions, (label,), floor, .5)['classes'][label]
+                           for floor in THRESHOLDS},
+            'negativeFrames': {f'{floor:.2f}': class_negative_frames(scoped, predictions, (label,), floor)[label]
+                               for floor in (.01, .25)},
+            'missesAtFloor': dict(Counter(error['reason'] for error in errors)),
+        }
+    return report
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('output', type=Path)
+    parser.add_argument('--dataset', action='append', nargs='+', required=True,
+                        help='Name, image directory and one or more annotation manifests')
+    parser.add_argument('--exclude', action='append', nargs=2, metavar=('DATASET', 'BASENAME'), default=[])
+    parser.add_argument('--model', action='append', nargs=2, dest='models', metavar=('NAME', 'WEIGHTS'),
+                        required=True)
+    parser.add_argument('--size', type=int, action='append', required=True)
+    parser.add_argument('--tiles', action='store_true', help='Also test tiled inference at the first size')
+    parser.add_argument('--device', default='0')
+    args = parser.parse_args()
+    if any(size < 32 or size % 32 for size in args.size):
+        parser.error('--size must be a positive multiple of 32')
+    if any(len(item) < 3 for item in args.dataset):
+        parser.error('--dataset needs a name, images directory and annotation manifest')
+    if len(dict(args.models)) != len(args.models):
+        parser.error('Model names must be unique')
+    excluded = {}
+    for name, file in args.exclude:
+        excluded.setdefault(name, []).append(file)
+    datasets = load_datasets(args.dataset, excluded)
+
+    from ultralytics import YOLO, settings
+
+    settings.update({'sync': False})
+    report = {'device': args.device, 'excluded': excluded, 'runs': {}}
+    variants = [(str(size), size, False) for size in dict.fromkeys(args.size)]
+    if args.tiles:
+        variants.append((f'{args.size[0]}-tiles', args.size[0], True))
+    for name, filename in args.models:
+        path = Path(filename).resolve(strict=True)
+        model = YOLO(str(path))
+        with path.open('rb') as weights:
+            result = {'sha256': file_digest(weights, 'sha256').hexdigest(), 'variants': {}}
+        report['runs'][name] = result
+        for mode, size, tiles in variants:
+            variant = result['variants'][mode] = {}
+            for key, (rows, paths) in datasets.items():
+                labels = sorted({obj['class'] for row in rows for obj in row['objects']} & set(model.names.values()))
+                if not labels:
+                    continue
+                predictions, timings = infer(model, paths, args.device, size, tiles=tiles)
+                variant[key] = {'summary': summarize(rows, predictions, labels), 'timing': timings,
+                                'medianMs': median(timings.values()), 'predictions': predictions}
+                print(name, mode, key, round(variant[key]['medianMs']), flush=True)
+                temporary = args.output.with_suffix(args.output.suffix + '.tmp')
+                temporary.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+                temporary.replace(args.output)
+
+
+if __name__ == '__main__':
+    main()
