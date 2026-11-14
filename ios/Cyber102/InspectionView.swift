@@ -9,7 +9,9 @@ private enum CaptureSheet: String, Identifiable { case photo, qr, measurePhoto, 
 struct InspectionView: View {
     private static let en = Locale.Language(identifier: "en")
     private static let ru = Locale.Language(identifier: "ru")
-    @State private var engine = InspectionEngine()
+    @Environment(\.scenePhase) private var scenePhase
+    private let engine = InspectionEngine.shared
+    @State private var profile: InspectionProfile = .detailed
     @StateObject private var store = InspectionStore()
     @State private var picked: PhotosPickerItem?
     @State private var clip: InspectionClip?
@@ -37,6 +39,7 @@ struct InspectionView: View {
     @State private var translationConfig: TranslationSession.Configuration?
     @State private var translating = false
     @State private var translationEntryID: UUID?
+    @State private var translationRun = UUID()
     @State private var missingLanguage = false
     @State private var showHistory = false
 
@@ -105,9 +108,16 @@ struct InspectionView: View {
                         .accessibilityLabel("Время кадра")
                         .disabled(analysis != nil || translating)
                     }
-                    if analysis == nil {
-                        Button("Проверить на iPhone", action: analyze)
-                            .disabled(jpeg == nil || translating || loadingFrame)
+                    Picker("Режим анализа", selection: $profile) {
+                        Text("Подробный").tag(InspectionProfile.detailed)
+                        Text("Быстрый").tag(InspectionProfile.quick)
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("offline-analysis-profile")
+                    .disabled(analysis != nil || translating)
+                    if analysis == nil && !translating {
+                        Button(entry == nil ? "Проверить на iPhone" : "Проверить ещё раз", action: analyze)
+                            .disabled(jpeg == nil || loadingFrame)
                     } else {
                         Button("Остановить", role: .cancel, action: stop)
                     }
@@ -115,6 +125,7 @@ struct InspectionView: View {
                 }
                 if let entry {
                     Section("Предварительное наблюдение") {
+                        if let timing = entry.timing { timingDetails(timing) }
                         Text(entry.russian ?? entry.english).textSelection(.enabled)
                         if entry.russian != nil {
                             DisclosureGroup("Английский оригинал") { Text(entry.english).textSelection(.enabled) }
@@ -127,6 +138,10 @@ struct InspectionView: View {
                         Button(store.entries.first(where: { $0.id == entry.id }) == nil ? "Сохранить осмотр" : "Обновить запись") {
                             saveDraft()
                         }
+                        Button { openCamera(.photo) } label: {
+                            Label("Снять следующее фото", systemImage: "camera")
+                        }
+                        .disabled(analysis != nil || translating)
                     }
                 }
                 if let message = error ?? store.error { Section { Text(message).foregroundStyle(.secondary) } }
@@ -150,6 +165,7 @@ struct InspectionView: View {
                                 Button("Открыть кадр с точками") { historyPhoto = row }
                             }
                         }
+                        if let timing = row.timing { timingDetails(timing) }
                         if !row.english.isEmpty { Text(row.russian ?? row.english).textSelection(.enabled) }
                         if row.russian != nil {
                             DisclosureGroup("Английский оригинал") { Text(row.english).textSelection(.enabled) }
@@ -162,6 +178,12 @@ struct InspectionView: View {
                         SavedMeasurementView(jpeg: data, measurement: value)
                     }
                 }
+            }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background && (analysis != nil || translating) {
+                stop()
+                error = "Проверка остановлена при переходе в фон. Можно продолжить с этим кадром или выбрать другой."
             }
         }
         .onChange(of: picked) { _, value in
@@ -224,14 +246,15 @@ struct InspectionView: View {
         }
         .translationTask(translationConfig) { session in
             guard let id = translationEntryID, entry?.id == id, let english = entry?.english else { return }
+            let token = translationRun
             do {
                 let response = try await session.translate(english)
-                guard entry?.id == id else { return }
+                guard translationRun == token, translationEntryID == id, entry?.id == id else { return }
                 entry?.russian = response.targetText
                 missingLanguage = false
                 error = nil
             } catch {
-                guard entry?.id == id else { return }
+                guard translationRun == token, translationEntryID == id, entry?.id == id else { return }
                 self.error = "Русский перевод недоступен. \(error.localizedDescription)"
             }
             if translationEntryID == id { translating = false; phase = "" }
@@ -241,6 +264,24 @@ struct InspectionView: View {
     @ViewBuilder private func equipmentDetails(_ object: RegisteredEquipment) -> some View {
         ForEach(object.details, id: \.label) { field in
             LabeledContent(field.label, value: field.value).font(.subheadline)
+        }
+    }
+    @ViewBuilder private func timingDetails(_ timing: InspectionTiming) -> some View {
+        let name = timing.profile == .quick ? "Быстрый" : "Подробный"
+        let time: (Double) -> String = { milliseconds in
+            (milliseconds / 1_000).formatted(.number.precision(.fractionLength(0...2))) + " с"
+        }
+        DisclosureGroup("\(name) · анализ \(time(timing.totalMs))") {
+            if timing.preparationMs > 0 { LabeledContent("Загрузка модели", value: time(timing.preparationMs)) }
+            LabeledContent("Обработка кадра и запроса", value: time(timing.promptMs))
+            LabeledContent("Входных токенов", value: String(timing.inputTokens))
+            LabeledContent("Генерация ответа", value: time(timing.generationMs))
+            LabeledContent("Токенов ответа", value: String(timing.generatedTokens))
+        }
+        .font(.subheadline)
+        if timing.truncated {
+            Text("Достигнут лимит ответа. Описание может быть неполным.")
+                .font(.subheadline).foregroundStyle(.secondary)
         }
     }
     private func selectPhoto(_ bytes: Data) throws {
@@ -302,15 +343,16 @@ struct InspectionView: View {
         guard let jpeg else { return }
         let id = UUID(); run = id
         let epoch = engine.begin()
-        error = nil; phase = "LFM3 описывает фото…"; entry = nil; note = ""
+        let selectedProfile = profile
+        error = nil; phase = "LFM3 описывает фото…"; entry = nil
         translationConfig = nil; translationEntryID = nil; translating = false; missingLanguage = false
         analysis = Task {
             defer { if run == id { analysis = nil } }
             do {
-                let english = try await engine.describe(jpeg, epoch: epoch)
+                let output = try await engine.describe(jpeg, profile: selectedProfile, epoch: epoch)
                 guard run == id, !Task.isCancelled else { return }
                 let inspectionDate = store.entries.first { $0.id == draftID }?.date ?? Date()
-                entry = InspectionEntry(id: draftID, date: inspectionDate, english: english, russian: nil, qr: equipment?.serial, note: "", videoSeconds: frameSeconds, equipment: equipment)
+                entry = InspectionEntry(id: draftID, date: inspectionDate, english: output.text, russian: nil, qr: equipment?.serial, note: note, videoSeconds: frameSeconds, equipment: equipment, timing: InspectionTiming(output))
                 phase = ""
                 let status = await LanguageAvailability().status(from: Self.en, to: Self.ru)
                 guard run == id, !Task.isCancelled else { return }
@@ -323,6 +365,7 @@ struct InspectionView: View {
         }
     }
     private func startTranslation(_ id: UUID) {
+        translationRun = UUID()
         error = nil
         translating = true; translationEntryID = id; phase = "Перевод на русский…"
         if translationConfig == nil { translationConfig = .init(source: Self.en, target: Self.ru) }
@@ -330,8 +373,12 @@ struct InspectionView: View {
     }
     private func stop() {
         run = UUID()
-        analysis?.cancel(); analysis = nil
-        engine.cancel()
+        translationRun = UUID()
+        if let analysis {
+            analysis.cancel()
+            engine.cancel()
+            self.analysis = nil
+        }
         translationEntryID = nil; translationConfig = nil; translating = false; phase = ""
     }
 }

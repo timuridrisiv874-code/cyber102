@@ -1,0 +1,160 @@
+{
+  "date": "2026-11-14",
+  "platform": "Mac, Apple M5, arm64, macOS 26.0; Xcode 26.3, Apple Swift 6.2.4 (macOS target).",
+  "scope": "Production iOS PhotoCapture.swift and InspectionEngine.swift linked to the shared native C++ CPU archive. No iPhone, simulator runtime or Apple Translation was used. This measures visual inspection up to receipt of the English answer, after initial import of the photo.",
+  "modelRepository": "LiquidAI/LFM3-VL-2B-GGUF",
+  "modelRevision": "1add221a5ea6c047fcf1eaaf2d247939d7cf8849",
+  "nativeLlamaRevision": "b1b770d90d94cad9e9ea5b993bdbc383a522fb28",
+  "model": "Q4_K_M with F16 projector, CPU with four threads",
+  "baseline": "App commit aaa8f792d8913499d7ca2d356fa6594cee885d87, old detailed-only actor, new host process, identical native archive. Sequence PIPE-04 (model cold), PUMP-16, PIPE-12, PIPE-04 (last three model warm). The old detailed output exactly matches both new detailed outputs for all three photos. Baseline times are a separate run and may include concurrent host build activity.",
+  "method": "After two consecutive different photos, run each mode twice on each photo with a loaded model, alternating pair order. Wall times use monotonic clocks and include resize, file I/O, encoding, inference and generation for the request. The lifecycle samples are separate. No other project builds overlapped the paired run. A cold sample means model unloaded in the process, not an empty OS file cache.",
+  "qualityScope": "Human-readable visual comparison on three selected photos only. No expert inspection labels.",
+  "samples": [
+    {
+      "photo": "PIPE-04",
+      "pixels": [
+        588,
+        320
+      ],
+      "sha256": "0230eb36b33b192145565bc76f3ecbc20d218763152d65125eca0f127ec9191f",
+      "oldDetailedWallMs": [
+        7094.3,
+        4404.4
+      ],
+      "detailed": {
+        "wallMsMedian": 5538.0,
+        "wallMs": [
+          6171.8,
+          4904.1
+        ],
+        "inputTokens": 260,
+        "generatedTokens": 67,
+        "truncated": false,
+        "text": "The image shows a weathered, cylindrical metal pipe or rail, likely part of industrial piping or a structural component. Clear defect: a long, jagged crack runs along the lower outer surface, with a smaller branching crack above it. Location: exterior face of the pipe, near the bottom. No other damage is clearly visible."
+      },
+      "quick": {
+        "wallMsMedian": 3551.1,
+        "wallMs": [
+          4069.5,
+          3032.7
+        ],
+        "inputTokens": 197,
+        "generatedTokens": 33,
+        "truncated": false,
+        "text": "Cracked pipe. The clearest defect is a long, jagged crack running along the pipe's surface, starting from the middle and extending towards the right."
+      },
+      "speedRatio": 1.56,
+      "visualReview": "Оба режима видят длинную неровную трещину на наружной поверхности трубы. Быстрый ответ начинает её с середины, хотя она продолжается к левому краю снимка."
+    },
+    {
+      "photo": "PUMP-16",
+      "pixels": [
+        1024,
+        768
+      ],
+      "sha256": "e1468cc7f48f2f3aefd715813fd544ff8e3c542515bc722e5bbfcd6c95982c46",
+      "oldDetailedWallMs": [
+        15650.7
+      ],
+      "detailed": {
+        "wallMsMedian": 18595.0,
+        "wallMs": [
+          22271.6,
+          14918.5
+        ],
+        "inputTokens": 848,
+        "generatedTokens": 101,
+        "truncated": false,
+        "text": "The image shows an electrical connector/terminal block with multiple wire terminals, some with copper/brass fittings and nuts, and colored wires (red, blue, yellow/green). Visible defects: corrosion/rust on several wire nuts and terminals, especially the blue wire connection and copper loop; worn/loose wire ends; a white cable labeled \"105M\" appears frayed or damaged near the right terminal. No internal fault inference—only observed physical wear/corrosion."
+      },
+      "quick": {
+        "wallMsMedian": 4371.5,
+        "wallMs": [
+          4405.2,
+          4337.8
+        ],
+        "inputTokens": 245,
+        "generatedTokens": 30,
+        "truncated": false,
+        "text": "The component is a terminal block. The clearest defect is corrosion and missing screws on the lower left terminal, located at the bottom of the image."
+      },
+      "speedRatio": 4.25,
+      "visualReview": "Оба режима узнали клеммную колодку. Ни один ясно не называет отсоединённый кольцевой наконечник синего провода справа. Быстрый ответ утверждает, что слева внизу отсутствуют винты. Подробный ответ описывает повреждение белого провода и коррозию контактов. Эти дополнительные дефекты снимок не подтверждает."
+    },
+    {
+      "photo": "PIPE-12",
+      "pixels": [
+        1024,
+        685
+      ],
+      "sha256": "9a6f1a4062911c9a19b3af80795e36f86eaf31d947935cda64083d409a394bcb",
+      "oldDetailedWallMs": [
+        13956.2
+      ],
+      "detailed": {
+        "wallMsMedian": 13446.6,
+        "wallMs": [
+          13421.1,
+          13472.0
+        ],
+        "inputTokens": 752,
+        "generatedTokens": 77,
+        "truncated": false,
+        "text": "The image shows a close-up of a rusted metal pipe or cylindrical component with a banded joint secured by multiple bolts or rivets. Visible damage includes extensive surface rust, cracking, and corrosion along the joint and surrounding areas. The metal surface exhibits flaking and discoloration, particularly around the bolt regions. No internal faults or operating status can be determined from the image."
+      },
+      "quick": {
+        "wallMsMedian": 3634.5,
+        "wallMs": [
+          3281.7,
+          3987.3
+        ],
+        "inputTokens": 229,
+        "generatedTokens": 24,
+        "truncated": false,
+        "text": "Rusty pipe; clear defect: corrosion and pitting on the pipe's surface, especially near the bolts."
+      },
+      "speedRatio": 3.7,
+      "visualReview": "Оба режима видят коррозию рядом с крепежом. Подробный сохраняет отслаивание поверхности и соединение с хомутом, быстрый опускает эти детали. Быстрый указывает на питтинг. Снимок не позволяет подтвердить глубину поражения."
+    }
+  ],
+  "lifecycle": [
+    {
+      "loadedBefore": false,
+      "phase": "firstPhoto",
+      "photo": "PIPE-04",
+      "preparationMs": 1620.5,
+      "profile": "detailed",
+      "totalMs": 7254.4
+    },
+    {
+      "loadedBefore": true,
+      "phase": "secondPhoto",
+      "photo": "PUMP-16",
+      "preparationMs": 0,
+      "profile": "quick",
+      "totalMs": 4234.0
+    },
+    {
+      "loadedBefore": true,
+      "phase": "afterCancel",
+      "photo": "PIPE-04",
+      "preparationMs": 0,
+      "profile": "quick",
+      "totalMs": 3041.8
+    },
+    {
+      "loadedBefore": false,
+      "phase": "afterMemoryPressure",
+      "photo": "PIPE-04",
+      "preparationMs": 1302.3,
+      "profile": "quick",
+      "totalMs": 4788.1
+    }
+  ],
+  "checks": [
+    "Stale request rejected after cancellation.",
+    "Short cancel kept the model loaded; continued inference returned a result.",
+    "Memory-pressure entry point unloaded the model, next request reloaded successfully, final release left model unloaded."
+  ],
+  "reproduce": "See InspectionProfileChecks.swift for commands. Supply three photos in the order PIPE-04, PUMP-16, PIPE-12; the SHA-256 hashes above identify the exact input files."
+}
