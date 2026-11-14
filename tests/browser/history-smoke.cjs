@@ -9,6 +9,9 @@ const evidenceId = '11111111-1111-4111-8111-111111111111';
 const missingId = '22222222-2222-4222-8222-222222222222';
 const syntheticNote = 'Автопроверка релиза 0.6: синтетическое фото, ручные демонстрационные значения.';
 const engineerNote = 'После автопроверки осмотреть крепление со стороны муфты.';
+const recordId = '33333333-3333-4333-8333-333333333333';
+const workId = '44444444-4444-4444-8444-444444444444';
+let firstWorkRequest, loseReply;
 const base = {serial: 'P-102', capturedAt: '2026-11-13T16:00:00Z', note: '', telemetry: {}, vision: {}, findings: []};
 const records = [
   {...base, id: 'camera-demo', scenarioId: 'coupling_guard',
@@ -16,7 +19,9 @@ const records = [
     evidence: {analysisId: evidenceId, imageUrl: 'javascript:alert(1)',
       result: {model: 'LocalModel', box: {x: 0.125, y: 0.25, width: 0.5, height: 0.25},
         observation: '<img id="unsafe" src=x onerror=alert(1)>'}}},
-  {...base, id: 'camera-none', scenarioId: null, note: engineerNote,
+  {...base, id: recordId, scenarioId: null, note: engineerNote,
+    closeup: {componentLabel: 'Выходной фланец', point: {x: 0.4, y: 0.6}, defectType: 'crack',
+      measurement: {referenceMm: 10, reference: [{x:0.1,y:0.3},{x:0.3,y:0.3}], target: [{x:0.2,y:0.5},{x:0.5,y:0.5}], lengthMm: 15}},
     vision: {guard_issue: true, terminal_damage: false, seal_leak: null},
     provenance: {source: 'camera_inspection', captureSource: 'uploaded_video', telemetry: 'none'},
     evidence: {analysisId: missingId, result: {model: 'LocalModel', media: {videoTimeSeconds: 4.39}}},
@@ -27,19 +32,34 @@ const records = [
       finding: 'Возможные признаки коррозии', observation: 'Корпус насоса: возможные признаки коррозии.'}}},
   {...base, id: 'old-demo', capturedAt: '2026-11-10T16:00:00Z', scenarioId: 'coupling_guard', note: 'Старая запись', provenance: {}, evidence: {}},
 ];
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const pathname = new URL(req.url, 'http://localhost').pathname;
   const json = data => {res.writeHead(200, {'Content-Type': 'application/json'}); res.end(JSON.stringify(data));};
   if (pathname === '/api/scenarios') return json({passport: {serial: 'P-102', model: 'Demo pump', serviceLife: '—', nextService: '—'},
     qrAvailable: false, scenarios: [{id: 'coupling_guard', label: 'Кожух муфты'}]});
   if (pathname === '/api/history') return json({records});
-  if (pathname === `/api/analyses/${evidenceId}/image`) {
+  if (pathname === `/api/history/${recordId}/work` && req.method === 'POST') {
+    const chunks = [];
+    for await (const chunk of req) chunks.push(chunk);
+    const body = JSON.parse(Buffer.concat(chunks));
+    if (firstWorkRequest) assert.deepEqual(body, firstWorkRequest, 'Retry must preserve request ID and image');
+    firstWorkRequest = body;
+    assert.equal(body.action, 'replaced');
+    assert.equal(body.date, '2025-04-15');
+    assert.equal(Buffer.from(body.image, 'base64').subarray(0, 2).toString('hex'), 'ffd8');
+    records[1].work = [{id: workId, action: body.action, date: body.date, imageUrl: pathname + '/' + workId + '/image'}];
+    if (loseReply) { loseReply = false; res.writeHead(502); res.end(); return; }
+    return json({record: records[1], created: false});
+  }
+  if ([`/api/analyses/${evidenceId}/image`, `/api/history/${recordId}/closeup/image`,
+    `/api/history/${recordId}/work/${workId}/image`].includes(pathname)) {
     res.writeHead(200, {'Content-Type': 'image/jpeg'});
     res.end(fs.readFileSync(path.join(root, 'web/demo-pump.jpg')));
     return;
   }
   const files = {'/checkpoint.html': 'text/html', '/checkpoint.js': 'application/javascript', '/bootstrap.js': 'application/javascript',
-    '/styles.css': 'text/css', '/checkpoint.css': 'text/css', '/workspace.css': 'text/css', '/shell.js': 'application/javascript'};
+    '/styles.css': 'text/css', '/checkpoint.css': 'text/css', '/workspace.css': 'text/css', '/shell.js': 'application/javascript',
+    '/inspection-photo.js': 'application/javascript'};
   if (files[pathname] && fs.existsSync(path.join(root, 'web', pathname))) {
     res.writeHead(200, {'Content-Type': files[pathname]}); res.end(fs.readFileSync(path.join(root, 'web', pathname))); return;
   }
@@ -55,6 +75,7 @@ const server = http.createServer((req, res) => {
     ]) {
       const browser = await engine.launch(options);
       try {
+        firstWorkRequest = null; loseReply = true; delete records[1].work;
         const page = await browser.newPage(devices['iPhone 13']);
         const errors = [];
         page.on('pageerror', error => errors.push(error.message));
@@ -121,7 +142,7 @@ const server = http.createServer((req, res) => {
         await dialog.waitFor({state: 'hidden'});
         assert.equal(await open.evaluate(button => document.activeElement === button), true);
 
-        const broken = videoEntry.getByText('Открыть кадр', {exact:true});
+        const broken = videoEntry.getByText('Общий вид', {exact:true});
         await broken.click();
         await dialog.getByRole('status').getByText('Не удалось загрузить кадр.', {exact:true}).waitFor();
         await dialog.getByRole('button', {name: /закрыть/i}).click();
@@ -132,8 +153,39 @@ const server = http.createServer((req, res) => {
         await dialog.locator('img').waitFor({state: 'visible'});
         assert.equal(await toggle.isVisible(), false, 'A frame without saved geometry must have no overlay control');
         assert.equal((await dialog.innerText()).match(/не удалось|недоступ|не загруз/i), null);
+        await dialog.getByRole('button', {name: 'Закрыть'}).click();
+        await videoEntry.getByRole('button', {name: 'Крупный план'}).click();
+        await dialog.locator('img').waitFor();
+        assert.equal(await dialog.locator('svg line').count(), 2);
+        assert.match(await dialog.innerText(), /Дефект ≈ 15 мм/);
+        await dialog.getByRole('button', {name: 'Линии измерения'}).click();
+        assert.equal(await dialog.locator('svg').isVisible(), false);
+        await dialog.getByRole('button', {name: 'Закрыть'}).click();
+        await videoEntry.getByRole('button', {name: 'Зафиксировать работу'}).tap();
+        const work = page.locator('#journal-work');
+        await work.waitFor();
+        assert.match(await work.innerText(), /Выходной фланец/);
+        await work.locator('#work-action').selectOption('replaced');
+        await work.locator('#work-date').fill('2025-04-15');
+        const picker = page.waitForEvent('filechooser');
+        await work.getByLabel('Добавить фото после работы').tap();
+        await (await picker).setFiles(path.join(root, 'web/demo-pump.jpg'));
+        await work.locator('#work-preview').waitFor();
+        await work.getByRole('button', {name: 'Сохранить работу'}).tap();
+        await work.getByText('Можно повторить сохранение.', {exact: false}).waitFor();
+        assert.equal(await work.locator('#work-action').inputValue(), 'replaced');
+        await work.getByRole('button', {name: 'Сохранить работу'}).tap();
+        await work.waitFor({state: 'hidden'});
+        assert.match(await videoEntry.innerText(), /Узел заменён/);
+        await page.reload();
+        await videoEntry.getByRole('button', {name: 'Фото после'}).tap();
+        await dialog.locator('img').waitFor();
+        assert.match(await dialog.innerText(), /15 апреля 2025/);
+        assert.equal(await videoEntry.locator('.journal-work-event').count(), 1);
+        assert.equal(await entries.last().getByRole('button', {name: 'Зафиксировать работу'}).count(), 0);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
         assert.deepEqual(errors, []);
-        console.log(`${name}: PASS (concise history, preserved notes and evidence, inline photo, focus, image failure and recovery)`);
+        console.log(`${name}: PASS (history, source/close-up/after photos, measurement, lost response and idempotent retry on mobile)`);
       } finally {await browser.close();}
     }
   } finally {await new Promise(resolve => server.close(resolve));}

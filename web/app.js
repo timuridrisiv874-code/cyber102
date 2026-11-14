@@ -2,7 +2,7 @@
 if (window.CyberWebBoot?.blocked) return;
 // The inspection page can retry a missing script without binding controls twice.
 if (!window.CyberMedia || !window.CyberInspection ||
-    (!window.CyberOffline?.enabled && (!window.CyberVideoReview || !window.CyberAnalysisJobs))) return;
+    (!window.CyberOffline?.enabled && (!window.CyberVideoReview || !window.CyberAnalysisJobs || !window.CyberInspectionPhoto))) return;
 if (window.CyberCaptureStarted) return;
 window.CyberCaptureStarted = true;
 const byId = (id) => document.getElementById(id);
@@ -234,15 +234,17 @@ function render() {
   if (detected) {
     detection.dataset.status = result.status;
     const [primaryLiquid, ...otherLiquid] = result.liquidBoxes ?? [];
-    detection.setAttribute('aria-label', primaryLiquid
-      ? `Открыть наблюдение: ${liquidNames[primaryLiquid.kind]}`
-      : `Открыть карточку узла: ${result.component}`);
+    detection.setAttribute('aria-label', `Открыть узел: ${primaryLiquid ? liquidNames[primaryLiquid.kind] : result.component}`);
     byId('detection-label').textContent = primaryLiquid ? liquidNames[primaryLiquid.kind] : result.component;
     for (const item of otherLiquid) {
-      const marker = document.createElement('div');
+      const marker = document.createElement('button');
+      marker.type = 'button';
       marker.className = detection.className;
-      marker.setAttribute('aria-hidden', 'true');
-      marker.style.pointerEvents = 'none';
+      marker.setAttribute('aria-label', `Открыть участок: ${liquidNames[item.kind]}`);
+      marker.addEventListener('click', event => {
+        const [left, top, right, bottom] = item.box;
+        selectInspectionTarget(event, {x:left / 1000, y:top / 1000, width:(right - left) / 1000, height:(bottom - top) / 1000}, liquidNames[item.kind], item.box.join(','));
+      });
       const label = document.createElement('span');
       label.textContent = liquidNames[item.kind];
       marker.append(label);
@@ -739,9 +741,19 @@ video.addEventListener('loadeddata', render);
 video.addEventListener('canplay', render);
 video.addEventListener('playing', render);
 video.addEventListener('resize', render);
-detection.addEventListener('click', () => {
+function selectInspectionTarget(event, box, label, anchor = 'primary') {
+  if (!box) return;
+  const marker = event.currentTarget.getBoundingClientRect();
+  // The overlay is already positioned in image coordinates, excluding letterboxing.
+  const fraction = (pixel, start, span) => event.detail && span ? Math.max(0, Math.min(1, (pixel - start) / span)) : 0.5;
+  const point = {x: Math.min(1, box.x + box.width * fraction(event.clientX, marker.left, marker.width)),
+    y: Math.min(1, box.y + box.height * fraction(event.clientY, marker.top, marker.height))};
+  if (window.CyberInspection.openCloseup?.(point, label, anchor)) return;
   byId('result-title').focus({ preventScroll: true });
   byId('result').scrollIntoView({ block: 'nearest' });
+}
+detection.addEventListener('click', event => {
+  selectInspectionTarget(event, result?.box, byId('detection-label').textContent);
 });
 function releaseCamera() {
   regionController?.abort();

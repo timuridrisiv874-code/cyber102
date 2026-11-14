@@ -8,10 +8,11 @@
     <link rel="icon" href="/favicon.ico?v=eye-1" type="image/x-icon" sizes="16x16 32x32 48x48 64x64">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=eye-1" sizes="180x180">
     <link rel="stylesheet" href="styles.css?v=field-20261114">
-    <link rel="stylesheet" href="checkpoint.css?v=journal-frame-1">
+    <link rel="stylesheet" href="checkpoint.css?v=journal-work-1">
   <link rel="stylesheet" href="workspace.css?v=field-20261114">
     <script src="bootstrap.js?v=local-file-20261114" defer></script>
-  <script src="checkpoint.js?v=journal-frame-2" defer></script>
+    <script src="inspection-photo.js?v=journal-work-1" defer></script>
+    <script src="checkpoint.js?v=journal-work-1" defer></script>
     <script src="shell.js?v=field-20261114" defer></script>
 </head>
   <body data-page="journal">
@@ -45,7 +46,45 @@
           <p id="journal-frame-status" role="status"></p>
           <div class="journal-frame-image" id="journal-frame-image" hidden></div>
         </div>
-        <footer hidden id="journal-frame-tools"><button type="button" class="button secondary" id="journal-frame-box" aria-pressed="false">Рамка узла</button></footer>
+        <footer hidden id="journal-frame-tools">
+          <div hidden id="journal-measure-legend"><span id="journal-reference-length"></span><span id="journal-target-length"></span></div>
+          <button type="button" class="button secondary" id="journal-frame-box" aria-pressed="false">Рамка узла</button>
+        </footer>
+      </dialog>
+      <dialog id="journal-work" class="journal-work" aria-labelledby="work-title" aria-describedby="work-context">
+        <form id="work-form">
+          <h2 id="work-title">Зафиксировать работу</h2>
+          <p id="work-context"></p>
+          <fieldset id="work-fields">
+            <div class="work-inputs">
+              <label class="field" for="work-action">Что сделали
+                <select id="work-action" required autofocus>
+                  <option value="">Выберите действие</option>
+                  <option value="checked">Проверили узел</option>
+                  <option value="serviced">Обслужили узел</option>
+                  <option value="replaced">Заменили узел</option>
+                </select>
+              </label>
+              <label class="field" for="work-date">Дата работы
+                <input type="date" id="work-date" required>
+              </label>
+            </div>
+            <div class="work-photo" role="group" aria-labelledby="work-photo-title">
+              <h3 id="work-photo-title">Фото после работы</h3>
+              <div class="work-photo-actions">
+                <label class="button secondary media-upload-control"><span>Добавить фото</span><input id="work-photo" type="file" accept="image/*" aria-label="Добавить фото после работы"></label>
+                <label class="button secondary media-upload-control work-camera"><span>Снять фото</span><input id="work-camera" type="file" accept="image/*" capture="environment" aria-label="Снять фото после работы"></label>
+                <button id="work-remove-photo" class="history-evidence" type="button" hidden>Убрать фото</button>
+              </div>
+              <img id="work-preview" alt="Выбранное фото после работы" hidden>
+            </div>
+          </fieldset>
+          <p class="message" id="work-message" role="status" aria-live="polite"></p>
+          <div class="work-buttons">
+            <button type="submit" class="button primary" id="work-submit">Сохранить работу</button>
+            <button type="button" class="button secondary" id="work-close">Отмена</button>
+          </div>
+        </form>
       </dialog>
       <details class="journal-tools">
         <summary>Паспорт и проверка правил</summary>

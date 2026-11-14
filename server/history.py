@@ -45,6 +45,29 @@ def initialize(connection):
         CREATE INDEX IF NOT EXISTS inspection_records_by_serial
         ON inspection_records (serial, captured_at DESC)
     ''')
+    connection.execute('''
+        CREATE TABLE IF NOT EXISTS inspection_closeups (
+            record_id TEXT PRIMARY KEY REFERENCES inspection_records(id) ON DELETE CASCADE,
+            component_label TEXT NOT NULL,
+            point_x REAL NOT NULL CHECK(point_x BETWEEN 0 AND 1),
+            point_y REAL NOT NULL CHECK(point_y BETWEEN 0 AND 1),
+            image_jpeg BLOB NOT NULL,
+            defect_type TEXT,
+            measurement_json TEXT
+        )
+    ''')
+    connection.execute('''
+        CREATE TABLE IF NOT EXISTS inspection_work (
+            id TEXT PRIMARY KEY,
+            record_id TEXT NOT NULL REFERENCES inspection_records(id) ON DELETE CASCADE,
+            request_id TEXT NOT NULL,
+            action TEXT NOT NULL CHECK(action IN ('checked', 'serviced', 'replaced')),
+            work_date TEXT NOT NULL,
+            image_sha256 TEXT,
+            image_jpeg BLOB,
+            UNIQUE(record_id, request_id)
+        )
+    ''')
 
 
 def _identifier(value, label):
@@ -69,6 +92,31 @@ def _record(row):
         'note': note, 'requestId': request_id,
         'evidence': json.loads(evidence), 'provenance': json.loads(provenance),
     }
+
+
+def with_attachments(connection, records):
+    """Load only photo metadata for the selected records, including historical rows."""
+    grouped = {record['id']: record for record in records}
+    if not grouped:
+        return records
+    placeholders = ','.join('?' for _ in grouped)
+    for record_id, label, x, y, kind, measure in connection.execute(f'''
+        SELECT record_id, component_label, point_x, point_y, defect_type, measurement_json FROM inspection_closeups
+        WHERE record_id IN ({placeholders})''', tuple(grouped)):
+        grouped[record_id]['closeup'] = {'componentLabel': label, 'point': {'x': x, 'y': y},
+                                        'imageUrl': f'/api/history/{record_id}/closeup/image'}
+        if kind:
+            grouped[record_id]['closeup']['defectType'] = kind
+        if measure:
+            grouped[record_id]['closeup']['measurement'] = json.loads(measure)
+    for record_id, work_id, action, day, has_image in connection.execute(f'''
+        SELECT record_id, id, action, work_date, image_sha256 IS NOT NULL FROM inspection_work
+        WHERE record_id IN ({placeholders}) ORDER BY work_date DESC, rowid DESC''', tuple(grouped)):
+        work = {'id': work_id, 'action': action, 'date': day}
+        if has_image:
+            work['imageUrl'] = f'/api/history/{record_id}/work/{work_id}/image'
+        grouped[record_id].setdefault('work', []).append(work)
+    return records
 
 
 def save(connection, serial, scenario_id, telemetry, vision, findings, note='', request_id=None, *, evidence=None, provenance=None):
@@ -113,20 +161,20 @@ def save(connection, serial, scenario_id, telemetry, vision, findings, note='', 
     if (row[2], row[4], row[5], row[7], row[9], row[10]) != (
             scenario_id, telemetry_json, vision_json, note, evidence_json, provenance_json):
         raise IdempotencyConflict('Идентификатор запроса уже использован для другого осмотра.')
-    return _record(row), False
+    return with_attachments(connection, [_record(row)])[0], False
 
 
 def by_request_id(connection, serial, request_id):
     row = connection.execute(f'''
         SELECT {_RECORD_COLUMNS} FROM inspection_records WHERE serial = ? AND request_id = ?
     ''', (serial, request_id)).fetchone()
-    return _record(row) if row else None
+    return with_attachments(connection, [_record(row)])[0] if row else None
 
 
 def get_record(connection, record_id):
     _identifier(record_id, 'Идентификатор осмотра')
     row = connection.execute(f'SELECT {_RECORD_COLUMNS} FROM inspection_records WHERE id = ?', (record_id,)).fetchone()
-    return _record(row) if row else None
+    return with_attachments(connection, [_record(row)])[0] if row else None
 
 
 def list_records(connection, serial, limit=50):
@@ -139,4 +187,4 @@ def list_records(connection, serial, limit=50):
         SELECT {_RECORD_COLUMNS} FROM inspection_records
         WHERE serial = ? ORDER BY captured_at DESC, rowid DESC LIMIT ?
     ''', (serial, limit))
-    return [_record(row) for row in rows]
+    return with_attachments(connection, [_record(row) for row in rows])

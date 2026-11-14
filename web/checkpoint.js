@@ -15,10 +15,16 @@ const historyMessage = byId('history-message');
 const historyRecords = byId('history-records');
 const historyDay = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 const historyTime = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' });
+const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
+const workActions = {checked: 'Узел проверен', serviced: 'Узел обслужен', replaced: 'Узел заменён'};
+const defectNames = {corrosion: 'Коррозия', liquid: 'Следы жидкости', crack: 'Трещина или разрыв',
+  wiring: 'Повреждение проводки', coating: 'Повреждение покрытия', other: 'Другой признак'};
+const millimetres = value => value.toLocaleString('ru-RU', {maximumSignificantDigits: 4}) + ' мм';
 const lookupMessage = byId('lookup-message');
 let serial = '';
 let saveContext = null;
 let historyLoad = 0;
+let linkedRecord = new URLSearchParams(location.search).get('record');
 
 const labels = {
   vibration: 'Вибрация', temperature: 'Температура', current: 'Ток двигателя',
@@ -155,13 +161,52 @@ const frameTools = byId('journal-frame-tools');
 const boxButton = byId('journal-frame-box');
 let frameOpener;
 
-function openJournalFrame(button, path, title, context, box) {
+function validMeasurement(m) {
+  return m && [m.referenceMm, m.lengthMm].every(n => Number.isFinite(n) && n > 0) &&
+    [m.reference, m.target].every(pair => Array.isArray(pair) && pair.length === 2 &&
+      pair.every(p => p && [p.x, p.y].every(n => Number.isFinite(n) && n >= 0 && n <= 1)));
+}
+
+function addMeasureLines(measurement) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'journal-measure');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const [kind, pair] of [['reference', measurement.reference], ['target', measurement.target]]) {
+    const line = document.createElementNS(svg.namespaceURI, 'line');
+    line.setAttribute('class', kind);
+    for (let i = 0; i < pair.length; i++) {
+      line.setAttribute(`x${i + 1}`, `${pair[i].x * 100}%`);
+      line.setAttribute(`y${i + 1}`, `${pair[i].y * 100}%`);
+    }
+    svg.append(line);
+    for (const p of pair) {
+      const dot = document.createElementNS(svg.namespaceURI, 'circle');
+      dot.setAttribute('class', kind);
+      dot.setAttribute('cx', `${p.x * 100}%`);
+      dot.setAttribute('cy', `${p.y * 100}%`);
+      dot.setAttribute('r', '4');
+      svg.append(dot);
+    }
+  }
+  frameImage.append(svg);
+}
+
+function openJournalFrame(button, path, title, context, {box, point, measurement}) {
   const photo = new Image();
   photo.alt = title;
   const validBox = box && [box.x, box.y, box.width, box.height].every(Number.isFinite) &&
     box.x >= 0 && box.y >= 0 && box.width > 0 && box.height > 0 &&
     box.x + box.width <= 1.000001 && box.y + box.height <= 1.000001;
   frameImage.replaceChildren(photo);
+  const measured = validMeasurement(measurement);
+  if (measured) addMeasureLines(measurement);
+  if (point && [point.x, point.y].every(n => Number.isFinite(n) && n >= 0 && n <= 1)) {
+    const pin = element('span', undefined, 'journal-frame-point');
+    pin.setAttribute('role', 'img');
+    pin.setAttribute('aria-label', 'Позиция узла на общем кадре');
+    Object.assign(pin.style, {left: `${point.x * 100}%`, top: `${point.y * 100}%`});
+    frameImage.append(pin);
+  }
   if (validBox) {
     const marker = element('span', undefined, 'journal-frame-marker');
     marker.setAttribute('aria-hidden', 'true');
@@ -170,10 +215,18 @@ function openJournalFrame(button, path, title, context, box) {
     frameImage.append(marker);
   }
   frameImage.hidden = true;
-  frameImage.classList.remove('with-marker');
-  boxButton.setAttribute('aria-pressed', 'false');
+  frameImage.classList.toggle('with-marker', Boolean(measured));
+  boxButton.setAttribute('aria-pressed', String(Boolean(measured)));
+  boxButton.textContent = measured ? 'Линии измерения' : 'Рамка узла';
+  const legend = byId('journal-measure-legend');
+  legend.hidden = !measured;
+  if (measured) {
+    byId('journal-reference-length').textContent = 'Эталон ' + millimetres(measurement.referenceMm);
+    byId('journal-target-length').textContent = 'Дефект ≈ ' + millimetres(measurement.lengthMm);
+  }
   frameTools.hidden = true;
   frameStatus.textContent = 'Загружаем кадр…';
+  byId('journal-frame-title').textContent = title;
   byId('journal-frame-context').textContent = context;
   photo.onload = () => {
     if (photo.parentNode !== frameImage) return;
@@ -181,7 +234,7 @@ function openJournalFrame(button, path, title, context, box) {
     frameImage.style.setProperty('--photo-ratio', String(photo.naturalWidth / photo.naturalHeight));
     frameStatus.textContent = '';
     frameImage.hidden = false;
-    frameTools.hidden = !validBox;
+    frameTools.hidden = !(validBox || measured);
   };
   photo.onerror = () => {
     if (photo.parentNode === frameImage) frameStatus.textContent = 'Не удалось загрузить кадр.';
@@ -208,8 +261,135 @@ boxButton.addEventListener('click', () => {
   boxButton.setAttribute('aria-pressed', String(frameImage.classList.toggle('with-marker')));
 });
 
+function frameButton(label, path, context, overlay = {}) {
+  const button = element('button', label, 'history-evidence');
+  button.type = 'button';
+  button.setAttribute('aria-haspopup', 'dialog');
+  button.setAttribute('aria-controls', 'journal-frame');
+  button.addEventListener('click', () => openJournalFrame(button, path,
+    label === 'Открыть кадр' ? 'Кадр осмотра' : label, context, overlay));
+  return button;
+}
+
+const workDialog = byId('journal-work');
+const workForm = byId('work-form');
+const workStatus = byId('work-message');
+const workSubmit = byId('work-submit');
+const workDate = byId('work-date');
+const workAction = byId('work-action');
+const workPreview = byId('work-preview');
+let workDraft = null;
+let changingPhoto = 0;
+
+function localDate(date) {
+  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0')].join('-');
+}
+
+function openWork(record, context, opener) {
+  workForm.reset();
+  workDate.value = workDate.max = localDate(new Date());
+  workStatus.textContent = '';
+  workSubmit.disabled = byId('work-fields').disabled = byId('work-close').disabled = false;
+  byId('work-context').textContent = context;
+  workPreview.removeAttribute('src');
+  workPreview.hidden = byId('work-remove-photo').hidden = true;
+  workDraft = {record, opener, requestId: requestId(), image: '', saving: false};
+  workDialog.showModal();
+}
+
+function clearWorkPhoto() {
+  changingPhoto++;
+  workDraft.image = '';
+  workDraft.requestId = requestId();
+  workPreview.hidden = byId('work-remove-photo').hidden = true;
+  workPreview.removeAttribute('src');
+  workStatus.textContent = '';
+  workSubmit.disabled = false;
+}
+
+async function chooseWorkPhoto(input) {
+  const file = input.files?.[0];
+  if (!workDraft || workDraft.saving || !file) return;
+  input.value = '';
+  const draft = workDraft, token = ++changingPhoto;
+  workSubmit.disabled = true;
+  workStatus.textContent = 'Открываем фото…';
+  workStatus.dataset.error = 'false';
+  try {
+    const image = await window.CyberInspectionPhoto.toJpeg(file);
+    if (token !== changingPhoto || draft !== workDraft) return;
+    draft.image = image;
+    draft.requestId = requestId();
+    workPreview.src = 'data:image/jpeg;base64,' + image;
+    workPreview.hidden = byId('work-remove-photo').hidden = false;
+    workStatus.textContent = '';
+  } catch (error) {
+    if (token !== changingPhoto || draft !== workDraft) return;
+    workStatus.textContent = window.CyberInspectionPhoto ? error.message : 'Модуль фото не загрузился. Обновите страницу.';
+    workStatus.dataset.error = 'true';
+  } finally {
+    if (token === changingPhoto && draft === workDraft) workSubmit.disabled = false;
+  }
+}
+
+for (const id of ['work-photo', 'work-camera']) {
+  byId(id).addEventListener('change', event => chooseWorkPhoto(event.target));
+}
+byId('work-remove-photo').addEventListener('click', clearWorkPhoto);
+for (const control of [workDate, workAction]) {
+  control.addEventListener('input', () => { if (workDraft) workDraft.requestId = requestId(); });
+}
+byId('work-close').addEventListener('click', () => workDialog.close());
+workDialog.addEventListener('cancel', event => { if (workDraft?.saving) event.preventDefault(); });
+workDialog.addEventListener('close', () => {
+  changingPhoto++;
+  workDraft?.opener?.focus({preventScroll: true});
+  workDraft = null;
+  workPreview.removeAttribute('src');
+  workPreview.hidden = true;
+});
+
+workForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const draft = workDraft;
+  if (!draft || draft.saving || workSubmit.disabled || !workForm.reportValidity()) return;
+  draft.saving = true;
+  workSubmit.disabled = byId('work-fields').disabled = byId('work-close').disabled = true;
+  workStatus.textContent = 'Сохраняем работу…';
+  workStatus.dataset.error = 'false';
+  const controller = new AbortController();
+  const deadline = setTimeout(() => controller.abort(), 45000);
+  try {
+    const {record} = await api(`history/${draft.record.id}/work`, null, {method: 'POST',
+      headers: {'Content-Type': 'application/json'}, signal: controller.signal,
+      body: JSON.stringify({requestId: draft.requestId, action: workAction.value,
+        date: workDate.value, ...(draft.image ? {image: draft.image} : {})})});
+    if (record?.id !== draft.record.id || !Array.isArray(record.work) || !record.work.length) {
+      throw new Error('Сервер не подтвердил сохранение работы.');
+    }
+    const previous = draft.opener.closest('.history-entry');
+    if (previous?.isConnected) {
+      const updated = historyEntry(record, new Date(record.capturedAt), scenarioLabels());
+      previous.replaceWith(updated);
+      draft.opener = updated.querySelector('.work-trigger');
+    }
+    workDialog.close();
+  } catch (error) {
+    const issue = error.name === 'AbortError' || error instanceof TypeError ?
+      'Не удалось получить ответ сервера.' : error.message;
+    workStatus.textContent = `${issue} Можно повторить сохранение.`;
+    workStatus.dataset.error = 'true';
+  } finally {
+    clearTimeout(deadline);
+    draft.saving = false;
+    workSubmit.disabled = byId('work-fields').disabled = byId('work-close').disabled = false;
+  }
+});
+
 function historyEntry(record, date, scenarios) {
   const entry = element('li', undefined, 'history-entry');
+  entry.dataset.recordId = record.id;
   const captured = record.provenance?.source === 'camera_inspection';
   const scenario = scenarios.get(record.scenarioId) ?? record.scenarioId ?? 'Проверка правил';
   const evidence = record.evidence;
@@ -240,14 +420,23 @@ function historyEntry(record, date, scenarios) {
         details.append(element('p', `${labels[key] ?? key}: ${observationValue(key, value)}`));
       }
     }
+    const closeup = uuid.test(record.id) && record.closeup;
+    const nodeName = closeup?.componentLabel || result?.component || '';
+    if (closeup?.componentLabel) entry.append(element('p', nodeName, 'inspected-node'));
+    const engineerType = defectNames[closeup?.defectType];
+    const measured = validMeasurement(closeup?.measurement);
+    if (engineerType || measured) {
+      const annotation = [engineerType, measured && '≈ ' + millimetres(closeup.measurement.lengthMm)].filter(Boolean);
+      entry.append(element('p', 'Отметка инженера · ' + annotation.join(' · '), 'journal-annotation'));
+    }
     const note = result?.observation?.trim();
     if (note) {
       const normalized = value => value.toLocaleLowerCase('ru').replace(/[.\s]+$/u, '').trim();
       const component = result.component;
       if (normalized(note) === normalized(title)) {
-        if (component && component !== title) entry.append(element('p', component));
+        if (component && component !== title && !closeup) entry.append(element('p', component));
       } else if (component && normalized(note) === normalized(`${component}: ${title}`)) {
-        entry.append(element('p', component));
+        if (!closeup) entry.append(element('p', component));
       } else entry.append(element('p', note));
     }
     for (const recommendation of record.provenance.manufacturer?.recommendations || []) {
@@ -261,14 +450,35 @@ function historyEntry(record, date, scenarios) {
       }
     }
     if (details.childElementCount > 1) entry.append(details);
-    if (typeof evidence?.analysisId === 'string' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(evidence.analysisId)) {
-      const button = element('button', 'Открыть кадр', 'history-evidence');
-      button.type = 'button';
-      button.setAttribute('aria-haspopup', 'dialog');
-      button.setAttribute('aria-controls', 'journal-frame');
-      const context = [record.serial, Number.isFinite(date.getTime()) && `${historyDay.format(date)} · ${historyTime.format(date)}`, moment].filter(Boolean).join(' · ');
-      button.addEventListener('click', () => openJournalFrame(button, `/api/analyses/${evidence.analysisId}/image`, title, context, result?.box));
-      entry.append(button);
+    if (uuid.test(evidence?.analysisId)) {
+      const context = [record.serial, nodeName, Number.isFinite(date.getTime()) && `${historyDay.format(date)} · ${historyTime.format(date)}`, moment].filter(Boolean).join(' · ');
+      const photos = element('div', undefined, 'journal-photos');
+      photos.append(frameButton(closeup || record.work?.length ? 'Общий вид' : 'Открыть кадр',
+        `/api/analyses/${evidence.analysisId}/image`, context, {box: result?.box, point: closeup?.point}));
+      if (closeup) photos.append(frameButton('Крупный план', `/api/history/${record.id}/closeup/image`, context, {measurement: closeup.measurement}));
+      entry.append(photos);
+      if (uuid.test(record.id)) {
+        for (const work of record.work || []) {
+          if (!Object.hasOwn(workActions, work.action) || !/^\d{4}-\d{2}-\d{2}$/.test(work.date)) continue;
+          const day = new Date(work.date + 'T12:00:00');
+          if (!Number.isFinite(day.getTime())) continue;
+          const event = element('div', undefined, 'journal-work-event');
+          const time = element('time', historyDay.format(day));
+          time.dateTime = work.date;
+          event.append(element('strong', workActions[work.action]), time);
+          if (uuid.test(work.id) && work.imageUrl) {
+            const caption = [record.serial, nodeName, workActions[work.action], time.textContent].filter(Boolean).join(' · ');
+            event.append(frameButton('Фото после', `/api/history/${record.id}/work/${work.id}/image`, caption));
+          }
+          entry.append(event);
+        }
+        const action = element('button', 'Зафиксировать работу', 'button secondary work-trigger');
+        action.type = 'button';
+        action.setAttribute('aria-haspopup', 'dialog');
+        action.setAttribute('aria-controls', 'journal-work');
+        action.addEventListener('click', () => openWork(record, context, action));
+        entry.append(action);
+      }
     }
   }
   if (record.note && !releaseCheckNotes.has(record.note.trim())) entry.append(element('p', record.note, 'history-note'));
@@ -284,8 +494,12 @@ function historyEntry(record, date, scenarios) {
   return entry;
 }
 
+function scenarioLabels() {
+  return new Map(Array.from(scenarioInput.options, ({value, text}) => [value, text]));
+}
+
 function renderHistory(records) {
-  const scenarios = new Map(Array.from(scenarioInput.options, ({ value, text }) => [value, text]));
+  const scenarios = scenarioLabels();
   const groups = new Map();
   const fragment = document.createDocumentFragment();
   for (const record of records) {
@@ -301,6 +515,15 @@ function renderHistory(records) {
     groups.get(day).append(historyEntry(record, date, scenarios));
   }
   historyRecords.replaceChildren(fragment);
+  if (uuid.test(linkedRecord)) {
+    const entry = historyRecords.querySelector(`[data-record-id="${linkedRecord}"]`);
+    if (entry) {
+      entry.tabIndex = -1;
+      entry.focus({preventScroll: true});
+      entry.scrollIntoView({block: 'nearest'});
+    }
+    linkedRecord = null;
+  }
 }
 
 async function loadHistory(requestedSerial) {

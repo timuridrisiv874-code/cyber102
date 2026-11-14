@@ -10,9 +10,9 @@ const { setTimeout: delay } = require('node:timers/promises');
 const { chromium, webkit, devices } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(__dirname, '../..');
 
-async function startBackend() {
+async function startBackend(...options) {
   const child = spawn(process.env.CYBER102_TEST_PYTHON || 'python3',
-    [path.join(__dirname, 'gold_server.py')], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
+    [path.join(__dirname, 'gold_server.py'), ...options], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
   let stderr = '';
   child.stderr.on('data', chunk => { stderr = (stderr + chunk.toString()).slice(-8000); });
   const lines = readline.createInterface({ input: child.stdout });
@@ -183,7 +183,8 @@ async function run(browser, engine, fixture, android) {
   } finally { await page.close(); }
 }
 
-(async () => {
+module.exports = { startBackend };
+if (require.main === module) (async () => {
   const backend = await startBackend();
   try {
     for (const [engine, name, options] of [

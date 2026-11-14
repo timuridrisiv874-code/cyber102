@@ -112,19 +112,26 @@ def extract_request(content_type, body, *, include_metadata=False):
         if profile not in PROFILES:
             raise ValueError('Неизвестный режим анализа.')
     image = files[0].get_payload(decode=True)
+    normalized = normalize_image(image)
+    result = (normalized, profile)
+    return (*result, metadata) if include_metadata else result
+
+
+def normalize_image(image, *, formats=('JPEG', 'PNG'), max_side=1280):
+    """Decode, apply EXIF orientation and export fresh JPEG bytes without metadata."""
     if not image or len(image) > MAX_IMAGE_BYTES:
         raise ValueError('Недопустимый размер изображения.')
     from PIL import Image, ImageOps, UnidentifiedImageError
     try:
         with Image.open(BytesIO(image)) as original:
-            if original.format not in ('JPEG', 'PNG') or original.width * original.height > 8_000_000:
-                raise ValueError('Ожидается JPEG/PNG размером до 8 мегапикселей.')
+            if original.format not in formats or original.width * original.height > 8_000_000:
+                raise ValueError(f'Ожидается {"/".join(formats)} размером до 8 мегапикселей.')
             normalized = ImageOps.exif_transpose(original).convert('RGB')
-            normalized.thumbnail((1280, 1280))
+            normalized.thumbnail((max_side, max_side))
+            normalized.info.clear()
             output = BytesIO()
             normalized.save(output, format='JPEG', quality=85)
-            result = (output.getvalue(), profile)
-            return (*result, metadata) if include_metadata else result
+            return output.getvalue()
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as error:
         raise ValueError('Изображение не удалось прочитать.') from error
 
