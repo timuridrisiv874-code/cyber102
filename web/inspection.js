@@ -86,6 +86,7 @@
     if (Number.isFinite(result?.metrics?.generateMs)) timings.push(`Модель: ${number.format(result.metrics.generateMs / 1000)} с`);
     if (result?.profile === 'fast') timings.push('быстрый режим');
     if (result?.profile === 'standard') timings.push('подробный режим');
+    if (result?.profile === 'liquid') timings.push('поиск жидкости');
     node.textContent = timings.join(' · ');
     node.hidden = !timings.length;
   }

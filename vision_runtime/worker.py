@@ -26,7 +26,7 @@ VIDEO_MAX_NEW_TOKENS = 1800
 # Fast shortens generated text, not image detail. A one-tile experiment lost
 # the selected component on a smoke frame and must not become a product mode.
 PROFILES = {'standard': 4, 'fast': 4}
-OBSERVATION_KINDS = {'standard': 'model', 'fast': 'template'}
+OBSERVATION_KINDS = {'standard': 'model', 'fast': 'template', 'liquid': 'template'}
 SYSTEM_PROMPT = '''Ты помощник инженера при визуальном осмотре промышленного оборудования.
 Возвращай только JSON. Естественный язык в полях observation и summary — только русский,
 кириллицей, без китайских иероглифов и без английских предложений.
@@ -151,7 +151,7 @@ def request_profile(payload):
             or set(payload) - {'image', 'profile'} or not isinstance(payload['image'], str)):
         raise ValueError('Expected one base64 image and an optional supported profile')
     profile = payload.get('profile', 'standard')
-    if not isinstance(profile, str) or profile not in PROFILES:
+    if not isinstance(profile, str) or profile not in OBSERVATION_KINDS:
         raise ValueError('Unsupported inference profile')
     return profile
 
@@ -366,7 +366,8 @@ class Handler(BaseHTTPRequestHandler):
         self.reply(200, {'status': 'ok', 'model': getattr(self.server.engine, 'model_id', MODEL),
                          'revision': getattr(self.server.engine, 'revision', REVISION),
                          'device': self.server.engine.device, 'busy': self.server.engine.lock.locked(),
-                         'offline': True, 'profiles': list(PROFILES), 'defaultProfile': 'standard',
+                         'offline': True, 'profiles': [*PROFILES, *(['liquid'] if hasattr(self.server.engine, 'infer_liquid') else [])],
+                         'defaultProfile': 'standard',
                          'video': {'enabled': True, 'mode': 'sampled_multi_image',
                                    'maxFrames': MAX_VIDEO_FRAMES, 'maxSeconds': MAX_VIDEO_SECONDS}})
 
@@ -419,14 +420,20 @@ class Handler(BaseHTTPRequestHandler):
                 image = read_image(payload)
                 try:
                     with image:
-                        observation = self.server.engine.infer(image, profile=profile)
+                        if profile == 'liquid':
+                            find_liquid = getattr(self.server.engine, 'infer_liquid', None)
+                            if find_liquid is None:
+                                raise ValueError('Liquid localization is unavailable for this model')
+                            result = {'liquidBoxes': find_liquid(image)}
+                        else:
+                            result = {'observation': self.server.engine.infer(image, profile=profile)}
                 except (ValueError, KeyError, TypeError):
                     status = 502
                     response = {'error': 'Model did not return a valid observation'}
                 else:
                     status = 200
                     response = {'model': getattr(self.server.engine, 'model_id', MODEL),
-                                'revision': getattr(self.server.engine, 'revision', REVISION), 'observation': observation,
+                                'revision': getattr(self.server.engine, 'revision', REVISION), **result,
                                 'profile': profile, 'metrics': self.server.engine.last_metrics,
                                 'observationKind': OBSERVATION_KINDS[profile],
                                 'durationSeconds': round(time.monotonic() - started, 3)}

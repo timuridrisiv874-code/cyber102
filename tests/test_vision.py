@@ -142,6 +142,39 @@ class VisionTest(unittest.TestCase):
         self.assertEqual(result['profile'], 'fast')
         self.assertEqual(result['box'], vision.result_from_observation(OBSERVATION)['box'])
 
+    def test_liquid_profile_prioritizes_stream_and_keeps_both_findings(self):
+        spec = vision.model_spec('qwen3_vl_4b')
+        wet_surface = {'kind': 'wet_surface', 'box': [0, 700, 1000, 900]}
+        stream = {'kind': 'liquid_flow', 'box': [100, 200, 600, 650]}
+        envelope = {'model': spec.model_id, 'revision': spec.revision, 'profile': 'liquid',
+                    'observationKind': 'template', 'liquidBoxes': [wet_surface, stream]}
+        with patch.dict('os.environ', {'CYBER102_VLM_MODEL': 'qwen3_vl_4b'}), \
+                patch.object(vision, 'request_json', return_value=envelope) as request:
+            result = vision.analyze(b'frame', backend='internvl3', profile='liquid')
+            self.assertEqual(request.call_args.args[1]['profile'], 'liquid')
+            self.assertEqual(result['liquidBoxes'], [stream, wet_surface])
+            self.assertEqual(result['box'], {'x': .1, 'y': .2, 'width': .5, 'height': .45})
+            self.assertEqual(result['status'], 'defect')
+            self.assertNotIn('seal_leak', result)
+            envelope['liquidBoxes'] = []
+            result = vision.analyze(b'frame', backend='internvl3', profile='liquid')
+            self.assertEqual(result['status'], 'unusable')
+            self.assertNotIn('box', result)
+            envelope['liquidBoxes'] = [{'kind': 'liquid_flow', 'box': [0, 0, True, 1000]}]
+            with self.assertRaises(vision.VisionUnavailable):
+                vision.analyze(b'frame', backend='internvl3', profile='liquid')
+            envelope['liquidBoxes'] = [stream]
+            del envelope['revision']
+            with self.assertRaises(vision.VisionUnavailable):
+                vision.analyze(b'frame', backend='internvl3', profile='liquid')
+
+    def test_liquid_profile_not_advertised_for_internvl_or_detector(self):
+        with patch.dict('os.environ', {'CYBER102_VLM_MODEL': 'internvl3_5'}):
+            self.assertEqual(vision.supported_profiles('internvl3'), ('standard', 'fast'))
+        with patch.dict('os.environ', {'CYBER102_VLM_MODEL': 'qwen3_vl_4b'}):
+            self.assertEqual(vision.supported_profiles('internvl3'), ('standard', 'fast', 'liquid'))
+            self.assertEqual(vision.supported_profiles('detector'), ('standard',))
+
     def test_old_worker_must_not_silently_ignore_fast_profile(self):
         with patch.object(vision, 'request_json', return_value={
             'model': vision.INTERNVL_MODEL, 'observation': OBSERVATION,
@@ -267,7 +300,7 @@ class VisionTest(unittest.TestCase):
         out = BytesIO()
         Image.new('RGB', (8, 8)).save(out, 'JPEG')
         image = out.getvalue()
-        for profile in ('standard', 'fast'):
+        for profile in ('standard', 'fast', 'liquid'):
             normalized, selected = vision.extract_request(*multipart(('file', image), ('profile', profile.encode())))
             self.assertEqual(selected, profile)
             self.assertEqual(Image.open(BytesIO(normalized)).size, (8, 8))

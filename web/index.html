@@ -13,11 +13,11 @@
   <script src="offline.js" defer></script>
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="analysis-jobs.js" defer></script>
-  <script src="inspection.js?v=resource-20261114" defer></script>
+  <script src="inspection.js?v=liquid-inspection-20261114" defer></script>
   <script src="media.js?v=mobile-recovery-20261114" defer></script>
   <script src="video-review.js?v=resource-20261114" defer></script>
   <script src="region-review.js?v=field-20261114" defer></script>
-  <script src="app.js?v=mobile-recovery-20261114" defer></script>
+  <script src="app.js?v=liquid-inspection-20261114" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
 </head>
 <body data-page="inspection">
@@ -87,8 +87,8 @@
             <div class="camera-options" id="camera-options" hidden>
               <label for="camera-mode" id="camera-mode-label">Проверка</label>
               <select id="camera-mode"><option value="single">Один кадр</option><option value="video">Видеопроверка</option></select>
-              <label for="analysis-profile">Описание</label>
-              <select id="analysis-profile"><option value="standard" selected>Подробный</option><option value="fast">Краткий</option></select>
+              <label for="analysis-profile">Режим модели</label>
+              <select id="analysis-profile"><option value="standard" selected>Подробный</option><option value="fast">Краткий</option><option value="liquid" hidden disabled>Струи и мокрые участки</option></select>
               <label for="frame-interval" id="frame-interval-label" hidden>Интервал</label>
               <select id="frame-interval" hidden><option value="2000">2 секунды</option><option value="5000" selected>5 секунд</option><option value="10000">10 секунд</option></select>
             </div>
