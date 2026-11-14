@@ -1,4 +1,4 @@
-"""Measure box and optional mask AP on the original S2DS test split."""
+"""Measure box and optional mask AP against a held-out dataset and common box reference."""
 import argparse
 import hashlib
 import json
@@ -24,7 +24,7 @@ def metrics(metric, names):
 def box_reference(model, reference, calibrate=False):
     config = yaml.safe_load(reference.read_text(encoding='utf-8'))
     if config['names'] != model.names or config['test'] != 'images/test':
-        raise ValueError('Expected the original S2DS test configuration')
+        raise ValueError('Expected a common box test split with the same checkpoint class map')
     root = Path(config['path'])
     rows, images, test_hashes = labeled_frames(root, 'test', model.names)
     for row in rows:

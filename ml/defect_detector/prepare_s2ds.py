@@ -16,14 +16,29 @@ CLASSES = ('efflorescence', 'masonry_damage')
 COLORS = ((0, 255, 255), (255, 0, 0))
 
 
+def binary_components(binary, min_pixels):
+    _, components, regions, _ = cv2.connectedComponentsWithStats(binary, connectivity=8)
+    for index, (left, top, size_x, size_y, area) in enumerate(regions[1:], start=1):
+        if area >= min_pixels:
+            region = np.uint8(components[top:top + size_y, left:left + size_x] == index)
+            yield left, top, size_x, size_y, region
+
+
 def mask_components(mask, min_pixels):
     for label, color in enumerate(COLORS):
-        binary = cv2.inRange(mask, color, color)
-        _, components, regions, _ = cv2.connectedComponentsWithStats(binary, connectivity=8)
-        for index, (left, top, size_x, size_y, area) in enumerate(regions[1:], start=1):
-            if area >= min_pixels:
-                region = np.uint8(components[top:top + size_y, left:left + size_x] == index)
-                yield label, left, top, size_x, size_y, region
+        for region in binary_components(cv2.inRange(mask, color, color), min_pixels):
+            yield label, *region
+
+
+def exterior_polygon(region):
+    contours, _ = cv2.findContours(region, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if len(contours) != 1:
+        raise ValueError('Connected mask region must have one exterior outline')
+    outline = cv2.approxPolyDP(contours[0], epsilon=.5, closed=True).reshape(-1, 2)
+    if len(np.unique(outline, axis=0)) < 3 or cv2.contourArea(outline) == 0:
+        size_y, size_x = region.shape
+        return np.array([[0, 0], [size_x, 0], [size_x, size_y], [0, size_y]])
+    return outline
 
 
 def mask_boxes(mask, min_pixels):
@@ -34,14 +49,8 @@ def mask_boxes(mask, min_pixels):
 
 def mask_polygons(mask, min_pixels):
     height, width = mask.shape[:2]
-    for label, left, top, size_x, size_y, region in mask_components(mask, min_pixels):
-        contours, _ = cv2.findContours(region, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if len(contours) != 1:
-            raise ValueError('Connected mask region must have one exterior outline')
-        outline = cv2.approxPolyDP(contours[0], epsilon=.5, closed=True).reshape(-1, 2)
-        if len(np.unique(outline, axis=0)) < 3 or cv2.contourArea(outline) == 0:
-            # A one-pixel stripe has an extent even when the pixel-center contour is a line.
-            outline = np.array([[0, 0], [size_x, 0], [size_x, size_y], [0, size_y]])
+    for label, left, top, _, _, region in mask_components(mask, min_pixels):
+        outline = exterior_polygon(region)
         yield label, *(((outline + (left, top)) / (width, height)).flatten())
 
 

@@ -1,5 +1,6 @@
 """Evaluate detector checkpoints against manually marked, held-out frames."""
 import argparse
+import hashlib
 import json
 import statistics
 import time
@@ -207,7 +208,19 @@ def main():
     labels = {obj['class'] for row in rows for obj in row['objects']}
     if args.labels and labels - set(args.labels):
         parser.error('--labels must include all annotated classes')
-    images = [args.images / row['file'] for row in rows]
+    images = []
+    names = set()
+    for row in rows:
+        name = row['file']
+        if not name or Path(name).name != name or name in names:
+            raise ValueError(f'Expected unique image basenames: {name!r}')
+        path = args.images / name
+        if 'sha256' in row:
+            with path.open('rb') as stream:
+                if hashlib.file_digest(stream, 'sha256').hexdigest() != row['sha256']:
+                    raise ValueError(f'Image contents differ from annotations: {name}')
+        names.add(name)
+        images.append(path)
     predictions, timings = infer(YOLO(str(args.weights.resolve(strict=True))), images,
                                  args.device, args.size, tiles=args.tiles, strips=args.strips)
     if args.labels:

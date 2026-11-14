@@ -1,0 +1,172 @@
+[
+  {
+    "file": "cracked-cast-iron.jpg",
+    "scene": "cast-iron-open-road",
+    "sha256": "16d08ea0bef102dd96279df567dce46b81f46801b822476725fd7b497db76c38",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.38,
+          0.36,
+          0.59,
+          0.83
+        ]
+      }
+    ],
+    "note": "Visible tan and reddish corrosion along the damaged iron pipe.",
+    "source": "https://commons.wikimedia.org/wiki/File:Crack_Pipe.jpg",
+    "author": "ilovebutter",
+    "license": "CC BY 2.0"
+  },
+  {
+    "file": "leak.jpg",
+    "scene": "well-pipe",
+    "sha256": "abc2a753456e76c9eb8f752e722321846b6743e5b55b27895ce54656a3c434fc",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.22,
+          0.32,
+          0.71,
+          0.68
+        ]
+      }
+    ],
+    "note": "Corroded metal around the well pipe defect. Lug and downstream droplet are outside the target.",
+    "source": "https://commons.wikimedia.org/wiki/File:Leak_in_rusted_pipe_side_view.jpg",
+    "author": "Shamrock Lee",
+    "license": "CC BY 4.0"
+  },
+  {
+    "file": "outlook-fig-09.jpg",
+    "scene": "outlook-cladding",
+    "sha256": "01ba30d1abf009107c708d8d08252351518c104c5d3c15061b5d1c46f8fc2631",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.04,
+          0.035,
+          0.963,
+          0.488
+        ]
+      }
+    ],
+    "note": "Rough corroded cladding along the lip and upper face, above the relatively smooth panel.",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/"
+  },
+  {
+    "file": "sault-covered.jpg",
+    "scene": "sault-motor-mount",
+    "sha256": "6b3777909a6ec25b862912a10c39d4892aec166b348c4d2882cff15c07a0b9b4",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.69,
+          0.79,
+          0.9,
+          0.995
+        ]
+      }
+    ],
+    "note": "Orange-brown corrosion on the painted motor foot. The glossy black guard is excluded.",
+    "source": "https://machineguard.com/coupling-guards-pump-motor-assembly/"
+  },
+  {
+    "file": "clip-5-web-0.jpg",
+    "scene": "video-5-valve",
+    "sha256": "55184b93a14cf7cde73d0fef4674a2785589b3f331ffad7616c77b1b9cb05124",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.09,
+          0.15,
+          0.91,
+          0.82
+        ]
+      }
+    ],
+    "note": "Corrosion covers the valve body and bolted flanges. Wet reflections coexist. The floor and streams below are excluded.",
+    "clip": "5.mp4",
+    "frameIndex": 0,
+    "timestampSeconds": 1.25
+  },
+  {
+    "file": "clip-5-web-2.jpg",
+    "scene": "video-5-pump",
+    "sha256": "b4622c7430dd05c7af951800de744900ff71410aa508931e5d849da582488aa8",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.43,
+          0.2,
+          0.87,
+          0.89
+        ]
+      }
+    ],
+    "note": "Exposed brown and flaking corroded metal around the main pump housing and front flange.",
+    "clip": "5.mp4",
+    "frameIndex": 2,
+    "timestampSeconds": 6.25
+  },
+  {
+    "file": "clip-5-web-6.jpg",
+    "scene": "video-5-pump",
+    "sha256": "c17c92110aa3169b948a686c648fcfa0aa676cc06fdc540514eb71e4faca2102",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.47,
+          0.23,
+          0.81,
+          0.88
+        ]
+      }
+    ],
+    "note": "Another view of corrosion and chipped coating on the same pump housing.",
+    "clip": "5.mp4",
+    "frameIndex": 6,
+    "timestampSeconds": 16.25
+  },
+  {
+    "file": "commons-ksb.jpg",
+    "scene": "clean-assembled-pump",
+    "sha256": "d0ffb7ffc34824430a6e3823e53a65733777b3714f733d0b4247de6580b0ddc9",
+    "objects": [],
+    "note": "Blue assembled pump and motor, with no clear rust on the visible surfaces.",
+    "source": "https://commons.wikimedia.org/wiki/File:KSB_09_Etanorm_mit_Motor_und_Frequenzumrichter.jpg"
+  },
+  {
+    "file": "maintain-07.jpg",
+    "scene": "colored-pipe-bank",
+    "sha256": "64f755a265c18fe66e61ac8711533d1df2dbd91416b072700c159ac83c6b1b7d",
+    "objects": [],
+    "note": "Orange and yellow paint and reflected light on pipes, with no clear rust.",
+    "source": "https://insulation.org/io/articles/maintain-insulation-jacketing-to-ensure-mechanical-insulation-performance/"
+  },
+  {
+    "file": "maintain-09.jpg",
+    "scene": "reflective-cladding",
+    "sha256": "2dbea043605bc303912976fc51c7af65863498ec756a661946d70ec59274a5ae",
+    "objects": [],
+    "note": "Silver pipeline jacketing with normal seams and highlights.",
+    "source": "https://insulation.org/io/articles/maintain-insulation-jacketing-to-ensure-mechanical-insulation-performance/"
+  },
+  {
+    "file": "intact-box.jpg",
+    "scene": "intact-electric-box",
+    "sha256": "5cbc2cf289852e37771a94d367863e64328bb278109ab5b3b2d98240c0f38084",
+    "objects": [],
+    "note": "Orange molded housing with visible clean fittings.",
+    "source": "https://commons.wikimedia.org/wiki/File:Cable_junction_box_for_maintaining_electrical_functional_integrity_according_to_DIN_4102_Part_12.JPG",
+    "author": "S.J. de Waard",
+    "license": "CC BY 2.5"
+  }
+]
