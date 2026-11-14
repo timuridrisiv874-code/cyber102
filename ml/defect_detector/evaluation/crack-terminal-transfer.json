@@ -1,0 +1,227 @@
+[
+  {
+    "file": "dyno.jpg",
+    "scene": "dyno-nobel-2022",
+    "source": "https://www.csb.gov/assets/1/6/incident_reports_volume_3_2025-07-22.pdf#page=32",
+    "author": "Dyno Nobel",
+    "license": "Photo credit in public CSB report; original illustration rights not specified",
+    "sourceImage": "csb-001.jpg",
+    "sourceCrop": [
+      0,
+      0,
+      746,
+      636
+    ],
+    "sourceSha256": "72c35adf999de211565e239db5c43174dc17fbb42955cbafc0d5d7478ac4acca",
+    "sha256": "e6e4036c6d6dae6a27b67d68a69a0411d34b0ef6fa1751408ff5e58d8c122f15",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.22,
+          0.12,
+          0.47,
+          0.475
+        ]
+      }
+    ],
+    "note": "Visible torn shell around the opening, left panel of figure 2."
+  },
+  {
+    "file": "oneok.jpg",
+    "scene": "oneok-2022",
+    "source": "https://www.csb.gov/assets/1/6/incident_reports_volume_3_2025-07-22.pdf#page=34",
+    "author": "ONEOK",
+    "license": "Photo credit in public CSB report; original illustration rights not specified",
+    "sourceImage": "csb-009.jpg",
+    "sourceCrop": [
+      0,
+      0,
+      680,
+      530
+    ],
+    "sourceSha256": "a1d57c9e6db933b62e602ba68a69a7892baf8dfdd99654c8e65444adc31514e4",
+    "sha256": "943d2ac55583ee20e96876026ef14b2a90f4a158c54efdaab7360311ae1dee68",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.09,
+          0.115,
+          0.875,
+          0.65
+        ]
+      }
+    ],
+    "note": "Irregular wall opening bordered by corrosion, outside left panel of figure 3."
+  },
+  {
+    "file": "corner.jpg",
+    "scene": "cornerstone-2023",
+    "source": "https://www.csb.gov/assets/1/6/incident_reports_volume_3_2025-07-22.pdf#page=57",
+    "author": "Cornerstone",
+    "license": "Photo credit in public CSB report; original illustration rights not specified",
+    "sourceImage": "corner-002.jpg",
+    "sourceCrop": [
+      0,
+      0,
+      334,
+      277
+    ],
+    "sourceSha256": "8416fa52441e5eba83dde4d65c051ce392f9db60b07cdc49eab3cebbcec5bfa3",
+    "sha256": "6646f798faf35edab0e4cd5c7aaed04c7e0e2f855f72eacf1095d0ec445c34d5",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.19,
+          0.23,
+          0.81,
+          0.76
+        ]
+      }
+    ],
+    "note": "Torn roof opening and lifted edges of tank shell, left panel of figure 2."
+  },
+  {
+    "file": "moeller.jpg",
+    "scene": "moeller-breaker",
+    "source": "https://commons.wikimedia.org/wiki/File:Moeller_Xpole_PXF-40-4-003-A_-_case_removed-2373.jpg",
+    "author": "Raimond Spekking",
+    "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "sourceImage": "moeller.jpg",
+    "sourceCrop": null,
+    "sourceSha256": "04a393a8233e4668080b3cc7493dc5725bf22c11696185a46913ad3e03669a6b",
+    "sha256": "34e75ba4f4302358fa71d35e2c3feba8b003b2d398655785d3b75d3f88e9a624",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.43,
+          0.0,
+          0.915,
+          1.0
+        ]
+      }
+    ],
+    "note": "Right clamp and adjacent melted cover."
+  },
+  {
+    "file": "ge-rcd.jpg",
+    "scene": "ge-rcd",
+    "source": "https://commons.wikimedia.org/wiki/File:Disassembled_GE_RCD.JPG",
+    "author": "Dmitry G",
+    "license": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceImage": "ge-rcd.jpg",
+    "sourceCrop": null,
+    "sourceSha256": "1c2a624bedf49cf4cb93aecdbd8a85ebb4c63157abb2a003d0b688955f70ace5",
+    "sha256": "f86e713b3f9badc7d1b58772776bdf480cbcb8425a0b1c13023737fe4c93d0ba",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.013,
+          0.18,
+          0.285,
+          0.66
+        ]
+      }
+    ],
+    "note": "Blackened connector bank at upper left of the opened device."
+  },
+  {
+    "file": "molded.jpg",
+    "scene": "molded-breaker",
+    "source": "https://commons.wikimedia.org/wiki/File:630_Amps_Molded_Case_Circuit_Breaker.jpg",
+    "author": "Balurbala",
+    "license": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceImage": "molded.jpg",
+    "sourceCrop": null,
+    "sourceSha256": "f50e44bb886eea6e1c5161a65c49eca8a251bdddaab6d34c053d76d4d70f5d21",
+    "sha256": "4ab08b31dc0d7e395545c0143bdac3cb59a95ae9fe3da8c12a111f73844c4a6a",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [],
+    "note": "No visible terminal damage in this view of the installed breaker."
+  },
+  {
+    "file": "cabinet.jpg",
+    "scene": "cabinet-terminal-block",
+    "source": "https://commons.wikimedia.org/wiki/File:Cabinet_Terminal_Block.jpg",
+    "author": "tony_duell",
+    "license": "https://creativecommons.org/licenses/by/2.0/",
+    "sourceImage": "cabinet.jpg",
+    "sourceCrop": null,
+    "sourceSha256": "612be4bda0122ca6903b7ebdaca495118c256a93f102ac58e6b03ef520ce0d07",
+    "sha256": "9e844ec3cf9d1ab69fb175c201506cca7f41f1100e314669bbc504666c45af78",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [],
+    "note": "Open terminal strip with exposed screws and intact connections."
+  },
+  {
+    "file": "rust-flange.jpg",
+    "scene": "rust-flange",
+    "source": "https://commons.wikimedia.org/wiki/File:Rusty_Bolts_on_Pipe_Flange.jpg",
+    "author": "לקמוס",
+    "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "sourceImage": "rust-flange.jpg",
+    "sourceCrop": null,
+    "sourceSha256": "643228cce6d3ce0c5e5f617f4882b1e5e9a91dacead75e095f6910215b9d431d",
+    "sha256": "84adefb83d3f2673a249780adffdd5f557ec5f9c5a5e4d7119cdb5c1f5c8f73e",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [],
+    "note": "Corrosion, exposed fasteners and flange seam."
+  },
+  {
+    "file": "clean-pump.jpg",
+    "scene": "cleaned-pump-housing",
+    "source": "https://commons.wikimedia.org/wiki/File:Clean_pump.JPG",
+    "author": "Oldforgefarm",
+    "license": "Public domain",
+    "sourceImage": "clean-pump.jpg",
+    "sourceCrop": null,
+    "sourceSha256": "1210671cfe4e973ea73a00e61d3ec5e1ba001bd222aae030cb4edec1247c16fb",
+    "sha256": "cc3cc695093ea627e467daa7ef8c96fccf94da49097c941fcf9548e60e5d723f",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [],
+    "note": "Housing with pitting and manufactured holes."
+  },
+  {
+    "file": "rust-pipe.jpg",
+    "scene": "rusted-water-pipe",
+    "source": "https://commons.wikimedia.org/wiki/File:Rusted_water_pipe.jpg",
+    "author": "Geographer",
+    "license": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceImage": "rust-pipe.jpg",
+    "sourceCrop": null,
+    "sourceSha256": "61b1bd5969c2ab2a728e7ce465a154a6bab43ce162b4d6ac80c4f877f976c2e5",
+    "sha256": "ffb34a29ac886f03f0d253d3f2e551e36b1479bf52dae6e534d7a3595422a382",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [],
+    "note": "Open end of a detached fitting with rust."
+  }
+]

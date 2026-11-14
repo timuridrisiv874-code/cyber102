@@ -3,6 +3,7 @@ import argparse
 import json
 from pathlib import Path
 
+from evaluate import class_negative_frames, measurements, scene_coverage
 from evaluate_qwen_video_grounding import LABELS, measure
 
 
@@ -12,6 +13,23 @@ def has_component_support(box, observation):
     left, top, right, bottom = (value / 1000 for value in observation['box'])
     x1, y1, x2, y2 = box['xyxy']
     return left <= (x1 + x2) / 2 <= right and top <= (y1 + y2) / 2 <= bottom
+
+
+def measure_reviewed(rows, predictions):
+    if not any('reviewedLabels' in row for row in rows):
+        return measure(rows, predictions)
+    result = {}
+    for label in LABELS:
+        reviewed = [row for row in rows if label in row.get('reviewedLabels', LABELS)]
+        if reviewed:
+            classes = (label,)
+            result[label] = {
+                'metrics': {f'{iou:.2f}': measurements(reviewed, predictions, classes, 1, iou)['classes'][label]
+                            for iou in (.30, .50)},
+                'scenes': scene_coverage(reviewed, predictions, classes, 1, .50)[label],
+                'negativeFrames': class_negative_frames(reviewed, predictions, classes, 1)[label],
+            }
+    return result
 
 
 def compare(rows, clips, baseline, candidate):
@@ -32,7 +50,7 @@ def compare(rows, clips, baseline, candidate):
         raw[name] = [box for box in candidate['predictions'][name] if box['class'] in LABELS]
         supported[name] = [box for box in raw[name] if has_component_support(box, observation)]
     return {'model': candidate['model'], 'revision': candidate['revision'],
-            'baseline': measure(rows, raw), 'componentSupported': measure(rows, supported),
+            'baseline': measure_reviewed(rows, raw), 'componentSupported': measure_reviewed(rows, supported),
             'predictions': supported}
 
 

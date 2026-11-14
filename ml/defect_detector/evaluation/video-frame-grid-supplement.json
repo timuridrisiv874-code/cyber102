@@ -1,0 +1,357 @@
+[
+  {
+    "file": "clip-2-web-0.jpg",
+    "sha256": "65e199602ef7b1a3d6430749c3b5806f123661188e460669a20fa73a2992b79a",
+    "timestampSeconds": 0.625,
+    "clip": "2.mp4",
+    "frameIndex": 0,
+    "scene": "video-2",
+    "reviewedLabels": [
+      "crack",
+      "terminal_damage"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.913,
+          0.344,
+          1.0,
+          0.502
+        ]
+      },
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.851,
+          0.41,
+          1.0,
+          0.664
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-2-web-1.jpg",
+    "sha256": "00c93b2ec07b75b3aa4e021c1c2a53066327518da334d5ababc710ac8f9129ae",
+    "timestampSeconds": 1.875,
+    "clip": "2.mp4",
+    "frameIndex": 1,
+    "scene": "video-2-gauge",
+    "reviewedLabels": [
+      "crack",
+      "terminal_damage"
+    ],
+    "objects": []
+  },
+  {
+    "file": "clip-2-web-2.jpg",
+    "sha256": "6cb48c904af2c6fd34626b3ac79ea01d1d93fad3137129b585db9aca33fb4cee",
+    "timestampSeconds": 3.125,
+    "clip": "2.mp4",
+    "frameIndex": 2,
+    "scene": "video-2-gauge",
+    "reviewedLabels": [
+      "crack",
+      "terminal_damage"
+    ],
+    "objects": []
+  },
+  {
+    "file": "clip-2-web-6.jpg",
+    "sha256": "6e793f5750ae89f3ff84da589188232b0f52e5462e682b655c8966c8e480c3da",
+    "timestampSeconds": 8.125,
+    "clip": "2.mp4",
+    "frameIndex": 6,
+    "scene": "video-2",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.646,
+          0.31,
+          0.751,
+          0.582
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-2-web-7.jpg",
+    "sha256": "e325c4eec547d1ccf2b2f9761b2d338a61742a6f1d70ea66a26b390debf2ca43",
+    "timestampSeconds": 9.375,
+    "clip": "2.mp4",
+    "frameIndex": 7,
+    "scene": "video-2",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.661,
+          0.12,
+          0.751,
+          0.416
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-3-web-0.jpg",
+    "sha256": "bf791f933872f4f8192f8e9317a6eb707ad2bd580bec608f04d95acbd033a5af",
+    "timestampSeconds": 0.625,
+    "clip": "3.mp4",
+    "frameIndex": 0,
+    "scene": "video-3-cabinet",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.426,
+          0.45,
+          0.673,
+          0.81
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-3-web-5.jpg",
+    "sha256": "246ddb09991394a266b2038ceea53a2796b11ca81475abcd91f066555ef5a6a1",
+    "timestampSeconds": 6.875,
+    "clip": "3.mp4",
+    "frameIndex": 5,
+    "scene": "video-3-tank",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.095,
+          0.0,
+          0.386,
+          0.226
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-3-web-6.jpg",
+    "sha256": "f0986905c7031a8bcf2674344cfa2d2b344996cdc30f0590ee075cddd5a341c6",
+    "timestampSeconds": 8.125,
+    "clip": "3.mp4",
+    "frameIndex": 6,
+    "scene": "video-3-tank",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.273,
+          0.0,
+          0.461,
+          0.28
+        ]
+      },
+      {
+        "class": "crack",
+        "xyxy": [
+          0.577,
+          0.62,
+          0.661,
+          0.79
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-3-web-7.jpg",
+    "sha256": "0aa6d4823b4517a44b7035018bd2f821045fc96d1a5b3712fafa9a6293329e78",
+    "timestampSeconds": 9.375,
+    "clip": "3.mp4",
+    "frameIndex": 7,
+    "scene": "video-3-tank-and-cabinet",
+    "reviewedLabels": [
+      "crack",
+      "terminal_damage"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.441,
+          0.288,
+          0.637,
+          0.529
+        ]
+      },
+      {
+        "class": "crack",
+        "xyxy": [
+          0.646,
+          0.615,
+          0.743,
+          0.742
+        ]
+      },
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.019,
+          0.441,
+          0.32,
+          0.743
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-4-web-2.jpg",
+    "sha256": "d18e96a8ae9cb5ff80d867730bd52a8b16bb76aa88c514b29e8688f8d427f4d5",
+    "timestampSeconds": 3.125,
+    "clip": "4.mp4",
+    "frameIndex": 2,
+    "scene": "video-4-tank",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.545,
+          0.399,
+          0.697,
+          0.5
+        ]
+      },
+      {
+        "class": "crack",
+        "xyxy": [
+          0.656,
+          0.553,
+          0.742,
+          0.704
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-4-web-3.jpg",
+    "sha256": "4ab0d07791c53b2fc9b52bc655a63d250d24b21f3fd3af0db4d8bfc9c0ef3247",
+    "timestampSeconds": 4.375,
+    "clip": "4.mp4",
+    "frameIndex": 3,
+    "scene": "video-4-tank",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.379,
+          0.303,
+          0.661,
+          0.481
+        ]
+      },
+      {
+        "class": "crack",
+        "xyxy": [
+          0.525,
+          0.612,
+          0.655,
+          0.807
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-4-web-4.jpg",
+    "sha256": "041f6d13709bcba9bff6f1fdaca0dec06708c88ffdc540af5948cb42d9b6be9e",
+    "timestampSeconds": 5.625,
+    "clip": "4.mp4",
+    "frameIndex": 4,
+    "scene": "video-4-tank",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.375,
+          0.0,
+          0.64,
+          0.106
+        ]
+      },
+      {
+        "class": "crack",
+        "xyxy": [
+          0.399,
+          0.389,
+          0.594,
+          0.679
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-4-web-7.jpg",
+    "sha256": "a562f94249a6405ac95025d9ed4efafd79e88a981ce445c153436996d2afe868",
+    "timestampSeconds": 9.375,
+    "clip": "4.mp4",
+    "frameIndex": 7,
+    "scene": "video-4-tank",
+    "reviewedLabels": [
+      "crack"
+    ],
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.312,
+          0.298,
+          0.683,
+          0.501
+        ]
+      },
+      {
+        "class": "crack",
+        "xyxy": [
+          0.452,
+          0.584,
+          0.625,
+          0.805
+        ]
+      }
+    ]
+  },
+  {
+    "file": "clip-5-web-2.jpg",
+    "sha256": "b4622c7430dd05c7af951800de744900ff71410aa508931e5d849da582488aa8",
+    "timestampSeconds": 6.25,
+    "clip": "5.mp4",
+    "frameIndex": 2,
+    "scene": "video-5-pump",
+    "reviewedLabels": [
+      "crack",
+      "terminal_damage"
+    ],
+    "objects": []
+  }
+]

@@ -98,6 +98,7 @@ def main():
     if not timing:
         raise ValueError('Original service report contained no damaged components')
     report = {**compare(rows, clips, service, candidate), 'allFrames': len(candidate['predictions']),
+              'allFrameProposals': candidate['predictions'],
               'medianAdditionalMs': median(timing.values()), 'additionalMs': timing, 'errors': errors}
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
 
