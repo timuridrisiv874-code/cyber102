@@ -145,11 +145,11 @@ def strip_tiles(width, height):
     return [(0, y, width, y + window) for y in starts]
 
 
-def infer(model, images, device, size, tiles=False, preprocess=None, strips=False):
+def infer(model, images, device, size, tiles=False, preprocess=None, strips=False, *, rect=True):
     from PIL import Image, ImageOps
 
     def detect(image, offset_x=0, offset_y=0, fraction_x=1, fraction_y=1):
-        result = model.predict(image, device=device, imgsz=size, conf=.01, verbose=False, max_det=100)[0]
+        result = model.predict(image, device=device, imgsz=size, conf=.01, verbose=False, max_det=100, rect=rect)[0]
         boxes = result.boxes.cpu()
         return [{'class': model.names[int(index)], 'score': float(score),
                  'xyxy': [offset_x + fraction_x * left, offset_y + fraction_y * top,
@@ -157,7 +157,8 @@ def infer(model, images, device, size, tiles=False, preprocess=None, strips=Fals
                 for index, score, (left, top, right, bottom) in
                 zip(boxes.cls.tolist(), boxes.conf.tolist(), boxes.xyxyn.tolist(), strict=True)]
 
-    model.predict(Image.new('RGB', (size, size)), device=device, imgsz=size, verbose=False)
+    with Image.new('RGB', (size, size)) as blank:
+        model.predict(blank, device=device, imgsz=size, verbose=False, rect=rect)
     predictions, timings = {}, {}
     for file in images:
         started = time.perf_counter()
