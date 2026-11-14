@@ -193,6 +193,13 @@ class VisionTest(unittest.TestCase):
                     vision.analyze(b'frame', backend='internvl3')
                 self.assertIs(type(caught.exception), expected)
 
+    def test_worker_invalid_observation_is_not_reported_as_outage(self):
+        body = {'error': 'Model did not return a valid observation'}
+        error = HTTPError(vision.INTERNVL_ENDPOINT, 502, 'invalid observation', {}, BytesIO(json.dumps(body).encode()))
+        with patch.object(vision, 'request_json', side_effect=error):
+            with self.assertRaises(vision.VisionInvalidResponse):
+                vision.analyze(b'frame', backend='internvl3', context='reference excerpt')
+
     def test_malformed_worker_metrics_cannot_reach_client(self):
         for metrics in ({}, [], {'totalMs': float('nan')}):
             with self.subTest(metrics=metrics), patch.object(vision, 'request_json', return_value={

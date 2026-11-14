@@ -45,7 +45,14 @@ def analyze_photo_job(payload, *, cache=None):
         return {**cached, 'media': payload['media']}
     context = payload.get('equipmentContext')
     options = {'context': context['text']} if context else {}
-    result = vision.analyze(payload['image'], backend=payload['backend'], profile=payload['profile'], **options)
+    try:
+        result = vision.analyze(payload['image'], backend=payload['backend'], profile=payload['profile'], **options)
+    except vision.VisionInvalidResponse:
+        if not context:
+            raise
+        # Reference excerpts can push a valid frame outside the model's response format.
+        result = vision.analyze(payload['image'], backend=payload['backend'], profile=payload['profile'])
+        context = None
     if context:
         result['equipmentContext'] = knowledge.context_metadata(context)
     if cache is not None:

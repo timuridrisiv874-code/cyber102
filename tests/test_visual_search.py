@@ -203,6 +203,18 @@ class PhotoRagApiTests(unittest.TestCase):
             self.assertNotIn('equipmentContext', result)
             self.assertNotIn('context', infer.call_args.kwargs)
 
+    def test_invalid_response_with_references_retries_without_them(self):
+        with patch.object(visual_search, 'search', return_value=visual_match('knz-km')), \
+             patch.object(vision, 'analyze', side_effect=[vision.VisionInvalidResponse('invalid'), self.observation.copy()]) as infer:
+            status, _, result = self.upload()
+            self.assertEqual(status, 200, result)
+            self.assertEqual(infer.call_count, 2)
+            self.assertIn('context', infer.call_args_list[0].kwargs)
+            self.assertNotIn('context', infer.call_args_list[1].kwargs)
+            self.assertNotIn('equipmentContext', result)
+            self.assertEqual(self.upload()[1], 'hit')
+            self.assertEqual(infer.call_count, 2)
+
     def test_async_retry_keeps_the_original_job_if_search_becomes_unavailable(self):
         entered, release = threading.Event(), threading.Event()
         self.addCleanup(release.set)

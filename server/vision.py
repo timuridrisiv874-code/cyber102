@@ -270,13 +270,15 @@ def analyze(image, backend='ollama', profile='standard', *, context=None):
                 envelope = request_json(INTERNVL_ENDPOINT, payload, timeout=100)
             except HTTPError as error:
                 # Only an explicitly signalled contention is safe to retry.
-                if error.code == 503:
+                if error.code in (502, 503):
                     try:
                         failure = json.loads(error.read(MAX_RESPONSE_BYTES + 1))
                     except (ValueError, OSError):
                         failure = {}
-                    if isinstance(failure, dict) and (failure.get('code') == 'vision_busy' or failure.get('error') == 'Local GPU is busy'):
+                    if error.code == 503 and isinstance(failure, dict) and (failure.get('code') == 'vision_busy' or failure.get('error') == 'Local GPU is busy'):
                         raise VisionBusy('Модель занята другим кадром. Повторите через несколько секунд.') from error
+                    if error.code == 502 and isinstance(failure, dict) and failure.get('error') == 'Model did not return a valid observation':
+                        raise VisionInvalidResponse('Модель вернула неоднозначный ответ. Попробуйте снять узел крупнее.') from error
                 raise
             expected = model_spec()
             if (envelope.get('model') != expected.model_id
