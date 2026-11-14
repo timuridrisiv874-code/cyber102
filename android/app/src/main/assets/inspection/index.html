@@ -54,6 +54,13 @@
         <div class="capture-footer">
           <p class="video-help" id="qr-scan-status" role="status" hidden></p>
           <div class="qr-selected" id="qr-selected" role="status" hidden><div><strong id="qr-name"></strong><div id="qr-value"></div><div id="qr-model" hidden></div><div id="qr-maker" hidden></div><small id="qr-demo" hidden>Демонстрационный объект</small></div><button type="button" id="qr-clear" aria-label="Убрать выбранный объект">×</button></div>
+          <div class="field" id="offline-analysis-mode" hidden>
+            <label for="offline-analysis-profile">Анализ на телефоне</label>
+            <select id="offline-analysis-profile">
+              <option value="detailed" selected>Подробный · до 1024 пикселей</option>
+              <option value="quick">Быстрый · краткий ответ, до 512 пикселей</option>
+            </select>
+          </div>
           <div class="actions">
             <button class="button primary" id="check" type="button" disabled><i class="scan-icon" aria-hidden="true"></i><span id="check-label">Проверить кадр</span></button>
             <button class="button primary" id="video-toggle" type="button" hidden><i class="scan-icon" aria-hidden="true"></i><span id="video-toggle-label">Начать проверку</span></button>

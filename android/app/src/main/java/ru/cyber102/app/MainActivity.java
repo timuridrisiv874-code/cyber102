@@ -780,13 +780,14 @@ public final class MainActivity extends ComponentActivity {
     }
     @Override protected void onStop() {
         releaseCamera(); cancelCamera();
-        if (isOffline() && !filePickerActive && !modelPickerActive) offline.unload();
+        // A gallery, a screen lock or a short app switch is common between frames.
+        // Keep the session resident. Actual memory pressure is handled below.
         if (web != null) web.onPause();
         super.onStop();
     }
     @Override public void onTrimMemory(int level) {
         super.onTrimMemory(level);
-        if (offline != null && level >= TRIM_MEMORY_RUNNING_CRITICAL && !filePickerActive && !modelPickerActive) offline.unload();
+        if (offline != null && (level == TRIM_MEMORY_RUNNING_CRITICAL || level >= TRIM_MEMORY_BACKGROUND)) offline.unload();
     }
     @Override protected void onDestroy() {
         network.shutdownNow();
@@ -847,6 +848,9 @@ public final class MainActivity extends ComponentActivity {
         }
         @JavascriptInterface public void analyze(String requestId, String base64Jpeg) {
             runOnUiThread(() -> { if (allowed() && foreground) offline.analyze(requestId, base64Jpeg); });
+        }
+        @JavascriptInterface public void analyzeWithProfile(String requestId, String base64Jpeg, String profile) {
+            runOnUiThread(() -> { if (allowed() && foreground) offline.analyze(requestId, base64Jpeg, profile); });
         }
         @JavascriptInterface public void cancel() {
             runOnUiThread(() -> { if (allowed()) offline.cancel(); });

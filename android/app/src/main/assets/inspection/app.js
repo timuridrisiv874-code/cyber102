@@ -104,7 +104,10 @@ function positionDetection() {
 }
 
 function render() {
-  if (offlineMode) cameraMode.value = 'single';
+  if (offlineMode) {
+    cameraMode.value = 'single';
+    byId('offline-analysis-profile').disabled = checking;
+  }
   const clipBusy = Boolean(clipReview?.busy);
   const videoMode = cameraMode.value === 'video';
   const frozen = frameSource !== null;
@@ -318,10 +321,19 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
   }, offlineMode ? 180000 : useServer ? 120000 : 12000);
   try {
     if (offlineMode) {
-      const image = await new Promise((resolve) => frame.toBlob(resolve, 'image/jpeg', 0.85));
+      const profile = byId('offline-analysis-profile').value;
+      let input = frame;
+      const edge = Math.max(frame.width, frame.height);
+      if (profile === 'quick' && edge > 512) {
+        input = document.createElement('canvas');
+        input.width = Math.max(1, Math.round(frame.width * 512 / edge));
+        input.height = Math.max(1, Math.round(frame.height * 512 / edge));
+        input.getContext('2d').drawImage(frame, 0, 0, input.width, input.height);
+      }
+      const image = await new Promise((resolve) => input.toBlob(resolve, 'image/jpeg', 0.85));
       if (!image) throw new Error('Не удалось подготовить кадр.');
       const data = await window.CyberOffline.analyze(image, {
-        signal: controller.signal, onProgress: showMessage, metadata,
+        signal: controller.signal, onProgress: showMessage, metadata, profile,
       });
       data.clientDurationSeconds = (performance.now() - started) / 1000;
       return readResult(data);
@@ -352,7 +364,7 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
     }
     return readResult(data);
   } catch (error) {
-    if (timedOut) throw new Error(offlineMode ? 'Модель на телефоне не завершила анализ вовремя. Попробуйте другой кадр.' : 'Сервер не ответил вовремя. Повторите проверку.');
+    if (timedOut) throw new Error(offlineMode ? 'За 3 минуты телефон не успел подготовить полный результат. Попробуйте быстрый режим или другой кадр.' : 'Сервер не ответил вовремя. Повторите проверку.');
     throw error;
   } finally {
     clearTimeout(timeout);

@@ -17,6 +17,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,9 @@ final class SmolEngineManager {
             + "visible damage or defects and their location. If no clear defect is visible, say so. Report only what "
             + "the image supports; do not infer internal faults, causes, operating status or severity. Use at most "
             + "70 words. Answer in English.";
+    private static final String QUICK_PROMPT =
+            "In English, name the visible industrial component, then state the clearest visible defect and its location. "
+            + "If none is clear or the component is uncertain, say so. Use at most 28 words.";
     private final Context context;
     private final Listener listener;
     // Created, reused and closed only on the model executor.
@@ -52,6 +57,7 @@ final class SmolEngineManager {
     private final AtomicBoolean busy = new AtomicBoolean();
     private final AtomicInteger generation = new AtomicInteger();
     private volatile boolean loaded;
+    private volatile int sessionLoads;
     private volatile boolean closed;
     private volatile String state = "idle";
     private volatile String stateMessage = "Модель ещё не загружена";
@@ -78,7 +84,7 @@ final class SmolEngineManager {
 
     JSONObject snapshot() {
         return json("type", "status", "state", state, "message", stateMessage, "progress", progress,
-                "loaded", loaded, "busy", busy.get(), "available", SmolNative.isAvailable(),
+                "loaded", loaded, "sessionLoads", sessionLoads, "busy", busy.get(), "available", SmolNative.isAvailable(),
                 "model", modelId, "revision", revision, "modelBytes", modelBytes,
                 "modelFileName", modelFileName, "projectorFileName", projectorFileName);
     }
@@ -115,44 +121,62 @@ final class SmolEngineManager {
         int token = start("");
         if (token < 0) return;
         executor.execute(() -> {
-            Trace.beginSection("Cyber102.lfm.prepare");
             try {
-                check(token);
-                if (!SmolNative.initialize()) throw new IOException("Не удалось загрузить движок LFM3. Для этой сборки нужен 64-битный Android на ARM.");
-                long epoch = SmolNative.beginOperation();
-                check(token);
-                status("preparing", "Проверяем и подготавливаем модель на телефоне…", 0);
-                List<ModelFile> files = manifest();
-                status("preparing", "Проверяем файлы " + modelId + " на телефоне…", 0);
-                File folder = modelFolder();
-                for (int i = 0; i < files.size(); i++) prepare(files.get(i), folder, token, i);
-                check(token);
-                status("loading", "Загружаем " + modelId + " в память телефона…", 100);
-                int processors = Runtime.getRuntime().availableProcessors();
-                // Leave CPU capacity for the camera and WebView during generation.
-                int threads = Math.max(2, Math.min(6, processors * 3 / 4));
-                SmolNative.load(new File(folder, "model.gguf").getAbsolutePath(),
-                        new File(folder, "projector.gguf").getAbsolutePath(), threads, epoch);
-                check(token);
-                loaded = true;
-                status("ready", modelId + " готова. Анализ выполняется только на этом телефоне.", 100);
+                ensureLoaded(token);
+                status("ready", modelId + " готова. Можно проверять кадры один за другим.", 100);
             } catch (Exception error) {
-                loaded = false;
-                if (OWNER.get() == this && SmolNative.isAvailable()) SmolNative.unload();
                 if (token != generation.get()) status("idle", "Подготовка модели отменена.", 0);
                 else status("error", safeMessage(error), 0);
             } finally {
-                Trace.endSection();
                 busy.set(false);
                 emit(snapshot());
             }
         });
     }
 
+    // Invoked only on the single model executor. A frame can resume a released session.
+    private void ensureLoaded(int token) throws Exception {
+        check(token);
+        if (loaded) return;
+        Trace.beginSection("Cyber102.lfm.prepare");
+        try {
+            check(token);
+            if (!SmolNative.initialize()) throw new IOException("Не удалось загрузить движок LFM3. Для этой сборки нужен 64-битный Android на ARM.");
+            long epoch = SmolNative.beginOperation();
+            check(token);
+            status("preparing", "Проверяем и подготавливаем модель на телефоне…", 0);
+            List<ModelFile> files = manifest();
+            status("preparing", "Проверяем файлы " + modelId + " на телефоне…", 0);
+            File folder = modelFolder();
+            for (int i = 0; i < files.size(); i++) prepare(files.get(i), folder, token, i);
+            check(token);
+            status("loading", "Загружаем " + modelId + " в память телефона…", 100);
+            int processors = Runtime.getRuntime().availableProcessors();
+            // Leave CPU capacity for the camera and WebView during generation.
+            int threads = Math.max(2, Math.min(6, processors * 3 / 4));
+            SmolNative.load(new File(folder, "model.gguf").getAbsolutePath(),
+                    new File(folder, "projector.gguf").getAbsolutePath(), threads, epoch);
+            check(token);
+            loaded = true;
+            sessionLoads++;
+        } catch (Exception error) {
+            loaded = false;
+            if (OWNER.get() == this && SmolNative.isAvailable()) SmolNative.unload();
+            throw error;
+        } finally {
+            Trace.endSection();
+        }
+    }
+
     void analyze(String requestId, String encoded) {
+        analyze(requestId, encoded, "detailed");
+    }
+
+    void analyze(String requestId, String encoded, String profile) {
         if (requestId == null || !requestId.matches("[a-zA-Z0-9_-]{1,64}")) return;
-        if (!loaded) {
-            emit(json("type", "error", "requestId", requestId, "code", "not_ready", "message", "Сначала подготовьте офлайн-модель."));
+        boolean quick = "quick".equals(profile);
+        if (!quick && !"detailed".equals(profile)) {
+            emit(json("type", "error", "requestId", requestId, "code", "invalid_profile", "message", "Неизвестный режим офлайн-анализа."));
             return;
         }
         if (encoded == null || encoded.length() > MAX_IMAGE_BASE64) {
@@ -161,7 +185,6 @@ final class SmolEngineManager {
         }
         int token = start(requestId);
         if (token < 0) return;
-        final long epoch = SmolNative.isAvailable() ? SmolNative.beginOperation() : 0;
         executor.execute(() -> {
             File image = null;
             try {
@@ -169,16 +192,25 @@ final class SmolEngineManager {
                 if (jpeg.length == 0 || jpeg.length > MAX_IMAGE_BYTES || jpeg.length < 3 || (jpeg[0] & 255) != 255 || (jpeg[1] & 255) != 216) throw new IOException("Ожидается JPEG-кадр.");
                 BitmapFactory.Options bounds = new BitmapFactory.Options(); bounds.inJustDecodeBounds = true;
                 BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length, bounds);
-                if (bounds.outWidth <= 0 || bounds.outHeight <= 0 || bounds.outWidth > 1024 || bounds.outHeight > 1024) throw new IOException("Размер офлайн-кадра должен быть не более 1024 × 1024.");
+                int edge = quick ? 512 : 1024;
+                if (bounds.outWidth <= 0 || bounds.outHeight <= 0 || bounds.outWidth > edge || bounds.outHeight > edge)
+                    throw new IOException("Размер кадра для выбранного режима должен быть не более " + edge + " × " + edge + ".");
                 OfflineFrameQuality.check(jpeg);
                 check(token);
                 image = File.createTempFile("lfm-frame-", ".jpg", context.getCacheDir());
                 try (FileOutputStream output = new FileOutputStream(image)) { output.write(jpeg); }
+                boolean cold = !loaded;
+                long prepareStarted = SystemClock.elapsedRealtimeNanos();
+                ensureLoaded(token);
+                double loadMs = cold ? (SystemClock.elapsedRealtimeNanos() - prepareStarted) / 1_000_000d : 0;
+                long epoch = SmolNative.beginOperation();
+                check(token);
                 status("analyzing", "LFM3 анализирует кадр на телефоне…", 0);
                 JSONObject result;
                 Trace.beginSection("Cyber102.lfm.inference");
                 try {
-                    result = new JSONObject(SmolNative.analyze(image.getAbsolutePath(), PROMPT, MAX_OUTPUT_TOKENS, epoch));
+                    result = new JSONObject(SmolNative.analyze(image.getAbsolutePath(), quick ? QUICK_PROMPT : PROMPT,
+                            quick ? 64 : MAX_OUTPUT_TOKENS, epoch));
                 } finally {
                     Trace.endSection();
                 }
@@ -186,10 +218,14 @@ final class SmolEngineManager {
                 if (result.optBoolean("cancelled")) throw new IOException("Операция отменена.");
                 String text = result.optString("text", "").trim();
                 if (text.isEmpty() || text.length() > 4000) throw new IOException("Модель не вернула пригодное наблюдение. Попробуйте другой кадр.");
+                result.put("modelLoadMs", loadMs);
+                result.put("inferenceProfile", profile);
+                result.put("imageWidth", bounds.outWidth);
+                result.put("imageHeight", bounds.outHeight);
                 addRussianTranslation(result, text, token);
                 check(token);
                 emit(json("type", "result", "requestId", requestId, "result", result, "model", modelId,
-                        "modelVersion", revision + ".inspection-en-v1"));
+                        "modelVersion", revision + (quick ? ".inspection-quick-en-v1" : ".inspection-en-v1")));
                 status("ready", "Наблюдение готово. Проверьте его по изображению.", 100);
             } catch (Exception error) {
                 emit(json("type", "error", "requestId", requestId, "code", token != generation.get() ? "cancelled" : "inference_failed",
@@ -315,12 +351,32 @@ final class SmolEngineManager {
 
     private void prepare(ModelFile model, File folder, int token, int index) throws Exception {
         File destination = new File(folder, model.role + ".gguf");
-        if (destination.isFile() && destination.length() == model.size && hash(destination, token).equals(model.sha256)) return;
+        if (destination.isFile() && destination.length() == model.size) {
+            ModelVerificationStamp stamp = verificationStamp(model);
+            check(token);
+            String before = stamp.identity(destination);
+            if (stamp.matches(before)) return;
+            try (FileInputStream input = new FileInputStream(destination)) {
+                String opened = stamp.identity(input.getFD());
+                if (model.sha256.equals(hash(input, token))) {
+                    check(token);
+                    if (opened != null && (!opened.equals(stamp.identity(input.getFD())) || !opened.equals(stamp.identity(destination)))) {
+                        throw new IOException("Файл модели изменился во время проверки.");
+                    }
+                    stamp.record(opened);
+                    return;
+                }
+            }
+        }
         try (InputStream input = context.getAssets().open(model.asset)) {
             copy(input, destination, model, token, index);
         } catch (java.io.FileNotFoundException error) {
             throw new IOException("В этой облегчённой сборке нет весов. Нажмите «Импортировать модель» и выберите два официальных GGUF-файла.");
         }
+    }
+
+    private ModelVerificationStamp verificationStamp(ModelFile model) {
+        return new ModelVerificationStamp(context.getNoBackupFilesDir(), model.role, model.sha256);
     }
 
     private void copy(InputStream input, File destination, ModelFile model, int token, int index) throws Exception {
@@ -342,20 +398,20 @@ final class SmolEngineManager {
                     if (now - updateAt >= 250) { updateAt = now; status("preparing", "Проверяем файл " + (index + 1) + " из 2…", (int) (100 * total / model.size)); }
                 }
                 output.getFD().sync();
+                if (total != model.size || !hex(digest.digest()).equals(model.sha256)) throw new IOException("Контрольная сумма файла не совпадает с комплектом LFM3.");
+                check(token);
+                Files.move(temporary.toPath(), destination.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+                // rename may change ctime. The still-open descriptor identifies the file we actually verified.
+                ModelVerificationStamp stamp = verificationStamp(model);
+                stamp.record(stamp.identity(output.getFD()));
             }
-            if (total != model.size || !hex(digest.digest()).equals(model.sha256)) throw new IOException("Контрольная сумма файла не совпадает с комплектом LFM3.");
-            check(token);
-            if (destination.exists() && !destination.delete()) throw new IOException("Не удалось заменить файл модели.");
-            if (!temporary.renameTo(destination)) throw new IOException("Не удалось сохранить проверенный файл модели.");
         } finally { temporary.delete(); }
     }
 
-    private String hash(File file, int token) throws Exception {
+    private String hash(InputStream input, int token) throws Exception {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        try (InputStream input = new FileInputStream(file)) {
-            byte[] bytes = new byte[256 * 1024]; int count;
-            while ((count = input.read(bytes)) != -1) { check(token); digest.update(bytes, 0, count); }
-        }
+        byte[] bytes = new byte[256 * 1024]; int count;
+        while ((count = input.read(bytes)) != -1) { check(token); digest.update(bytes, 0, count); }
         return hex(digest.digest());
     }
 

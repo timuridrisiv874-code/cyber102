@@ -95,6 +95,12 @@ public final class OfflineInferenceTest {
             await("network isolation", "window.networkProbe === 'blocked'", 10000);
 
             scanTestLabel();
+            String profile = InstrumentationRegistry.getArguments().getString("analysisProfile", "detailed");
+            assertTrue("Requested profile must be supported", "quick".equals(profile) || "detailed".equals(profile));
+            assertEquals("detailed", stringJs("document.getElementById('offline-analysis-profile').value"));
+            if ("quick".equals(profile)) {
+                js("(()=>{const s=document.getElementById('offline-analysis-profile');s.value='quick';s.dispatchEvent(new Event('change',{bubbles:true}));return true})()");
+            }
             String videoSecond = InstrumentationRegistry.getArguments().getString("videoSecond");
             supplyMedia(target, videoSecond != null);
             if (videoSecond != null) {
@@ -137,7 +143,9 @@ public final class OfflineInferenceTest {
             assertEquals("230201068", saved.getJSONObject("media").getString("equipmentTag"));
             assertTrue(saved.getJSONObject("media").getString("equipmentName").contains("Электродвигатель"));
             assertEquals("LFM3-VL-2B", saved.getString("model"));
-            assertTrue(saved.getString("modelVersion").endsWith(".inspection-en-v1"));
+            assertEquals(profile, saved.getString("inferenceProfile"));
+            assertTrue(saved.getString("modelVersion").endsWith(
+                    "quick".equals(profile) ? ".inspection-quick-en-v1" : ".inspection-en-v1"));
             assertEquals(observation, saved.getString("observation"));
             assertEquals(english, saved.getString("originalEnglish"));
             assertEquals("ru", saved.getString("observationLanguage"));
@@ -158,6 +166,29 @@ public final class OfflineInferenceTest {
             Bundle report = new Bundle();
             report.putString("stream", "\nREAL_OFFLINE_RESULT " + saved + "\nAPP_PSS_KIB " + Debug.getPss() + "\n");
             instrumentation.sendStatus(0, report);
+            if ("true".equals(InstrumentationRegistry.getArguments().getString("checkSessionReuse"))) {
+                int loads = Integer.parseInt(js("JSON.parse(CyberSmolNative.state()).sessionLoads"));
+                assertEquals(1, loads);
+                instrumentation.runOnMainSync(() -> activity.moveTaskToBack(true));
+                long stopDeadline = SystemClock.elapsedRealtime() + 10000;
+                while (((MainActivity)activity).getLifecycle().getCurrentState().isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)
+                        && SystemClock.elapsedRealtime() < stopDeadline) SystemClock.sleep(100);
+                assertEquals(androidx.lifecycle.Lifecycle.State.CREATED, ((MainActivity)activity).getLifecycle().getCurrentState());
+                target.startActivity(new Intent(target, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                await("resident model after returning to app", "document.visibilityState==='visible' && JSON.parse(CyberSmolNative.state()).loaded", 15000);
+                assertEquals(loads, Integer.parseInt(js("JSON.parse(CyberSmolNative.state()).sessionLoads")));
+                js("document.getElementById('check').click(); true");
+                await("next photo used the same model", "!document.getElementById('offline-result').hidden && !JSON.parse(CyberSmolNative.state()).busy", 240000);
+                assertEquals(loads, Integer.parseInt(js("JSON.parse(CyberSmolNative.state()).sessionLoads")));
+                instrumentation.runOnMainSync(() -> ((MainActivity)activity).onTrimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL));
+                await("released model after severe memory pressure", "JSON.parse(CyberSmolNative.state()).state==='idle' && !JSON.parse(CyberSmolNative.state()).loaded", 15000);
+                js("document.getElementById('check').click(); true");
+                await("next photo reloads automatically", "JSON.parse(CyberSmolNative.state()).sessionLoads===" + (loads+1)
+                        + " && !JSON.parse(CyberSmolNative.state()).busy && !document.getElementById('offline-result').hidden", 240000);
+                Bundle reuse = new Bundle();
+                reuse.putString("stream", "\nSESSION_REUSE_OK before=1 afterBackgroundAndNextFrame=1 afterPressureAndNextFrame=2\n");
+                instrumentation.sendStatus(0, reuse);
+            }
             if ("true".equals(InstrumentationRegistry.getArguments().getString("captureOnly"))) return;
 
             if (videoSecond != null) {

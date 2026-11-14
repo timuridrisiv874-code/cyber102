@@ -11,6 +11,7 @@
   let historyPanel, renderedResult = null;
   const HISTORY_KEY = 'cyber102.offline.inspections.v1';
   const CURRENT_MODEL = 'LFM3-VL-2B';
+  const profileName = profile => profile === 'quick' ? 'Быстрый' : 'Подробный';
   const PREVIOUS_MODELS = new Set(['SmolVLM-256M-Instruct', 'SmolVLM-500M-Instruct', 'SmolVLM2-2.2B-Instruct', 'VisionPsy-Nano-460M']);
   const modelName = model => model === CURRENT_MODEL || PREVIOUS_MODELS.has(model) ? model : 'Офлайн-модель';
   const displayBytes = bytes => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(2).replace('.', ',')} ГБ` : `${Math.ceil(bytes / 1e6)} МБ`;
@@ -54,6 +55,7 @@
         const item = text('li');
         item.style.overflowWrap = 'anywhere';
         item.append(text('strong', new Date(record.createdAt).toLocaleString('ru-RU')), text('p', record.observation));
+        if (record.truncated) item.append(text('p', 'Достигнут лимит ответа. Описание может быть неполным.', 'offline-warning'));
         if (record.media?.equipmentTag) item.append(text('p', (record.media.equipmentName || 'Метка') + ' · ' + record.media.equipmentTag, 'equipment-id'));
         if (record.observationLanguage === 'ru' && typeof record.originalEnglish === 'string') {
           item.append(englishOriginal(record.originalEnglish));
@@ -70,6 +72,7 @@
 
   function updateStatus(state) {
     modelState = { ...modelState, ...state };
+    document.dispatchEvent(new Event('offline-model-status'));
     if (!controls) return;
     const size = Number.isSafeInteger(modelState.modelBytes) && modelState.modelBytes > 0 ?
       `Размер двух файлов модели: ${displayBytes(modelState.modelBytes)}. ` : '';
@@ -78,6 +81,7 @@
     message.dataset.error = String(modelState.state === 'error');
     progress.hidden = !modelState.busy;
     progress.value = Number.isFinite(modelState.progress) ? modelState.progress : 0;
+    loadButton.hidden = Boolean(modelState.loaded || modelState.busy);
     loadButton.disabled = Boolean(modelState.busy || modelState.loaded);
     loadButton.textContent = modelState.loaded ? 'Модель готова' : 'Подготовить модель';
     cancelButton.hidden = !modelState.busy;
@@ -98,13 +102,16 @@
         return;
       }
       const timings = {};
-      for (const key of ['promptMs', 'generateMs', 'totalMs', 'generatedTokens', 'inputTokens', 'translationLoadMs', 'translationMs']) {
+      for (const key of ['modelLoadMs', 'promptMs', 'generateMs', 'totalMs', 'generatedTokens', 'inputTokens', 'translationLoadMs', 'translationMs']) {
         if (Number.isFinite(raw[key]) && raw[key] >= 0) timings[key] = raw[key];
       }
       const russian = typeof raw.russian === 'string' && raw.russian.length <= 12000 ? raw.russian.trim() : '';
       const originalEnglish = raw.text.trim();
       job.resolve({ status: 'offline_observation', source: 'on_device', model: event.model,
         modelVersion: typeof event.modelVersion === 'string' ? event.modelVersion : '',
+        inferenceProfile: raw.inferenceProfile === 'quick' ? 'quick' : 'detailed',
+        imageWidth: Number.isInteger(raw.imageWidth) ? raw.imageWidth : undefined,
+        imageHeight: Number.isInteger(raw.imageHeight) ? raw.imageHeight : undefined,
         observation: russian || originalEnglish, originalEnglish, preliminary: true,
         observationLanguage: russian ? 'ru' : 'en',
         translatorModel: russian && typeof raw.translatorModel === 'string' ? raw.translatorModel : undefined,
@@ -117,12 +124,31 @@
     }
   }
 
-  async function analyze(blob, { signal, onProgress, metadata = { captureSource: 'camera' } } = {}) {
+  async function analyze(blob, { signal, onProgress, metadata = { captureSource: 'camera' }, profile = 'detailed' } = {}) {
     if (!enabled) throw new Error('Офлайн-модель доступна только в Android-приложении.');
     if (signal?.aborted) throw aborted();
     updateStatus(JSON.parse(window.CyberSmolNative.state()));
-    if (!modelState.loaded) throw new Error('Сначала нажмите «Подготовить модель» в блоке офлайн-анализа.');
+    if (!modelState.loaded && modelState.busy && ['idle', 'preparing', 'loading'].includes(modelState.state)) {
+      onProgress?.('Модель загружается. Проверка кадра начнётся автоматически.');
+      await new Promise((resolve, reject) => {
+        const finish = error => {
+          signal?.removeEventListener('abort', stop);
+          document.removeEventListener('offline-model-status', changed);
+          error ? reject(error) : resolve();
+        };
+        const stop = () => finish(aborted());
+        const changed = () => {
+          if (!modelState.busy) finish(modelState.loaded ? null : new Error(modelState.message || 'Не удалось загрузить модель.'));
+        };
+        document.addEventListener('offline-model-status', changed);
+        signal?.addEventListener('abort', stop, { once: true });
+        if (signal?.aborted) stop(); else changed();
+      });
+    }
     if (modelState.busy || pending.size) throw new Error('Офлайн-модель занята. Дождитесь завершения или отмените анализ.');
+    const withProfile = typeof window.CyberSmolNative.analyzeWithProfile === 'function';
+    if ((profile !== 'detailed' && profile !== 'quick') || (profile === 'quick' && !withProfile))
+      throw new Error('Выбранный режим недоступен в этой версии приложения.');
     if (!(blob instanceof Blob) || blob.type !== 'image/jpeg' || !blob.size || blob.size > 1536 * 1024) throw new Error('Для офлайн-анализа нужен JPEG-кадр до 1,5 МБ.');
     const encoded = await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -133,6 +159,7 @@
       reader.readAsDataURL(blob);
     });
     if (signal?.aborted) throw aborted();
+    if (pending.size) throw new Error('Офлайн-модель занята. Дождитесь завершения анализа.');
     const requestId = `frame_${Date.now()}_${++counter}`;
     onProgress?.('Анализ на телефоне. Кадр не отправляется в сеть…');
     return new Promise((resolve, reject) => {
@@ -151,9 +178,12 @@
       signal?.addEventListener('abort', cancel, { once: true });
       timer = setTimeout(() => {
         window.CyberSmolNative.cancel();
-        finish(reject, new Error('Офлайн-анализ не завершился за 3 минуты. Попробуйте более простой кадр.'));
+        finish(reject, new Error('За 3 минуты телефон не успел подготовить полный результат. Попробуйте быстрый режим или другой кадр.'));
       }, 180000);
-      try { window.CyberSmolNative.analyze(requestId, encoded); }
+      try {
+        if (withProfile) window.CyberSmolNative.analyzeWithProfile(requestId, encoded, profile);
+        else window.CyberSmolNative.analyze(requestId, encoded);
+      }
       catch (error) { finish(reject, error); }
     });
   }
@@ -184,12 +214,13 @@
     const position = result.media?.captureSource === 'uploaded_video' && Number.isFinite(result.media.videoTimeSeconds) ? ` · ${result.media.videoTimeSeconds.toFixed(1)} с` : '';
     const seconds = ms => (ms / 1000).toLocaleString('ru-RU', { maximumFractionDigits: 2 });
     const times = [];
+    if (result.metrics.modelLoadMs > 0) times.push(`Загрузка модели ${seconds(result.metrics.modelLoadMs)} с`);
     if (Number.isFinite(result.metrics.totalMs)) times.push(`Анализ ${seconds(result.metrics.totalMs)} с`);
     if (result.metrics.translationLoadMs > 0) times.push(`Загрузка переводчика ${seconds(result.metrics.translationLoadMs)} с`);
     if (Number.isFinite(result.metrics.translationMs)) times.push(`Перевод ${seconds(result.metrics.translationMs)} с`);
     resultCard.replaceChildren(text('span', 'Офлайн · предварительное наблюдение', 'finding'),
       text('h3', `${modelName(result.model)} на этом телефоне`),
-      text('p', [capture + position, ...times].join(' · '), 'video-metrics'),
+      text('p', [capture + position, profileName(result.inferenceProfile), ...times].join(' · '), 'video-metrics'),
       checkedFrame());
     if (result.media?.equipmentTag) resultCard.append(text('p', (result.media.equipmentName || 'Метка') + ' · ' + result.media.equipmentTag, 'equipment-id'));
     if (result.translationFailed) {
@@ -200,8 +231,22 @@
     const description = text('p', result.observation, 'offline-observation');
     description.lang = result.observationLanguage;
     resultCard.append(description);
-    if (result.truncated) resultCard.append(text('p', 'Ответ прерван. Описание может быть неполным.', 'offline-warning'));
+    if (result.truncated) resultCard.append(text('p', 'Достигнут лимит ответа. Описание может быть неполным.', 'offline-warning'));
     if (result.observationLanguage === 'ru') resultCard.append(englishOriginal(result.originalEnglish));
+    if (Number.isFinite(result.metrics.promptMs) || Number.isFinite(result.metrics.generateMs)) {
+      const details = text('details');
+      details.id = 'offline-inference-timings';
+      details.append(text('summary', 'Время и размер кадра'));
+      const data = [];
+      if (result.imageWidth && result.imageHeight) data.push(`Кадр для модели: ${result.imageWidth} × ${result.imageHeight}`);
+      if (Number.isFinite(result.metrics.promptMs)) data.push(`Обработка кадра и запроса: ${seconds(result.metrics.promptMs)} с`);
+      if (Number.isFinite(result.metrics.inputTokens)) data.push(`Входных токенов: ${result.metrics.inputTokens}`);
+      if (Number.isFinite(result.metrics.generateMs)) data.push(`Генерация ответа: ${seconds(result.metrics.generateMs)} с`);
+      if (Number.isFinite(result.metrics.generatedTokens)) data.push(`Токенов ответа: ${result.metrics.generatedTokens}`);
+      if (Number.isFinite(result.clientDurationSeconds)) data.push(`Полное ожидание результата: ${seconds(result.clientDurationSeconds * 1000)} с`);
+      details.append(text('p', data.join(' · '), 'video-help'));
+      resultCard.append(details);
+    }
     resultCard.append(text('p', 'Сверьте описание с кадром.', 'equipment-id'));
     const label = text('label', 'Заметка к осмотру на телефоне'); label.htmlFor = 'offline-note';
     const note = text('textarea'); note.id = label.htmlFor; note.rows = 3; note.maxLength = 1000;
@@ -215,6 +260,8 @@
           observationLanguage: result.observationLanguage, originalEnglish: result.originalEnglish,
           translatorModel: result.translatorModel, translationMs: result.metrics.translationMs,
           translationLoadMs: result.metrics.translationLoadMs,
+          inferenceProfile: result.inferenceProfile, metrics: result.metrics,
+          imageWidth: result.imageWidth, imageHeight: result.imageHeight, clientDurationSeconds: result.clientDurationSeconds,
           note: note.value.slice(0,1000), media: result.media, durationSeconds: result.durationSeconds,
           truncated: result.truncated };
         localStorage.setItem(HISTORY_KEY, JSON.stringify([record, ...readHistory()].slice(0, 10)));
@@ -241,6 +288,8 @@
 
   function setup() {
     if (!enabled) return;
+    const profileControl = document.getElementById('offline-analysis-mode');
+    if (profileControl) profileControl.hidden = typeof window.CyberSmolNative.analyzeWithProfile !== 'function';
     controls = text('section', undefined, 'panel'); controls.id = 'offline-controls';
     modelDescription = text('p', 'Определяем модель из комплекта приложения…', 'video-help'); modelDescription.id = 'offline-model-description';
     controls.append(text('h2', 'Модель на телефоне'), modelDescription);
