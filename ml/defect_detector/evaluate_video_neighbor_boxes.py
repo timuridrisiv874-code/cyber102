@@ -116,16 +116,29 @@ def intermediate_features(capture, first, second, max_gap, sift):
         yield frame_features(sift, gray, size)
 
 
-def follow(boxes, sequence, matches):
+def follow(box, sequence, matches):
     for (first, second), (left, right) in zip(zip(sequence, sequence[1:]), matches, strict=True):
-        boxes = [projected for box in boxes
-                 if (projected := project_box(box, first[0], second[0], left, right)) is not None]
-        if not boxes:
+        box = project_box(box, first[0], second[0], left, right)
+        if box is None:
             break
-    return boxes
+    return box
 
 
-def compare(clips, cached, baseline, sift, videos=None, max_gap=.4):
+def transfer_boxes(boxes, sequence, forward, reverse, roundtrip_iou):
+    transferred = []
+    for box in boxes:
+        target = follow(box, sequence, forward)
+        if target is None:
+            continue
+        if roundtrip_iou:
+            returned = follow(target, sequence[::-1], reverse)
+            if returned is None or overlap(box['xyxy'], returned['xyxy']) < roundtrip_iou:
+                continue
+        transferred.append(target)
+    return transferred
+
+
+def compare(clips, cached, baseline, sift, videos=None, max_gap=.4, roundtrip_iou=0):
     import cv2
 
     transferred = {name: [] for name in baseline}
@@ -146,8 +159,9 @@ def compare(clips, cached, baseline, sift, videos=None, max_gap=.4):
                 intermediate = intermediate_features(capture, a, b, max_gap, sift) if capture is not None else ()
                 sequence = [cached[first], *intermediate, cached[second]]
                 pairs = [match_features(left, right) for left, right in zip(sequence, sequence[1:])]
-                forward = follow(baseline[first], sequence, pairs)
-                reverse = follow(baseline[second], sequence[::-1], [(r, l) for l, r in pairs[::-1]])
+                reversed_pairs = [(r, l) for l, r in pairs[::-1]]
+                forward = transfer_boxes(baseline[first], sequence, pairs, reversed_pairs, roundtrip_iou)
+                reverse = transfer_boxes(baseline[second], sequence[::-1], reversed_pairs, pairs, roundtrip_iou)
                 transferred[second].extend(forward)
                 transferred[first].extend(reverse)
                 timings.append(round((perf_counter() - started) * 1000, 3))
@@ -174,6 +188,8 @@ def main():
     parser.add_argument('output', type=Path)
     parser.add_argument('--videos', type=Path, help='Decode intermediate frames from the original local videos')
     parser.add_argument('--max-gap', type=float, default=.4, help='Maximum interval in seconds with --videos')
+    parser.add_argument('--roundtrip-iou', type=float, default=0,
+                        help='Require this overlap after projecting each transferred box back to its source')
     args = parser.parse_args()
     sets = {path.stem: json.loads(path.read_bytes()) for path in args.annotations}
     clips = json.loads((args.images / 'clips.json').read_bytes())
@@ -196,6 +212,8 @@ def main():
                 video_hashes[clip] = hashlib.file_digest(stream, 'sha256').hexdigest()
     if not .1 <= args.max_gap <= 3:
         parser.error('--max-gap must be between 0.1 and 3 seconds')
+    if not 0 <= args.roundtrip_iou <= 1:
+        parser.error('--roundtrip-iou must be between 0 and 1')
     for row in rows:
         frame = clips[row['clip']]['frames'][row['frameIndex']]
         if any(row[key] != frame[key] for key in ('file', 'sha256', 'timestampSeconds')):
@@ -208,12 +226,14 @@ def main():
     if set(cached) != expected:
         raise ValueError('Sampled clips must cover the same frames as the annotations')
     extraction = round((perf_counter() - start) * 1000, 3)
-    combined, confirmed, transferred, links, timings = compare(clips, cached, baseline, sift, args.videos, args.max_gap)
+    combined, confirmed, transferred, links, timings = compare(
+        clips, cached, baseline, sift, args.videos, args.max_gap, args.roundtrip_iou)
     novel = {name: [box for box in boxes if box not in baseline[name]] for name, boxes in combined.items()}
     output = {'model': report['model'], 'revision': report['revision'], 'featureExtractionMs': extraction,
               'labels': LABELS, 'mode': 'tracked-candidates', 'predictions': novel,
               'inputReportSha256': hashlib.sha256(report_body).hexdigest(),
               'videoSha256': video_hashes, 'maxGapSeconds': args.max_gap if args.videos else None,
+              'roundtripIoU': args.roundtrip_iou,
               'medianNeighborPairMs': median(timings) if timings else None, 'totalNeighborMs': sum(timings),
               'links': links,
               'transferred': transferred, 'combined': combined, 'confirmed': confirmed,
