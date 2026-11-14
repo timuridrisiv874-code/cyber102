@@ -11,6 +11,7 @@ from vision_runtime import qwen_download, qwen_worker, worker
 
 OBSERVATION = {'component': 'pump', 'condition': 'corrosion', 'box': [100, 200, 700, 800],
                'observation': 'На корпусе видны следы коррозии.'}
+COMPACT_OBSERVATION = {key: value for key, value in OBSERVATION.items() if key != 'observation'}
 
 
 class QwenSnapshotTest(unittest.TestCase):
@@ -100,32 +101,32 @@ class QwenEngineTest(unittest.TestCase):
 
     def test_video_uses_one_context_exact_indices_and_shared_grounded_prompt(self):
         engine = self.make_engine()
-        rows = [dict(OBSERVATION, frameIndex=index) for index in range(2)]
-        engine.processor.decode.return_value = json.dumps({'observations': rows, 'summary': 'Видны признаки коррозии.'})
+        rows = [dict(COMPACT_OBSERVATION, frameIndex=index) for index in range(2)]
+        engine.processor.decode.return_value = json.dumps(rows)
         result = engine.infer_video([object(), object()], [0.5, 4.5])
         content = engine.processor.apply_chat_template.call_args.args[0][-1]['content']
         self.assertEqual([item['type'] for item in content], ['text', 'image', 'text', 'image', 'text'])
-        self.assertIn(worker.VIDEO_PROMPT, content[-1]['text'])
-        self.assertIn('EXACTLY 2 observations', content[-1]['text'])
-        self.assertIn('[0, 1]', content[-1]['text'])
+        self.assertEqual(content[-1]['text'], qwen_worker.VIDEO_BATCH_PROMPT)
+        self.assertIn('exactly two frames', content[-1]['text'])
         self.assertEqual([row['timestampSeconds'] for row in result['observations']], [0.5, 4.5])
         self.assertEqual(engine.last_metrics['frames'], 2)
         self.assertEqual(engine.last_input_metadata['maxPixels'], qwen_worker.VIDEO_MAX_PIXELS)
         engine.model.generate.assert_called_once()
+        self.assertEqual(engine.model.generate.call_args.kwargs['max_new_tokens'], 160)
 
     def test_video_batches_keep_all_frame_indices_and_aggregate_metrics(self):
         engine = self.make_engine()
         images, timestamps = [object() for _ in range(8)], list(range(8))
-        rows = [dict(OBSERVATION, frameIndex=index) for index in range(4)]
-        engine.processor.decode.return_value = json.dumps({'observations': rows, 'summary': 'Коррозия.'})
+        rows = [dict(COMPACT_OBSERVATION, frameIndex=index) for index in range(2)]
+        engine.processor.decode.return_value = json.dumps(rows)
         result = engine.infer_video(images, timestamps)
         self.assertEqual([row['frameIndex'] for row in result['observations']], list(range(8)))
         self.assertEqual([row['timestampSeconds'] for row in result['observations']], timestamps)
         self.assertIn('коррозия', result['summary'])
         self.assertEqual(engine.last_metrics['frames'], 8)
-        self.assertEqual(engine.last_metrics['outputTokens'], 140)
+        self.assertEqual(engine.last_metrics['outputTokens'], 280)
         self.assertEqual([call.kwargs['images'] for call in engine.processor.call_args_list],
-                         [images[:4], images[4:]])
+                         [images[:2], images[2:4], images[4:6], images[6:]])
 
     def test_video_retries_smaller_batches_after_cuda_oom(self):
         class OutOfMemoryError(RuntimeError):
@@ -133,20 +134,19 @@ class QwenEngineTest(unittest.TestCase):
 
         engine = self.make_engine()
         engine.torch.cuda.OutOfMemoryError = OutOfMemoryError
-        rows = [dict(OBSERVATION, frameIndex=index) for index in range(2)]
-        engine.processor.decode.return_value = json.dumps({'observations': rows, 'summary': 'Коррозия.'})
+        engine.processor.decode.return_value = json.dumps(COMPACT_OBSERVATION)
         tokens = engine.model.generate.return_value
-        engine.model.generate.side_effect = [OutOfMemoryError(), tokens, tokens, tokens, tokens]
-        images = [object() for _ in range(8)]
-        with patch.object(qwen_worker.time, 'monotonic', side_effect=[0, 0, 4, 8, 12, 16]):
-            result = engine.infer_video(images, list(range(8)))
-        self.assertEqual([row['frameIndex'] for row in result['observations']], list(range(8)))
-        self.assertEqual([row['timestampSeconds'] for row in result['observations']], list(range(8)))
+        engine.model.generate.side_effect = [OutOfMemoryError(), tokens, tokens]
+        images = [object(), object()]
+        with patch.object(qwen_worker.time, 'monotonic', side_effect=[0, 0, 4, 8]):
+            result = engine.infer_video(images, [0, 1])
+        self.assertEqual([row['frameIndex'] for row in result['observations']], [0, 1])
+        self.assertEqual([row['timestampSeconds'] for row in result['observations']], [0, 1])
         self.assertEqual([call.kwargs['images'] for call in engine.processor.call_args_list],
-                         [images[:4], images[:2], images[2:4], images[4:6], images[6:]])
+                         [images, images[0], images[1]])
         self.assertEqual([call.kwargs['max_time'] for call in engine.model.generate.call_args_list],
-                         [110, 106, 102, 98, 94])
-        self.assertEqual(engine.last_metrics['frames'], 8)
+                         [110, 106, 102])
+        self.assertEqual(engine.last_metrics['frames'], 2)
         self.assertEqual(engine.torch.cuda.empty_cache.call_count, 2)
 
     def test_video_single_frame_oom_is_propagated_without_looping(self):
@@ -164,9 +164,8 @@ class QwenEngineTest(unittest.TestCase):
     def test_invalid_batch_response_falls_back_to_grounded_single_frames(self):
         engine = self.make_engine()
         engine.torch.cuda.OutOfMemoryError = RuntimeError
-        compact = {key: value for key, value in OBSERVATION.items() if key != 'observation'}
-        engine.processor.decode.side_effect = [json.dumps({'observations': [], 'summary': 'Кадры.'}),
-                                               json.dumps(compact), json.dumps(compact)]
+        compact = json.dumps(COMPACT_OBSERVATION)
+        engine.processor.decode.side_effect = ['[]', compact, compact]
         result = engine.infer_video([object(), object()], [1.25, 4.75])
         self.assertEqual([row['timestampSeconds'] for row in result['observations']], [1.25, 4.75])
         self.assertEqual([row['frameIndex'] for row in result['observations']], [0, 1])
