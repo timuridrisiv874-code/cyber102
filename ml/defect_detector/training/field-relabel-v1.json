@@ -185,25 +185,6 @@
     "note": "Staged dark liquid streaks and the visible small floor spill under the right stream."
   },
   {
-    "file": "oil_chemical-Level01-Wheeled-002875-001.jpg",
-    "scene": "inspecsafe-yellow-suit-platform",
-    "sha256": "9c3f8ab70ad3f3467e3e3d71b9dc7476d65d09d8e242abdfdd19a442b76317e2",
-    "objects": [
-      {
-        "class": "wet_patch",
-        "xyxy": [
-          0.435,
-          0.436,
-          0.857,
-          0.803
-        ]
-      }
-    ],
-    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
-    "sourceImage": "oil_chemical-Level01-Wheeled-002875-001.jpg",
-    "note": "Wet irregular spill on textured metal platform; tight region excludes shiny intact pipes."
-  },
-  {
     "file": "oil_chemical-Level01-Wheeled-002784-001.jpg",
     "scene": "inspecsafe-yellow-fluid-painted-platform",
     "sha256": "bae33fc2526a3a36aa4a8e38bbdccd68433a6a26034da077b580441a3e8c1d9b",
