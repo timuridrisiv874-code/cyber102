@@ -172,6 +172,27 @@ class QueueTest(unittest.TestCase):
         self.assertEqual(failed['status'], 'failed')
         self.assertNotIn('secret', str(failed))
 
+    def test_public_failure_message_and_private_exception_classification(self):
+        queue = self.queue()
+        client = identity()
+        for error, code, message in [
+            (vision.VisionUnavailable('credential=secret'), 'vision_unavailable', 'Сервис анализа временно недоступен. Повторите разбор этого видео позже.'),
+            (vision.VisionInvalidResponse('secret bytes'), 'vision_invalid_response', 'Модель вернула несогласованные наблюдения. Повторите разбор видео.'),
+            (RuntimeError('secret payload'), 'analysis_failed', 'Не удалось выполнить анализ. Повторите запрос позже.'),
+        ]:
+            with self.subTest(code=code):
+                def fail(_):
+                    raise error from ConnectionRefusedError('secret address')
+                with self.assertLogs('server.analysis_queue', 'WARNING') as logs:
+                    job = queue.submit(client, identity(), 'a', 'video', b'sensitive image', 15, fail)
+                    failed = self.wait(queue, job, client, 'failed')
+                self.assertEqual((failed['code'], failed['error'], failed['errorStatus']), (code, message, 503))
+                self.assertIn(job['id'], logs.output[0])
+                self.assertIn(type(error).__name__, logs.output[0])
+                self.assertIn('ConnectionRefusedError', logs.output[0])
+                self.assertNotIn('secret', str([failed, logs.output]))
+                self.assertNotIn('sensitive image', str([failed, logs.output]))
+
     def test_close_cancels_pending_and_drops_running_result(self):
         queue = self.queue()
         gate, entered = threading.Event(), threading.Event()

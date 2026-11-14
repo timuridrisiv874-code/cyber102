@@ -232,7 +232,7 @@ def _analyze_prepared(payload):
     except (OSError, HTTPException) as error:
         raise vision.VisionUnavailable('Локальная модель не ответила на видео. Повторите разбор позже.') from error
     except (ValueError, KeyError, TypeError, RecursionError) as error:
-        raise vision.VisionUnavailable('Модель не смогла согласованно разобрать видео. Попробуйте короткий ролик с одним узлом.') from error
+        raise vision.VisionInvalidResponse('Модель не смогла согласованно разобрать видео. Попробуйте короткий ролик с одним узлом.') from error
     finally:
         vision._slot.release()
 

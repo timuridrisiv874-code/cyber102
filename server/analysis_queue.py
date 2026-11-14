@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
 import hmac
+import logging
 import re
 import threading
 import time
@@ -18,6 +19,14 @@ from . import vision
 
 TOKEN = re.compile(r'(?:[0-9a-fA-F]{32,64}|[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})\Z')
 TERMINAL = {'succeeded', 'failed', 'cancelled', 'expired'}
+logger = logging.getLogger(__name__)
+
+
+def log_failure(job, stage, error):
+    # Error messages, tracebacks and request payloads may contain image bytes or credentials.
+    cause = error.__cause__ or error.__context__
+    logger.warning('Analysis %s (%s) failed during %s: %s; cause=%s', job.id, job.kind, stage,
+                   type(error).__name__, type(cause).__name__ if cause else 'none')
 
 
 class QueueFull(Exception):
@@ -244,8 +253,12 @@ class AnalysisQueue:
                     job.status, job.started_wall = 'queued', None
                     self._pending.appendleft(job.id)
                 elif error is not None:
-                    job.error, job.code, job.error_status = (
-                        'Не удалось выполнить анализ. Повторите запрос позже.', 'analysis_failed', 503)
+                    log_failure(job, 'inference', error)
+                    if isinstance(error, vision.VisionUnavailable):
+                        job.error, job.code = error.public_message(job.kind), error.code
+                    else:
+                        job.error, job.code = 'Не удалось выполнить анализ. Повторите запрос позже.', 'analysis_failed'
+                    job.error_status = 503
                     self._finish(job, 'failed')
                 else:
                     try:
@@ -253,7 +266,8 @@ class AnalysisQueue:
                         # is committed, later cancellation cannot revoke it.
                         job.result = finalize(payload, result) if finalize else result
                         self._finish(job, 'succeeded')
-                    except Exception:
+                    except Exception as error:
+                        log_failure(job, 'persistence', error)
                         job.error, job.code, job.error_status = (
                             'Не удалось сохранить результат анализа. Повторите запрос.', 'analysis_failed', 503)
                         self._finish(job, 'failed')

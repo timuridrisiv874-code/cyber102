@@ -52,6 +52,7 @@ const server = http.createServer(async (req, res) => {
       }));
     }
     if (state.mode === 'empty') result.observations = [];
+    if (state.mode === 'unavailable') return reply(res, 503, {code:'vision_unavailable', error:'Сервис анализа временно недоступен. Повторите разбор этого видео позже.'});
     if (state.mode === 'hold') { state.pending.push(() => reply(res, 200, result)); return; }
     return reply(res, 200, result);
   }
@@ -244,6 +245,17 @@ async function run(browser, engine, android) {
       assert.equal(await page.locator('#video-review-results').isVisible(),false);
     }
 
+    if (!android) {
+      const selectedVideo = await page.locator('#uploaded-video').evaluate(el => el.currentSrc);
+      state.mode = 'unavailable';
+      await page.locator('#video-review-run').click();
+      await page.locator('#video-review-status').getByText(/Сервис анализа временно недоступен/).waitFor();
+      state.mode = 'success';
+      await page.locator('#video-review-run').click();
+      await page.locator('#video-review-results').waitFor();
+      assert.ok(selectedVideo.startsWith('blob:'));
+      assert.equal(await page.locator('#uploaded-video').evaluate(el => el.currentSrc), selectedVideo, 'Retry keeps the selected video');
+    }
     state.mode = 'mismatch';
     await page.locator('#video-review-run').click();
     await page.locator('#video-review-status').getByText('Позиции наблюдений не совпали', { exact: false }).waitFor();

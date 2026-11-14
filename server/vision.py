@@ -55,7 +55,20 @@ Write a concise factual observation in Russian. Return only JSON matching this s
 
 
 class VisionUnavailable(Exception):
-    pass
+    """Inference failure; exception arguments may contain private implementation details."""
+    code = 'vision_unavailable'
+
+    def public_message(self, kind):
+        action = 'разбор этого видео' if kind == 'video' else 'проверку кадра'
+        return f'Сервис анализа временно недоступен. Повторите {action} позже.'
+
+
+class VisionInvalidResponse(VisionUnavailable):
+    code = 'vision_invalid_response'
+
+    def public_message(self, kind):
+        return ('Модель вернула несогласованные наблюдения. Повторите разбор видео.'
+                if kind == 'video' else 'Модель вернула неоднозначное наблюдение. Повторите проверку кадра.')
 
 
 class VisionBusy(VisionUnavailable):
@@ -293,6 +306,6 @@ def analyze(image, backend='ollama', profile='standard'):
     except (OSError, HTTPException) as error:
         raise VisionUnavailable('Локальная модель не ответила. Повторите кадр позже.') from error
     except (ValueError, KeyError, TypeError, RecursionError) as error:
-        raise VisionUnavailable('Модель вернула неоднозначный ответ. Попробуйте снять узел крупнее.') from error
+        raise VisionInvalidResponse('Модель вернула неоднозначный ответ. Попробуйте снять узел крупнее.') from error
     finally:
         _slot.release()
