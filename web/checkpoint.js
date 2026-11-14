@@ -141,6 +141,71 @@ function severityBadge(level) {
   return badge;
 }
 
+const releaseCheckNotes = new Set([
+  'Автопроверка релиза 0.6: синтетическое фото, ручные демонстрационные значения.',
+  'Проверка версии 0.5: синтетический тестовый кадр, демонстрационная телеметрия.',
+]);
+
+const frameDialog = byId('journal-frame');
+const frameImage = byId('journal-frame-image');
+const frameStatus = byId('journal-frame-status');
+const frameTools = byId('journal-frame-tools');
+const boxButton = byId('journal-frame-box');
+let frameOpener;
+
+function openJournalFrame(button, path, title, context, box) {
+  const photo = new Image();
+  photo.alt = title;
+  const validBox = box && [box.x, box.y, box.width, box.height].every(Number.isFinite) &&
+    box.x >= 0 && box.y >= 0 && box.width > 0 && box.height > 0 &&
+    box.x + box.width <= 1.000001 && box.y + box.height <= 1.000001;
+  frameImage.replaceChildren(photo);
+  if (validBox) {
+    const marker = element('span', undefined, 'journal-frame-marker');
+    marker.setAttribute('aria-hidden', 'true');
+    Object.assign(marker.style, {left: `${box.x * 100}%`, top: `${box.y * 100}%`,
+      width: `${box.width * 100}%`, height: `${box.height * 100}%`});
+    frameImage.append(marker);
+  }
+  frameImage.hidden = true;
+  frameImage.classList.remove('with-marker');
+  boxButton.setAttribute('aria-pressed', 'false');
+  frameTools.hidden = true;
+  frameStatus.textContent = 'Загружаем кадр…';
+  byId('journal-frame-context').textContent = context;
+  photo.onload = () => {
+    if (photo.parentNode !== frameImage) return;
+    frameImage.style.setProperty('--photo-width', `${photo.naturalWidth}px`);
+    frameImage.style.setProperty('--photo-ratio', String(photo.naturalWidth / photo.naturalHeight));
+    frameStatus.textContent = '';
+    frameImage.hidden = false;
+    frameTools.hidden = !validBox;
+  };
+  photo.onerror = () => {
+    if (photo.parentNode === frameImage) frameStatus.textContent = 'Не удалось загрузить кадр.';
+  };
+  frameOpener = button;
+  frameDialog.showModal();
+  photo.src = path;
+}
+
+byId('journal-frame-close').addEventListener('click', () => frameDialog.close());
+frameDialog.addEventListener('click', event => {
+  if (event.target === frameDialog) {
+    const bounds = frameDialog.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right ||
+        event.clientY < bounds.top || event.clientY > bounds.bottom) frameDialog.close();
+  }
+});
+frameDialog.addEventListener('close', () => {
+  frameImage.replaceChildren();
+  frameOpener?.focus({preventScroll: true});
+  frameOpener = null;
+});
+boxButton.addEventListener('click', () => {
+  boxButton.setAttribute('aria-pressed', String(frameImage.classList.toggle('with-marker')));
+});
+
 function historyEntry(record, date, scenarios) {
   const entry = element('li', undefined, 'history-entry');
   const captured = record.provenance?.source === 'camera_inspection';
@@ -163,14 +228,26 @@ function historyEntry(record, date, scenarios) {
   } else {
     const details = element('details', undefined, 'data-note history-entry-details');
     details.append(element('summary', 'Данные осмотра'));
-    if (title !== source) details.append(element('p', source));
     if (record.provenance.telemetry === 'demo_scenario') entry.append(element('p', `Пример показаний · ${scenario}`));
-    else details.append(element('p', record.provenance.telemetry === 'manual' ? 'Показания введены вручную.' : 'Показаний датчиков нет.'));
-    if (typeof result?.model === 'string') details.append(element('p', `${result.model}. Оборудование выбрано инженером.`));
-    if (Number.isFinite(result?.media?.videoTimeSeconds)) details.append(element('p', `Время в видео — ${result.media.videoTimeSeconds} с.`));
-    if (typeof result?.observation === 'string' && result.observation) entry.append(element('p', result.observation));
-    const confirmed = Object.entries(record.vision ?? {}).filter(([, value]) => value !== null && value !== undefined);
-    details.append(element('p', confirmed.length ? confirmed.map(([key, value]) => `${labels[key] ?? key}: ${observationValue(key, value)}`).join(' · ') : 'Признаки инженером не оценены.'));
+    const videoTime = result?.media?.videoTimeSeconds;
+    const moment = Number.isFinite(videoTime) ? `Время в видео — ${videoTime.toLocaleString('ru-RU')} с` : '';
+    if (moment) details.append(element('p', moment));
+    const measurements = record.provenance.telemetry === 'manual' ? record.telemetry : {};
+    for (const [key, value] of Object.entries({...measurements, ...record.vision})) {
+      if (value !== null && value !== undefined && value !== '') {
+        details.append(element('p', `${labels[key] ?? key}: ${observationValue(key, value)}`));
+      }
+    }
+    const note = result?.observation?.trim();
+    if (note) {
+      const normalized = value => value.toLocaleLowerCase('ru').replace(/[.\s]+$/u, '').trim();
+      const component = result.component;
+      if (normalized(note) === normalized(title)) {
+        if (component && component !== title) entry.append(element('p', component));
+      } else if (component && normalized(note) === normalized(`${component}: ${title}`)) {
+        entry.append(element('p', component));
+      } else entry.append(element('p', note));
+    }
     for (const recommendation of record.provenance.manufacturer?.recommendations || []) {
       details.append(element('p', `${recommendation.title}: ${recommendation.text} Применимость: ${recommendation.appliesTo}`));
       for (const source of recommendation.sources || []) {
@@ -181,16 +258,18 @@ function historyEntry(record, date, scenarios) {
         details.append(link, element('blockquote', source.quote));
       }
     }
-    if (!findings.length) details.append(element('p', 'Правила не сработали. Неоценённые признаки остаются неизвестными.'));
-    entry.append(details);
-    if (typeof evidence?.analysisId === 'string' && /^[0-9a-f-]{36}$/.test(evidence.analysisId)) {
-      const link = element('a', 'Открыть кадр', 'history-evidence');
-      link.href = `/api/analyses/${evidence.analysisId}/image`;
-      link.target = '_blank'; link.rel = 'noopener';
-      entry.append(link);
+    if (details.childElementCount > 1) entry.append(details);
+    if (typeof evidence?.analysisId === 'string' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(evidence.analysisId)) {
+      const button = element('button', 'Открыть кадр', 'history-evidence');
+      button.type = 'button';
+      button.setAttribute('aria-haspopup', 'dialog');
+      button.setAttribute('aria-controls', 'journal-frame');
+      const context = [record.serial, Number.isFinite(date.getTime()) && `${historyDay.format(date)} · ${historyTime.format(date)}`, moment].filter(Boolean).join(' · ');
+      button.addEventListener('click', () => openJournalFrame(button, `/api/analyses/${evidence.analysisId}/image`, title, context, result?.box));
+      entry.append(button);
     }
   }
-  if (record.note) entry.append(element('p', record.note, 'history-note'));
+  if (record.note && !releaseCheckNotes.has(record.note.trim())) entry.append(element('p', record.note, 'history-note'));
   if (findings.length) {
     const list = element('ul');
     for (const finding of findings) {

@@ -6,10 +6,10 @@
     <meta name="theme-color" content="#f6f3ec">
     <title>Журнал осмотров — Cyber102</title>
     <link rel="stylesheet" href="styles.css?v=field-20261114">
-    <link rel="stylesheet" href="checkpoint.css">
+    <link rel="stylesheet" href="checkpoint.css?v=journal-frame-1">
   <link rel="stylesheet" href="workspace.css?v=field-20261114">
     <script src="bootstrap.js?v=local-file-20261114" defer></script>
-  <script src="checkpoint.js?v=field-20261114" defer></script>
+  <script src="checkpoint.js?v=journal-frame-1" defer></script>
     <script src="shell.js?v=field-20261114" defer></script>
 </head>
   <body data-page="journal">
@@ -34,6 +34,17 @@
               <ol class="history-list" id="history-records"></ol>
             </div>
           </section>
+      <dialog id="journal-frame" class="journal-frame" aria-labelledby="journal-frame-title">
+        <header>
+          <div><h2 id="journal-frame-title">Кадр осмотра</h2><p id="journal-frame-context"></p></div>
+          <button type="button" class="button secondary" id="journal-frame-close" autofocus>Закрыть</button>
+        </header>
+        <div class="journal-frame-stage">
+          <p id="journal-frame-status" role="status"></p>
+          <div class="journal-frame-image" id="journal-frame-image" hidden></div>
+        </div>
+        <footer hidden id="journal-frame-tools"><button type="button" class="button secondary" id="journal-frame-box" aria-pressed="false">Рамка узла</button></footer>
+      </dialog>
       <details class="journal-tools">
         <summary>Паспорт и проверка правил</summary>
       <div class="dashboard">

@@ -41,6 +41,21 @@
 .history-entry p { margin-top: 8px; white-space: pre-wrap; color: #626a60; }
 .history-entry ul { list-style: none; padding: 0; margin: 8px 0 0; }
 .history-entry li + li { margin-top: 8px; }
+.history-evidence { min-height: 44px; padding: 0; border: 0; background: none; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.journal-frame { width: min(900px, calc(100% - 24px)); max-height: calc(100dvh - 24px); padding: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); overscroll-behavior: contain; }
+.journal-frame::backdrop { background: rgb(22 23 20 / 75%); }
+html:has(.journal-frame[open]) { overflow: hidden; }
+.journal-frame header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; }
+.journal-frame header p { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.journal-frame-stage { display: grid; place-items: center; min-height: min(160px, 36dvh); background: #22231f; color: #fff; }
+.journal-frame-stage p { padding: 16px; }
+.journal-frame-stage p:empty { display: none; }
+.journal-frame-image { position: relative; width: min(100%, var(--photo-width), calc(min(70dvh, 100dvh - 166px) * var(--photo-ratio))); }
+.journal-frame-image img { display: block; width: 100%; height: auto; }
+.journal-frame-marker { position: absolute; pointer-events: none; border: 2px solid #ffd080; box-shadow: 0 0 0 1px #332314; }
+.journal-frame-image:not(.with-marker) .journal-frame-marker { display: none; }
+.journal-frame footer { display: flex; justify-content: flex-end; padding: 8px 16px; }
+#journal-frame-box[aria-pressed=true] { color: var(--surface); background: var(--accent); border-color: var(--accent); }
 #inspection-history.panel { margin-bottom: 24px; }
 @media (max-width: 900px) {
   .dashboard { gap: 16px; }
