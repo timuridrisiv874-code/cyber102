@@ -336,6 +336,20 @@
         const summary = text('p', 'video-review-summary', summarize(grouped));
         fragment.append(summary);
         fragment.append(text('p', 'video-review-meta', `Длительность ${evidenceTime(captured.durationSeconds)} · Проверено кадров: ${grouped.frameCount}. Промежутки между ними не проверялись.`));
+        const context = data.equipmentContext;
+        if (context?.references?.length) {
+          const sources = document.createElement('details');
+          sources.append(text('summary', '', 'Источники контекста · ' + context.serial));
+          for (const item of context.references) {
+            const url = item.source?.url;
+            if (typeof url !== 'string' || !/^\/api\/customer\/documents\/[a-z0-9-]+\/pdf#page=\d+$/.test(url)) continue;
+            const link = text('a', 'source-link', item.title + ' · стр. ' + item.source.page);
+            link.href = url; link.target = '_blank'; link.rel = 'noopener';
+            const row = document.createElement('p');
+            row.append(link); sources.append(row);
+          }
+          fragment.append(sources);
+        }
         const representative = data.representativeFrame;
         if (onUseOverview && representative) {
           const index = representative.media?.frameIndex;
@@ -542,10 +556,12 @@
           message('Сопоставляем кадры и готовим общий вывод… Видео остаётся на устройстве.');
           timer = setTimeout(() => { timedOut = true; controller?.abort(); }, 13 * 60 * 1000);
           const request = window.CyberAnalysisJobs?.request || fetch;
+          const serial = document.getElementById('active-equipment')?.value.trim();
           const response = await request('/api/video-review', {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
             cache: 'no-store', redirect: 'error', signal,
             body: JSON.stringify({ durationSeconds: captured.durationSeconds,
+              ...(serial ? {equipmentSerial: serial} : {}),
               frames: captured.frames.map(({ image, timestampSeconds }) => ({ image, timestampSeconds })) }),
           }, value => { if (active(token) && !signal.aborted) message(value); });
           const data = await response.json();

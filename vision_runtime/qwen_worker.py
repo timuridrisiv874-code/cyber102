@@ -12,6 +12,7 @@ import threading
 import time
 
 from . import worker
+from server.knowledge import contextual_prompt
 from .qwen_download import REPOSITORY as MODEL, REVISION
 
 SYSTEM_PROMPT = worker.SYSTEM_PROMPT
@@ -198,10 +199,13 @@ class Engine:
                 'peakReservedMiB': round(cuda.max_memory_reserved() / 2**20, 3),
             }
 
-    def infer(self, image, profile='standard'):
+    def infer(self, image, profile='standard', *, context=None):
         if not isinstance(profile, str) or profile not in worker.PROFILES:
             raise ValueError('Unsupported inference profile')
-        return self._run(image, self.compact_prompt if profile == 'fast' else self.prompt,
+        prompt = self.compact_prompt if profile == 'fast' else self.prompt
+        if context:
+            prompt = self._prompt([{'type': 'image'}, {'type': 'text', 'text': contextual_prompt(PROMPT, context)}])
+        return self._run(image, prompt,
             max_pixels=PHOTO_MAX_PIXELS, max_new_tokens=180, max_time=85,
             parse=worker.parse_compact if profile == 'fast' else worker.parse_observation)
 
@@ -241,27 +245,30 @@ class Engine:
             max_pixels=DETAIL_MAX_PIXELS_PER_IMAGE, max_new_tokens=DETAIL_MAX_NEW_TOKENS,
             max_time=DETAIL_MAX_TIME_SECONDS, parse=worker.parse_observation)
 
-    def infer_video(self, images, timestamps):
+    def infer_video(self, images, timestamps, *, context=None):
+        options = {'context': context} if context else {}
         mode = os.environ.get('CYBER102_VIDEO_DEFECT_DETAILS')
         if mode in ('1', '6'):
-            return self.infer_video_with_defects(images, timestamps, maximum=6 if mode == '6' else 8)
-        return self._video_overview(images, timestamps)
+            return self.infer_video_with_defects(images, timestamps, maximum=6 if mode == '6' else 8, **options)
+        return self._video_overview(images, timestamps, **options)
 
-    def _video_overview(self, images, timestamps):
+    def _video_overview(self, images, timestamps, *, context=None):
         if not 1 <= len(images) <= worker.MAX_VIDEO_FRAMES or len(images) != len(timestamps):
             raise ValueError('Invalid sampled frame count')
         try:
-            return self._infer_video_batches(images, timestamps)
+            options = {'context': context} if context else {}
+            return self._infer_video_batches(images, timestamps, **options)
         finally:
             # The model stays loaded, but other jobs can use released video buffers.
             self.torch.cuda.empty_cache()
 
-    def infer_video_with_defects(self, images, timestamps, *, maximum=8):
+    def infer_video_with_defects(self, images, timestamps, *, maximum=8, context=None):
         """Add separately verified defect boxes to the regular video overview."""
         from . import video_defects
 
         deadline = time.monotonic() + VIDEO_MAX_TIME_SECONDS
-        overview = self._video_overview(images, timestamps)
+        options = {'context': context} if context else {}
+        overview = self._video_overview(images, timestamps, **options)
         metrics = self.last_metrics
         selected = video_defects.selected_frames(overview['observations'], maximum)
         details = []
@@ -286,7 +293,7 @@ class Engine:
             self.torch.cuda.empty_cache()
         return {**overview, 'defectDetails': details}
 
-    def _infer_video_batches(self, images, timestamps):
+    def _infer_video_batches(self, images, timestamps, *, context=None):
         deadline = time.monotonic() + VIDEO_MAX_TIME_SECONDS
         observations, metrics = [], {}
         batch_size = VIDEO_BATCH_FRAMES
@@ -297,7 +304,8 @@ class Engine:
             if remaining <= 0:
                 raise TimeoutError('Video inference deadline elapsed')
             try:
-                batch = self._infer_video_batch(images[start:end], timestamps[start:end], remaining)
+                options = {'context': context} if context else {}
+                batch = self._infer_video_batch(images[start:end], timestamps[start:end], remaining, **options)
             except self.torch.cuda.OutOfMemoryError:
                 if end - start == 1:
                     raise
@@ -328,9 +336,11 @@ class Engine:
             summary = 'На проверенных кадрах явных внешних дефектов не отмечено.'
         return {'observations': observations, 'summary': summary}
 
-    def _infer_video_batch(self, images, timestamps, max_time):
+    def _infer_video_batch(self, images, timestamps, max_time, *, context=None):
         if len(images) == 1:
-            row = self._run(images[0], self.compact_prompt, max_pixels=VIDEO_MAX_PIXELS,
+            prompt = (self._prompt([{'type': 'image'}, {'type': 'text', 'text': contextual_prompt(worker.COMPACT_PROMPT, context)}])
+                      if context else self.compact_prompt)
+            row = self._run(images[0], prompt, max_pixels=VIDEO_MAX_PIXELS,
                             max_new_tokens=VIDEO_FRAME_MAX_TOKENS, max_time=max_time,
                             parse=worker.parse_compact, frame_count=1)
             return [{**row, 'frameIndex': 0, 'timestampSeconds': timestamps[0]}]
@@ -339,7 +349,7 @@ class Engine:
         for index, timestamp in enumerate(timestamps):
             content.extend([{'type': 'text', 'text': f'Frame {index}, time {timestamp:g} seconds:\n'},
                             {'type': 'image'}])
-        content.append({'type': 'text', 'text': VIDEO_BATCH_PROMPT})
+        content.append({'type': 'text', 'text': contextual_prompt(VIDEO_BATCH_PROMPT, context)})
         return self._run(images, self._prompt(content), max_pixels=VIDEO_MAX_PIXELS,
             max_new_tokens=VIDEO_BATCH_MAX_TOKENS, max_time=max_time,
             parse=lambda text: parse_video_batch(text, timestamps), frame_count=len(images))

@@ -145,6 +145,22 @@ function positionDetection() {
 }
 
 function render() {
+  const knowledge = byId('photo-knowledge');
+  if (knowledge) {
+    const list = knowledge.querySelector('ul');
+    list.replaceChildren();
+    for (const item of result?.equipmentContext?.references || []) {
+      const url = item.source?.url;
+      if (typeof url !== 'string' || !/^\/api\/customer\/documents\/[a-z0-9-]+\/pdf#page=\d+$/.test(url)) continue;
+      const li = document.createElement('li'), link = document.createElement('a');
+      link.href = url; link.target = '_blank'; link.rel = 'noopener';
+      link.textContent = item.title + ' · стр. ' + item.source.page;
+      li.append(link); list.append(li);
+    }
+    knowledge.hidden = !list.childElementCount;
+    const context = result?.equipmentContext;
+    knowledge.querySelector('summary').textContent = context ? 'Источники контекста · ' + context.serial : 'Источники контекста';
+  }
   if (offlineMode) cameraMode.value = 'single';
   const clipBusy = Boolean(clipReview?.busy);
   const videoOverview = !offlineMode && media.kind === 'uploaded_video';
@@ -430,6 +446,8 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
       const body = new FormData();
       body.append('file', image, 'frame.jpg');
       body.append('profile', 'standard');
+      const serial = byId('active-equipment')?.value.trim();
+      if (serial) body.append('equipmentSerial', serial);
       body.append('captureSource', metadata.captureSource);
       if (metadata.captureSource === 'uploaded_video') body.append('videoTimeSeconds', String(metadata.videoTimeSeconds));
       Object.assign(options, { method: 'POST', body });

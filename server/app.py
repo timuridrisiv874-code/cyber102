@@ -1,6 +1,7 @@
 import argparse
 import hashlib
 import json
+import logging
 import re
 import sqlite3
 import threading
@@ -15,7 +16,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 from .demo_data import PASSPORT, SCENARIOS
 from . import history
 from . import vision
-from . import inspections, customer, recommendations, assessment, video_review, analysis_queue
+from . import inspections, customer, recommendations, assessment, video_review, analysis_queue, knowledge, emulator
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -30,8 +31,12 @@ def connect(database):
 
 
 def analyze_photo_job(payload):
-    return {**vision.analyze(payload['image'], backend=payload['backend'], profile=payload['profile']),
-            'media': payload['media']}
+    context = payload.get('equipmentContext')
+    options = {'context': context['text']} if context else {}
+    result = vision.analyze(payload['image'], backend=payload['backend'], profile=payload['profile'], **options)
+    if context:
+        result['equipmentContext'] = {key: context[key] for key in ('serial', 'references')}
+    return {**result, 'media': payload['media']}
 
 
 def save_photo_job(payload, result):
@@ -42,7 +47,12 @@ def save_photo_job(payload, result):
 
 
 def analyze_video_job(payload):
-    return video_review._analyze_prepared(payload)
+    if 'equipmentContext' not in payload:
+        return video_review._analyze_prepared(payload)
+    context = payload['equipmentContext']
+    request = {key: payload[key] for key in ('frames', 'durationSeconds')} | {'context': context['text']}
+    result = video_review._analyze_prepared(request)
+    return {**result, 'equipmentContext': {key: context[key] for key in ('serial', 'references')}}
 
 
 def save_video_job(payload, result, *, database):
@@ -50,6 +60,8 @@ def save_video_job(payload, result, *, database):
     if frame is None:
         return result
     jpeg, observation = frame
+    if 'equipmentContext' in result:
+        observation['equipmentContext'] = result['equipmentContext']
     with closing(connect(database)) as connection, connection:
         evidence = inspections.store_analysis(connection, jpeg, observation)
     return {**result, 'representativeFrame': {**observation, **evidence}}
@@ -101,6 +113,7 @@ def initialize(database, customer_root=None):
                 VALUES (?, ?, ?, ?, ?, ?, 'demo')
         ''', ((case['id'], serial, case['label'], json.dumps(case['telemetry']),
                json.dumps(case['vision']), json.dumps(case['zones'])) for case in SCENARIOS))
+        emulator.initialize(connection)
         history.initialize(connection)
         inspections.initialize(connection)
         if customer_root is not None:
@@ -148,9 +161,10 @@ class BoundedHTTPServer(ThreadingHTTPServer):
 
 
 class Handler(SimpleHTTPRequestHandler):
-    def __init__(self, *args, database, public_url, vision_enabled=False, vision_backend='ollama', customer_root=None, **kwargs):
+    def __init__(self, *args, database, public_url, vision_enabled=False, vision_backend='ollama', customer_root=None, telemetry_emulator=False, **kwargs):
         from server import customer
         self.customer_root = customer_root or customer.ROOT
+        self.telemetry_emulator = telemetry_emulator
         self.database = database
         self.public_url = public_url
         self.vision_enabled = vision_enabled
@@ -245,6 +259,42 @@ class Handler(SimpleHTTPRequestHandler):
         target = urlsplit(self.path)
         if target.path.startswith('/api/analysis-jobs/'):
             self.analysis_job(target.path)
+            return
+        if target.path in ('/api/equipment/knowledge', '/api/equipment/models', '/api/telemetry/simulated'):
+            parameters = parse_qs(target.query, keep_blank_values=True)
+            try:
+                allowed = {'/api/equipment/knowledge': {'serial', 'model', 'component', 'q'},
+                           '/api/equipment/models': set(), '/api/telemetry/simulated': {'serial'}}[target.path]
+                if set(parameters) - allowed or any(len(values) != 1 for values in parameters.values()):
+                    raise TypeError()
+                values = {key: items[0] for key, items in parameters.items()}
+                if target.path == '/api/equipment/models':
+                    result = knowledge.catalog(self.customer_root)
+                elif target.path == '/api/telemetry/simulated':
+                    if not self.telemetry_emulator:
+                        self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Эмулятор на этом сервере выключен.')
+                        return
+                    serial = values.get('serial', '')
+                    if not serial or len(serial) > 100:
+                        raise TypeError()
+                    with closing(connect(self.database)) as connection:
+                        result = emulator.snapshot(connection, serial)
+                else:
+                    try:
+                        result = knowledge.lookup(serial=values.get('serial'), model=values.get('model'),
+                                                  component=values.get('component'), query=values.get('q', ''),
+                                                  root=self.customer_root)
+                    except ValueError as error:
+                        self.error(HTTPStatus.BAD_REQUEST, str(error))
+                        return
+                if result is None:
+                    self.error(HTTPStatus.NOT_FOUND, 'Данные для выбранного оборудования не найдены.')
+                else:
+                    self.send_json(result)
+            except TypeError:
+                self.error(HTTPStatus.BAD_REQUEST, 'Проверьте параметры запроса.')
+            except (ValueError, KeyError, OSError, sqlite3.Error):
+                self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Контекст оборудования временно недоступен.')
             return
         if target.path in ('/api/equipment', '/api/recommendations'):
             try:
@@ -574,10 +624,12 @@ class Handler(SimpleHTTPRequestHandler):
             image, profile, media = vision.extract_request(self.headers.get('Content-Type', ''), body, include_metadata=True)
             if profile not in vision.supported_profiles(self.vision_backend):
                 raise ValueError('Выбранный режим не поддерживается моделью.')
+            serial = media.pop('equipmentSerial', None)
+            context = self.equipment_context(serial) if profile == 'standard' else None
             payload = {'image': image, 'backend': self.vision_backend, 'profile': profile,
-                       'media': media, 'database': self.database}
+                       'media': media, 'database': self.database, 'equipmentContext': context}
             if asynchronous:
-                canonical = json.dumps({'backend': self.vision_backend, 'profile': profile, 'media': media},
+                canonical = json.dumps({'backend': self.vision_backend, 'profile': profile, 'media': media, 'equipmentContext': context},
                                        sort_keys=True).encode() + b'\0' + image
                 self.enqueue_analysis('photo', payload, canonical, analyze_photo_job, save_photo_job)
                 return
@@ -598,6 +650,14 @@ class Handler(SimpleHTTPRequestHandler):
             self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Не удалось сохранить кадр. Повторите проверку.')
         else:
             self.send_json(result)
+
+    def equipment_context(self, serial):
+        if not serial or serial == PASSPORT['serial'] or self.vision_backend == 'detector':
+            return None
+        context = knowledge.photo_context(serial, self.customer_root)
+        if context is None:
+            raise ValueError('Серийный номер не найден в реестре оборудования.')
+        return context
 
     @bounded_analysis_upload
     def analyze_video(self):
@@ -625,7 +685,14 @@ class Handler(SimpleHTTPRequestHandler):
             body = self.rfile.read(length)
             if len(body) != length:
                 raise ValueError('Кадры получены не полностью. Повторите отправку.')
-            payload = video_review.prepare_request(video_review.strict_json(body))
+            data = video_review.strict_json(body)
+            serial = data.pop('equipmentSerial', None) if isinstance(data, dict) else None
+            if serial is not None:
+                recommendations._serial(serial)
+            payload = video_review.prepare_request(data)
+            context = self.equipment_context(serial)
+            if context:
+                payload['equipmentContext'] = context
             finalize = partial(save_video_job, database=self.database)
             if asynchronous:
                 canonical = json.dumps(payload, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()
@@ -704,6 +771,7 @@ def main():
     parser.add_argument('--port', type=int, default=8000)
     parser.add_argument('--database', type=Path, default=ROOT / 'var' / 'cyber102.sqlite3')
     parser.add_argument('--public-url', default='', help='HTTPS-адрес вебки для QR, без пути')
+    parser.add_argument('--telemetry-emulator', action='store_true', help='Записывать эмулированные показания насосов в SQLite')
     parser.add_argument('--vision', action='store_true', help='Включить локальный анализ кадров')
     parser.add_argument('--vision-backend', choices=vision.BACKENDS, default='ollama',
                         help='Локальный сервис анализа кадров (по умолчанию ollama)')
@@ -715,13 +783,31 @@ def main():
             parser.error('--public-url должен быть HTTPS-адресом без пути, параметров и учётных данных')
     initialize(args.database, customer_root=customer.ROOT)
     handler = partial(Handler, database=args.database, public_url=public_url,
-                      vision_enabled=args.vision, vision_backend=args.vision_backend)
+                      vision_enabled=args.vision, vision_backend=args.vision_backend, telemetry_emulator=args.telemetry_emulator)
     with BoundedHTTPServer((args.bind, args.port), handler) as server:
+        stop_emulator = threading.Event()
+        if args.telemetry_emulator:
+            reference = emulator.replay_template(customer.ROOT)
+            def collect_telemetry():
+                while not stop_emulator.is_set():
+                    try:
+                        with closing(connect(args.database)) as connection, connection:
+                            emulator.record(connection, reference=reference)
+                    except sqlite3.Error:
+                        logging.exception('Failed to persist simulated telemetry')
+                    stop_emulator.wait(emulator.PERIOD)
+
+            collector = threading.Thread(target=collect_telemetry, name='telemetry-emulator', daemon=True)
+            collector.start()
         print(f'Cyber102 · http://{args.bind}:{server.server_port}/', flush=True)
         try:
             server.serve_forever()
         except KeyboardInterrupt:
             pass
+        finally:
+            stop_emulator.set()
+            if args.telemetry_emulator:
+                collector.join()
 
 
 if __name__ == '__main__':
