@@ -1,0 +1,1501 @@
+[
+  {
+    "file": "field-valve-indoor.jpg",
+    "scene": "commons-valve-indoor",
+    "source": "https://commons.wikimedia.org/wiki/File:Rusty_Valve.jpg",
+    "sourceImage": "Rusty_Valve.jpg",
+    "author": "comedy_nose",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "sha256": "1070b9b9e690c91742d8f636b698fb6b91194ed4d96f00668464c10dc3dfee4a",
+    "sourceSha256": "5abf5e568237bc48e058288613c1c5eb67cda2b01b0bad0c3ac0da77583d266c",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.322,
+          0.033,
+          0.681,
+          0.968
+        ]
+      }
+    ],
+    "note": "Manually reviewed rust on pipe or valve; valve openings or part seams are not cracks."
+  },
+  {
+    "file": "field-valve-rust.jpg",
+    "scene": "commons-valve-rust",
+    "source": "https://commons.wikimedia.org/wiki/File:Rustvalve.jpg",
+    "sourceImage": "Rustvalve.jpg",
+    "author": "Moralist",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "sha256": "830e608f190d401c00b4a3a6b583e8aefc900ac811a53e743f70825233b3ec18",
+    "sourceSha256": "dab8919c7ade0467fe3e1f7cba8edd9aa170526489ac017b9d27138fa01f018b",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.168,
+          0.395,
+          0.914,
+          0.997
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.525,
+          0.0,
+          0.67,
+          0.408
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.232,
+          0.685,
+          0.384,
+          0.989
+        ]
+      }
+    ],
+    "note": "Manually reviewed rust on pipe or valve; valve openings or part seams are not cracks."
+  },
+  {
+    "file": "field-pipes-rust.jpg",
+    "scene": "commons-pipes-rust",
+    "source": "https://commons.wikimedia.org/wiki/File:Rusty_pipes.jpg",
+    "sourceImage": "Rusty_pipes.jpg",
+    "author": "ProjectManhattan",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "sha256": "c4cbf86fbc884d9ffbdf1ab9e038a148196c78208229f36e33514a64575fc3da",
+    "sourceSha256": "2af62beb0a6530a4a9d2c285bd9609fb7eb3a201b1fa082652c14740ad82102a",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.313,
+          0.334,
+          0.617,
+          0.949
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.824,
+          0.0,
+          0.986,
+          0.997
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.619,
+          0.3,
+          0.823,
+          0.995
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.016,
+          0.09,
+          0.157,
+          0.557
+        ]
+      }
+    ],
+    "note": "Manually reviewed rust on pipe or valve; valve openings or part seams are not cracks."
+  },
+  {
+    "file": "vt-corrosion-000.jpg",
+    "scene": "vt-corrosion-photo-000",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/0.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "a7428d1dc5f82707fe02159844c8ca391fd972e3d6b2d5dc173b9e35c5a681ce",
+    "sourceSha256": "56a2a43630326731cf4c40b3309a88884b1d56eca9c534e7ccbf3f307ddeee9e",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.0,
+          0.11979166666666667,
+          0.216796875,
+          0.17708333333333334
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.396484375,
+          0.1796875,
+          0.7265625,
+          0.4791666666666667
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.2109375,
+          0.4635416666666667,
+          0.8828125,
+          1.0
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.87109375,
+          0.9010416666666666,
+          1.0,
+          1.0
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-007.jpg",
+    "scene": "vt-corrosion-photo-007",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/7.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "dec0d6e3d82dd98336a6af654992b38818c3ef5d62876c9686382282e2484417",
+    "sourceSha256": "1521f5724199ed7dacb582a5818b0dfedb0c304b8ea90f4ae46c984add92972d",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.083984375,
+          0.20052083333333334,
+          0.107421875,
+          0.3463541666666667
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.173828125,
+          0.3177083333333333,
+          0.212890625,
+          0.375
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.138671875,
+          0.4401041666666667,
+          0.83984375,
+          1.0
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-022.jpg",
+    "scene": "vt-corrosion-photo-022",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/22.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "b4c5bcfb9c36fa3f3abc980b5b56559539b1e2a57e494ae7184dcb836e5b8e83",
+    "sourceSha256": "fcd085429ea344d214980887f56cc415c0b4d2b009811a1961ea77f2f8e0354b",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.302734375,
+          0.5364583333333334,
+          0.390625,
+          0.6875
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.41015625,
+          0.609375,
+          0.744140625,
+          0.7161458333333334
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-078.jpg",
+    "scene": "vt-corrosion-photo-078",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/78.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "3d3c8b52d9ca358d37bc76f326d9640de74596ec4ecb81a04015bf75bd1fe112",
+    "sourceSha256": "68987e6b76b406f6def9d5fa816e6c10ee3dc29c1e90abc7d53700d5a55ae342",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.0,
+          0.0,
+          0.849609375,
+          0.28125
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.05078125,
+          0.6197916666666666,
+          0.97265625,
+          0.8333333333333334
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-081.jpg",
+    "scene": "vt-corrosion-photo-081",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/81.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "8f1d5e6c2d5197b0eea3f51679c36adb12f9eb4a178e91825b415e97bd71ed3c",
+    "sourceSha256": "6e3143e2981c6b8c07483819b4f4eaa27b6210b841cd52fa91eaf0bb1e9ea135",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.791015625,
+          0.09895833333333333,
+          0.919921875,
+          0.21875
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.65234375,
+          0.2630208333333333,
+          0.671875,
+          0.3411458333333333
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-088.jpg",
+    "scene": "vt-corrosion-photo-088",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/88.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "3b85bf88cc34b23dd6dbf031cefb4343c604cb5d7cb79e13dfc4a10d3f092ddb",
+    "sourceSha256": "f0319340bc587cea98a393cea7639f475948be148463af85030f4b6d29e430fc",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.103515625,
+          0.0390625,
+          0.14453125,
+          0.07291666666666667
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.048828125,
+          0.6875,
+          0.255859375,
+          0.7916666666666666
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.408203125,
+          0.7161458333333334,
+          1.0,
+          0.9921875
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-102.jpg",
+    "scene": "vt-corrosion-photo-102",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/102.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "4be9967a71b4f7da8ea41e4f7fea4304cf94828b2349a117a47eea50d9556cfa",
+    "sourceSha256": "df9a520daba132f13593a7c16863dce246eb1bd30ba1dba976cdda9edef53729",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.57421875,
+          0.0,
+          0.6953125,
+          0.0859375
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.0,
+          0.052083333333333336,
+          0.412109375,
+          0.22916666666666666
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.666015625,
+          0.10416666666666667,
+          0.6953125,
+          0.13802083333333334
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.666015625,
+          0.19010416666666666,
+          0.6875,
+          0.21354166666666666
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.49609375,
+          0.203125,
+          0.568359375,
+          0.3203125
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.4140625,
+          0.22135416666666666,
+          0.46875,
+          0.2630208333333333
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.169921875,
+          0.23697916666666666,
+          0.810546875,
+          0.8072916666666666
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-110.jpg",
+    "scene": "vt-corrosion-photo-110",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/110.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "5a9e836d70bb769ae1b2eca91e88521051b6d0d52ddd48eb5a3df723b6da8b20",
+    "sourceSha256": "daf35d38692c9d0b469549102d0e813bb0ec9c50e6dba6f8fd0c7b096b2f48ac",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.166015625,
+          0.3151041666666667,
+          0.2890625,
+          0.3854166666666667
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-112.jpg",
+    "scene": "vt-corrosion-photo-112",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/112.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "c41f4fe9547f6b528d895e7739d3655cc593cd1941d7cba976ac59c7e1bd9850",
+    "sourceSha256": "1a059ad77341917e634963f6c9609d8bc87a44fa396ea422316de30c60b5599d",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.4609375,
+          0.0,
+          0.48046875,
+          0.033854166666666664
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.400390625,
+          0.0078125,
+          0.4375,
+          0.049479166666666664
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.392578125,
+          0.0859375,
+          0.4296875,
+          0.16666666666666666
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.357421875,
+          0.1875,
+          0.3984375,
+          0.2526041666666667
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.28515625,
+          0.3177083333333333,
+          0.349609375,
+          0.4375
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.01171875,
+          0.4583333333333333,
+          0.380859375,
+          0.5963541666666666
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-117.jpg",
+    "scene": "vt-corrosion-photo-117",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/117.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "1a01be1cfec4f4ba7cf21293f59dd44e01b2a6966c04d78a80c37a9a4d4ec750",
+    "sourceSha256": "c6d8b512e359eec33c056ab06d71d92b40dda6c6eec085bca5dff8bda928bf46",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.0,
+          0.5026041666666666,
+          0.267578125,
+          0.6875
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.380859375,
+          0.59375,
+          1.0,
+          0.8984375
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-128.jpg",
+    "scene": "vt-corrosion-photo-128",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/128.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "90a674544a32c828a4315e1fcaf19c87445d05359bdf2882b10da80fa6ad649e",
+    "sourceSha256": "d7e955bf6112da99d9490a9449c037daee43322f0f2a46d08d858df3708bfcd1",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.294921875,
+          0.0,
+          0.765625,
+          0.2421875
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.77734375,
+          0.1796875,
+          0.845703125,
+          0.24739583333333334
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-147.jpg",
+    "scene": "vt-corrosion-photo-147",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/147.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "53b51fc12138c34a54f0c080bf708118334694639a4bcdf255eb454f06af3f11",
+    "sourceSha256": "9adced6278737554fd5e999412514fee7172adb6e8e9cbff6e99bce001fb0c47",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.708984375,
+          0.359375,
+          0.76953125,
+          0.4427083333333333
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.763671875,
+          0.4166666666666667,
+          0.99609375,
+          0.4947916666666667
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-162.jpg",
+    "scene": "vt-corrosion-photo-162",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/162.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "8f2f873c828590ba858e82379e3a59e49fbb52dc6255a18492048c319b9d573f",
+    "sourceSha256": "57a43cd630a0d49411bfc6f9cbbfe8e82c81d495e97c507fb82f86066dba5929",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.1328125,
+          0.0,
+          0.19140625,
+          0.2526041666666667
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.21484375,
+          0.5130208333333334,
+          0.28515625,
+          0.5989583333333334
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-174.jpg",
+    "scene": "vt-corrosion-photo-174",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/174.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "0c164bf3c359b7af7f1d98d29c1273f8ba625267954f2d586114d23d6dde9513",
+    "sourceSha256": "9cdf5bff3a9100f758ea74449784074bd117b964fb56b2f1587a893df71e4fc8",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.642578125,
+          0.2265625,
+          0.681640625,
+          0.296875
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-179.jpg",
+    "scene": "vt-corrosion-photo-179",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/179.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "21610f7a9fec0b8c2634d69b68efc4c07b2073efc4c0aa56d6adbc4d48a591a7",
+    "sourceSha256": "f632a016139141fad5f0b43ec2389cc2e5f616183bea403fd466ad64d1c05942",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.400390625,
+          0.0,
+          1.0,
+          0.15625
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.171875,
+          0.3307291666666667,
+          0.951171875,
+          0.921875
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-187.jpg",
+    "scene": "vt-corrosion-photo-187",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/187.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "19d57efa1e124c6d8386812134cfdd6e917bf0bcd88963639e79183836f89059",
+    "sourceSha256": "b45d31f793f0725a3c81a6da7eb00db57ad23bb208facbe6e059938e484d076a",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.0,
+          0.0,
+          1.0,
+          0.5625
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.146484375,
+          0.3203125,
+          0.181640625,
+          0.5286458333333334
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.77734375,
+          0.3411458333333333,
+          0.796875,
+          0.4713541666666667
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.69921875,
+          0.4088541666666667,
+          0.75390625,
+          0.5963541666666666
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.2578125,
+          0.4192708333333333,
+          0.283203125,
+          0.5078125
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.6015625,
+          0.4166666666666667,
+          0.623046875,
+          0.5234375
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.064453125,
+          0.5052083333333334,
+          0.908203125,
+          0.953125
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-196.jpg",
+    "scene": "vt-corrosion-photo-196",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/196.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "d8bf16bf34864dc65752d7fd65b9d3f010c70ba965fda11ca50be893cb66fce9",
+    "sourceSha256": "de91dcbcff4345ed4f9ff5c3d977fffa8ef436fce426175f128c5d70463feabf",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.498046875,
+          0.0625,
+          0.5234375,
+          0.140625
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-213.jpg",
+    "scene": "vt-corrosion-photo-213",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/213.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "e4f1fb4b6521b4edd71c18ef4743e4244fbd094b2f9ed01dbedd775a702b1529",
+    "sourceSha256": "24b3580abde6fb9bd8231c51b1dfb2e9832bc5d4392ed71bac82932c9cdfa406",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.6119791666666666,
+          0.19140625,
+          0.7630208333333334,
+          0.271484375
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-226.jpg",
+    "scene": "vt-corrosion-photo-226",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/226.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "93ec3dd6c620a7a4f01a3bcde9998a5e81a6a00c1e543c8cb4077d8c88e34b3a",
+    "sourceSha256": "94a84c82d60db9b619ecd6e51a4d14f014f2615c8d37445fd90da81ed11d75fa",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.529296875,
+          0.1796875,
+          0.58984375,
+          0.3645833333333333
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.48828125,
+          0.2421875,
+          0.509765625,
+          0.3723958333333333
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.6171875,
+          0.3177083333333333,
+          0.6875,
+          0.40625
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.62890625,
+          0.4505208333333333,
+          0.69140625,
+          0.5026041666666666
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.578125,
+          0.7916666666666666,
+          0.73828125,
+          0.8541666666666666
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.517578125,
+          0.8880208333333334,
+          0.853515625,
+          0.9557291666666666
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-246.jpg",
+    "scene": "vt-corrosion-photo-246",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/246.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "b830a5f2ebc5e06778c9716238bc7d9df4b71616f8e91278486447a3080cdd53",
+    "sourceSha256": "5cd3ff29689a5ccc422155b0091a6e168a6f7070b9efae0a897b81a51d8f3acb",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.166015625,
+          0.19834710743801653,
+          0.1875,
+          0.22865013774104684
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.83203125,
+          0.8567493112947658,
+          1.0,
+          1.0
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-256.jpg",
+    "scene": "vt-corrosion-photo-256",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/256.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "15bf13245e8988066f420605b5e79754345d4f4bec06e9e36d7328ac10319d80",
+    "sourceSha256": "f75f835bd8cc75e6f2e2eba691ab3c43c108463ae0a0883f00fa0fec24045c37",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.326171875,
+          0.16145833333333334,
+          1.0,
+          0.4479166666666667
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.1015625,
+          0.3411458333333333,
+          0.302734375,
+          0.4791666666666667
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.0234375,
+          0.3697916666666667,
+          0.083984375,
+          0.4036458333333333
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.505859375,
+          0.453125,
+          0.91796875,
+          0.7916666666666666
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.23046875,
+          0.7265625,
+          0.34765625,
+          0.7838541666666666
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-259.jpg",
+    "scene": "vt-corrosion-photo-259",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/259.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "940ddc89f21b3253569d2ae19aadc0ec95d3512ed25dc582a1731c1eebd89b28",
+    "sourceSha256": "78b50f2ef6f2551c34b214528e8cd3df39c0bce701b4a98e12c3b0eae2bd4c53",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.162109375,
+          0.0,
+          0.228515625,
+          0.11197916666666667
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.259765625,
+          0.0,
+          0.279296875,
+          0.026041666666666668
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.103515625,
+          0.0,
+          0.48828125,
+          0.6145833333333334
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.400390625,
+          0.0,
+          1.0,
+          0.7369791666666666
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.5546875,
+          0.0,
+          0.5859375,
+          0.2786458333333333
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.234375,
+          0.09895833333333333,
+          0.25390625,
+          0.14322916666666666
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-264.jpg",
+    "scene": "vt-corrosion-photo-264",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/264.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "76618aef5ff9ea706e0df9afbb7267f9383e8cef2d11776e1b4f9bab4e0df95b",
+    "sourceSha256": "9a3c3206f89371b4a5bcdbc2d2927480ab217f7b9ea61cf232c399b2b84e63e5",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.72265625,
+          0.0,
+          0.943359375,
+          0.08333333333333333
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.892578125,
+          0.0,
+          1.0,
+          0.16666666666666666
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.734375,
+          0.15364583333333334,
+          0.828125,
+          0.2604166666666667
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-276.jpg",
+    "scene": "vt-corrosion-photo-276",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/276.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "f4e07e0521e5161b94a8981f54b4fb6ed903fccaa5d9b37d7e1119d25db25e79",
+    "sourceSha256": "0dbc0ba3eb1db838f7c590edba7b5782a8e21958788040ac1a4bd3104c094f5c",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.435546875,
+          0.234375,
+          0.578125,
+          0.3411458333333333
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.296875,
+          0.3333333333333333,
+          0.43359375,
+          0.6536458333333334
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.287109375,
+          0.6119791666666666,
+          0.705078125,
+          0.7682291666666666
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-306.jpg",
+    "scene": "vt-corrosion-photo-306",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/306.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "3af9989c97918e6ced87202afcb9121b8100ed26a455d95253e3462d8864b426",
+    "sourceSha256": "f54cce8046dec9398a95b10fad88e1e25d62c6ed0cd19fd3a86d98fde26c7c94",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.1875,
+          0.24479166666666666,
+          1.0,
+          0.890625
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.69921875,
+          0.2734375,
+          1.0,
+          0.4322916666666667
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.25390625,
+          0.4114583333333333,
+          0.30859375,
+          0.4661458333333333
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-319.jpg",
+    "scene": "vt-corrosion-photo-319",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/319.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "6ef2625cb899a69da3db69450e149632dd306709607c37a8138e5ac34ec25fb5",
+    "sourceSha256": "3ee524e8b349a520d267be4c881ed3f8bcf73a00191b4e8dd06e8cb68e1c69ae",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.365234375,
+          0.0,
+          0.48046875,
+          0.4046997389033943
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.373046875,
+          0.381201044386423,
+          0.541015625,
+          0.6710182767624021
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.93359375,
+          0.587467362924282,
+          1.0,
+          0.6370757180156658
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.466796875,
+          0.6945169712793734,
+          0.896484375,
+          1.0
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.134765625,
+          0.9634464751958225,
+          0.275390625,
+          1.0
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-323.jpg",
+    "scene": "vt-corrosion-photo-323",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/323.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "111b75eeeefc74c7fdaf4692fb0e648f862ee47e5a32e82fb4cc9439dcd63c45",
+    "sourceSha256": "6d1f44412c0d936b9eea3beb9894e2f29f47b6f41559e2db57d9c5882d145ce2",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.271484375,
+          0.0,
+          0.375,
+          0.09114583333333333
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.181640625,
+          0.015625,
+          0.234375,
+          0.1484375
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.1015625,
+          0.15625,
+          0.1171875,
+          0.2421875
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-329.jpg",
+    "scene": "vt-corrosion-photo-329",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/329.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "7264276e5dc1acf5a9d3d26a75d6e9ffec97d8b07284b0eb26062b8868dc110f",
+    "sourceSha256": "a5c6e4d341906096416a49e529bc654b201eef8f314e345abaa99d5444551a86",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.765625,
+          0.9118457300275482,
+          0.806640625,
+          1.0
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-336.jpg",
+    "scene": "vt-corrosion-photo-336",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/336.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "8f294b890405d2525734ca710e4f500beb0a685fa77ce4103cc15ce1b18c2982",
+    "sourceSha256": "5bf919954029e92887af3ca3c2e4b80a2e780db36b2348d42cec918673962a16",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.7734375,
+          0.0,
+          0.935546875,
+          0.2942708333333333
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-340.jpg",
+    "scene": "vt-corrosion-photo-340",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/340.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "9db334d627830cd034ab1a576eefc83fbe16b5de70aa4c8fa442e2a87eac2eed",
+    "sourceSha256": "b1752ac323e19f968fc13c25d192d172be6d02dbe4f99dd8b8ecdd597739ff20",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.0,
+          0.0,
+          0.8359375,
+          0.6857142857142857
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.87890625,
+          0.0,
+          1.0,
+          0.6597402597402597
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.84765625,
+          0.6519480519480519,
+          0.96875,
+          0.8571428571428571
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-357.jpg",
+    "scene": "vt-corrosion-photo-357",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/357.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "81b72d8baed39268df7aff6bf75ef1d9ac83ea9e106a6214c4c350238ea91e7d",
+    "sourceSha256": "633bc050624436e0a1373ef49f6783e768aa939399ad84e01aa92053cfc43903",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.728515625,
+          0.0,
+          0.787109375,
+          0.0703125
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.798828125,
+          0.0,
+          0.8828125,
+          0.044270833333333336
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.0,
+          0.6744791666666666,
+          0.419921875,
+          1.0
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-365.jpg",
+    "scene": "vt-corrosion-photo-365",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/365.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "74b9f49133cba9e50120a90d93c256f35d1fc9a785448e283c6ee141b0226c7e",
+    "sourceSha256": "3d5536c18e0737e3653a82c407682d360579346ae23b0dfa118ea63302a3a487",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.0,
+          0.2935064935064935,
+          0.953125,
+          0.4831168831168831
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.0,
+          0.42337662337662335,
+          0.96484375,
+          0.6961038961038961
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.6796875,
+          0.6935064935064935,
+          1.0,
+          0.9272727272727272
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.853515625,
+          0.6935064935064935,
+          1.0,
+          0.8727272727272727
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-380.jpg",
+    "scene": "vt-corrosion-photo-380",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/380.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "af0678ed8a98f91f36a65f1bdba4b463225f8d980f0e639caa1f7fbea59cb111",
+    "sourceSha256": "88320d6cb55212323a58bc427a046445e4c1d1a629856654af707652dd3b04e5",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.337890625,
+          0.18229166666666666,
+          0.513671875,
+          0.296875
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.28515625,
+          0.234375,
+          1.0,
+          0.7838541666666666
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  },
+  {
+    "file": "vt-corrosion-390.jpg",
+    "scene": "vt-corrosion-photo-390",
+    "source": "https://doi.org/10.7294/16624663.v2",
+    "sourceImage": "Corrosion Condition State Classification/original/Train/images/390.jpeg",
+    "author": "Eric Bianchi and Matthew Hebdon",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "f6ac2db4f0a56da6891a1f573ac70d8c8f2693bba48ce1961994329a5c2ab69a",
+    "sourceSha256": "dc03d35c725c1b45d21ad541d17e6aa6fd2e5a80382624349f9cb76a09d427b3",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.6640625,
+          0.007772020725388601,
+          0.703125,
+          0.05699481865284974
+        ]
+      }
+    ],
+    "note": "Original train photograph of structural steel. Labeled rust polygons from all three positive grades were merged only when touching after closing."
+  }
+]
