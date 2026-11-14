@@ -52,25 +52,35 @@
       {
         "class": "wet_patch",
         "xyxy": [
-          0.353,
-          0.589,
-          0.455,
-          0.991
-        ],
-        "liquidType": "liquid_flow"
-      },
-      {
-        "class": "wet_patch",
-        "xyxy": [
           0.705,
           0.856,
           1.0,
           1.0
         ],
         "liquidType": "wet_surface"
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.35,
+          0.56389,
+          0.45391,
+          0.9375
+        ],
+        "liquidType": "liquid_flow"
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.50625,
+          0.62083,
+          0.54375,
+          0.94861
+        ],
+        "liquidType": "liquid_flow"
       }
     ],
-    "note": "Streams below the outlet and a separate wet floor patch."
+    "note": "Two distinct falling streams under the flange and a separate floor patch."
   },
   {
     "file": "clip-3-web-5.jpg",
@@ -83,15 +93,15 @@
       {
         "class": "wet_patch",
         "xyxy": [
-          0.446,
-          0.453,
-          0.465,
-          0.915
+          0.44141,
+          0.59167,
+          0.46875,
+          0.9
         ],
         "liquidType": "liquid_flow"
       }
     ],
-    "note": "Narrow stream below the gauge fitting. Floor highlights are not measured."
+    "note": "Visible stream starting under the brass gauge fitting. Floor highlights and ambiguous wall streaks are outside the reviewed regions."
   },
   {
     "file": "clip-4-web-3.jpg",
@@ -110,9 +120,19 @@
           0.539
         ],
         "liquidType": "wet_surface"
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.51797,
+          0.74306,
+          0.57891,
+          0.9125
+        ],
+        "liquidType": "liquid_flow"
       }
     ],
-    "note": "Visible wet streak directly below the torn wall in this view."
+    "note": "Wall streak and visible liquid dropping below the ruptured pipe. The irregular metal rim and floor splashes are excluded."
   },
   {
     "file": "clip-4-web-7.jpg",
@@ -131,9 +151,19 @@
           0.472
         ],
         "liquidType": "wet_surface"
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.48125,
+          0.71667,
+          0.49609,
+          0.90833
+        ],
+        "liquidType": "liquid_flow"
       }
     ],
-    "note": "Wet streak below the wall opening."
+    "note": "Wall streak plus a faint but continuous thin strand below the torn pipe, checked on adjacent original frames."
   },
   {
     "file": "clip-5-web-0.jpg",
@@ -197,9 +227,9 @@
       {
         "class": "wet_patch",
         "xyxy": [
-          0.342,
-          0.754,
-          0.389,
+          0.32812,
+          0.86111,
+          0.34922,
           1.0
         ],
         "liquidType": "liquid_flow"
@@ -207,15 +237,25 @@
       {
         "class": "wet_patch",
         "xyxy": [
-          0.49,
-          0.805,
-          0.521,
+          0.475,
+          0.82361,
+          0.50547,
           1.0
+        ],
+        "liquidType": "liquid_flow"
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.67578,
+          0.87361,
+          0.68672,
+          0.97361
         ],
         "liquidType": "liquid_flow"
       }
     ],
-    "note": "The visible left and center trickles below the valve."
+    "note": "Three falling trickles below the valve and flanges, including the short visible right-hand trickle."
   },
   {
     "file": "clip-5-web-5.jpg",
