@@ -9,8 +9,14 @@ from ultralytics import YOLO, settings
 from ultralytics.models.yolo.detect import DetectionTrainer
 import torch
 
+from stream_checkpoints import StreamCheckpoints
 
-class ClassTransferTrainer(DetectionTrainer):
+
+class DetectionCheckpointTrainer(StreamCheckpoints, DetectionTrainer):
+    pass
+
+
+class ClassTransferTrainer(DetectionCheckpointTrainer):
     """Keep the classification channels whose names survive a label-map change."""
 
     def get_model(self, cfg=None, weights=None, verbose=True):
@@ -100,7 +106,8 @@ def main():
     if args.learning_rate is not None:
         optimizer = {'optimizer': 'AdamW', 'lr0': args.learning_rate,
                      'warmup_epochs': 1.0, 'warmup_bias_lr': 0.0}
-    model.train(trainer=ClassTransferTrainer if args.transfer_class_head else None,
+    trainer = ClassTransferTrainer if args.transfer_class_head else DetectionCheckpointTrainer
+    model.train(trainer=trainer if args.task == 'detect' else None,
                       data=str(config),imgsz=resolution,epochs=args.epochs,patience=15,batch=args.batch,workers=0,
                       device=0,project=str(root/'runs'),name=run_name,exist_ok=False,seed=102,
                       plots=False,cache=False,amp=False,mosaic=args.mosaic,fliplr=.5,close_mosaic=5,
