@@ -4,6 +4,7 @@ import base64
 import hashlib
 import json
 from pathlib import Path
+import re
 from statistics import median
 from time import perf_counter
 from urllib.request import ProxyHandler, Request, build_opener
@@ -12,6 +13,25 @@ from uuid import UUID, uuid4
 from calibrate_thresholds import labeled_frames
 from evaluate import class_negative_frames, match_indices, measurements
 from evaluate_service import NoRedirects
+
+
+def load_annotated_images(annotations, folder):
+    rows = json.loads(annotations.read_bytes())
+    if not isinstance(rows, list) or not rows:
+        raise ValueError('Expected a nonempty list of annotated images')
+    images, names = [], set()
+    for row in rows:
+        name, digest = row['file'], row['sha256']
+        if (not isinstance(name, str) or not name or Path(name).name != name or name in names
+                or not isinstance(digest, str) or not re.fullmatch(r'[0-9a-f]{64}', digest)):
+            raise ValueError(f'Invalid image identity: {name!r}')
+        path = folder / name
+        with path.open('rb') as image:
+            if hashlib.file_digest(image, 'sha256').hexdigest() != digest:
+                raise ValueError(f'Image differs from annotation: {name}')
+        names.add(name)
+        images.append(path)
+    return rows, images
 
 
 def predictions(detections):
@@ -103,6 +123,8 @@ def agreement(worker, app):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('reference', type=Path)
+    parser.add_argument('--images', type=Path, help='Use reference as a SHA-256 annotated JSON manifest')
+    parser.add_argument('--labels', nargs='+', help='Exhaustively annotated classes in the JSON manifest')
     parser.add_argument('output', type=Path)
     parser.add_argument('--port', type=int, required=True)
     parser.add_argument('--app-port', type=int, help='Also compare a separate Cyber102 app using this detector')
@@ -113,13 +135,21 @@ def main():
         parser.error('Ports must be in [1, 65535]')
     if args.app_port == args.port:
         parser.error('Worker and app require different ports')
-    import yaml
+    if bool(args.images) != bool(args.labels):
+        parser.error('--images and --labels must be supplied together')
+    if args.images:
+        labels = tuple(dict.fromkeys(args.labels))
+        rows, images = load_annotated_images(args.reference, args.images)
+        if set(obj['class'] for row in rows for obj in row['objects']) - set(labels):
+            parser.error('--labels must cover all annotated objects')
+    else:
+        import yaml
 
-    config = yaml.safe_load(args.reference.read_text(encoding='utf-8'))
-    if config['test'] != 'images/test':
-        raise ValueError('Expected an explicitly configured test split')
-    labels = tuple(config['names'].values())
-    rows, images, _ = labeled_frames(Path(config['path']), 'test', config['names'])
+        config = yaml.safe_load(args.reference.read_text(encoding='utf-8'))
+        if config['test'] != 'images/test':
+            raise ValueError('Expected an explicitly configured test split')
+        labels = tuple(config['names'].values())
+        rows, images, _ = labeled_frames(Path(config['path']), 'test', config['names'])
     opener = build_opener(ProxyHandler({}), NoRedirects())
     base = f'http://127.0.0.1:{args.port}'
     with opener.open(base + '/health', timeout=5) as reply:
@@ -136,7 +166,7 @@ def main():
             raise ValueError('Expected an isolated Cyber102 app using the detector')
     for row, image in zip(rows, images, strict=True):
         name = row['file']
-        row['scene'] = row['file']
+        row.setdefault('scene', row['file'])
         image_bytes = image.read_bytes()
         version = health['modelVersion']
         detected[name], times[name] = analyze_worker(opener, base, image_bytes, version)
