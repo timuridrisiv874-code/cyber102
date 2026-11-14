@@ -1,0 +1,357 @@
+[
+  {
+    "file": "oil_chemical-Level01-Wheeled-002329-001.jpg",
+    "scene": "pump-service",
+    "sha256": "614bfb4296a530334b9e949cbd297661117b5370dab01cb42e0108d4fc2341ad",
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level01-Wheeled-002329/oil_chemical-Level01-Wheeled-002329-001.json",
+    "license": "CC BY 4.0",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.6140625,
+          0.49166666666666664,
+          0.859375,
+          0.725
+        ],
+        "sourceLabel": "Liquid"
+      }
+    ]
+  },
+  {
+    "file": "oil_chemical-Level01-Wheeled-002330-001.jpg",
+    "scene": "pump-service",
+    "sha256": "aacf42566213c9cf6036ad40eace857935d44f9865f61bb0c3d82c626f754144",
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level01-Wheeled-002330/oil_chemical-Level01-Wheeled-002330-001.json",
+    "license": "CC BY 4.0",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.58125,
+          0.6555555555555556,
+          0.8328125,
+          0.9472222222222222
+        ],
+        "sourceLabel": "Liquid"
+      }
+    ]
+  },
+  {
+    "file": "oil_chemical-Level01-Wheeled-002331-001.jpg",
+    "scene": "pump-service",
+    "sha256": "82b398155eeec278f082790e8595ea5575fad1e6f9bc2e0788c78436d623e7bd",
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level01-Wheeled-002331/oil_chemical-Level01-Wheeled-002331-001.json",
+    "license": "CC BY 4.0",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.5609375,
+          0.6472222222222223,
+          0.8265625,
+          0.9472222222222222
+        ],
+        "sourceLabel": "Liquid"
+      }
+    ]
+  },
+  {
+    "file": "oil_chemical-Level02-Wheeled-002388-001.jpg",
+    "scene": "equipment-base",
+    "sha256": "675643b9ceaa96adf191e9a685c2e863142bedd4afc52e2ec8a68e5323686ec9",
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level02-Wheeled-002388/oil_chemical-Level02-Wheeled-002388-001.json",
+    "license": "CC BY 4.0",
+    "note": "Two liquid regions from source polygons. Tiny separate droplet polygons on the seam are outside this benchmark.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.5484375,
+          0.14444444444444443,
+          0.9859375,
+          0.8583333333333333
+        ],
+        "sourceLabel": "Liquid"
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.044956140350877194,
+          0.10136452241715399,
+          0.36403508771929827,
+          0.27485380116959063
+        ],
+        "sourceLabel": "Liquid"
+      }
+    ]
+  },
+  {
+    "file": "oil_chemical-Level02-Wheeled-002391-001.jpg",
+    "scene": "pump-floor",
+    "sha256": "231e374ad87c6fb8bdbdcb3f5f86c009fa76673fa9de6127a04f3d55297a0ab1",
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level02-Wheeled-002391/oil_chemical-Level02-Wheeled-002391-001.json",
+    "license": "CC BY 4.0",
+    "note": "Manually tightened the source box to the visible wet floor on the right of the pump.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.461,
+          0.092,
+          1.0,
+          1.0
+        ],
+        "sourceLabel": "Liquid"
+      }
+    ]
+  },
+  {
+    "file": "water-meter.jpg",
+    "scene": "water-meter",
+    "sha256": "7e49fee2141c9a921828dd0427762d3e58fdbf49c4d2dae8b762d3f1b4f4679c",
+    "source": "https://commons.wikimedia.org/wiki/File:BCA_pipe_burst_1_at_water_meter.jpg",
+    "author": "Sarang",
+    "license": "Public domain",
+    "note": "Visible runoff below the installation; exact origin not visible.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.0,
+          0.69,
+          1.0,
+          1.0
+        ]
+      }
+    ]
+  },
+  {
+    "file": "urban-line.jpg",
+    "scene": "urban-line",
+    "sha256": "446c12de871ce5eaadd01b21bf5d672efd7bb36675cc1194d33f03d5c03bbcb4",
+    "source": "https://commons.wikimedia.org/wiki/File:Water_dripping_out_of_an_urban_water_supply_pipeline_in_India_20120311.jpg",
+    "author": "Ganesh Dhamodkar/Wikimedia Commons",
+    "license": "CC BY-SA 3.0",
+    "note": "Pooled water around the pipe.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.24,
+          0.23,
+          0.82,
+          1.0
+        ]
+      }
+    ]
+  },
+  {
+    "file": "roof-drain.jpg",
+    "scene": "roof-drain",
+    "sha256": "0bd85953b084054acc8d1246fb4404d3233b8af0d322ff3b6ad98e76f68c5d73",
+    "source": "https://commons.wikimedia.org/wiki/File:2003-09-23_Water_dripping_from_pipe_at_UNC.jpg",
+    "author": "Ildar Sagdejev",
+    "license": "CC BY-SA 4.0",
+    "note": "Visible liquid at the outlet of a drain; a positive for liquid only.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.408,
+          0.515,
+          0.635,
+          0.971
+        ]
+      }
+    ]
+  },
+  {
+    "file": "park-pipe.jpg",
+    "scene": "park-pipe",
+    "sha256": "51dc3825b0088598440d8b4b286e4e11f4a252ac71a81ae116dfb3278669665c",
+    "source": "https://commons.wikimedia.org/wiki/File:2024-12-25_Leaking_pipe_in_Lisi_Park.jpg",
+    "author": "Yuri Samoylov",
+    "license": "CC BY-SA 4.0",
+    "note": "Visible jet and spray; excludes the downstream wet ground.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.216,
+          0.391,
+          0.973,
+          0.743
+        ]
+      }
+    ]
+  },
+  {
+    "file": "rural-pipe.jpg",
+    "scene": "rural-pipe",
+    "sha256": "dd250591b4ebe474f3e18e4652ede4b7c5a2f4059301770ee4c36967988dce21",
+    "source": "https://commons.wikimedia.org/wiki/File:Water_pipeline_leak_%40_Bord_de_Mars_01.jpg",
+    "author": "Rémih",
+    "license": "CC BY-SA 4.0",
+    "note": "Visible water jet above the pipe.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.492,
+          0.269,
+          0.614,
+          0.761
+        ]
+      }
+    ]
+  },
+  {
+    "file": "cracked-cast-iron.jpg",
+    "scene": "cracked-cast-iron",
+    "sha256": "16d08ea0bef102dd96279df567dce46b81f46801b822476725fd7b497db76c38",
+    "source": "https://commons.wikimedia.org/wiki/File:Crack_Pipe.jpg",
+    "author": "ilovebutter",
+    "license": "CC BY 2.0",
+    "objects": [],
+    "note": "Corroded broken pipe on asphalt without a visible wet region."
+  },
+  {
+    "file": "damaged-water-pipe.jpg",
+    "scene": "damaged-water-pipe",
+    "sha256": "4da3707d29c4833a9209fa756c9fb6317cef6d33cbacde279936b996efb3c438",
+    "source": "https://commons.wikimedia.org/wiki/File:Damaged_pipe_line.jpg",
+    "author": "Asikironalio",
+    "license": "CC BY 4.0",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.46,
+          0.43,
+          0.65,
+          0.57
+        ]
+      }
+    ]
+  },
+  {
+    "file": "leak.jpg",
+    "scene": "rusted-well-pipe",
+    "sha256": "abc2a753456e76c9eb8f752e722321846b6743e5b55b27895ce54656a3c434fc",
+    "source": "https://commons.wikimedia.org/wiki/File:Leak_in_rusted_pipe_side_view.jpg",
+    "author": "Shamrock Lee",
+    "license": "CC BY 4.0",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.44,
+          0.57,
+          0.62,
+          0.73
+        ]
+      }
+    ]
+  },
+  {
+    "file": "burnt-screw.jpg",
+    "scene": "burnt-screw",
+    "sha256": "b02c8e7a2f8cd141397581a93ce7394c34fbbfd1bee28cec970173d0bae72f7c",
+    "source": "https://commons.wikimedia.org/wiki/File:Burnt_terminals.JPG",
+    "author": "Dmitry G",
+    "license": "Public domain",
+    "note": "Dark dry-looking burn stain around the wiring opening.",
+    "objects": []
+  },
+  {
+    "file": "intact-box.jpg",
+    "scene": "intact-box",
+    "sha256": "5cbc2cf289852e37771a94d367863e64328bb278109ab5b3b2d98240c0f38084",
+    "source": "https://commons.wikimedia.org/wiki/File:Cable_junction_box_for_maintaining_electrical_functional_integrity_according_to_DIN_4102_Part_12.JPG",
+    "author": "S.J. de Waard",
+    "license": "CC BY 2.5",
+    "note": "Dry-looking junction box and fittings on textured blue fabric.",
+    "objects": []
+  },
+  {
+    "file": "outlook-fig-09.jpg",
+    "scene": "corroded-covering",
+    "site": "outlook-refinery",
+    "sha256": "01ba30d1abf009107c708d8d08252351518c104c5d3c15061b5d1c46f8fc2631",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "note": "Pitted corrosion; no visible pooling or flowing liquid.",
+    "objects": []
+  },
+  {
+    "file": "outlook-fig-13.jpg",
+    "scene": "sound-elbow",
+    "site": "outlook-refinery",
+    "sha256": "dc39265fe4d272aa22a86a9e0edc7cabb9c2c57602ccabf583bbe97c31200f31",
+    "source": "https://insulation.org/io/articles/case-study-creating-a-program-for-cui-prevention-at-a-refinery/",
+    "note": "Reflections on banded metallic jacketing.",
+    "objects": []
+  },
+  {
+    "file": "maintain-07.jpg",
+    "scene": "glossy-pvc-jackets",
+    "site": "maintenance-fig07",
+    "sha256": "64f755a265c18fe66e61ac8711533d1df2dbd91416b072700c159ac83c6b1b7d",
+    "source": "https://insulation.org/io/articles/maintain-insulation-jacketing-to-ensure-mechanical-insulation-performance/",
+    "note": "White light reflected in glossy colored pipe cladding.",
+    "objects": []
+  },
+  {
+    "file": "maintain-09.jpg",
+    "scene": "roof-insulated-pipe",
+    "site": "maintenance-fig09",
+    "sha256": "2dbea043605bc303912976fc51c7af65863498ec756a661946d70ec59274a5ae",
+    "source": "https://insulation.org/io/articles/maintain-insulation-jacketing-to-ensure-mechanical-insulation-performance/",
+    "note": "Daylight highlights on dry-looking metal jacketing.",
+    "objects": []
+  },
+  {
+    "file": "sault-covered.jpg",
+    "scene": "sault-coupling",
+    "site": "sault-coupling",
+    "sha256": "6b3777909a6ec25b862912a10c39d4892aec166b348c4d2882cff15c07a0b9b4",
+    "source": "https://machineguard.com/coupling-guards-pump-motor-assembly/",
+    "note": "Glossy black guard with dry-looking rust around the mount.",
+    "objects": []
+  },
+  {
+    "file": "patterson-orange-cover.jpg",
+    "scene": "patterson-coupling",
+    "site": "patterson-coupling",
+    "sha256": "a98838565baee1a277aa6cae6d01a41482ceb23e199a1511df3656e4d03194a6",
+    "source": "https://www.uniguardmgc.com/machine-guarding-solution-for-patterson-pump/",
+    "note": "Bright perforated guard with an adjacent green pump housing.",
+    "objects": []
+  },
+  {
+    "file": "commons-ksb.jpg",
+    "scene": "commons-ksb",
+    "site": "commons-ksb",
+    "sha256": "d0ffb7ffc34824430a6e3823e53a65733777b3714f733d0b4247de6580b0ddc9",
+    "source": "https://commons.wikimedia.org/wiki/File:KSB_09_Etanorm_mit_Motor_und_Frequenzumrichter.jpg",
+    "author": "KSB Aktiengesellschaft, Frankenthal",
+    "license": "CC BY-SA 3.0",
+    "note": "Clean assembled pump with silver coupling guard.",
+    "objects": []
+  },
+  {
+    "file": "transformer-oxidized-plate.jpg",
+    "scene": "transformer-oxidized-plate",
+    "sha256": "e685b0a1dff8a9da43bdc0858e3c126ad93bf0902c5025dfa6af189706555514",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/test/images/rouille-142-_jpg.rf.feccaddfec1bcf0d9569894200a35a90.jpg",
+    "license": "CC BY 4.0",
+    "note": "Dark corrosion pattern on a plate; no visible liquid boundary.",
+    "objects": []
+  }
+]

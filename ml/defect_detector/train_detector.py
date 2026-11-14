@@ -74,8 +74,12 @@ def main():
         cfg['test']='images/test'
     config=dataset/'config.yaml'
     config.write_text(yaml.safe_dump(cfg),encoding='utf-8')
-    print('dataset',dict(Counter(int(line.split()[0]) for f in (dataset/'labels/train').glob('*.txt')
-                                 for line in f.read_text().splitlines() if line.strip())),flush=True)
+    # Match Ultralytics' image discovery, which excludes hidden archive sidecars.
+    label_paths = (path for path in (dataset / 'labels/train').glob('*.txt')
+                   if not path.name.startswith('.') and path.is_file())
+    counts = Counter(int(line.split()[0]) for path in label_paths
+                     for line in path.read_text(encoding='utf-8').splitlines() if line.strip())
+    print('dataset', dict(counts), flush=True)
     if not torch.cuda.is_available():
         raise RuntimeError('CUDA is required')
     settings.update({'sync':False})
