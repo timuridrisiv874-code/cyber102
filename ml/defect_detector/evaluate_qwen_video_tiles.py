@@ -73,9 +73,13 @@ def main():
                         help='Use a short single-image localization format for terminal damage')
     parser.add_argument('--image-area', type=int, default=524_288,
                         help='Maximum number of pixels per region')
+    parser.add_argument('--single-pass', action='store_true',
+                        help='Use the same one-image prompt on the full frame without cropping')
     args = parser.parse_args()
     if args.compact_terminals and not args.single_crop:
         parser.error('--compact-terminals requires --single-crop')
+    if args.single_pass and not args.single_crop:
+        parser.error('--single-pass requires --single-crop')
     if not 65_536 <= args.image_area <= 786_432:
         parser.error('--image-area must be between 65536 and 786432 pixels')
     sets = {path.stem: json.loads(path.read_bytes()) for path in args.annotations}
@@ -116,7 +120,7 @@ def main():
 
     def detect(image):
         errors = {}
-        crops = windows(*image.size)
+        crops = [(0, 0, *image.size)] if args.single_pass else windows(*image.size)
         with ExitStack() as stack:
             views = [stack.enter_context(image.crop(crop)) for crop in crops]
             if args.single_crop:
@@ -152,6 +156,7 @@ def main():
         print(name, len(predictions[name]), times[name], flush=True)
     combined = {name: merge_boxes(pairs['predictions'][name] + boxes) for name, boxes in predictions.items()}
     report = {**identity, 'separateCropRequests': args.single_crop, 'stillImages': args.still_images,
+              'fullFrameSinglePass': args.single_pass,
               'labels': labels, 'compactTerminals': args.compact_terminals, 'imageArea': args.image_area,
               'baselineReportSha256': hashlib.sha256(baseline_bytes).hexdigest(),
               'frameSha256': {row['file']: row['sha256'] for row in rows},

@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 from statistics import median
 
@@ -14,8 +15,9 @@ LABELS = ('terminal_damage',)
 def observations(clips, review, identity):
     result = {}
     for clip, item in clips.items():
-        response = review[clip]['response']
-        if review[clip]['httpStatus'] != 200 or any(response[key] != identity[key] for key in ('model', 'revision')):
+        recorded = review[clip]
+        response = recorded.get('response', {})
+        if recorded['httpStatus'] != 200 or any(response.get(key) != identity[key] for key in ('model', 'revision')):
             raise ValueError(f'Unexpected review result for {clip}')
         frames = item['frames']
         checked = response['observations']
@@ -52,11 +54,18 @@ def compare(rows, clips, review, proposals, verification, budget):
                 (proposals, 'predictions'), (proposals, 'frameMs'),
                 (verification, 'predictions'), (verification, 'verificationMs')))):
         raise ValueError('Require the same reviewed frames and timings from all inputs')
+    for clip in clips:
+        duration = review[clip]['elapsedMs']
+        if type(duration) not in (int, float) or not math.isfinite(duration) or duration < 0:
+            raise ValueError(f'Invalid recorded review latency: {clip}')
     for row in rows:
         frame = clips[row['clip']]['frames'][row['frameIndex']]
         if any(row[key] != frame[key] for key in ('file', 'sha256', 'timestampSeconds')):
             raise ValueError(f'Annotation differs from sampled frame: {row["file"]}')
         name = row['file']
+        for duration in (proposals['frameMs'][name], verification['verificationMs'][name]):
+            if type(duration) not in (int, float) or not math.isfinite(duration) or duration < 0:
+                raise ValueError(f'Invalid recorded latency: {name}')
         localized = proposals['predictions'][name]
         if any(box not in localized for box in verification['predictions'][name]):
             raise ValueError(f'Verification returned an unrecognized proposal: {name}')
@@ -73,6 +82,8 @@ def compare(rows, clips, review, proposals, verification, budget):
                                    for name in chosen), 3) for clip, chosen in selection.items()}
         results[mode] = {'frames': selection, 'extraMsByClip': elapsed,
                          'medianExtraMs': median(elapsed.values()),
+                         'medianEstimatedReviewPlusExtraMs': median(
+                             review[clip]['elapsedMs'] + elapsed[clip] for clip in selection),
                          **measure_reviewed(rows, predictions, LABELS)['terminal_damage']}
     return results
 
