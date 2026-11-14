@@ -1,5 +1,10 @@
 (() => {
 if (window.CyberWebBoot?.blocked) return;
+// The inspection page can retry a missing script without binding controls twice.
+if (!window.CyberMedia || !window.CyberInspection ||
+    (!window.CyberOffline?.enabled && (!window.CyberVideoReview || !window.CyberAnalysisJobs))) return;
+if (window.CyberCaptureStarted) return;
+window.CyberCaptureStarted = true;
 const byId = (id) => document.getElementById(id);
 
 const viewfinder = byId('viewfinder');
@@ -736,6 +741,7 @@ if ('ResizeObserver' in window) {
 }
 render();
 
+window.CyberCaptureReady = true;
 
 async function loadCapabilities() {
   if (offlineMode) return;

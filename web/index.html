@@ -12,10 +12,10 @@
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="analysis-jobs.js" defer></script>
   <script src="inspection.js?v=resource-20261114" defer></script>
-  <script src="media.js?v=mobile-file-20261114" defer></script>
+  <script src="media.js?v=mobile-recovery-20261114" defer></script>
   <script src="video-review.js?v=resource-20261114" defer></script>
   <script src="region-review.js?v=field-20261114" defer></script>
-  <script src="app.js?v=mobile-file-20261114" defer></script>
+  <script src="app.js?v=mobile-recovery-20261114" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
 </head>
 <body data-page="inspection">
@@ -67,6 +67,7 @@
             <button class="button secondary" id="choose-region" type="button" hidden>Выбрать область</button>
           </div>
           <p class="message" id="message" role="status"></p>
+          <button type="button" id="retry-capture-load" class="button secondary" hidden>Повторить загрузку</button>
           <p class="video-metrics" id="media-progress" role="status" hidden></p>
 
           <div id="video-review-home">
@@ -138,5 +139,47 @@
       </section>
     </div>
   </main>
+  <script>
+    // Keep this with the HTML so a dropped script cannot also remove recovery.
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!/^https?:$/.test(location.protocol) || window.CyberCaptureReady) return;
+      const message = document.getElementById('message');
+      const retry = document.getElementById('retry-capture-load');
+      const dependencies = [
+        ['analysis-jobs.js', 'CyberAnalysisJobs'], ['inspection.js', 'CyberInspection'],
+        ['media.js', 'CyberMedia'], ['video-review.js', 'CyberVideoReview'],
+      ];
+      function loadAgain(name) {
+        const original = document.querySelector('script[src^="' + name + '"]');
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.onload = resolve;
+          script.onerror = reject;
+          script.src = original.src;
+          document.head.append(script);
+        });
+      }
+      async function restore() {
+        retry.hidden = true;
+        message.textContent = 'Загружаем инструменты осмотра…';
+        try {
+          for (const [name, provided] of dependencies) {
+            if (!window[provided]) await loadAgain(name);
+            if (!window[provided]) throw new Error();
+          }
+          if (!window.CyberCaptureStarted) {
+            message.textContent = '';
+            await loadAgain('app.js');
+          }
+          if (!window.CyberCaptureReady) throw new Error();
+        } catch {
+          message.textContent = 'Не удалось загрузить страницу осмотра. Проверьте соединение и повторите.';
+          retry.hidden = false;
+        }
+      }
+      retry.addEventListener('click', () => window.CyberCaptureStarted ? location.reload() : restore());
+      restore();
+    });
+  </script>
 </body>
 </html>

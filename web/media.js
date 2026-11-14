@@ -1,15 +1,18 @@
 // Files are decoded locally. Only normalized JPEG frames reach the local analysis API.
 (() => {
   const abortError = () => new DOMException('Операция отменена', 'AbortError');
-  function fileKind(file) {
-    if (file.type.startsWith('video/')) return 'uploaded_video';
-    if (file.type.startsWith('image/')) return 'uploaded_photo';
+  const FILE_TYPES = new Map(Object.entries({
+    mp4: 'video/mp4', m4v: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm',
+    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp',
+    heic: 'image/heic', heif: 'image/heif', avif: 'image/avif', gif: 'image/gif',
+  }));
+  function mediaType(file) {
+    if (/^(video|image)\//.test(file.type)) return file.type;
     // Some mobile file providers supply a generic MIME even for a valid
     // JPEG or MP4. The image/video decoder still validates the contents.
     if (file.type && !/^(application|binary)\/octet-stream$/i.test(file.type)) return null;
-    if (/\.(mp4|mov|m4v|webm)$/i.test(file.name)) return 'uploaded_video';
-    if (/\.(jpe?g|png|webp|heic|heif|avif|gif)$/i.test(file.name)) return 'uploaded_photo';
-    return null;
+    const extension = /\.([a-z0-9]+)$/i.exec(file.name)?.[1].toLowerCase();
+    return FILE_TYPES.get(extension);
   }
   function waitFor(element, event, signal, ready, timeout = 20000) {
     return new Promise((resolve, reject) => {
@@ -83,26 +86,27 @@
       async function openSelectedFile() {
         const file = input.files?.[0];
         if (!file) return;
-        const nextKind = fileKind(file);
-        const limit = nextKind === 'uploaded_video' ? 150 : 20;
-        if (!nextKind || !file.size || file.size > limit * 1024 * 1024) {
+        const mime = mediaType(file);
+        const isVideo = mime?.startsWith('video/');
+        const limit = isVideo ? 150 : 20;
+        if (!mime || !file.size || file.size > limit * 1024 * 1024) {
           input.value = '';
-          message(nextKind ? `Файл пустой или превышает ${limit} МБ. Выберите меньший файл.` :
+          message(mime ? `Файл пустой или превышает ${limit} МБ. Выберите меньший файл.` :
             'Выберите фото или видео. Поддержка формата зависит от браузера.', true);
           return;
         }
         beforeChange(); clear();
         const token = generation;
         try {
-          kind = nextKind; loading = true; loader = new AbortController();
-          const mime = /\.(mp4|m4v)$/i.test(file.name) ? 'video/mp4' : /\.mov$/i.test(file.name) ? 'video/quicktime' : null;
-          url = URL.createObjectURL(nextKind === 'uploaded_video' && !file.type.startsWith('video/') && mime
-            ? file.slice(0, file.size, mime) : file);
+          kind = isVideo ? 'uploaded_video' : 'uploaded_photo';
+          loading = true; loader = new AbortController();
+          url = URL.createObjectURL(mime === file.type ? file : file.slice(0, file.size, mime));
           message('Открываем файл на устройстве…'); changed();
           if (kind === 'uploaded_video') {
             const metadata = waitFor(video, 'loadedmetadata', loader.signal);
             video.src = url; video.load();
             await metadata;
+            if (token !== generation) return;
             if (!Number.isFinite(video.duration) || video.duration <= 0 || video.duration > 120) throw new Error('Выберите видео длительностью до 2 минут.');
             // A mobile browser can wait for a tap on the native player before
             // decoding any pixels. Metadata is valid; keep the file available.
@@ -114,7 +118,7 @@
           }
           if (token !== generation) return;
           loading = false; loader = null;
-          message(waitingForVideoFrame ? 'Нажмите ▶ в плеере, чтобы открыть первый кадр.' : window.CyberOffline?.enabled
+          message(waitingForVideoFrame ? 'Нажмите «Воспроизвести» в плеере, чтобы открыть первый кадр.' : window.CyberOffline?.enabled
             ? kind === 'uploaded_video'
               ? 'Видео открыто. Выберите кадр и нажмите «Проверить кадр». Анализ выполняется на телефоне.'
               : 'Фото открыто. Нажмите «Проверить кадр»: снимок обработает SmolVLM на телефоне.'

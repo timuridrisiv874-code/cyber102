@@ -25,7 +25,7 @@ async function previewReady(page, kind) {
   }, kind, { timeout: 8000 });
 }
 
-async function exercise(browser, device, origin, clip, kind) {
+async function exercise(browser, device, origin, clip, kind, drop = '') {
   const context = await browser.newContext({ ...device, serviceWorkers: 'block' });
   const page = await context.newPage();
   const errors = [];
@@ -33,6 +33,11 @@ async function exercise(browser, device, origin, clip, kind) {
   let allowBoot;
   const gate = new Promise(resolve => { allowBoot = resolve; });
   await page.route('**/app.js*', async route => { await gate; await route.continue(); });
+  let blocked = 0;
+  if (drop) await page.route('**/' + drop + '*', async route => {
+    if (blocked++ < 2) { await route.abort('failed'); return; }
+    await route.continue();
+  });
   try {
     await page.goto(origin + '/index.html', { waitUntil: 'commit' });
     const file = kind === 'image' ? photo : clip;
@@ -40,6 +45,11 @@ async function exercise(browser, device, origin, clip, kind) {
     assert.equal(await page.locator('#media-file').evaluate(el => el.files.length), 1);
     allowBoot();
     await page.waitForLoadState('domcontentloaded');
+    if (drop) {
+      const retry = page.getByRole('button', { name: 'Повторить загрузку' });
+      await retry.waitFor();
+      await retry.tap();
+    }
     await previewReady(page, kind);
     // The page may visit the back/forward cache while the user switches tasks.
     await page.evaluate(() => {
@@ -60,6 +70,15 @@ async function exercise(browser, device, origin, clip, kind) {
     await tapAndChoose(page, { name: path.basename(file), mimeType: 'application/octet-stream', buffer: fs.readFileSync(file) });
     await previewReady(page, kind);
     assert.deepEqual(errors, []);
+  } catch (error) {
+    console.error({ kind, drop, errors, state: await page.evaluate(() => ({
+      message: document.getElementById('message')?.textContent,
+      started: !!window.CyberCaptureStarted, ready: !!window.CyberCaptureReady,
+      media: !!window.CyberMedia, inspection: !!window.CyberInspection,
+      client: !!window.CyberAnalysisJobs, review: !!window.CyberVideoReview,
+      picked: document.getElementById('media-file')?.files.length,
+    })) });
+    throw error;
   } finally { allowBoot(); await context.close(); }
 }
 
@@ -91,6 +110,8 @@ async function main() {
           await exercise(browser, device, origin, clip, kind);
           console.log(`${name} ${kind} PASS: tap, early choice, page restore, replacement, cancel and same-file choice`);
         }
+        await exercise(browser, device, origin, clip, 'image', 'media.js');
+        console.log(name + ' recovered a pending photo after two failed media script requests');
       } finally { await browser.close(); }
     }
   } finally {
