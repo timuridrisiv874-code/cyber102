@@ -252,10 +252,8 @@ function render() {
   byId('frame-interval-label').hidden = !videoMode;
   intervalSelect.hidden = !videoMode;
   intervalSelect.disabled = cameraMode.disabled;
-  byId('video-help').hidden = !videoMode;
-  byId('video-help').textContent = media.kind === 'uploaded_video' ?
-    'С начала ролика с выбранным интервалом, максимум 20 кадров за запуск.' :
-    'Проверяем отдельные кадры с камеры. Рамка относится к последнему проверенному кадру.';
+  byId('video-help').hidden = !videoMode || media.kind === 'uploaded_video';
+  byId('video-help').textContent = 'Проверяем отдельные кадры с камеры. Рамка относится к последнему проверенному кадру.';
   videoToggle.hidden = !videoMode;
   videoToggle.disabled = clipBusy || (!videoRun && ((!stream && media.kind !== 'uploaded_video') || !frameReady || openingCamera || Boolean(analysisController)));
   byId('video-toggle-label').textContent = videoRun ? 'Остановить проверку' : videoOverview ? 'Проверить по интервалу' : 'Начать проверку';
