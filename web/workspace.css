@@ -303,3 +303,16 @@ body[data-inspection-layout=capture] #result { display: none; }
 
 .pump-photo-figure { display: inline-block; vertical-align: top; width: min(100%, 480px); margin: 0 16px 8px 0; }
 .pump-photo-figure figcaption { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+
+.equipment-card-photo { margin: 0 0 12px; }
+.equipment-card-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  background: white;
+  border-radius: 12px;
+}
+.equipment-card-photo figcaption { margin-top: 6px; }
+#other-equipment-photos .equipment-card-photo { max-width: 360px; }
+#other-equipment-photos img { aspect-ratio: 4 / 3; background: transparent; }
