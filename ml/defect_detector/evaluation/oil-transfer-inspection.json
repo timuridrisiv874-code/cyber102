@@ -1,0 +1,229 @@
+[
+  {
+    "file": "tank-gauge-seepage.jpg",
+    "scene": "tank-gauge-seepage",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/test/images/-_20200721093841_jpg.rf.f3cf1bfc5dc52821b3765514ed458e0f.jpg",
+    "sourceSplit": "test",
+    "sourceAnnotation": [
+      "3 0.478906 0.700000 0.957812 0.599219"
+    ],
+    "sourceLabel": "oil_leak",
+    "license": "CC BY 4.0",
+    "sha256": "12db92e5610fc1b18c0cd61865193b40f60b4ef3cfc0635e2b01dfdd0fb7fd70",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.214,
+          0.661,
+          0.644,
+          0.951
+        ]
+      }
+    ],
+    "note": "Localized wide dark residue beneath the gauge, labelled oil by the source dataset."
+  },
+  {
+    "file": "radiator-seam.jpg",
+    "scene": "radiator-seam",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/val/images/27_jpg.rf.de7a1fed0104e85a3fb22e8864709ec8.jpg",
+    "sourceSplit": "val",
+    "sourceAnnotation": [
+      "3 0.504687 0.619531 0.990625 0.658594"
+    ],
+    "sourceLabel": "oil_leak",
+    "license": "CC BY 4.0",
+    "sha256": "0cea76bfd6f06a79aa07247e7a18c3e967da45349fcd3cba00efea51cdab68d5",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.024,
+          0.445,
+          0.374,
+          0.827
+        ]
+      }
+    ],
+    "note": "A brown streak and residue below a radiator joint, tagged oil in the source."
+  },
+  {
+    "file": "transformer-base-liquid.jpg",
+    "scene": "transformer-base-liquid",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/val/images/mmexport1661065566456-1-_jpg.rf.319271efbea48ffe79add590ca08f14d.jpg",
+    "sourceSplit": "val",
+    "sourceAnnotation": [
+      "3 0.533594 0.266406 0.521875 0.193750",
+      "3 0.628906 0.555469 0.398438 0.530469"
+    ],
+    "sourceLabel": "oil_leak",
+    "license": "CC BY 4.0",
+    "sha256": "2f1754b75251ffb2a00d1d91c3de014746074bbc5c3cf2629c202c391224c220",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.025,
+          0.843,
+          0.419,
+          1
+        ]
+      }
+    ],
+    "note": "Shiny dark liquid below the transformer. The source labels this scene as oil."
+  },
+  {
+    "file": "transformer-bushing.jpg",
+    "scene": "transformer-bushing",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/val/images/4cbe21030_jpg.rf.39d150b082147718376c5ee34257bcc8.jpg",
+    "sourceSplit": "val",
+    "sourceAnnotation": [
+      "3 0.317188 0.481250 0.632031 0.753906"
+    ],
+    "sourceLabel": "oil_leak",
+    "license": "CC BY 4.0",
+    "sha256": "53d87ada096c3a65b1af28e47ac1cb4355407c784c41bc770ee5ad3af5a3a5f3",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.37,
+          0.451,
+          0.595,
+          0.784
+        ]
+      }
+    ],
+    "note": "Dark glossy film on the lower bushing. Source label is oil."
+  },
+  {
+    "file": "radiator-streaks.jpg",
+    "scene": "radiator-streaks",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/val/images/webwxgetmsgimg-4-_jpg.rf.5bd54bb340919af83a1fbed11bba2413.jpg",
+    "sourceSplit": "val",
+    "sourceAnnotation": [
+      "3 0.490625 0.473438 0.397656 0.139844",
+      "3 0.596094 0.779687 0.210156 0.440625"
+    ],
+    "sourceLabel": "oil_leak",
+    "license": "CC BY 4.0",
+    "sha256": "40f2d0c8d407b04cf2d84624ec1afb51236b0b2c9581a2d735a162bda9011ac7",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.493,
+          0.553,
+          0.725,
+          0.897
+        ]
+      }
+    ],
+    "note": "Distinct dark drip trails on adjacent radiator fins. Source label is oil."
+  },
+  {
+    "file": "green-industrial-housing.jpg",
+    "scene": "green-industrial-housing",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/train/images/5_jpg.rf.2d1c21a25d0f7e472230d76060471732.jpg",
+    "sourceSplit": "train",
+    "sourceAnnotation": [
+      "3 0.483594 0.319531 0.305469 0.214062",
+      "3 0.496875 0.792188 0.992969 0.414844"
+    ],
+    "sourceLabel": "oil_leak",
+    "license": "CC BY 4.0",
+    "sha256": "2460ca107cb21e56b99817c6581b3a0e5b04bdb063f28fe9e9ad4fca920ef9ba",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.323,
+          0.207,
+          0.643,
+          0.414
+        ]
+      },
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.258,
+          0.79,
+          0.739,
+          0.977
+        ]
+      }
+    ],
+    "note": "The source annotates traces at the pipe joint and on the floor below it."
+  },
+  {
+    "file": "transformer-oxidized-plate.jpg",
+    "scene": "transformer-oxidized-plate",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/test/images/rouille-142-_jpg.rf.feccaddfec1bcf0d9569894200a35a90.jpg",
+    "sourceSplit": "test",
+    "sourceAnnotation": [
+      "4 0.513889 0.447917 0.577778 0.715278"
+    ],
+    "sourceLabel": "rust_corrosion",
+    "license": "CC BY 4.0",
+    "sha256": "e685b0a1dff8a9da43bdc0858e3c126ad93bf0902c5025dfa6af189706555514",
+    "objects": [],
+    "note": "Corroded plate without annotated oil."
+  },
+  {
+    "file": "water-meter.jpg",
+    "scene": "water-meter",
+    "source": "https://commons.wikimedia.org/wiki/File:BCA_pipe_burst_1_at_water_meter.jpg",
+    "author": "Sarang",
+    "license": "Public domain",
+    "objects": [],
+    "note": "Known water example for checking false oil alerts.",
+    "sha256": "7e49fee2141c9a921828dd0427762d3e58fdbf49c4d2dae8b762d3f1b4f4679c"
+  },
+  {
+    "file": "urban-line.jpg",
+    "scene": "urban-line",
+    "source": "https://commons.wikimedia.org/wiki/File:Water_dripping_out_of_an_urban_water_supply_pipeline_in_India_20120311.jpg",
+    "author": "Ganesh Dhamodkar/Wikimedia Commons",
+    "license": "CC BY-SA 3.0",
+    "objects": [],
+    "note": "Known water example for checking false oil alerts.",
+    "sha256": "446c12de871ce5eaadd01b21bf5d672efd7bb36675cc1194d33f03d5c03bbcb4"
+  },
+  {
+    "file": "roof-drain.jpg",
+    "scene": "roof-drain",
+    "source": "https://commons.wikimedia.org/wiki/File:2003-09-23_Water_dripping_from_pipe_at_UNC.jpg",
+    "author": "Ildar Sagdejev",
+    "license": "CC BY-SA 4.0",
+    "objects": [],
+    "note": "Known water example for checking false oil alerts.",
+    "sha256": "0bd85953b084054acc8d1246fb4404d3233b8af0d322ff3b6ad98e76f68c5d73"
+  },
+  {
+    "file": "park-pipe.jpg",
+    "scene": "park-pipe",
+    "source": "https://commons.wikimedia.org/wiki/File:2024-12-25_Leaking_pipe_in_Lisi_Park.jpg",
+    "author": "Yuri Samoylov",
+    "license": "CC BY-SA 4.0",
+    "objects": [],
+    "note": "Known water example for checking false oil alerts.",
+    "sha256": "51dc3825b0088598440d8b4b286e4e11f4a252ac71a81ae116dfb3278669665c"
+  },
+  {
+    "file": "rural-pipe.jpg",
+    "scene": "rural-pipe",
+    "source": "https://commons.wikimedia.org/wiki/File:Water_pipeline_leak_%40_Bord_de_Mars_01.jpg",
+    "author": "Rémih",
+    "license": "CC BY-SA 4.0",
+    "objects": [],
+    "note": "Known water example for checking false oil alerts.",
+    "sha256": "dd250591b4ebe474f3e18e4652ede4b7c5a2f4059301770ee4c36967988dce21"
+  }
+]

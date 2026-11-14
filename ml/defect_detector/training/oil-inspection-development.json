@@ -1,0 +1,214 @@
+[
+  {
+    "file": "bushing-close.jpg",
+    "scene": "bushing-close",
+    "split": "train",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/train/images/201406200936019294324_jpg.rf.5339f17a0764cfe39551304f90bc2384.jpg",
+    "archiveSourceName": "201406200936019294324_jpg",
+    "sourceSplit": "train",
+    "license": "CC BY 4.0",
+    "sha256": "0f9e15be374744a3c4bab551610f99f33ba4dbf2962fafee51abb85d45346853",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.21,
+          0.536,
+          0.967,
+          0.99
+        ]
+      }
+    ]
+  },
+  {
+    "file": "indoor-pump.jpg",
+    "scene": "indoor-pump",
+    "split": "train",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/train/images/285_jpg.rf.9Yh4J50CQ0s7dmiGrjoz.jpg",
+    "archiveSourceName": "285_jpg",
+    "sourceSplit": "train",
+    "license": "CC BY 4.0",
+    "sha256": "b6b5e0c2b617debee1a7a28f817cb2f0563d9865d6d648501a6c52cb24f16fcc",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.292,
+          0.524,
+          0.368,
+          0.602
+        ]
+      }
+    ]
+  },
+  {
+    "file": "outdoor-transformer-gravel.jpg",
+    "scene": "outdoor-transformer-gravel",
+    "split": "train",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/train/images/139_jpg.rf.b5f379fcf6869b694da29a62cc952af4.jpg",
+    "archiveSourceName": "139_jpg",
+    "sourceSplit": "train",
+    "license": "CC BY 4.0",
+    "sha256": "fdba867cdc53b3c67377a478e1d5dff94eece830b4244eb30e7ff229de9eeda4",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.65,
+          0.357,
+          0.803,
+          0.509
+        ]
+      }
+    ]
+  },
+  {
+    "file": "blue-main-transformer.jpg",
+    "scene": "blue-main-transformer",
+    "split": "train",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/train/images/211_jpg.rf.fuy4xvnwxt69nfQo2D59.jpg",
+    "archiveSourceName": "211_jpg",
+    "sourceSplit": "train",
+    "license": "CC BY 4.0",
+    "sha256": "91a2b1741ec3a53e9a7a98e69961472af0223b3ae1f8c02b60d4720826d277ed",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.3,
+          0.747,
+          0.4,
+          0.808
+        ]
+      }
+    ]
+  },
+  {
+    "file": "transformer-streaks.jpg",
+    "scene": "transformer-streaks",
+    "split": "train",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/train/images/231_jpg.rf.0b4717bd9af1a50e8f646c7728066b4a.jpg",
+    "archiveSourceName": "231_jpg",
+    "sourceSplit": "train",
+    "license": "CC BY 4.0",
+    "sha256": "738cad18e5d2d127d1a0b276e423d70ac45622f3046b5ba1d6001a789f62ea14",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.314,
+          0.328,
+          0.498,
+          0.909
+        ]
+      }
+    ]
+  },
+  {
+    "file": "isolator-tower.jpg",
+    "scene": "isolator-tower",
+    "split": "val",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/val/images/4_jpg.rf.b69368a7e0038d88e71c788807cb9ec9.jpg",
+    "archiveSourceName": "4_jpg",
+    "sourceSplit": "val",
+    "license": "CC BY 4.0",
+    "sha256": "f41e61ec4237a4f2cf1ed09b6d04830775fd7b1f985a94efe2d7ff7c983540ff",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.16,
+          0.641,
+          0.792,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "file": "green-gauge.jpg",
+    "scene": "green-gauge",
+    "split": "val",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/test/images/1889317731_jpg.rf.81f2e7a44e0b2ff4bea51ddf5bedc6cf.jpg",
+    "archiveSourceName": "1889317731_jpg",
+    "sourceSplit": "test",
+    "license": "CC BY 4.0",
+    "sha256": "799b455ebcaeadaf281a2be5745b7c1c3fb9dcab7e2216c8ef387b6d61b50bf5",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.162,
+          0.686,
+          0.696,
+          0.996
+        ]
+      }
+    ]
+  },
+  {
+    "file": "forked-shaft.jpg",
+    "scene": "forked-shaft",
+    "split": "val",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/test/images/084_jpg.rf.8d1eb6dfb534a487a6e6ba973ebdf536.jpg",
+    "archiveSourceName": "084_jpg",
+    "sourceSplit": "test",
+    "license": "CC BY 4.0",
+    "sha256": "f5b7cd572347baeae145f7c291c9baffb5d476c942a8ae4c2c301ffef5c993fc",
+    "objects": [
+      {
+        "class": "oil_leak",
+        "xyxy": [
+          0.438,
+          0.501,
+          0.699,
+          0.816
+        ]
+      }
+    ]
+  },
+  {
+    "file": "outdoor-rust-strut.jpg",
+    "scene": "outdoor-rust-strut",
+    "split": "train",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/train/images/rouille-493-_jpg.rf.df9f1aafaa15a993bf3b67273460a598.jpg",
+    "archiveSourceName": "rouille-493-_jpg",
+    "sourceSplit": "train",
+    "license": "CC BY 4.0",
+    "sha256": "de232912c84fe8fc881114450019e77b1d60c30dc1bb30ca4b61119c9c02f80f",
+    "objects": []
+  },
+  {
+    "file": "dry-substation-wide.jpg",
+    "scene": "dry-substation-wide",
+    "split": "train",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/train/images/v1IMG_0923_jpg.rf.3891f66b00c4a67341f0c0e5b15c5029.jpg",
+    "archiveSourceName": "v1IMG_0923_jpg",
+    "sourceSplit": "train",
+    "license": "CC BY 4.0",
+    "sha256": "28eaf0f141a306da1279ff27b5797f83f7ba9acdd086a079b4b2a75e705375cf",
+    "objects": []
+  },
+  {
+    "file": "intact-framing.jpg",
+    "scene": "intact-framing",
+    "split": "val",
+    "source": "https://zenodo.org/records/22771088",
+    "archiveMember": "image/val/images/cable3-225-_jpg.rf.29d0303f7d15272b5f2a8e2194d02f6b.jpg",
+    "archiveSourceName": "cable3-225-_jpg",
+    "sourceSplit": "val",
+    "license": "CC BY 4.0",
+    "sha256": "6e79c6e3c83e66dc10144fdbaa5587fb09eafbaad188ed138f95333f2004148b",
+    "objects": []
+  }
+]
