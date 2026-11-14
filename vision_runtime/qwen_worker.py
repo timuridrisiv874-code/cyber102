@@ -205,6 +205,15 @@ class Engine:
             max_pixels=PHOTO_MAX_PIXELS, max_new_tokens=180, max_time=85,
             parse=worker.parse_compact if profile == 'fast' else worker.parse_observation)
 
+    def infer_liquid(self, image):
+        from .liquid import LIQUID_LABELS, LIQUID_PROMPT
+        from .video_defects import parse_proposals
+
+        content = [{'type': 'image'}, {'type': 'text', 'text': LIQUID_PROMPT}]
+        return self._run(image, self._prompt(content), max_pixels=PHOTO_MAX_PIXELS,
+                         max_new_tokens=200, max_time=25,
+                         parse=lambda raw: parse_proposals(raw, LIQUID_LABELS))
+
     def infer_detail(self, overview, crop, crop_box):
         """Experimental two-view photo call; no serving route or default uses it.
 

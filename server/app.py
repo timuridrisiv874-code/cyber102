@@ -336,7 +336,7 @@ class Handler(SimpleHTTPRequestHandler):
                     'revision': vision.model_spec().revision if self.vision_backend == 'internvl3' else None,
                     'videoReview': self.vision_enabled and self.vision_backend == 'internvl3',
                     'queue': self.server.analysis_queue.capabilities(self.vision_enabled),
-                    'profiles': list(vision.PROFILES) if self.vision_backend == 'internvl3' else ['standard']},
+                    'profiles': list(vision.supported_profiles(self.vision_backend))},
                     'media': {'maxPhotoBytes': 20 * 1024 * 1024, 'maxVideoBytes': 150 * 1024 * 1024,
                               'maxVideoSeconds': 120, 'maxSampledFrames': 20, 'maxReviewFrames': 8}})
             elif target.path == '/api/scenarios':
@@ -528,7 +528,7 @@ class Handler(SimpleHTTPRequestHandler):
             if len(body) != length:
                 raise ValueError('Тело запроса с кадром получено не полностью.')
             image, profile, media = vision.extract_request(self.headers.get('Content-Type', ''), body, include_metadata=True)
-            if profile not in vision.PROFILES or (self.vision_backend != 'internvl3' and profile != 'standard'):
+            if profile not in vision.supported_profiles(self.vision_backend):
                 raise ValueError('Выбранный режим не поддерживается моделью.')
             payload = {'image': image, 'backend': self.vision_backend, 'profile': profile,
                        'media': media, 'database': self.database}

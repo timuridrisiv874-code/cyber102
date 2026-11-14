@@ -11,6 +11,7 @@ from io import BytesIO
 from urllib.error import URLError, HTTPError
 from urllib.request import Request, ProxyHandler, HTTPRedirectHandler, build_opener
 from .vision_models import model_spec
+from vision_runtime.liquid import LIQUID_NAMES
 
 MODEL = 'qwen3-vl:8b'
 ENDPOINT = 'http://127.0.0.1:11435/api/chat'
@@ -18,7 +19,7 @@ INTERNVL_MODEL = 'OpenGVLab/InternVL3_5-2B-HF'
 INTERNVL_REVISION = '3f301ffcf3dcbb47893afae6650ea3e78d96fb6d'
 INTERNVL_ENDPOINT = 'http://127.0.0.1:11436/analyze'
 BACKENDS = ('ollama', 'internvl3', 'detector')
-PROFILES = ('standard', 'fast')
+PROFILES = ('standard', 'fast', 'liquid')
 MAX_IMAGE_BYTES = 3 * 1024 * 1024
 MAX_RESPONSE_BYTES = 128 * 1024
 _slot = threading.BoundedSemaphore(1)
@@ -165,6 +166,36 @@ def result_from_observation(data, model=MODEL):
     }
 
 
+def supported_profiles(backend):
+    if backend != 'internvl3':
+        return ('standard',)
+    return PROFILES if model_spec() == model_spec('qwen3_vl_4b') else PROFILES[:2]
+
+
+def result_from_liquid(boxes, model):
+    if not isinstance(boxes, list) or len(boxes) > 4:
+        raise ValueError('Invalid visible liquid detections')
+    for item in boxes:
+        if (not isinstance(item, dict) or set(item) != {'kind', 'box'}
+                or not isinstance(item['kind'], str) or item['kind'] not in LIQUID_NAMES):
+            raise ValueError('Invalid visible liquid label')
+        box = item['box']
+        if (not isinstance(box, list) or len(box) != 4
+                or any(type(value) is not int or not 0 <= value <= 1000 for value in box)
+                or not (box[0] < box[2] and box[1] < box[3])):
+            raise ValueError('Invalid visible liquid coordinates')
+    boxes = sorted(boxes, key=lambda item: item['kind'] != 'liquid_flow')
+    if not boxes:
+        return {'status': 'unusable', 'source': 'local_vision', 'model': model, 'liquidBoxes': []}
+    result = result_from_observation({
+        'component': 'other', 'condition': 'wet_patch', 'box': boxes[0]['box'],
+        'observation': ' · '.join(f'{label}: {count}' for kind, label in LIQUID_NAMES.items()
+                                 if (count := sum(item['kind'] == kind for item in boxes))),
+    }, model=model)
+    result.update(component='Жидкость на кадре', liquidBoxes=boxes)
+    return result
+
+
 def request_json(endpoint, payload, timeout):
     request = Request(endpoint, json.dumps(payload).encode(), {'Content-Type': 'application/json'})
     # Ignore host proxy settings: images must travel only to the local model service.
@@ -193,7 +224,7 @@ def ollama_observation(encoded_image):
 def analyze(image, backend='ollama', profile='standard'):
     if backend not in BACKENDS:
         raise ValueError('Unknown local vision backend')
-    if profile not in PROFILES or (backend != 'internvl3' and profile != 'standard'):
+    if profile not in supported_profiles(backend):
         raise ValueError('Выбранный режим не поддерживается моделью.')
     if not _slot.acquire(blocking=False):
         raise VisionBusy('Модель занята другим кадром. Повторите через несколько секунд.')
@@ -224,7 +255,12 @@ def analyze(image, backend='ollama', profile='standard'):
             if (envelope.get('model') != expected.model_id
                     or ('revision' in envelope and envelope['revision'] != expected.revision)):
                 raise ValueError('Unexpected local VLM model or revision')
-            result = result_from_observation(envelope['observation'], model=expected.model_id)
+            if profile == 'liquid':
+                if envelope.get('revision') != expected.revision:
+                    raise ValueError('Liquid localization requires the pinned model revision')
+                result = result_from_liquid(envelope['liquidBoxes'], expected.model_id)
+            else:
+                result = result_from_observation(envelope['observation'], model=expected.model_id)
             if 'profile' in envelope:
                 if envelope['profile'] != profile:
                     raise ValueError('Unexpected model profile')
@@ -232,7 +268,7 @@ def analyze(image, backend='ollama', profile='standard'):
             elif profile != 'standard':
                 raise ValueError('Worker does not support the requested profile')
             if 'observationKind' in envelope:
-                expected_kind = 'template' if profile == 'fast' else 'model'
+                expected_kind = 'model' if profile == 'standard' else 'template'
                 if envelope['observationKind'] != expected_kind:
                     raise ValueError('Unexpected observation kind')
                 result['observationKind'] = expected_kind

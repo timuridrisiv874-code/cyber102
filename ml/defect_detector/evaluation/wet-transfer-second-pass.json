@@ -1,0 +1,167 @@
+[
+  {
+    "file": "meter-hydrant.jpg",
+    "scene": "meter-hydrant",
+    "source": "https://commons.wikimedia.org/wiki/File:Fire_Hydrant_with_Defective_Temporary_Meter.jpg",
+    "author": "Mark Cross",
+    "license": "CC BY 4.0",
+    "note": "Main jet from the temporary meter.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.33,
+          0.085,
+          0.786,
+          0.508
+        ],
+        "liquidType": "liquid_flow"
+      }
+    ],
+    "sha256": "2e0ba04c985f3fed18ca1d5c26e9e8f2952aad6dffc32f45aaf1828ab78f76b8",
+    "asset": "https://upload.wikimedia.org/wikipedia/commons/3/37/Fire_Hydrant_with_Defective_Temporary_Meter.jpg",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "file": "vero-hydrant.jpg",
+    "scene": "vero-hydrant",
+    "source": "https://commons.wikimedia.org/wiki/File:Broken_fire_hydrant_leak_high_pressure_water_spout_(2023,_Vero_Beach,_Florida)_02.jpg",
+    "author": "Kiran891",
+    "license": "CC BY-SA 4.0",
+    "note": "Main hydrant spray in a distant view.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.418,
+          0.494,
+          0.599,
+          0.798
+        ],
+        "liquidType": "liquid_flow"
+      }
+    ],
+    "sha256": "0cfbfb7c3d0793483a777d1cdb16d352aa8a93cffed7e67ef022a2451238ab04",
+    "assetVariant": "960px Wikimedia thumbnail",
+    "asset": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Broken_fire_hydrant_leak_high_pressure_water_spout_%282023%2C_Vero_Beach%2C_Florida%29_02.jpg/960px-Broken_fire_hydrant_leak_high_pressure_water_spout_%282023%2C_Vero_Beach%2C_Florida%29_02.jpg",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+    "file": "rusty-flush.jpg",
+    "scene": "rusty-flush",
+    "source": "https://commons.wikimedia.org/wiki/File:Fire_hydrant_flushing_rusty_water.jpg",
+    "author": "Daniel Case",
+    "license": "CC BY-SA 3.0",
+    "note": "Discoloured jet during planned flushing.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.078,
+          0.151,
+          0.803,
+          0.598
+        ],
+        "liquidType": "liquid_flow"
+      }
+    ],
+    "sha256": "222386b9dd14ae8802bab4b515bcc68a7776a040298f87ffe36672764bfd7378",
+    "operatingContext": "planned_flush",
+    "asset": "https://upload.wikimedia.org/wikipedia/commons/9/92/Fire_hydrant_flushing_rusty_water.jpg",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+    "file": "piston-pump.jpg",
+    "scene": "piston-pump",
+    "source": "https://commons.wikimedia.org/wiki/File:Industrial_hydraulic_piston_pump.jpg",
+    "author": "Klankbeeld",
+    "license": "CC BY-SA 4.0",
+    "note": "Pipework and shadows. The foreground dark lines are seams or shadows.",
+    "objects": [],
+    "sha256": "7a86caae8ba25aab3a510268eb1adb0c7f5e8da65c248e272c17ca502a1687ce",
+    "asset": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Industrial_hydraulic_piston_pump.jpg",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+    "file": "oil_chemical-Level02-Wheeled-002389-001.jpg",
+    "scene": "oil_chemical-Level02-Wheeled-002389-001",
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "author": "Tetrabot2026",
+    "license": "CC BY 4.0",
+    "note": "Visible moisture at the base of the panel, including liquid near the lower edge.",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.0984375,
+          0.45,
+          0.8875,
+          0.6638888888888889
+        ],
+        "liquidType": "wet_surface"
+      }
+    ],
+    "sha256": "403a027c8a6b06283309b82f27d6d0d168da12f8bb2e9ab18c4e11c068689f00",
+    "sourceMember": "DATA_PATH/test/Annotations/Anomaly_data/oil_chemical-Level02-Wheeled-002389/oil_chemical-Level02-Wheeled-002389-001.json",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "file": "commons-nwo.jpg",
+    "scene": "commons-nwo",
+    "source": "https://commons.wikimedia.org/wiki/File:NWO-Pumpe2.JPG",
+    "author": "Wilfra",
+    "license": "Public domain",
+    "note": "Dry pump installation with shadows under ducts.",
+    "objects": [],
+    "sha256": "88ff08722b74379564f364cbb763427356ff206145b759945a1703ab5a0be64a",
+    "assetTransform": "Same JPEG as the coupling guard evaluation",
+    "asset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/NWO-Pumpe2.JPG/960px-NWO-Pumpe2.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "sourceSha256": "b8324a61305a25456bc8f99172fe82ae345ab47725489fcf4412d90963acf263",
+    "sourceCropPx": null
+  },
+  {
+    "file": "commons-water.jpg",
+    "scene": "commons-water",
+    "source": "https://commons.wikimedia.org/wiki/File:Pompa_wody2.jpg",
+    "author": "Maly LOLek",
+    "license": "CC BY-SA 3.0",
+    "note": "Polished pump body and bright reflections.",
+    "objects": [],
+    "sha256": "46a96201f65dab730fedb29e6c3872633032bd85d4b5883ccaaf9e5c3954af35",
+    "assetTransform": "Same JPEG as the coupling guard evaluation",
+    "asset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Pompa_wody2.jpg/960px-Pompa_wody2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "sourceSha256": "ce215c6fd0d8948cf2ab4165cf679e12c5062b3e59bf2fd6444d202ec672aab0",
+    "sourceCropPx": null,
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+    "file": "commons-electric.jpg",
+    "scene": "commons-electric",
+    "source": "https://commons.wikimedia.org/wiki/File:Kreiselpumpe-Elektromotor.jpg",
+    "author": "HopuWiki",
+    "license": "CC BY-SA 4.0",
+    "note": "Glossy paint and reflections on the motor and supporting base.",
+    "objects": [],
+    "sha256": "4f4719ca6e0f04fa0025b5ea07fd8b5edc21e014d6e7d5f29197c83a2be636bc",
+    "assetTransform": "Same JPEG as the coupling guard evaluation",
+    "asset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Kreiselpumpe-Elektromotor.jpg/960px-Kreiselpumpe-Elektromotor.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "sourceSha256": "7d7cc502d018aade82931635d5cf052692f62ca0f9153bd0e6f4848d9339c322",
+    "sourceCropPx": null,
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+    "file": "commons-victor.jpg",
+    "scene": "commons-victor",
+    "source": "https://commons.wikimedia.org/wiki/File:Victor_zelfaanzuigende_vuilwaterpomp_(01).JPG",
+    "author": "S.J. de Waard",
+    "license": "CC BY-SA 3.0",
+    "note": "Cutaway pump with painted edges and bare reflective metal.",
+    "objects": [],
+    "sha256": "bd62973219fd8b2ed3a1907f8b876ca6ef28c97069d43d4533c2e8f1966fa209",
+    "assetTransform": "Same JPEG as the coupling guard evaluation",
+    "asset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Victor_zelfaanzuigende_vuilwaterpomp_%2801%29.JPG/960px-Victor_zelfaanzuigende_vuilwaterpomp_%2801%29.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "sourceSha256": "5065090229ad6d5d04375fa545e6eb49aec8863ebd14cc940c86c070d03d251e",
+    "sourceCropPx": null,
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/"
+  }
+]

@@ -13,6 +13,8 @@ const cameraIdle = byId('camera-idle');
 const video = byId('video');
 const snapshot = byId('snapshot');
 const detection = byId('detection');
+const liquidNames = { liquid_flow: 'Струя или капли', wet_surface: 'Мокрый участок' };
+let liquidMarkers = [];
 const checkButton = byId('check');
 const cameraButton = byId('camera');
 const demoScenario = byId('demo-scenario');
@@ -118,12 +120,17 @@ function positionDetection() {
   const scale = Math.min(width / snapshot.width, height / snapshot.height);
   const frameWidth = snapshot.width * scale;
   const frameHeight = snapshot.height * scale;
-  const box = result.box;
-
-  detection.style.left = `${(width - frameWidth) / 2 + box.x * frameWidth}px`;
-  detection.style.top = `${(height - frameHeight) / 2 + box.y * frameHeight}px`;
-  detection.style.width = `${box.width * frameWidth}px`;
-  detection.style.height = `${box.height * frameHeight}px`;
+  function place(marker, box) {
+    marker.style.left = `${(width - frameWidth) / 2 + box.x * frameWidth}px`;
+    marker.style.top = `${(height - frameHeight) / 2 + box.y * frameHeight}px`;
+    marker.style.width = `${box.width * frameWidth}px`;
+    marker.style.height = `${box.height * frameHeight}px`;
+  }
+  place(detection, result.box);
+  for (const [index, marker] of liquidMarkers.entries()) {
+    const [left, top, right, bottom] = result.liquidBoxes[index + 1].box;
+    place(marker, { x: left / 1000, y: top / 1000, width: (right - left) / 1000, height: (bottom - top) / 1000 });
+  }
 }
 
 function render() {
@@ -219,13 +226,29 @@ function render() {
   document.body.dataset.analysisState = checking || Boolean(videoRun) || clipBusy ? 'working' : 'idle';
   byId('result').dataset.resultReady = String(Boolean(detected || (offlineMode && result?.status === 'offline_observation')));
   detection.hidden = !detected;
+  for (const marker of liquidMarkers) marker.remove();
+  liquidMarkers = [];
   byId('details').hidden = !detected;
   byId('empty').hidden = Boolean(detected) || (videoOverview && !result);
 
   if (detected) {
     detection.dataset.status = result.status;
-    detection.setAttribute('aria-label', `Открыть карточку узла: ${result.component}`);
-    byId('detection-label').textContent = result.component;
+    const [primaryLiquid, ...otherLiquid] = result.liquidBoxes ?? [];
+    detection.setAttribute('aria-label', primaryLiquid
+      ? `Открыть наблюдение: ${liquidNames[primaryLiquid.kind]}`
+      : `Открыть карточку узла: ${result.component}`);
+    byId('detection-label').textContent = primaryLiquid ? liquidNames[primaryLiquid.kind] : result.component;
+    for (const item of otherLiquid) {
+      const marker = document.createElement('div');
+      marker.className = detection.className;
+      marker.setAttribute('aria-hidden', 'true');
+      marker.style.pointerEvents = 'none';
+      const label = document.createElement('span');
+      label.textContent = liquidNames[item.kind];
+      marker.append(label);
+      detection.after(marker);
+      liquidMarkers.push(marker);
+    }
     byId('finding').dataset.status = result.status;
     byId('finding').textContent = result.finding;
     const genericName = result.source === 'local_vision' && result.equipment.name === 'Оборудование на снимке';
@@ -250,7 +273,9 @@ function render() {
     byId('recommendation').textContent = result.recommendation;
     positionDetection();
   } else {
-    const [title, description] = unavailableResults[result?.status] ?? [
+    const [title, description] = result?.profile === 'liquid'
+      ? ['Видимой жидкости не найдено', 'Для проверки внутренних утечек нужны осмотр узла и показания датчиков.']
+      : unavailableResults[result?.status] ?? [
       'Ожидает кадр',
       'Добавьте фото или видео для проверки.',
     ];
@@ -422,6 +447,15 @@ function readResult(data) {
   if (offlineMode && data?.status === 'offline_observation' && data.source === 'on_device' &&
       typeof data.model === 'string' && typeof data.observation === 'string' &&
       data.observation.trim() && data.observation.length <= 4000 && !data.box) return data;
+  if (data?.profile === 'liquid') {
+    const boxes = data.liquidBoxes;
+    if (!Array.isArray(boxes) || boxes.length > 4 || (boxes.length ? data.status !== 'defect' : data.status !== 'unusable')
+        || boxes.some((item) => !item || !Object.hasOwn(liquidNames, item.kind) || !Array.isArray(item.box)
+          || item.box.length !== 4 || item.box.some((value) => !Number.isInteger(value) || value < 0 || value > 1000)
+          || item.box[0] >= item.box[2] || item.box[1] >= item.box[3])) {
+      throw new Error('Сервер вернул некорректные рамки жидкости.');
+    }
+  }
   if (data && Object.prototype.hasOwnProperty.call(unavailableResults, data.status)) return data;
   if (!data || !['defect', 'clear'].includes(data.status)) throw new Error('Invalid result status');
 
