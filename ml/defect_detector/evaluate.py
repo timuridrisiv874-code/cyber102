@@ -53,6 +53,17 @@ def measurements(rows, predictions, labels, threshold, iou):
     return {'classes': summary, 'flagged_controls': sorted(flagged_controls)}
 
 
+def class_negative_frames(rows, predictions, labels, threshold):
+    """Count false alerts of each class, even when another class is present."""
+    summary = {}
+    for label in labels:
+        negatives = [row['file'] for row in rows if all(obj['class'] != label for obj in row['objects'])]
+        flagged = [name for name in negatives
+                   if any(p['class'] == label and p['score'] >= threshold for p in predictions[name])]
+        summary[label] = {'count': len(negatives), 'flagged': sorted(flagged)}
+    return summary
+
+
 def scene_coverage(rows, predictions, labels, threshold, iou):
     scenes = {}
     for frame in rows:
@@ -155,20 +166,28 @@ def main():
     parser.add_argument('--size', type=int, required=True)
     parser.add_argument('--device', default='0')
     parser.add_argument('--tiles', action='store_true')
+    parser.add_argument('--labels', nargs='+', help='Classes exhaustively annotated in this benchmark')
     args = parser.parse_args()
     from ultralytics import YOLO, settings
     settings.update({'sync': False})
     rows = json.loads(args.annotations.read_text(encoding='utf-8'))
     labels = {obj['class'] for row in rows for obj in row['objects']}
+    if args.labels and labels - set(args.labels):
+        parser.error('--labels must include all annotated classes')
     images = [args.images / row['file'] for row in rows]
     predictions, timings = infer(YOLO(str(args.weights.resolve(strict=True))), images, args.device, args.size, args.tiles)
-    labels.update(p['class'] for items in predictions.values() for p in items)
+    if args.labels:
+        labels = set(args.labels)
+    else:
+        labels.update(p['class'] for items in predictions.values() for p in items)
+    labels = sorted(labels)
     report = {'weights': str(args.weights), 'size': args.size, 'tiles': args.tiles,
               'median_ms': statistics.median(timings.values()), 'timings_ms': timings,
               'support_by_scene': dict(Counter(row['scene'] for row in rows)),
-              'metrics': {f'{confidence:.2f}/{iou:.2f}': measurements(rows, predictions, sorted(labels), confidence, iou)
+              'metrics': {f'{confidence:.2f}/{iou:.2f}': measurements(rows, predictions, labels, confidence, iou)
                           for confidence in (.05, .15, .25, .40) for iou in (.30, .50)},
-              'scene_coverage_at_0.25/0.50': scene_coverage(rows, predictions, sorted(labels), .25, .50),
+              'scene_coverage_at_0.25/0.50': scene_coverage(rows, predictions, labels, .25, .50),
+              'class_negative_frames_at_0.25': class_negative_frames(rows, predictions, labels, .25),
               'localization_errors_at_0.25/0.50': localization_errors(rows, predictions),
               'predictions': predictions}
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
