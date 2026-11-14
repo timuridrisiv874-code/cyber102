@@ -263,7 +263,7 @@ class Handler(SimpleHTTPRequestHandler):
         if target.path in ('/api/equipment/knowledge', '/api/equipment/models', '/api/telemetry/simulated'):
             parameters = parse_qs(target.query, keep_blank_values=True)
             try:
-                allowed = {'/api/equipment/knowledge': {'serial', 'model', 'component', 'q'},
+                allowed = {'/api/equipment/knowledge': {'serial', 'model', 'section', 'component', 'q'},
                            '/api/equipment/models': set(), '/api/telemetry/simulated': {'serial'}}[target.path]
                 if set(parameters) - allowed or any(len(values) != 1 for values in parameters.values()):
                     raise TypeError()
@@ -282,7 +282,8 @@ class Handler(SimpleHTTPRequestHandler):
                 else:
                     try:
                         result = knowledge.lookup(serial=values.get('serial'), model=values.get('model'),
-                                                  component=values.get('component'), query=values.get('q', ''),
+                                                  section=values.get('section'), component=values.get('component'),
+                                                  query=values.get('q', ''),
                                                   root=self.customer_root)
                     except ValueError as error:
                         self.error(HTTPStatus.BAD_REQUEST, str(error))

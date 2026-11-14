@@ -151,10 +151,12 @@ function render() {
     list.replaceChildren();
     for (const item of result?.equipmentContext?.references || []) {
       const url = item.source?.url;
-      if (typeof url !== 'string' || !/^\/api\/customer\/documents\/[a-z0-9-]+\/pdf#page=\d+$/.test(url)) continue;
+      const local = typeof url === 'string' && /^\/api\/customer\/documents\/[a-z0-9-]+\/pdf#page=\d+$/.test(url);
+      const external = item.applicability === 'technical_reference' && /^https:\/\/[a-z0-9.-]+\//i.test(url);
+      if (!local && !external) continue;
       const li = document.createElement('li'), link = document.createElement('a');
       link.href = url; link.target = '_blank'; link.rel = 'noopener';
-      link.textContent = item.title + ' · стр. ' + item.source.page;
+      link.textContent = item.title + (local ? ' · стр. ' + item.source.page : ' · ' + item.source.publisher);
       li.append(link); list.append(li);
     }
     knowledge.hidden = !list.childElementCount;

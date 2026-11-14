@@ -3,11 +3,46 @@
   if (window.CyberWebBoot?.blocked) return;
   const $ = id => document.getElementById(id);
   let documents = [], equipment = [], currentPassports = {}, catalogReady = false;
+  const equipmentPhotos = new Map([
+    ['AMS PCP60S12/3 01 Ex B1 HNBR DTS', {
+      image: 'ams-pcp-oil.jpg', title: 'Фото серии AMS PCP',
+      url: 'https://am-systems.ru/nefteprodukty-i-nefteshlamy/', credit: 'АМС',
+    }],
+    ['BRA160M4 FБУ1', {
+      image: 'eldin-ba-bra.jpg', title: 'Каталожное фото серии ЭЛДИН ВА / ВРА',
+      url: 'https://uralenergotel.ru/product/ba160sa6', credit: 'УралЭнергоТел',
+    }],
+    ['WXRF87-AM160-5.30-M1-Ø300', {
+      image: 'wanshsin-wxr.jpg', title: 'Каталожный вид мотор-редуктора WANSHSIN WXR',
+      url: 'https://www.wanshsin.com/hyzyjsj/511.html', credit: 'WANSHSIN',
+    }],
+    ['ПТ 0304Ex-ВТ', {
+      image: 'elemer-pt0304.jpg', title: 'Каталожное фото исполнений ЭЛЕМЕР ПТ 0304-ВТ',
+      url: 'https://manometry.ru/pt-0304', credit: 'Манотек',
+    }],
+  ]);
   function node(tag, text, className) {
     const element = document.createElement(tag);
     if (text != null) element.textContent = text;
     if (className) element.className = className;
     return element;
+  }
+  function equipmentPhoto(photo, catalog = true) {
+    const figure = node('figure', null, 'equipment-card-photo');
+    const image = node('img');
+    image.src = '/equipment-photos/' + photo.image;
+    image.alt = photo.title;
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    const caption = node('figcaption', photo.title, 'workspace-note');
+    caption.append(node('br'), external({url: photo.url, title: photo.credit}));
+    if (catalog) caption.append(document.createTextNode(' · Серийный номер на фото не подтверждён'));
+    if (photo.license) {
+      caption.append(document.createTextNode(' · '), external(photo.license),
+        document.createTextNode(' · уменьшенное превью'));
+    }
+    figure.append(image, caption);
+    return figure;
   }
   function sourceLink(documentId, page, label) {
     if (!documents.some(document => document.id === documentId)) return node('span', label || 'Источник не найден');
@@ -30,10 +65,14 @@
     $('equipment-grid').replaceChildren();
     equipment = passports.equipment || [];
     const selected = $('equipment-kind').value;
+    const pumpGallery = $('pump-gallery');
+    if (pumpGallery) pumpGallery.hidden = selected !== 'pump' && selected !== 'all';
     for (const item of equipment.filter(item => selected === 'all' || item.kind === selected)) {
       const card = node('article', null, 'workspace-card');
       card.dataset.equipment = item.id;
       card.append(node('h3', item.title || item.id));
+      const photo = equipmentPhotos.get(item.model);
+      if (photo) card.append(equipmentPhoto(photo));
       const facts = node('dl', null, 'workspace-facts');
       for (const [title, value] of [['Модель', item.model], ['Серийный номер', item.serial], ['Изготовитель', item.manufacturer]]) {
         facts.append(node('dt', title), node('dd', valueText(value)));
@@ -118,9 +157,27 @@
   window.addEventListener('pageshow', () => { if (!loaded && !controller) initialize(); });
   $('document-search').addEventListener('input', renderDocuments);
   $('equipment-kind').addEventListener('change', () => renderEquipment(currentPassports));
+  const installationPhotos = [
+    {
+      image: 'industrial-pipes-valves.jpg', title: 'Трубопроводы на промышленной установке',
+      url: 'https://commons.wikimedia.org/wiki/File:Close_view_of_pipes_and_valves_on_a_machine_in_an_industrial_setting.jpg',
+      credit: 'Shixart1985 · Wikimedia Commons',
+      license: {url: 'https://creativecommons.org/licenses/by/2.0/', title: 'CC BY 2.0'},
+    },
+    {
+      image: 'gate-valve.jpg', title: 'Фланцевая задвижка',
+      url: 'https://commons.wikimedia.org/wiki/File:Valve.jpg', credit: 'Heather Smith · The Alloy Valve Stockist',
+      license: {url: 'https://creativecommons.org/licenses/by/3.0/', title: 'CC BY 3.0'},
+    },
+    {
+      image: 'wika-gauge.jpg', title: 'Стрелочный манометр с трубкой Бурдона',
+      url: 'https://blog.wika.com/us/products/pressure-products/eugene-bourdon-history-bourdon-gauge/', credit: 'WIKA',
+    },
+  ];
+  $('other-equipment-photos').append(...installationPhotos.map(photo => equipmentPhoto(photo, false)));
   function external(source) {
     const link = node('a', source.title || 'Источник', 'source-link');
-    if (!/^https:\/\/(?:knz\.ru|am-systems\.ru)\//.test(source.url)) return node('span', link.textContent);
+    if (!/^https:\/\/[a-z0-9.-]+\//i.test(source.url)) return node('span', link.textContent);
     link.href = source.url; link.target = '_blank'; link.rel = 'noopener';
     return link;
   }
@@ -137,7 +194,8 @@
     if (selected.startsWith('serial:')) {
       params.set('serial', selected.slice(7));
       if (component.value) params.set('component', component.value);
-    } else params.set('model', selected.slice(6));
+    } else if (selected.startsWith('model:')) params.set('model', selected.slice(6));
+    else params.set('section', selected.slice(8));
     const results = $('knowledge-results');
     results.replaceChildren(node('p', 'Поиск в документации…'));
     try {
@@ -170,6 +228,9 @@
       for (const item of data.matches) {
         const card = node('article', null, 'document-item');
         card.append(node('h3', item.title), node('p', item.text));
+        if (item.applicability === 'technical_reference') {
+          card.append(node('p', 'Отраслевая справка · ' + item.source.publisher, 'workspace-note'));
+        }
         card.append(item.source.documentId
           ? sourceLink(item.source.documentId, item.source.page, item.source.title + ' · стр. ' + item.source.page)
           : external(item.source));
@@ -208,6 +269,9 @@
       card.append(facts, external(row.source), external(row.manual));
       models.append(card);
     }
+    for (const section of catalog?.sections || []) {
+      $('knowledge-target').append(new Option(section.title + ' · справка', 'section:' + section.id));
+    }
     $('pump-gallery')?.remove();
     if (catalog?.photos?.length) {
       const gallery = node('details', null, 'workspace-card');
@@ -224,8 +288,9 @@
         figure.append(illustration, caption);
         gallery.append(figure);
       }
-      gallery.open = true;
-      $('equipment-grid').before(gallery);
+      const selected = $('equipment-kind').value;
+      gallery.hidden = selected !== 'pump' && selected !== 'all';
+      $('equipment-grid').after(gallery);
     }
     $('knowledge-panel').hidden = !$('knowledge-target').options.length;
   }

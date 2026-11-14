@@ -1,0 +1,468 @@
+{
+  "sections": [
+    {
+      "id": "pressure",
+      "title": "Манометры и датчики давления"
+    },
+    {
+      "id": "valve",
+      "title": "Запорная и регулирующая арматура"
+    },
+    {
+      "id": "pipe",
+      "title": "Трубопроводы и коррозия"
+    },
+    {
+      "id": "motor",
+      "title": "Электродвигатели"
+    },
+    {
+      "id": "gearbox",
+      "title": "Редукторы"
+    },
+    {
+      "id": "bearing",
+      "title": "Подшипники и смазка"
+    },
+    {
+      "id": "shaft_joints",
+      "title": "Муфты, валы и центровка"
+    },
+    {
+      "id": "foundation",
+      "title": "Опоры и фундаменты"
+    },
+    {
+      "id": "temperature_transmitter",
+      "title": "Датчики температуры"
+    },
+    {
+      "id": "drive",
+      "title": "Преобразователи частоты"
+    },
+    {
+      "id": "level",
+      "title": "Уровнемеры"
+    }
+  ],
+  "sources": {
+    "ams-pcp": {
+      "publisher": "АМС",
+      "title": "Горизонтальные винтовые насосы AMS PCP",
+      "url": "https://am-systems.ru/ams-pcp-gorizontalnye/"
+    },
+    "netzsch-pcp": {
+      "publisher": "NETZSCH",
+      "title": "Geometrical Models of the Progressing Cavity Pumps",
+      "url": "https://pumps-systems.netzsch.com/en-AU/products-and-accessories/nemo-r-helical-rotor-pumps/geometrical-models-of-the-progressing-cavity-pumps"
+    },
+    "ksb-cavitation": {
+      "publisher": "KSB",
+      "title": "Cavitation",
+      "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/cavitation-1117364"
+    },
+    "ksb-suction": {
+      "publisher": "KSB",
+      "title": "Suction characteristics",
+      "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/suction-characteristics-1117252"
+    },
+    "ksb-efficiency": {
+      "publisher": "KSB",
+      "title": "Pump efficiency",
+      "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/pump-efficiency-1116510"
+    },
+    "ksb-clearance": {
+      "publisher": "KSB",
+      "title": "Clearance gap width",
+      "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/clearance-gap-width-1117356"
+    },
+    "ksb-seal": {
+      "publisher": "KSB",
+      "title": "Shaft seal",
+      "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/shaft-seal-1116516"
+    },
+    "skf-bearings": {
+      "publisher": "SKF",
+      "title": "Bearing damage and failure",
+      "url": "https://cdn.skfmediahub.skf.com/api/public/0901d196806f2d3a/pdf_preview_medium/0901d196806f2d3a_pdf_preview_medium.pdf"
+    },
+    "skf-lubrication": {
+      "publisher": "SKF",
+      "title": "Machine reliability · Lubrication systems",
+      "url": "https://cdn.skfmediahub.skf.com/api/public/094fe398236d3d0a/pdf_preview_medium/03000EN_pdf_preview_medium.pdf"
+    },
+    "skf-alignment": {
+      "publisher": "SKF",
+      "title": "Shaft Alignment Tool · Soft foot",
+      "url": "https://cdn.skfmediahub.skf.com/api/public/0901d19680704553/pdf_preview_medium/MP5468EN_TKSA_71_Soft-Foot-app_pdf_preview_medium.pdf"
+    },
+    "osha-guarding": {
+      "publisher": "OSHA",
+      "title": "General requirements for all machines",
+      "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.212"
+    },
+    "fluke-unbalance": {
+      "publisher": "Fluke",
+      "title": "What is unbalanced voltage and current unbalance?",
+      "url": "https://www.fluke.com/en-us/learn/blog/motors-drives-pumps-compressors/voltage-unbalance"
+    },
+    "fluke-thermography": {
+      "publisher": "Fluke",
+      "title": "Electrical Fire Prevention Tests and Measurements",
+      "url": "https://www.fluke.com/en/learn/blog/electrical/test-and-measurements-for-electrical-fire-prevention"
+    },
+    "wika-accuracy": {
+      "publisher": "WIKA",
+      "title": "Frequently asked questions · pressure measurement",
+      "url": "https://www.wika.com/en-us/faq.WIKA"
+    },
+    "emerson-pressure": {
+      "publisher": "Emerson",
+      "title": "Rosemount 3051 Pressure Transmitter · Reference Manual",
+      "url": "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/pressure/documents/dl-rmt-3051-pressure-transmitter-76002.pdf"
+    },
+    "wika-thermowells": {
+      "publisher": "WIKA",
+      "title": "How Thermowells Affect Temperature Response Times",
+      "url": "https://www.wika.com/media/Others/EN-US/wp007_thermowells_en_us.pdf"
+    },
+    "emerson-valve": {
+      "publisher": "Emerson",
+      "title": "Fisher IC2 · Instruction Manual",
+      "url": "https://www.emerson.com/is/content/emerson/en/final-control/pressure-management/documents/instruction-manual-fisher-ic2-cryogenic-top-entry-sliding-stem-control-valve-en.pdf"
+    },
+    "rosen-corrosion": {
+      "publisher": "ROSEN",
+      "title": "In-line Inspection Services for Corrosion",
+      "url": "https://www.rosen-group.com/en/expertise/product-and-service-finder/in-line-inspection-services-for-corrosion"
+    },
+    "abb-motor-cooling": {
+      "publisher": "ABB",
+      "title": "Low Voltage Motors · Installation, operation and maintenance",
+      "url": "https://library.e.abb.com/public/e65d60531885462da9336070c6654783/Standard_Manual_Low_Voltage_multilang_revE%20lores.pdf"
+    },
+    "fluke-motor-insulation": {
+      "publisher": "Fluke",
+      "title": "Avoid Costly Equipment Breakdowns With Motor Insulation Tests",
+      "url": "https://www.fluke.com/en-us/learn/blog/motors-drives-pumps-compressors/motor-insulation-tests-avoid-costly-equipment-breakdowns"
+    },
+    "sew-gearbox-troubleshooting": {
+      "publisher": "SEW‑EURODRIVE",
+      "title": "Gear Units · Possible malfunctions/remedy",
+      "url": "https://download.sew-eurodrive.com/download/html/31981496/en-EN/25440305419.html"
+    },
+    "sew-gearbox-level": {
+      "publisher": "SEW‑EURODRIVE",
+      "title": "Gear Units · Oil expansion tank",
+      "url": "https://download.sew-eurodrive.com/download/html/31981496/en-EN/4605324043.html"
+    },
+    "fluke-vibration": {
+      "publisher": "Fluke",
+      "title": "Diagnosing Imbalance, Misalignment, Looseness, and Bearing Wear",
+      "url": "https://www.fluke.com/en-us/learn/blog/alignment/understanding-vibration-monitoring-common-faults-part-4"
+    },
+    "wika-pt100": {
+      "publisher": "WIKA",
+      "title": "Pt100 in 2-, 3- or 4-wire connection?",
+      "url": "https://blog.wika.com/en/knowhow/pt100-in-2-3-or-4-wire-connection/"
+    },
+    "emerson-positioner": {
+      "publisher": "Emerson",
+      "title": "Valve Positioners",
+      "url": "https://www.emerson.com/en/final-control/catalog/products-and-software/valve-actuator-regulator-instrumentation/valve-positioners"
+    },
+    "evident-wall-thickness": {
+      "publisher": "Evident",
+      "title": "Corrosion Thickness Gauging with Dual Element Transducers",
+      "url": "https://ims.evidentscientific.com/en/applications/corrosion-gaging-dual-element-transducers"
+    },
+    "schneider-ocf": {
+      "publisher": "Schneider Electric",
+      "title": "What could cause an OCF Overcurrent Fault on ATV630 or ATV930?",
+      "url": "https://www.se.com/us/en/faqs/FA336832/"
+    },
+    "schneider-output-phase": {
+      "publisher": "Schneider Electric",
+      "title": "How can I troubleshoot an Altivar Process Drive with an Output Phase Fault?",
+      "url": "https://www.se.com/us/en/faqs/FA318175/"
+    },
+    "vega-level": {
+      "publisher": "VEGA",
+      "title": "A better focus on bitumen tank level",
+      "url": "https://www.vega.com/en-uk/company/blog/2019/better-focus-on-bitumen-tank-level"
+    }
+  },
+  "entries": [
+    {
+      "source": "ams-pcp",
+      "title": "Горизонтальный винтовой насос AMS PCP",
+      "text": "Страница изготовителя описывает семейство горизонтальных винтовых насосов AMS PCP. Комплектацию, режим и допустимые пределы конкретного агрегата сверяют по его паспорту.",
+      "scopes": [
+        "progressive_cavity"
+      ],
+      "tags": "тип устройство конструкция серия винтовой шнековый"
+    },
+    {
+      "source": "netzsch-pcp",
+      "title": "Ротор и статор винтового насоса",
+      "text": "В одновинтовом эксцентриковом насосе ротор вращается внутри статора. Между ними образуются полости, перемещающие жидкость от всасывания к нагнетанию. Ротор и статор внутри корпуса по наружному кадру оценить нельзя.",
+      "scopes": [
+        "progressive_cavity"
+      ],
+      "tags": "ротор статор рабочее колесо принцип устройство проточная часть шнек"
+    },
+    {
+      "source": "ksb-cavitation",
+      "title": "Кавитация центробежного насоса",
+      "text": "При схлопывании паровых пузырьков возможны шум, неровная работа, снижение напора и КПД, а также эрозия. Шум или неровная работа сами по себе не определяют причину.",
+      "scopes": [
+        "centrifugal"
+      ],
+      "tags": "кавитация шум гравий вход всасывание давление вибрация эрозия импеллер"
+    },
+    {
+      "source": "ksb-suction",
+      "title": "Кавитационный запас NPSH",
+      "text": "Для центробежного насоса сравнивают доступный запас системы NPSHa с требуемым запасом NPSHr в рабочей точке. Один замер давления следует интерпретировать вместе с условиями работы и кривой насоса.",
+      "scopes": [
+        "centrifugal"
+      ],
+      "tags": "npsh npsha npshr кавитация всас всасывание задвижка фильтр вход подпор"
+    },
+    {
+      "source": "ksb-efficiency",
+      "title": "КПД и рабочая точка центробежного насоса",
+      "text": "КПД связывает полезную гидравлическую мощность с подводимой мощностью. При сравнении двух измерений учитывают рабочую точку и то, относится ли показатель к самому насосу или агрегату в сборе.",
+      "scopes": [
+        "centrifugal"
+      ],
+      "tags": "производительность эффективность мощность кпд упал износ"
+    },
+    {
+      "source": "ksb-clearance",
+      "title": "Зазоры и внутренние перетоки",
+      "text": "Зазоры в проточной части влияют на внутренние перетоки. Их состояние нельзя определить по внешнему кадру. Снижение КПД служит поводом сверить рабочую точку и оценить внутренние детали при обслуживании.",
+      "scopes": [
+        "centrifugal"
+      ],
+      "tags": "износ уплотнительные кольца рабочее колесо импеллер проточная часть кпд упал"
+    },
+    {
+      "source": "ksb-seal",
+      "title": "Утечка и тип уплотнения вала",
+      "text": "Величина допустимой утечки зависит от типа уплотнения и режима. По мокрому пятну определяют область для проверки. Источник жидкости и состояние уплотнения уточняют отдельно.",
+      "scopes": [
+        "seal"
+      ],
+      "tags": "сальник мокро блеск потекло капли течь течет подтекает жидкость масло уплотнение"
+    },
+    {
+      "source": "skf-bearings",
+      "title": "Причины нагрева и повреждений подшипников",
+      "text": "Для установления причины повреждения SKF сопоставляет условия работы, скорость и нагрузку, схему подшипникового узла и анализ смазки. Рост вибрации и температуры может обосновать проверку, но не определяет причину сам по себе.",
+      "scopes": [
+        "bearing",
+        "gearbox",
+        "motor"
+      ],
+      "tags": "перегрев посторонний шум вибрация ток смазка подшипник масляное голодание"
+    },
+    {
+      "source": "skf-lubrication",
+      "title": "Количество, тип и загрязнение смазки",
+      "text": "Недостаток, избыток и неверный тип смазки, а также загрязнение могут привести к преждевременным повреждениям. Цвет, мутность и уровень масла полезно записать как признаки для дальнейшей проверки. Тип и объём задаёт документация узла.",
+      "scopes": [
+        "bearing",
+        "gearbox"
+      ],
+      "tags": "темное черное мутное молочное эмульсия смазка масло уровень min глазок смотровое загрязнение"
+    },
+    {
+      "source": "skf-alignment",
+      "title": "Мягкая лапа и лазерная центровка",
+      "text": "Неплотная или неодинаковая посадка лап на плиту ухудшает повторяемость измерений соосности. Видимое состояние крепежа и опор фиксируют отдельно от результатов лазерной центровки.",
+      "scopes": [
+        "foundation",
+        "shaft_joints",
+        "motor",
+        "gearbox"
+      ],
+      "tags": "осевая вибрация 1x расцентровка несоосность центровка муфта анкер анкерный фундамент рама перекос болт"
+    },
+    {
+      "source": "osha-guarding",
+      "title": "Защитное ограждение вращающихся частей",
+      "text": "Ограждение служит для отделения вращающихся частей от людей. При наружном осмотре фиксируют видимое отсутствие или смещение кожуха, если область муфты действительно попала в кадр.",
+      "scopes": [
+        "shaft_joints",
+        "foundation"
+      ],
+      "tags": "кожух экран ограждение муфта привод вращение безопасность отсутствует сломан разлом"
+    },
+    {
+      "source": "fluke-unbalance",
+      "title": "Дисбаланс токов по фазам",
+      "text": "Дисбаланс считают по максимальному отклонению фазного тока от среднего значения трёх фаз. Неравномерность питающих напряжений тоже может вызывать неравномерность токов. По этим признакам нельзя определить конкретную клемму.",
+      "scopes": [
+        "motor"
+      ],
+      "tags": "клемма фазный ток фаза дисбаланс напряжение обмотка асимметрия"
+    },
+    {
+      "source": "fluke-thermography",
+      "title": "Локальный нагрев электрического соединения",
+      "text": "Тепловизор позволяет сравнивать нагрев соединений при сопоставимых условиях. По обычному фото фиксируют видимые потемнение, деформацию или окисление, не приписывая им измеренную температуру.",
+      "scopes": [
+        "motor"
+      ],
+      "tags": "клемма коробка подгорела плавление разъем оплавление нагар обгорела термография тепловизор контакт"
+    },
+    {
+      "source": "wika-accuracy",
+      "title": "Расхождение давления и класс точности",
+      "text": "Класс точности прибора выражается в процентах от диапазона. Для сравнения показаний стрелочного прибора и канала SCADA приводят их к общим единицам, проверяют диапазон, ноль, точку отбора и время измерения.",
+      "scopes": [
+        "pressure"
+      ],
+      "tags": "манометр аналоговый стрелка ocr распознание датчик расхождение бара перевод кпа давление показания"
+    },
+    {
+      "source": "emerson-pressure",
+      "title": "Импульсная линия и сигнал давления",
+      "text": "Подводящая импульсная линия влияет на передачу давления к датчику. При расхождении или зависании показаний проверяют состояние измерительного канала и следуют процедуре для фактически установленного преобразователя.",
+      "scopes": [
+        "pressure"
+      ],
+      "tags": "импульсная трубка забилась засорение scada асу тп давление замер дрейф поверка"
+    },
+    {
+      "source": "wika-thermowells",
+      "title": "Запаздывание температуры в защитной гильзе",
+      "text": "Защитная гильза влияет на время отклика измерительного канала. Для сверки температуры нужно знать точку измерения и учитывать тепловую инерцию датчика и гильзы.",
+      "scopes": [
+        "temperature_transmitter"
+      ],
+      "tags": "температура термопара термопреобразователь задержка гильза датчик показания нагрев"
+    },
+    {
+      "source": "emerson-valve",
+      "title": "Арматура: сальник штока",
+      "text": "В руководстве Fisher IC2 течь через набивку штока выделена отдельно от других соединений клапана. При внешнем обходе полезно отметить, видна ли жидкость вокруг штока, по фланцу или на соседней трубе. Для другой арматуры применяют её собственное руководство.",
+      "scopes": [
+        "valve"
+      ],
+      "tags": "задвижка клапан арматура уплотнение шток сальник течь мокро фланец жидкость"
+    },
+    {
+      "source": "rosen-corrosion",
+      "title": "Коррозия трубы и потеря толщины стенки",
+      "text": "Цвет коррозии и состояние покрытия можно зафиксировать при обходе. Для оценки потери металла и глубины повреждения применяют инструментальное обследование. По наружному фото остаточную толщину стенки не измеряют.",
+      "scopes": [
+        "pipe"
+      ],
+      "tags": "ржавчина труба трубопровод коррозия питтинг сквозная эрозия трещина толщина металла покрытие"
+    },
+    {
+      "source": "abb-motor-cooling",
+      "title": "Охлаждение двигателя и вентиляция",
+      "text": "При осмотре двигателя обращают внимание на доступ воздуха к вентилятору, грязь на решётке и наружных поверхностях. Температуру обмотки проверяют по соответствующему измерительному каналу.",
+      "scopes": [
+        "motor"
+      ],
+      "tags": "двигатель мотор забито пыль грязь ребра вентиляция вентилятор не охлаждает греется крыльчатка"
+    },
+    {
+      "source": "fluke-motor-insulation",
+      "title": "Сопротивление изоляции двигателя",
+      "text": "Состояние изоляции обмоток оценивают по результатам электрических измерений. Влага, загрязнение и температура влияют на интерпретацию. Потемнение корпуса или коробки само по себе не выявляет межвитковое замыкание.",
+      "scopes": [
+        "motor"
+      ],
+      "tags": "мегомметр меггер сопротивление изоляция обмотка влажность двигатель замыкание межвитковое"
+    },
+    {
+      "source": "sew-gearbox-troubleshooting",
+      "title": "Масло на сапуне, крышке или у вала редуктора",
+      "text": "Отметьте, где впервые видно масло: у сапуна, крышки или манжеты вала. Среди причин течи изготовитель редукторов приводит избыток масла, нарушение вентиляции и износ манжеты. Уровень и положение контролируют по РЭ установленного редуктора.",
+      "scopes": [
+        "gearbox"
+      ],
+      "tags": "сапун дыхательный клапан выброс гонит течет вытекло подтек подтекает редуктор манжета масляный"
+    },
+    {
+      "source": "sew-gearbox-level",
+      "title": "Уровень масла и расширительный бак редуктора",
+      "text": "Способ контроля уровня зависит от исполнения, в том числе от наличия расширительного бака. Уровень считывают по штатному указателю и сверяют с указаниями для монтажного положения и комплектации.",
+      "scopes": [
+        "gearbox"
+      ],
+      "tags": "масло редуктор расширительный бачок уровень глазок перелив отметка min max"
+    },
+    {
+      "source": "fluke-vibration",
+      "title": "Осевая вибрация, дисбаланс и ослабление опор",
+      "text": "Анализ сравнивает направления измерения и гармоники частоты вращения с базовыми значениями. Рост осевой составляющей может сопровождать нарушение соосности. Для вывода нужны измерения на обеих машинах и проверка привода.",
+      "scopes": [
+        "shaft_joints",
+        "foundation",
+        "motor",
+        "bearing"
+      ],
+      "tags": "осевая вибрация 1x 2x гармоника оборотная дисбаланс расцентровка несоосность лапа опора"
+    },
+    {
+      "source": "wika-pt100",
+      "title": "Pt100 и сопротивление проводов",
+      "text": "В двухпроводной схеме сопротивление проводов входит в измерение. Трёхпроводная компенсация предполагает сопоставимые сопротивления жил, а четырёхпроводная схема позволяет отделить сопротивление датчика от сопротивления проводов.",
+      "scopes": [
+        "temperature_transmitter"
+      ],
+      "tags": "pt100 пт100 тсп 2 провода 3 провода 4 провода мнимое завышение температура точность сопротивление проводов"
+    },
+    {
+      "source": "emerson-positioner",
+      "title": "Команда и фактическое положение клапана",
+      "text": "Позиционер управляет приводом, чтобы положение штока соответствовало уставке. При расхождении фиксируют команду и обратную связь, а для пневмопривода проверяют наличие штатного питания воздухом по документации узла.",
+      "scopes": [
+        "valve"
+      ],
+      "tags": "клапан задвижка шток не ходит залип не открывается привод позиционер команда обратная связь воздух пневматический"
+    },
+    {
+      "source": "evident-wall-thickness",
+      "title": "Ультразвуковой контроль толщины стенки",
+      "text": "При контроле толщины используют время прохождения ультразвукового импульса до отражения от стенки. При выборе преобразователя и оценке измерения учитывают шероховатость, покрытие и геометрию участка.",
+      "scopes": [
+        "pipe"
+      ],
+      "tags": "узк узи узт ультразвук толщиномер толщина трубы питтинг коррозия остаточная стенка"
+    },
+    {
+      "source": "schneider-ocf",
+      "title": "Сверхток OCF у приводов Altivar Process",
+      "text": "Для ATV630 и ATV930 OCF означает сверхток. При разборе фиксируют код, момент появления и режим разгона, затем проверяют нагрузку и параметры двигателя по документации конкретного привода.",
+      "scopes": [
+        "drive"
+      ],
+      "tags": "частотник пч частотный преобразователь привод altivar ocf сверхток перегрузка выбивает авария разгон"
+    },
+    {
+      "source": "schneider-output-phase",
+      "title": "Потеря выходной фазы преобразователя",
+      "text": "Для Altivar Process неисправность выходной фазы связана с контролем цепи от преобразователя до двигателя. При разборе сохраняют точный код и проверяют выходные соединения по процедуре изготовителя.",
+      "scopes": [
+        "drive"
+      ],
+      "tags": "частотник фаза потеря обрыв выход oph opf1 opf2 altivar клемма кабель"
+    },
+    {
+      "source": "vega-level",
+      "title": "Ложные отражения радарного уровнемера",
+      "text": "Внутренние элементы ёмкости могут отражать сигнал. Для разбора скачков уровня сопоставляют показание с эхограммой и проверяют, что измеритель направлен на поверхность продукта в соответствии с руководством.",
+      "scopes": [
+        "level"
+      ],
+      "tags": "уровнемер бак резервуар радар скачет помеха эхо отражение мешалка емкость уровень"
+    }
+  ]
+}
