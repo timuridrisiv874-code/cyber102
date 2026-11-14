@@ -15,11 +15,11 @@ def has_component_support(box, observation):
     return left <= (x1 + x2) / 2 <= right and top <= (y1 + y2) / 2 <= bottom
 
 
-def measure_reviewed(rows, predictions):
-    if not any('reviewedLabels' in row for row in rows):
+def measure_reviewed(rows, predictions, labels=LABELS):
+    if labels == LABELS and not any('reviewedLabels' in row for row in rows):
         return measure(rows, predictions)
     result = {}
-    for label in LABELS:
+    for label in labels:
         reviewed = [row for row in rows if label in row.get('reviewedLabels', LABELS)]
         if reviewed:
             classes = (label,)

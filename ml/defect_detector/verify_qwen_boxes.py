@@ -77,9 +77,14 @@ def main():
     parser.add_argument('images', type=Path)
     parser.add_argument('proposals', type=Path, help='Previously recorded Qwen output on these frames')
     parser.add_argument('output', type=Path)
+    parser.add_argument('--labels', nargs='+', choices=LABELS,
+                        help='Verify only these labels from the stored proposals')
+    parser.add_argument('--require-confirmation', action='store_true',
+                        help='Discard any proposal without a valid affirmative verdict')
     args = parser.parse_args()
     rows = json.loads(args.annotations.read_bytes())
-    original = json.loads(args.proposals.read_bytes())
+    proposal_bytes = args.proposals.read_bytes()
+    original = json.loads(proposal_bytes)
     inputs = original.get('proposals', original['predictions'])
     if not rows or set(inputs) != {row['file'] for row in rows} or len(inputs) != len(rows):
         raise ValueError('Recorded predictions and evaluation frames differ')
@@ -89,10 +94,12 @@ def main():
             raise ValueError(f'Expected image basename: {name}')
         if 'sha256' in row and hashlib.sha256((args.images / name).read_bytes()).hexdigest() != row['sha256']:
             raise ValueError(f'Image bytes differ from annotations: {name}')
-    labels = tuple(label for label in LABELS if label in original.get('labels', LABELS))
-    if not labels:
-        raise ValueError('No supported classes in the recorded proposal run')
+    available = tuple(label for label in LABELS if label in original.get('labels', LABELS))
+    labels = tuple(dict.fromkeys(args.labels)) if args.labels else available
+    if not labels or not set(labels) <= set(available):
+        raise ValueError('Requested verification labels are absent from the recorded proposal run')
     tracked = original.get('mode') == 'tracked-candidates'
+    require_confirmation = args.require_confirmation or tracked
     sys.path.insert(0, str(args.repo.resolve(strict=True)))
     from PIL import Image, ImageOps
     from vision_runtime.qwen_worker import Engine, VIDEO_MAX_PIXELS
@@ -123,27 +130,26 @@ def main():
             decisions = verify_frame(engine, frame, boxes, _parse_json, VIDEO_MAX_PIXELS)
         except (ValueError, TypeError) as error:
             errors[name] = str(error)
-            # Direct detections remain available. Inferred positions need an affirmative result.
-            decisions = [not tracked] * len(boxes)
+            decisions = [not require_confirmation] * len(boxes)
         finally:
             frame.close()
         timing[name] = round((time.perf_counter() - started) * 1000, 3)
         checked[name] = [box for box, accepted in zip(boxes, decisions, strict=True) if accepted]
         verdicts[name] = None if name in errors else decisions
         print(f'{name}: {len(checked[name])}/{len(boxes)} proposals, {timing[name]:.0f} ms', flush=True)
-    if tracked:
-        baseline_times = None
-    elif 'timings_ms' in original:
-        baseline_times = original['timings_ms']
-    else:
+    baseline_times = original.get('frameMs', original.get('timings_ms'))
+    if baseline_times is None and 'records' in original:
         baseline_times = {name: sum(ms for phase, ms in record['timingsMs'].items() if phase != 'overview')
                           for name, record in original['records'].items()}
     if partial:
-        metrics = {'baseline': measure_reviewed(rows, proposals), 'verified': measure_reviewed(rows, checked)}
+        metrics = {'baseline': measure_reviewed(rows, proposals, labels),
+                   'verified': measure_reviewed(rows, checked, labels)}
     else:
         metrics = {'baseline': summarize(rows, proposals, labels), 'verified': summarize(rows, checked, labels)}
     report = {'model': engine.model_id, 'revision': engine.revision,
               'proposalMode': original.get('mode', 'component-transfer-proposals'), 'labels': labels,
+              'inputReportSha256': hashlib.sha256(proposal_bytes).hexdigest(),
+              'requireConfirmation': require_confirmation,
               **metrics,
               'medianExtraMs': statistics.median(timing.values()),
               'medianActiveExtraMs': statistics.median(timing[name] for name, boxes in proposals.items() if boxes)
