@@ -1,0 +1,511 @@
+[
+  {
+    "file": "case-00.jpg",
+    "split": "train",
+    "scene": "core-terminal-box-a",
+    "sha256": "756117818f0f743cc8ffd0b808f7377668738ba5ec03a098d37603d4b42c41d8",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.51,
+          0.16,
+          0.92,
+          0.64
+        ]
+      }
+    ],
+    "note": "Reviewed existing industrial training export.",
+    "input": "core"
+  },
+  {
+    "file": "case-09.jpg",
+    "split": "train",
+    "scene": "core-terminal-box-b",
+    "sha256": "042260ee124b3eb02e08287fd54d50932eadf064ba63bc4c329a2ffb62534505",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.18,
+          0.41,
+          0.88,
+          0.91
+        ]
+      }
+    ],
+    "note": "Reviewed existing industrial training export.",
+    "input": "core"
+  },
+  {
+    "file": "terminal-board.jpg",
+    "split": "train",
+    "scene": "commons-board",
+    "sha256": "11cea225c6ceb91fc4bbbb988ac332aedc68db5cf2c8abf6c805396098e225f1",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.27,
+          0.2,
+          0.61,
+          0.54
+        ]
+      }
+    ],
+    "note": "Reviewed existing industrial training export.",
+    "input": "core",
+    "source": "https://commons.wikimedia.org/wiki/File:Burned_distribution_board.JPG"
+  },
+  {
+    "file": "terminal-junction.jpg",
+    "split": "train",
+    "scene": "commons-junction",
+    "sha256": "fcb7591e2480f1ad799150fb2484c2120eb59f5056989af3d6caa29f1442a993",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.42,
+          0.15,
+          0.66,
+          0.61
+        ]
+      }
+    ],
+    "note": "Reviewed existing industrial training export.",
+    "input": "core",
+    "source": "https://commons.wikimedia.org/wiki/File:Burned_junction_box.JPG"
+  },
+  {
+    "file": "terminal-ferrule-a.jpg",
+    "split": "train",
+    "scene": "commons-ferrule",
+    "sha256": "05465639164005d9d88bc114b49c58c67966d88e27f7e9834b28435f9e5e2ed9",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.11,
+          0.24,
+          0.58,
+          0.62
+        ]
+      }
+    ],
+    "note": "Reviewed existing industrial training export.",
+    "input": "core",
+    "source": "https://commons.wikimedia.org/wiki/File:Burnt_wire_ferrule.jpg"
+  },
+  {
+    "file": "terminal-ferrule-b.jpg",
+    "split": "train",
+    "scene": "commons-ferrule",
+    "sha256": "fb71102f3ee2fbdf3687d9433173e860b0d23f2a2ba2a6df21753b4a5801b248",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.08,
+          0.27,
+          0.79,
+          0.77
+        ]
+      }
+    ],
+    "note": "Reviewed existing industrial training export.",
+    "input": "core",
+    "source": "https://commons.wikimedia.org/wiki/File:Burnt_wire_ferrule_2.jpg"
+  },
+  {
+    "file": "terminal-disassembled.jpg",
+    "split": "train",
+    "scene": "commons-disassembled",
+    "sha256": "57553fd049b31813155d9a2b3d61bd2ede3cfef7a89e736e66512571dbf66224",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.29,
+          0.15,
+          0.56,
+          0.52
+        ]
+      },
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.35,
+          0.63,
+          0.47,
+          0.8
+        ]
+      },
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.57,
+          0.67,
+          0.81,
+          0.78
+        ]
+      }
+    ],
+    "note": "Reviewed existing industrial training export.",
+    "input": "core",
+    "source": "https://commons.wikimedia.org/wiki/File:Dissected_failed_schuko_plug.jpg"
+  },
+  {
+    "file": "case-15.jpg",
+    "split": "train",
+    "scene": "core-intact-terminal",
+    "sha256": "097f8c1b0f7747390bca229941568e78442a103816935bc7ed0d39e80b4d7758",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core"
+  },
+  {
+    "file": "case-04.jpg",
+    "split": "train",
+    "scene": "core-anchor",
+    "sha256": "bdec276ad3648762ae392c73762f3f347655949402f71680cb3d3c1cdb00b72c",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core"
+  },
+  {
+    "file": "case-14.jpg",
+    "split": "train",
+    "scene": "core-jacket",
+    "sha256": "42bd5db37411d89164c0c41bb3ac3c8589f7a2c126b7e035a50bae576237edbb",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core"
+  },
+  {
+    "file": "case-35.jpg",
+    "split": "train",
+    "scene": "core-valve",
+    "sha256": "ea5cad9248dba06de69fc8c611f7f2c4f702fb7ff35140fb1f9bf03081cf8621",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core"
+  },
+  {
+    "file": "ref-06.jpg",
+    "split": "train",
+    "scene": "core-plant",
+    "sha256": "f61df2c4eb1fe70165d495791f139b03effc52d9ec8aeec0c87ad52e5e5a30f7",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core"
+  },
+  {
+    "file": "ref-18.jpg",
+    "split": "train",
+    "scene": "core-coupling",
+    "sha256": "fabcb6419dfa741065069b7a191b0cbfc3d9cd734a087ee80c4e100456e47593",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core"
+  },
+  {
+    "file": "safe-ref-20.jpg",
+    "split": "train",
+    "scene": "core-bearing",
+    "sha256": "1d8fdbf1e1976d4f58cc0dac8da9858ab8bf08ffcc0ea85e236a1fc5d0f0f5f3",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core",
+    "source": "https://commons.wikimedia.org/wiki/File:Stainless-steel-sea-water-resistance-split-plummer-pillow-block-bearing-unit.jpg"
+  },
+  {
+    "file": "safe-ref-23.jpg",
+    "split": "train",
+    "scene": "core-housing",
+    "sha256": "346d17d1b8c7dd03834038615f57dea995d57591d922b49c25a00143b701f222",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core",
+    "source": "https://commons.wikimedia.org/wiki/File:Factory_Rotomax_bearing_housing_(6239710059).jpg"
+  },
+  {
+    "file": "case-08.jpg",
+    "split": "val",
+    "scene": "core-terminal-box-c",
+    "sha256": "03b54589fdddc36c713d65cbac392a681d42fa4e11613f6149d61069658a5d89",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.25,
+          0.17,
+          0.89,
+          0.78
+        ]
+      }
+    ],
+    "note": "Reviewed existing industrial training export.",
+    "input": "core"
+  },
+  {
+    "file": "terminal-plug.jpg",
+    "split": "val",
+    "scene": "commons-plug",
+    "sha256": "7408dacc5e1c12dc19be3cb1ba4bb3667552a35c79f166bd9dd92d060789510d",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.27,
+          0.19,
+          0.63,
+          0.55
+        ]
+      }
+    ],
+    "note": "Reviewed existing industrial training export.",
+    "input": "core",
+    "source": "https://commons.wikimedia.org/wiki/File:Defekter_Stecker_mit_verzinnter_Litze.jpg"
+  },
+  {
+    "file": "case-17.jpg",
+    "split": "val",
+    "scene": "core-valve-corrosion",
+    "sha256": "0d18ff52b197671e14fa4f56e3a264335585f60a7b282edae2eb3ca477139291",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core"
+  },
+  {
+    "file": "case-38.jpg",
+    "split": "val",
+    "scene": "core-valve-wet",
+    "sha256": "0e85145bdcb5930d1593352a7cbeeb788eb23584b7b245278e22d4ec8707e680",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core"
+  },
+  {
+    "file": "ref-24.jpg",
+    "split": "val",
+    "scene": "core-gauge",
+    "sha256": "36ec27fd355ed85b755b4a3d8c072072c448d34f8c0f05c7e9f23681ec9893d0",
+    "objects": [],
+    "note": "Hard negative without visible terminal damage.",
+    "input": "core"
+  },
+  {
+    "file": "tsbc-1420734-010.jpg",
+    "split": "train",
+    "scene": "tsbc-1420734",
+    "sha256": "345ba3c7cec9ce6e5313cf4b6419c84c78bec0b59d7d882266cdcc4c3c07a8d7",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.482,
+          0.04,
+          0.661,
+          0.41
+        ]
+      },
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.694,
+          0.067,
+          0.872,
+          0.414
+        ]
+      }
+    ],
+    "note": "Damaged insulation above the two fused-switch terminations.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/bltdf2105df96e6590f/646e943b160d217d5183cb78/II-1420734-2022-%2829331%29.pdf#page=4",
+    "sourceImage": "tsbc-1420734-010.jpg",
+    "sourceSha256": "fb0bac5ff968251b61aed841e6d3b513936c3d6ced8c5b12257c55c78e80d800"
+  },
+  {
+    "file": "tsbc-1420734-007.jpg",
+    "split": "train",
+    "scene": "tsbc-1420734",
+    "sha256": "7d64d6c08626e5acf0c36bd6751017a6acbe95d17e61521bc05498a555f56dd1",
+    "objects": [],
+    "note": "Closed switch enclosure with no observable electrical connection.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/bltdf2105df96e6590f/646e943b160d217d5183cb78/II-1420734-2022-%2829331%29.pdf#page=3",
+    "sourceImage": "tsbc-1420734-007.jpg",
+    "sourceSha256": "42b06708baf7f9e120bff3842e2a9a55c02d963178ebba24c63a57c3ace61183"
+  },
+  {
+    "file": "tsbc-1144715-006.jpg",
+    "split": "train",
+    "scene": "tsbc-1144715",
+    "sha256": "0c6694629ebd97bfa6e6252521543a62108a260064f25906153e66d0bad5b142",
+    "objects": [],
+    "note": "Nearby orange connectors and wiring with no clear visible damaged terminal in frame.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt5a25b32c6f51cdbf/633270999351be592163d4c2/B_20737-1144715.pdf#page=4",
+    "sourceImage": "tsbc-1144715-006.jpg",
+    "sourceSha256": "c104bcde7d18201212e4e634d54884edb8a01af421400cdacb86620889e9cf99"
+  },
+  {
+    "file": "tsbc-1144715-007.jpg",
+    "split": "train",
+    "scene": "tsbc-1144715",
+    "sha256": "893be51ec8916f9015d0d6ac45ba0c4c1a5ff72e8aaea05f43798cfa979da065",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.571,
+          0.269,
+          0.874,
+          0.805
+        ]
+      }
+    ],
+    "note": "Melted and blackened splice at the branching conductors.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt5a25b32c6f51cdbf/633270999351be592163d4c2/B_20737-1144715.pdf#page=4",
+    "sourceImage": "tsbc-1144715-007.jpg",
+    "sourceSha256": "c2b95b61ff0639773bcadd9c8ff9f15e7b53621cf75cd78315a968341bb9cc91"
+  },
+  {
+    "file": "tsbc-1144715-009.jpg",
+    "split": "train",
+    "scene": "tsbc-1144715",
+    "sha256": "0962f51340983e8c4e4bb7a895e0dde62ae459a0b503a6115646d8439e5338bc",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.175,
+          0.389,
+          0.421,
+          0.601
+        ]
+      }
+    ],
+    "note": "Heat damage around the visible lampholder electrical contact.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt5a25b32c6f51cdbf/633270999351be592163d4c2/B_20737-1144715.pdf#page=5",
+    "sourceImage": "tsbc-1144715-009.jpg",
+    "sourceSha256": "184d52eb0871c3f016d81f35da4036422942886cb54571193a3e8662bc6969bb"
+  },
+  {
+    "file": "tsbc-1144715-010.jpg",
+    "split": "train",
+    "scene": "tsbc-1144715",
+    "sha256": "151141a5eb4e32f57f19d6d7ee5f15ef39342f8df5b2e569d2d208f0200ccafc",
+    "objects": [],
+    "note": "Intact lampholder and undamaged wiring in comparison fixture.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt5a25b32c6f51cdbf/633270999351be592163d4c2/B_20737-1144715.pdf#page=5",
+    "sourceImage": "tsbc-1144715-010.jpg",
+    "sourceSha256": "2b1b6115808d6d8f041f4d73c465425e8b0385823a51e5ebedab186fdab8d00a"
+  },
+  {
+    "file": "tsbc-1280613-022.jpg",
+    "split": "train",
+    "scene": "tsbc-1280613",
+    "sha256": "73f0a4177e71972f58879db55e8160450ab184136223680582453a9acdd0220f",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.125,
+          0.122,
+          0.448,
+          0.665
+        ]
+      }
+    ],
+    "note": "Melted receptacle at contact end.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt4a56a125b85f19d0/63bc9f4abf8ad51208627302/Incident_Summary_II-1280613-2021_%28_24889%29.pdf#page=8",
+    "sourceImage": "tsbc-1280613-022.jpg",
+    "sourceSha256": "0c4efe317400bafefbf48c4bc93c40dc517c4650aa0d7060146dcf857ce989f0"
+  },
+  {
+    "file": "tsbc-1280613-017.jpg",
+    "split": "train",
+    "scene": "tsbc-1280613",
+    "sha256": "75b8fd5fc3c685273b4eb8a0522d4970e6f712ff4b339f2a22db07e4828d066a",
+    "objects": [],
+    "note": "Intact small terminal close-up from the same report.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt4a56a125b85f19d0/63bc9f4abf8ad51208627302/Incident_Summary_II-1280613-2021_%28_24889%29.pdf#page=7",
+    "sourceImage": "tsbc-1280613-017.jpg",
+    "sourceSha256": "2907c53b2493c08aa61db16e71ecbbd47e0a6546ce9fa47aaa903ffb107f61b2"
+  },
+  {
+    "file": "tsbc-1377385-007.jpg",
+    "split": "val",
+    "scene": "tsbc-1377385",
+    "sha256": "8990ef29290b45d238c43692df7a663d80b8bb8098c16a9bb9d2d423874b9986",
+    "objects": [],
+    "note": "Normal exposed contact jaws of meter socket.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blte8c14211e890e390/63e7e56c723591743bc4d180/Incident_Summary_II-1377385-2022_%28_27952%29.pdf#page=3",
+    "sourceImage": "tsbc-1377385-007.jpg",
+    "sourceSha256": "522d7aa53fd997ad263efc2a5b741de75d988134b70bcbd8437a0381e39613c7"
+  },
+  {
+    "file": "tsbc-1377385-018.jpg",
+    "split": "val",
+    "scene": "tsbc-1377385",
+    "sha256": "032b93354c72b9696fc188011172be10b7d68a1276294b001a4f252240caabac",
+    "objects": [],
+    "note": "Smoke on enclosure cover with connections concealed.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blte8c14211e890e390/63e7e56c723591743bc4d180/Incident_Summary_II-1377385-2022_%28_27952%29.pdf#page=6",
+    "sourceImage": "tsbc-1377385-018.jpg",
+    "sourceSha256": "3d4ac0a1c2671002589aba7821cbaddcb627bbcf7f6e3ea81d9068433c72c33c"
+  },
+  {
+    "file": "tsbc-1377385-023.jpg",
+    "split": "val",
+    "scene": "tsbc-1377385",
+    "sha256": "1552ccfe93088c11d9c72dcc41be2523463bd7614ae944d8bf2610245ae32d35",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.09,
+          0.348,
+          0.557,
+          0.702
+        ]
+      }
+    ],
+    "note": "Visible damaged main-breaker connection and burned conductors.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blte8c14211e890e390/63e7e56c723591743bc4d180/Incident_Summary_II-1377385-2022_%28_27952%29.pdf#page=8",
+    "sourceImage": "tsbc-1377385-023.jpg",
+    "sourceSha256": "75a9071b5ce5b64c0fb3ab3c169737a3cdc50d8e0bf7b66448dd93ad1d09ff76"
+  },
+  {
+    "file": "tsbc-1377385-025.jpg",
+    "split": "val",
+    "scene": "tsbc-1377385",
+    "sha256": "e4caf2080019fd62ac1e0300b8399810bbb1f5e29629951b17b665279733519e",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.344,
+          0.28,
+          0.671,
+          0.677
+        ]
+      }
+    ],
+    "note": "Wider view of the same damaged connection.",
+    "input": "incidents",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blte8c14211e890e390/63e7e56c723591743bc4d180/Incident_Summary_II-1377385-2022_%28_27952%29.pdf#page=9",
+    "sourceImage": "tsbc-1377385-025.jpg",
+    "sourceSha256": "c00d40e037d5508f77b5afa61bfcef2b34eaf099b9cd171050fea498831f1d97"
+  }
+]
