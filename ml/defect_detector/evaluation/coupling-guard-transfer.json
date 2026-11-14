@@ -1,0 +1,184 @@
+[
+  {
+    "file": "exposed-shaft.jpg",
+    "scene": "wci-pump",
+    "site": "wci-pump",
+    "expectedState": "guard_issue",
+    "domain": "captioned",
+    "source": "https://www.kh.aquaenergyexpo.com/wp-content/uploads/2022/11/Pump-Installation.pdf#page=6",
+    "sourceSha256": "66a9069d403e2c882e302f0facf3b5d12f67bd593adfa00d9e4e013a702c4970",
+    "sha256": "879cb17f53851dbe85cdeebf96d440ceca000dd64f6fd5f7982fa08c62b68297",
+    "sourceImage": "pump-000.jpg",
+    "objects": [
+      {
+        "xyxy": [
+          0.747,
+          0.233,
+          0.862,
+          0.32
+        ],
+        "class": "guard_issue"
+      }
+    ],
+    "note": "Exposed cylindrical drive shaft directly beside the motor. The source photograph has baked-in explanatory marks."
+  },
+  {
+    "file": "pump-mesh.jpg",
+    "scene": "new-mexico-pump",
+    "site": "new-mexico-pump",
+    "expectedState": "guard_visible",
+    "domain": "field",
+    "source": "https://ocdimage.emnrd.nm.gov/Imaging/FileStore/SantaFe/NF/20250519/nAB1813442138_05_19_2025_04_13_39.pdf#page=16",
+    "sourceSha256": "ffb8f0746ba6c9c28a6eac34dd407fe92ec82200a178de986a540a973b5fffb2",
+    "sha256": "c9fe88c6fa67e3b321d80ae06a690b63913fc3df671a5eb65091359377e31555",
+    "sourceImage": "ocd-000.jpg",
+    "objects": [
+      {
+        "xyxy": [
+          0.727,
+          0.303,
+          0.986,
+          0.591
+        ],
+        "class": "guard_visible"
+      }
+    ],
+    "note": "Expanded metal guard visibly spans the drive zone on the far side of the pump."
+  },
+  {
+    "file": "motor-only.jpg",
+    "scene": "new-mexico-pump",
+    "site": "new-mexico-pump",
+    "expectedState": "not_assessable",
+    "domain": "field",
+    "source": "https://ocdimage.emnrd.nm.gov/Imaging/FileStore/SantaFe/NF/20250519/nAB1813442138_05_19_2025_04_13_39.pdf#page=16",
+    "sourceSha256": "6333a67cebe5590d3dcd67db0a466ce33a2cf4bd8d1f91fd5a49057cb584c1c3",
+    "sha256": "14c16729d23d45e252e8f9a7ea274f443c6b2b33696348b84e81b399ede6ab25",
+    "sourceImage": "ocd-001.jpg",
+    "objects": [],
+    "note": "The motor fills the left of the frame. Only an edge of the drive zone is visible."
+  },
+  {
+    "file": "bench-grinder.jpg",
+    "scene": "bench-grinder",
+    "site": "bench-grinder",
+    "expectedState": "not_assessable",
+    "domain": "other-machinery",
+    "source": "https://isienvironmental.com/centrifugal-pump/",
+    "sourceSha256": "928b7952f9db411ef660bea6eceadc7056fc2242cc63c2c8e7fe8bdb77bac588",
+    "sha256": "8255ea49dcb757a4c6297aef5963cc4fc6eb293ab8448fba772292dbdeb0441b",
+    "sourceImage": "isi.jpg",
+    "objects": [],
+    "note": "Bench grinder with guards around its wheels and no pump drive coupling.",
+    "asset": "https://isienvironmental.com/images/photos/good-machine-guarding.jpg"
+  },
+  {
+    "file": "truflo-perforated.jpg",
+    "scene": "truflo-workshop",
+    "site": "truflo-workshop",
+    "expectedState": "guard_visible",
+    "domain": "field",
+    "source": "https://www.uniguardmgc.com/uniguard-machine-guards-in-the-field/",
+    "sourceSha256": "f291bdf7e10833482dfbdf46e8454df1ae1e390e8c26fbb43ea33ced0e91f53d",
+    "sha256": "44ce1c41f3a4c9bcc8d7643bdd7da240a00e476d434cabb0c202453cb806c433",
+    "sourceImage": "truflo.jpg",
+    "objects": [
+      {
+        "xyxy": [
+          0.342,
+          0.523,
+          0.472,
+          0.678
+        ],
+        "class": "guard_visible"
+      }
+    ],
+    "note": "Foreground horizontal perforated orange cover between the gray drive and blue pump. The frame contains other pumps.",
+    "asset": "https://www.uniguardmgc.com/wp-content/uploads/2024/09/Truflo-Pumps-1.jpg?x58268"
+  },
+  {
+    "file": "magnatex-solid.jpg",
+    "scene": "magnatex",
+    "site": "magnatex",
+    "expectedState": "guard_visible",
+    "domain": "field",
+    "source": "https://www.uniguardmgc.com/uniguard-machine-guards-in-the-field/",
+    "sourceSha256": "ea935611df696b5ffcaab228a743563f7d6d0286fbd5193173ce45e7e41f1487",
+    "sha256": "9238ccd499a46b520e487147974e92ded27ba9e3a93004891671ca9fece7dfd1",
+    "sourceImage": "magnatex.jpg",
+    "objects": [
+      {
+        "xyxy": [
+          0.361,
+          0.376,
+          0.537,
+          0.684
+        ],
+        "class": "guard_visible"
+      }
+    ],
+    "note": "Orange solid cover between the green pump and blue motor.",
+    "asset": "https://www.uniguardmgc.com/wp-content/uploads/2023/03/cgu-kit-guard-magnatex-pump.jpg?x58268"
+  },
+  {
+    "file": "municipal-cover.jpg",
+    "scene": "ny-municipal-pump",
+    "site": "ny-municipal-pump",
+    "expectedState": "guard_visible",
+    "domain": "field",
+    "source": "https://www.uniguardmgc.com/uniguard-machine-guards-in-the-field/",
+    "sourceSha256": "015396da3a8d1200932f295cb7f988dcd7438b368b3b40ba61b1bc3669df3fab",
+    "sha256": "5c467355b3cbae4fc1bf04fbaf9fa59f1265e5d4e63847c27966f0732681cd48",
+    "sourceImage": "new-york.jpg",
+    "objects": [
+      {
+        "xyxy": [
+          0.686,
+          0.407,
+          0.811,
+          0.64
+        ],
+        "class": "guard_visible"
+      }
+    ],
+    "note": "Orange coupler cover with dark inspection opening beside the motor.",
+    "asset": "https://www.uniguardmgc.com/wp-content/uploads/2021/03/NY-Municipality-CLGU-with-side-IWs.jpg?x58268"
+  },
+  {
+    "file": "split-case-cover.jpg",
+    "scene": "split-case-workshop",
+    "site": "split-case-workshop",
+    "expectedState": "guard_visible",
+    "domain": "field",
+    "source": "https://www.uniguardmgc.com/uniguard-machine-guards-in-the-field/",
+    "sourceSha256": "72f52ee6a0c4c0abe38c9accd3740c6ec3f53260fb690173d1bb1be9f7f70105",
+    "sha256": "27951b8cce7a71f4e2e9ce179942ae680e53c5652dbc598db651c74621d90369",
+    "sourceImage": "split-case.jpg",
+    "objects": [
+      {
+        "xyxy": [
+          0.248,
+          0.259,
+          0.54,
+          0.589
+        ],
+        "class": "guard_visible"
+      }
+    ],
+    "note": "Orange vented cover between the pump and gray motor.",
+    "asset": "https://www.uniguardmgc.com/wp-content/uploads/2020/05/3410-split-case-coupling-guard.jpg?x58268"
+  },
+  {
+    "file": "vertical-integrated.jpg",
+    "scene": "vertical-product",
+    "site": "vertical-product",
+    "expectedState": "not_assessable",
+    "domain": "catalog",
+    "source": "https://www.uniguardmgc.com/uniguard-machine-guards-in-the-field/",
+    "sourceSha256": "2db7daf4ce4ee88d06563d0774c44c5f7b42191844a0550da2e4875e537dd1be",
+    "sha256": "255b9fd466493b2d0804709b84bda98c1882e607757433d8501c805e27c40a2e",
+    "sourceImage": "vertical.jpg",
+    "objects": [],
+    "note": "The drive coupling is obscured or too small to assess in the product overview."
+  }
+]
