@@ -717,7 +717,12 @@ function releaseCamera() {
   showMessage(); render();
 }
 
-window.addEventListener('pagehide', () => { releaseCamera(); resetInput(); media.clear(); render(); });
+window.addEventListener('pagehide', event => {
+  releaseCamera();
+  if (event.persisted) return;
+  resetInput(); media.clear(); render();
+});
+window.addEventListener('pageshow', event => { if (event.persisted) render(); });
 byId('media-clear').addEventListener('click', () => { resetInput(); media.clear(); showMessage(); render(); });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) releaseCamera();

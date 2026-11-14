@@ -1,6 +1,16 @@
 // Files are decoded locally. Only normalized JPEG frames reach the local analysis API.
 (() => {
   const abortError = () => new DOMException('Операция отменена', 'AbortError');
+  function fileKind(file) {
+    if (file.type.startsWith('video/')) return 'uploaded_video';
+    if (file.type.startsWith('image/')) return 'uploaded_photo';
+    // Some mobile file providers supply a generic MIME even for a valid
+    // JPEG or MP4. The image/video decoder still validates the contents.
+    if (file.type && !/^(application|binary)\/octet-stream$/i.test(file.type)) return null;
+    if (/\.(mp4|mov|m4v|webm)$/i.test(file.name)) return 'uploaded_video';
+    if (/\.(jpe?g|png|webp|heic|heif|avif|gif)$/i.test(file.name)) return 'uploaded_photo';
+    return null;
+  }
   function waitFor(element, event, signal, ready, timeout = 20000) {
     return new Promise((resolve, reject) => {
       let timer;
@@ -20,14 +30,14 @@
     time(seconds) { const ticks = Math.round(Math.max(0, Number(seconds) || 0) * 10); return `${Math.floor(ticks / 600)}:${((ticks % 600) / 10).toFixed(1).padStart(4, '0')}`; },
     create({ input, image, video, beforeChange, changed, message }) {
       let kind = null, url = null, loading = false, generation = 0, loader = null;
-      let catalogPhoto = false;
+      let catalogPhoto = false, waitingForVideoFrame = false;
       function clear() {
         generation += 1;
         loader?.abort(); loader = null;
         video.pause(); video.removeAttribute('src'); video.load();
         image.removeAttribute('src');
         if (url) URL.revokeObjectURL(url);
-        url = null; kind = null; catalogPhoto = false; loading = false; input.value = '';
+        url = null; kind = null; catalogPhoto = false; loading = false; waitingForVideoFrame = false; input.value = '';
       }
       const state = {
         get kind() { return kind; }, get loading() { return loading; },
@@ -70,26 +80,33 @@
           if (signal?.aborted) throw abortError();
         },
       };
-      input.addEventListener('change', async () => {
+      async function openSelectedFile() {
         const file = input.files?.[0];
         if (!file) return;
+        const nextKind = fileKind(file);
+        const limit = nextKind === 'uploaded_video' ? 150 : 20;
+        if (!nextKind || !file.size || file.size > limit * 1024 * 1024) {
+          input.value = '';
+          message(nextKind ? `Файл пустой или превышает ${limit} МБ. Выберите меньший файл.` :
+            'Выберите фото или видео. Поддержка формата зависит от браузера.', true);
+          return;
+        }
         beforeChange(); clear();
         const token = generation;
-        let nextKind = file.type.startsWith('video/') ? 'uploaded_video' : file.type.startsWith('image/') ? 'uploaded_photo' : null;
-        if (!nextKind && !file.type) nextKind = /\.(mp4|mov|m4v|webm)$/i.test(file.name) ? 'uploaded_video' : /\.(jpg|jpeg|png|webp|heic|heif|avif)$/i.test(file.name) ? 'uploaded_photo' : null;
         try {
-          if (!nextKind) throw new Error('Выберите фото или видео. Поддержка формата зависит от браузера.');
-          const limit = nextKind === 'uploaded_video' ? 150 : 20;
-          if (!file.size || file.size > limit * 1024 * 1024) throw new Error(`Файл пустой или превышает ${limit} МБ. Выберите меньший файл.`);
           kind = nextKind; loading = true; loader = new AbortController();
-          url = URL.createObjectURL(file);
+          const mime = /\.(mp4|m4v)$/i.test(file.name) ? 'video/mp4' : /\.mov$/i.test(file.name) ? 'video/quicktime' : null;
+          url = URL.createObjectURL(nextKind === 'uploaded_video' && !file.type.startsWith('video/') && mime
+            ? file.slice(0, file.size, mime) : file);
           message('Открываем файл на устройстве…'); changed();
           if (kind === 'uploaded_video') {
             const metadata = waitFor(video, 'loadedmetadata', loader.signal);
             video.src = url; video.load();
             await metadata;
             if (!Number.isFinite(video.duration) || video.duration <= 0 || video.duration > 120) throw new Error('Выберите видео длительностью до 2 минут.');
-            await waitFor(video, 'loadeddata', loader.signal, () => video.readyState >= 2);
+            // A mobile browser can wait for a tap on the native player before
+            // decoding any pixels. Metadata is valid; keep the file available.
+            waitingForVideoFrame = video.readyState < 2;
           } else {
             const loaded = waitFor(image, 'load', loader.signal);
             image.src = url; await loaded;
@@ -97,7 +114,7 @@
           }
           if (token !== generation) return;
           loading = false; loader = null;
-          message(window.CyberOffline?.enabled
+          message(waitingForVideoFrame ? 'Нажмите ▶ в плеере, чтобы открыть первый кадр.' : window.CyberOffline?.enabled
             ? kind === 'uploaded_video'
               ? 'Видео открыто. Выберите кадр и нажмите «Проверить кадр». Анализ выполняется на телефоне.'
               : 'Фото открыто. Нажмите «Проверить кадр»: снимок обработает SmolVLM на телефоне.'
@@ -108,8 +125,22 @@
           if (error.name !== 'AbortError') message(error.message, true);
         }
         changed();
+      }
+      input.addEventListener('change', openSelectedFile);
+      // A native picker can finish while the deferred app scripts are still
+      // arriving. Defer callbacks until the owner has assigned the media state.
+      if (input.files?.length) queueMicrotask(openSelectedFile);
+      function videoChanged() {
+        if (waitingForVideoFrame && state.ready) {
+          waitingForVideoFrame = false; message();
+        }
+        changed();
+      }
+      video.addEventListener('error', () => {
+        if (kind !== 'uploaded_video' || loading || !video.error) return;
+        clear(); message('Видео не удалось прочитать. Выберите MP4 (H.264).', true); changed();
       });
-      ['loadeddata', 'resize', 'timeupdate', 'seeked'].forEach(event => video.addEventListener(event, changed));
+      ['loadeddata', 'canplay', 'playing', 'resize', 'timeupdate', 'seeked'].forEach(event => video.addEventListener(event, videoChanged));
       return state;
     },
   };
