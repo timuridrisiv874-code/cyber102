@@ -2,13 +2,17 @@
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 from statistics import median
 import sys
 from time import perf_counter
 
+from evaluate import merge_boxes
 from evaluate_qwen_boxes import parse_detections
+from evaluate_video_component_crops import PROMPT as CROP_PROMPT, project
 from evaluate_video_component_gate import LABELS, has_component_support, measure_reviewed
+from verify_qwen_boxes import crop_geometry
 
 
 PROMPT = """Find up to three separate areas of potential visible mechanical or electrical damage.
@@ -53,6 +57,68 @@ def center_coverage(rows, regions, service):
     return results
 
 
+def read_regions(body, identity, frame_hashes):
+    report = json.loads(body)
+    regions, times = report['regions'], report['overviewMs']
+    if (any(report[key] != value for key, value in identity.items()) or set(regions) != set(frame_hashes)
+            or set(times) != set(frame_hashes) or report.get('frameSha256', frame_hashes) != frame_hashes):
+        raise ValueError('Recorded regions differ from the evaluation model or frames')
+    for boxes in regions.values():
+        if not isinstance(boxes, list) or len(boxes) > 3:
+            raise ValueError('Expected at most three recorded regions per frame')
+        for box in boxes:
+            x, y, right, bottom = box['xyxy']
+            if box['class'] != 'region' or not (0 <= x < right <= 1 and 0 <= y < bottom <= 1):
+                raise ValueError('Invalid recorded overview region')
+    if any(type(ms) not in (int, float) or not math.isfinite(ms) or ms < 0 for ms in times.values()):
+        raise ValueError('Invalid recorded overview latency')
+    return report
+
+
+def localize_regions(image, regions, detect):
+    proposals, errors = [], {}
+    windows = dict.fromkeys(crop_geometry(region['xyxy'], *image.size)[0]
+                            for region in merge_boxes(regions, iou=.8))
+    for index, window in enumerate(windows):
+        with image.crop(window) as crop:
+            try:
+                proposals.extend(project(detect(crop), window, image.size))
+            except ValueError as error:
+                errors[str(index)] = str(error)
+    return merge_boxes(proposals), errors, len(windows)
+
+
+def benchmark_crops(args, sets, frames, pairs, identity, detect):
+    from PIL import Image, ImageOps
+
+    body = args.localize_regions.read_bytes()
+    hashes = {name: row['sha256'] for name, row in frames.items()}
+    recorded = read_regions(body, identity, hashes)
+    with Image.new('RGB', (512, 384), 'white') as blank:
+        try:
+            detect(blank)
+        except ValueError:
+            pass
+    localized, errors, timings, requests = {}, {}, {}, {}
+    for name in frames:
+        start = perf_counter()
+        with Image.open(args.images / name) as source, ImageOps.exif_transpose(source).convert('RGB') as image:
+            localized[name], failed, requests[name] = localize_regions(image, recorded['regions'][name], detect)
+        if failed:
+            errors[name] = failed
+        timings[name] = round((perf_counter() - start) * 1000, 3)
+        print(name, requests[name], len(localized[name]), timings[name], flush=True)
+    combined = {name: merge_boxes(pairs['predictions'][name] + boxes) for name, boxes in localized.items()}
+    return {**identity, 'regionsSha256': hashlib.sha256(body).hexdigest(), 'frameSha256': hashes,
+            'medianLocalizeMs': median(timings.values()),
+            'medianTotalMs': median(ms + recorded['overviewMs'][name] for name, ms in timings.items()),
+            'localizeMs': timings, 'cropRequests': requests, 'errors': errors, 'predictions': localized,
+            'combinedPredictions': combined,
+            'sets': {key: {'pairBaseline': measure_reviewed(rows, pairs['predictions']),
+                           'localized': measure_reviewed(rows, localized),
+                           'combined': measure_reviewed(rows, combined)} for key, rows in sets.items()}}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('repo', type=Path)
@@ -63,6 +129,8 @@ def main():
     parser.add_argument('pair_report', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--encoding', choices=('compact', 'numbered'), default='compact')
+    parser.add_argument('--localize-regions', type=Path,
+                        help='Replay an overview report and localize defects within its recorded regions')
     args = parser.parse_args()
     sets = {path.stem: json.loads(path.read_bytes()) for path in args.annotations}
     clips = json.loads((args.images / 'clips.json').read_bytes())
@@ -93,6 +161,17 @@ def main():
     reports = [pairs, *(item['response'] for item in service['clips'].values())]
     if any(report[key] != value for report in reports for key, value in identity.items()):
         raise ValueError('Model revision differs between evaluation reports')
+    if args.localize_regions:
+        prompt = engine._prompt([{'type': 'image'}, {'type': 'text', 'text': CROP_PROMPT}])
+
+        def detect_crop(image):
+            return engine._run(image, prompt, max_pixels=VIDEO_MAX_PIXELS, max_new_tokens=140, max_time=28,
+                               parse=lambda raw: parse_detections(raw, _parse_json, LABELS, 'numbered'))
+
+        result = benchmark_crops(args, sets, frames, pairs, identity, detect_crop)
+        args.output.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
+        return
+
     instruction = NUMBERED_PROMPT if args.encoding == 'numbered' else PROMPT
     prompt = engine._prompt([{'type': 'image'}, {'type': 'text', 'text': instruction}])
 
@@ -120,6 +199,7 @@ def main():
     supported = {name: [box for box in boxes if contained(box, regions[name])]
                  for name, boxes in pairs['predictions'].items()}
     result = {**identity, 'encoding': args.encoding, 'medianOverviewMs': median(timings.values()), 'overviewMs': timings,
+              'frameSha256': {name: row['sha256'] for name, row in frames.items()},
               'errors': errors, 'regions': regions, 'predictions': supported,
               'sets': {key: {'centerCoverage': center_coverage(rows, regions, service),
                              'pairBaseline': measure_reviewed(rows, pairs['predictions']),
