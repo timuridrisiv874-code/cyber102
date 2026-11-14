@@ -48,16 +48,24 @@ def main():
     p.add_argument('--mosaic', type=float, default=.65)
     p.add_argument('--learning-rate', type=float, help='Use AdamW with this initial learning rate')
     p.add_argument('--freeze-layers', type=int, default=0, help='Freeze the first N model layers')
+    p.add_argument('--task', choices=('detect', 'segment'), default='detect')
+    p.add_argument('--batch', type=int, default=6)
     args=p.parse_args()
     if args.learning_rate is not None and (not math.isfinite(args.learning_rate) or args.learning_rate <= 0):
         p.error('--learning-rate must be finite and positive')
     if args.freeze_layers < 0:
         p.error('--freeze-layers must be non-negative')
+    if args.batch < 1:
+        p.error('--batch must be positive')
+    if args.task == 'segment' and args.transfer_class_head:
+        p.error('--transfer-class-head is supported for detection only')
     root=Path.cwd()
     dataset=args.data.resolve()
     coverage = dataset / 'coverage.json'
     catalog = coverage if coverage.is_file() else dataset.parent / 'annotations.json'
     dataset_info = json.loads(catalog.read_text())
+    if (dataset_info.get('annotationFormat') == 'polygons') != (args.task == 'segment'):
+        p.error('Use --task segment with polygon annotations and detect with box annotations')
     if dataset_info.get('missingTrainLabels'):
         raise ValueError('Missing training examples for ' + ', '.join(dataset_info['missingTrainLabels']))
     classes=dataset_info['classes']
@@ -66,14 +74,18 @@ def main():
         cfg['test']='images/test'
     config=dataset/'config.yaml'
     config.write_text(yaml.safe_dump(cfg),encoding='utf-8')
-    print('dataset',dict(Counter(int(line.split()[0]) for f in (dataset/'labels/train').glob('*.txt') for line in f.read_text().splitlines())),flush=True)
+    print('dataset',dict(Counter(int(line.split()[0]) for f in (dataset/'labels/train').glob('*.txt')
+                                 for line in f.read_text().splitlines() if line.strip())),flush=True)
     if not torch.cuda.is_available():
         raise RuntimeError('CUDA is required')
     settings.update({'sync':False})
-    model_name, resolution, batch = ('yolo11m.pt',768,6) if args.role=='online' else ('yolo11n.pt',416,6)
+    variant, resolution = ('yolo11m',768) if args.role=='online' else ('yolo11n',416)
+    model_name = variant + ('-seg.pt' if args.task == 'segment' else '.pt')
     initial_weights = (args.initial_weights or root/model_name).resolve(strict=True)
     run_name = args.name or args.role
-    model=YOLO(str(initial_weights),task='detect')
+    model=YOLO(str(initial_weights),task=args.task)
+    if model.task != args.task:
+        p.error('--task does not match the initial weights')
     if args.freeze_layers >= len(model.model.model):
         p.error('--freeze-layers must leave at least the detection head trainable')
     optimizer = {}
@@ -81,14 +93,17 @@ def main():
         optimizer = {'optimizer': 'AdamW', 'lr0': args.learning_rate,
                      'warmup_epochs': 1.0, 'warmup_bias_lr': 0.0}
     model.train(trainer=ClassTransferTrainer if args.transfer_class_head else None,
-                      data=str(config),imgsz=resolution,epochs=args.epochs,patience=15,batch=batch,workers=0,
+                      data=str(config),imgsz=resolution,epochs=args.epochs,patience=15,batch=args.batch,workers=0,
                       device=0,project=str(root/'runs'),name=run_name,exist_ok=False,seed=102,
                       plots=False,cache=False,amp=False,mosaic=args.mosaic,fliplr=.5,close_mosaic=5,
                       freeze=args.freeze_layers, **optimizer)
     checkpoint=Path(model.trainer.best)
-    trained=YOLO(str(checkpoint),task='detect')
+    trained=YOLO(str(checkpoint),task=args.task)
     exported=Path(trained.export(format='onnx',imgsz=resolution,opset=17,dynamic=False,simplify=False,device='cpu'))
     torch.cuda.empty_cache()
+    if args.task == 'segment':
+        print('ARTIFACTS',checkpoint,exported,flush=True)
+        return
     catalog = Path(__file__).with_name('classes.json')
     supported_labels = {row['id'] for row in json.loads(catalog.read_text(encoding='utf-8'))['labels']}
     manifest={'schemaVersion':1,'model':'team-detector','modelVersion':'cyber102-'+run_name,
