@@ -1,0 +1,234 @@
+[
+  {
+    "file": "clairton-valve-fracture.jpg",
+    "scene": "csb-clairton-valve-battery13",
+    "sha256": "91089cbe30634e2f12b0547b448ccffe5be7b374d145703a8bc8d68f416e4d58",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.35,
+          0.08,
+          0.72,
+          0.84
+        ]
+      }
+    ],
+    "source": "https://www.csb.gov/file.aspx?DocumentId=6340#page=30",
+    "sourceImage": "clairton-final-007.jpg",
+    "note": "Exterior cast iron valve body fracture; Figure 15 detail 3. Scale and marker excluded from the box.",
+    "sourceSha256": "49f29de4eb6023aa332b24ee4268f5181fabe4c69883b62386e1018a867debc0",
+    "cropXYXY": [
+      0.574,
+      0.685,
+      0.994,
+      0.994
+    ]
+  },
+  {
+    "file": "tsbc1224484-007.jpg",
+    "scene": "tsbc-1224484-motor-starter",
+    "sha256": "a871f5a4dab2135a8e6c0a12600537e24d33cf8dd10c1a9d5acacc1349f38745",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.64,
+          0.56,
+          0.79,
+          0.94
+        ]
+      }
+    ],
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt2b26156cf25490cf/633270c55307da4ec9f07e72/Incident_Summary_II-1224484-2021_%28_22816%29.pdf#page=4",
+    "sourceImage": "tsbc1224484-007.jpg",
+    "note": "Melted terminal assembly at bottom right of the in-cabinet view."
+  },
+  {
+    "file": "tsbc1224484-006.jpg",
+    "scene": "tsbc-1224484-motor-starter",
+    "sha256": "fee86fd8a9db95eea6ef2c8f9ed86552b32d69e48bb277b13c72e680544ecd84",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.36,
+          0.71,
+          0.48,
+          0.98
+        ]
+      },
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.54,
+          0.69,
+          0.66,
+          0.98
+        ]
+      },
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.73,
+          0.72,
+          0.86,
+          0.98
+        ]
+      }
+    ],
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt2b26156cf25490cf/633270c55307da4ec9f07e72/Incident_Summary_II-1224484-2021_%28_22816%29.pdf#page=4",
+    "sourceImage": "tsbc1224484-006.jpg",
+    "note": "Three discolored or heat-damaged load terminations; boxes exclude most of the length of the conductors."
+  },
+  {
+    "file": "tsbc1639122-030.jpg",
+    "scene": "tsbc-1639122-furnace-connection",
+    "sha256": "2ddb2defcb2f6724d7787615452f2c71f0a7e0e695cfd9d0b1d0a4215acc6431",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.32,
+          0.28,
+          0.72,
+          0.65
+        ]
+      }
+    ],
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt4d59e19d45eacf51/68239d0d33df052fa3ab382b/II-1639122-2023_%2841742%29.pdf#page=8",
+    "sourceImage": "tsbc1639122-030.jpg",
+    "note": "Burnt push-on terminal at the furnace motor run capacitor."
+  },
+  {
+    "file": "tsbc966933-010.jpg",
+    "scene": "tsbc-966933-fused-disconnect",
+    "sha256": "83f6205a500d2318f27c634997f9e185196655d99a7098f7f661bb5e5596e410",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.4,
+          0.09,
+          0.53,
+          0.3
+        ]
+      }
+    ],
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt6a8f5206f9e5a15f/633270abbae94b55ffdee655/E_16355-966933.pdf#page=4",
+    "sourceImage": "tsbc966933-010.jpg",
+    "note": "Melted pole near the upper left fuse, paired with an intact pole on the right."
+  },
+  {
+    "file": "tsbc966933-005.jpg",
+    "scene": "tsbc-966933-fused-disconnect",
+    "sha256": "4947b7729e46b51ec3726c3904291680af0157c46b91c570ee83e9f4e96ac797",
+    "objects": [],
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt6a8f5206f9e5a15f/633270abbae94b55ffdee655/E_16355-966933.pdf#page=3",
+    "sourceImage": "tsbc966933-005.jpg",
+    "note": "Hard negative: closed disconnect enclosure; terminal cannot be seen in this view."
+  },
+  {
+    "file": "oil_chemical-Level01-Wheeled-002748-001.jpg",
+    "scene": "inspecsafe-bucket-to-blue-pipe",
+    "sha256": "45f807f0d4008171a2a8abf611d2d79efd95c289899d1051a6c0a2cea5154550",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.459,
+          0.423,
+          0.483,
+          0.557
+        ]
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "sourceImage": "oil_chemical-Level01-Wheeled-002748-001.jpg",
+    "note": "Staged scene: fine visible stream, excluding bucket and pipe."
+  },
+  {
+    "file": "oil_chemical-Level01-Wheeled-002821-001.jpg",
+    "scene": "inspecsafe-gray-vessel-demonstration",
+    "sha256": "d000cc1fa025208c063fbe4951e090508cae2ba0da5ce59681948ef7549982ff",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.306,
+          0.343,
+          0.325,
+          0.654
+        ]
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.6,
+          0.4,
+          0.65,
+          0.899
+        ]
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.617,
+          0.873,
+          0.669,
+          0.911
+        ]
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "sourceImage": "oil_chemical-Level01-Wheeled-002821-001.jpg",
+    "note": "Staged dark liquid streaks and the visible small floor spill under the right stream."
+  },
+  {
+    "file": "oil_chemical-Level01-Wheeled-002875-001.jpg",
+    "scene": "inspecsafe-yellow-suit-platform",
+    "sha256": "9c3f8ab70ad3f3467e3e3d71b9dc7476d65d09d8e242abdfdd19a442b76317e2",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.435,
+          0.436,
+          0.857,
+          0.803
+        ]
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "sourceImage": "oil_chemical-Level01-Wheeled-002875-001.jpg",
+    "note": "Wet irregular spill on textured metal platform; tight region excludes shiny intact pipes."
+  },
+  {
+    "file": "oil_chemical-Level01-Wheeled-002784-001.jpg",
+    "scene": "inspecsafe-yellow-fluid-painted-platform",
+    "sha256": "bae33fc2526a3a36aa4a8e38bbdccd68433a6a26034da077b580441a3e8c1d9b",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.278,
+          0.419,
+          0.58,
+          0.626
+        ]
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "sourceImage": "oil_chemical-Level01-Wheeled-002784-001.jpg",
+    "note": "Yellow reflective liquid against a support; excludes dark shadows and tubing."
+  },
+  {
+    "file": "oil_chemical-Level02-Wheeled-002932-001.jpg",
+    "scene": "inspecsafe-outdoor-pair-of-pumps",
+    "sha256": "58662fb585b7a88e35b12947f924b98ceef68f0039f9b4ea00fe5b8503e84f42",
+    "objects": [],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "sourceImage": "oil_chemical-Level02-Wheeled-002932-001.jpg",
+    "note": "Hard negative: installed pumps, pipe joints, shadows and discolored paving; no distinct visible stream or spill."
+  }
+]

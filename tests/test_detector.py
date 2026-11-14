@@ -228,6 +228,20 @@ class WorkerContractTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 worker.envelope_from_rows(coords, scores, ids, self.manifest)
 
+    def test_engine_keeps_valid_boxes_when_a_prediction_collapses_at_the_edge(self):
+        boxes = Mock()
+        boxes.__len__ = Mock(return_value=2)
+        boxes.cpu.return_value = boxes
+        boxes.xyxyn.tolist.return_value = [[.2, 0, .7, 0], [.1, .2, .6, .8]]
+        boxes.conf.tolist.return_value = [.99, .75]
+        boxes.cls.tolist.return_value = [0, 0]
+        model = SimpleNamespace(task='detect', names={0: 'rust'},
+                                predict=Mock(return_value=[SimpleNamespace(boxes=boxes)]))
+        engine = worker.Engine(self.weights, self.manifest_path, trusted_local_weights=True,
+                               device='cpu', loader=Mock(return_value=model))
+        result = engine.infer(Mock())
+        self.assertEqual([item['score'] for item in result['detections']], [.75])
+
     def test_fake_engine_warms_up_and_reports_hash_without_gpu_imports(self):
         boxes = Mock()
         boxes.__len__ = Mock(return_value=1)

@@ -201,7 +201,14 @@ class Engine:
         if len(boxes) > MAX_DETECTIONS:
             raise ValueError('Too many model detections')
         boxes = boxes.cpu()
-        return envelope_from_rows(boxes.xyxyn.tolist(), boxes.conf.tolist(), boxes.cls.tolist(), self.manifest)
+        coordinates = boxes.xyxyn.tolist()
+        scores = boxes.conf.tolist()
+        class_ids = boxes.cls.tolist()
+        # Clipping a predicted box to the input image can collapse it to an edge.
+        usable = [index for index, (left, top, right, bottom) in enumerate(coordinates)
+                  if left != right and top != bottom]
+        return envelope_from_rows([coordinates[i] for i in usable], [scores[i] for i in usable],
+                                  [class_ids[i] for i in usable], self.manifest)
 
     def warmup(self):
         from PIL import Image

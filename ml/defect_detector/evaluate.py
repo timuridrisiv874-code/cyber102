@@ -159,7 +159,8 @@ def infer(model, images, device, size, tiles=False, preprocess=None, strips=Fals
                  'xyxy': [offset_x + fraction_x * left, offset_y + fraction_y * top,
                           offset_x + fraction_x * right, offset_y + fraction_y * bottom]}
                 for index, score, (left, top, right, bottom) in
-                zip(boxes.cls.tolist(), boxes.conf.tolist(), boxes.xyxyn.tolist(), strict=True)]
+                zip(boxes.cls.tolist(), boxes.conf.tolist(), boxes.xyxyn.tolist(), strict=True)
+                if 0 <= left < right <= 1 and 0 <= top < bottom <= 1]
 
     with Image.new('RGB', (size, size)) as blank:
         model.predict(blank, device=device, imgsz=size, verbose=False, max_det=100, rect=rect, **options)
