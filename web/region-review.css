@@ -1,0 +1,34 @@
+.region-review {
+  box-sizing: border-box;
+  width: min(48rem, calc(100% - 1.5rem));
+  max-width: none;
+  max-height: calc(100vh - 1.5rem);
+  max-height: calc(100dvh - 1.5rem);
+  margin: auto;
+  padding: clamp(12px, 2.8vw, 24px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  color: var(--ink, #242622);
+  background: var(--surface, white);
+  border: 1px solid var(--line, #ccc);
+  border-radius: 10px;
+}
+.region-review::backdrop { background: rgb(20 22 19 / 70%); }
+.region-review h2 { margin: 0; font-size: 20px; }
+.region-review-hint, .region-review-status { margin: 8px 0 12px; font-size: 13px; line-height: 1.45; }
+.region-review-stage { display: grid; place-items: center; background: #242622; border-radius: 4px; overflow: hidden; }
+.region-review-stage canvas {
+  display: block; width: auto; height: auto; max-width: 100%; max-height: 50vh; max-height: 50dvh;
+  margin: 0; border: 0; padding: 0; touch-action: none; user-select: none; cursor: crosshair;
+}
+.region-review-coordinates { margin-top: 12px; }
+.region-review-coordinates summary { width: fit-content; padding-block: 6px; }
+.region-review-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.region-review-fields label { display: grid; gap: 3px; font-size: 12px; }
+.region-review-fields input { box-sizing: border-box; width: 100%; min-width: 0; min-height: 44px; padding: 6px; font: inherit; font-size: 16px; }
+.region-review-status { min-height: 2.9em; color: var(--muted, #555); font-variant-numeric: tabular-nums; }
+.region-review-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+@media (max-width: 440px) {
+  .region-review-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .region-review-actions .button { flex: 1 1 auto; }
+}

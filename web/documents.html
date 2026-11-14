@@ -3,28 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f1f2ef">
+  <meta name="theme-color" content="#f6f3ec">
   <title>Оборудование — Cyber102</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=field-20261114">
   <link rel="stylesheet" href="checkpoint.css">
-  <link rel="stylesheet" href="workspace.css?v=equipment-20261114">
+  <link rel="stylesheet" href="workspace.css?v=field-20261114">
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="documents.js?v=local-file-20261114" defer></script>
-  <script src="shell.js?v=local-file-20261114" defer></script>
+  <script src="shell.js?v=field-20261114" defer></script>
 </head>
 <body data-page="equipment">
   <a class="skip-link" href="#main-content">К основному содержимому</a>
   <aside class="app-sidebar" aria-label="Навигация Cyber102">
     <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
-    <p class="brand-caption">Инженерный контроль</p>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Оборудование</span></a><a href="checkpoint.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="telemetry.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
-    <div class="sidebar-foot"><span class="sidebar-foot-mark" aria-hidden="true"></span>Визуальная диагностика</div>
   </aside>
   <main id="main-content" class="page workspace-page">
-    <header class="intro"><div class="page-heading-group"><h1>Оборудование</h1><p>Паспорта, характеристики и регламенты обслуживания.</p><nav class="equipment-sections" aria-label="Оборудование"><a href="documents.html" aria-current="page">Карточки</a><a href="materials.html">Фото и примеры</a></nav><nav class="workspace-section-nav" aria-label="На странице карточек"><a href="#equipment-title">Реестр</a><a href="#library-title">Документы</a><a href="#requirements-title">Обслуживание</a></nav></div></header>
+    <header class="intro"><div class="page-heading-group"><h1>Оборудование</h1><nav class="equipment-sections" aria-label="Оборудование"><a href="documents.html" aria-current="page">Карточки</a><a href="materials.html">Фото и примеры</a></nav><nav class="workspace-section-nav" aria-label="На странице карточек"><a href="#equipment-title">Реестр</a><a href="#library-title">Документы</a><a href="#requirements-title">Обслуживание</a></nav></div></header>
     <p class="message" id="documents-status" role="status">Загружаем документы…</p>
     <section class="panel" aria-labelledby="equipment-title">
-      <div class="panel-heading"><h2 id="equipment-title">Реестр оборудования</h2><span class="source">По серийным номерам</span></div>
+      <div class="panel-heading"><h2 id="equipment-title">Реестр оборудования</h2></div>
       <div class="section-body">
 
         <div class="field equipment-filter"><label for="equipment-kind">Тип оборудования</label><select id="equipment-kind"><option value="pump">Насосы</option><option value="all">Все компоненты</option></select></div>

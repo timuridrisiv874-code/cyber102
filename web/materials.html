@@ -3,31 +3,29 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#f1f2ef">
+    <meta name="theme-color" content="#f6f3ec">
     <title>Фото и примеры — Оборудование — Cyber102</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=field-20261114">
     <link rel="stylesheet" href="checkpoint.css">
     <link rel="stylesheet" href="materials.css">
-  <link rel="stylesheet" href="workspace.css?v=equipment-20261114">
+  <link rel="stylesheet" href="workspace.css?v=field-20261114">
     <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="analysis-jobs.js" defer></script>
-    <script src="materials.js?v=equipment-20261114" defer></script>
-    <script src="shell.js?v=local-file-20261114" defer></script>
+    <script src="materials.js?v=field-20261114" defer></script>
+    <script src="shell.js?v=field-20261114" defer></script>
 </head>
   <body data-page="equipment">
     <a class="skip-link" href="#main-content">К основному содержимому</a>
   <aside class="app-sidebar" aria-label="Навигация Cyber102">
     <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
-    <p class="brand-caption">Инженерный контроль</p>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Оборудование</span></a><a href="checkpoint.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="telemetry.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
-    <div class="sidebar-foot"><span class="sidebar-foot-mark" aria-hidden="true"></span>Визуальная диагностика</div>
   </aside>
 
     <main id="main-content" class="page materials-page">
-      <header class="intro"><div class="page-heading-group"><h1>Оборудование</h1><p>Подборка организаторов.</p><nav class="equipment-sections" aria-label="Оборудование"><a href="documents.html">Карточки</a><a href="materials.html" aria-current="page">Фото и примеры</a></nav><nav class="section-nav" aria-label="На странице фото и примеров"><a href="#photos">Фотографии</a><a href="#measurements">Измерения</a><a href="#manual">Проверка правил</a></nav></div></header>
+      <header class="intro"><div class="page-heading-group"><h1>Оборудование</h1><nav class="equipment-sections" aria-label="Оборудование"><a href="documents.html">Карточки</a><a href="materials.html" aria-current="page">Фото и примеры</a></nav><nav class="section-nav" aria-label="На странице фото и примеров"><a href="#photos">Фотографии</a><a href="#measurements">Измерения</a><a href="#manual">Проверка правил</a><a href="index.html?example=1">Пример осмотра</a></nav></div></header>
 
       <section class="panel" id="photos" aria-labelledby="photos-title">
-        <div class="panel-heading"><h2 id="photos-title">Фотографии оборудования</h2><span class="source">Подборка организаторов</span></div>
+        <div class="panel-heading"><h2 id="photos-title">Фотографии оборудования</h2></div>
         <div class="section-body">
 
           <p id="catalog-status" class="message" role="status">Загружаем каталог…</p>
@@ -72,9 +70,9 @@
       </section>
 
       <section class="panel" id="manual" aria-labelledby="manual-title">
-        <div class="panel-heading"><h2 id="manual-title">Проверка диагностических правил</h2><span class="source">Демо · P-102</span></div>
+        <div class="panel-heading"><h2 id="manual-title">Проверка диагностических правил</h2></div>
         <div class="section-body">
-          <p class="material-note">Введите известные показания и признаки осмотра.</p><details class="data-note"><summary>О данных</summary><p class="material-note">Демонстрационный профиль P-102. Фото и измерения из библиотеки не подставляются автоматически.</p></details>
+          <p class="material-note">Пример расчёта для P-102.</p><details class="data-note"><summary>О данных</summary><p class="material-note">Используются только введённые показания и признаки осмотра.</p></details>
           <p class="message" id="rules-status" role="status">Загружаем правила…</p>
           <form id="manual-form" hidden>
 
@@ -85,7 +83,6 @@
           <div id="manual-findings"></div>
           <section id="rule-coverage" aria-labelledby="coverage-title" hidden>
             <h3 id="coverage-title">Полнота данных</h3>
-            <p class="material-note">Правила, для которых заполнены необходимые поля.</p>
             <div class="coverage-grid" id="coverage-list"></div>
           </section>
         </div>

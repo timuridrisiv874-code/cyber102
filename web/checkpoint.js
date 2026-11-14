@@ -13,9 +13,9 @@ const saveMessage = byId('save-message');
 const historyPanel = byId('inspection-history');
 const historyMessage = byId('history-message');
 const historyRecords = byId('history-records');
-const historyDate = new Intl.DateTimeFormat('ru-RU', {
-  day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
-});
+const historyDay = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+const historyTime = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' });
+const lookupMessage = byId('lookup-message');
 let serial = '';
 let saveContext = null;
 let historyLoad = 0;
@@ -59,10 +59,10 @@ async function api(path, parameters, options) {
   const query = parameters ? `?${new URLSearchParams(parameters)}` : '';
   const response = await fetch(`/api/${path}${query}`, { cache: 'no-store', ...options });
   if (!response.headers.get('content-type')?.includes('application/json')) {
-    throw new Error('Для диагностики запустите локальный сервер Cyber102. Команда указана в README.');
+    throw new Error('Сервер недоступен. Обновите страницу.');
   }
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Локальный сервер вернул ошибку.');
+  if (!response.ok) throw new Error(data.error || 'Не удалось выполнить запрос.');
   return data;
 }
 
@@ -76,7 +76,7 @@ function clearDiagnosis() {
   inspectionNote.value = '';
   inspectionNote.readOnly = false;
   saveButton.disabled = false;
-  saveButton.textContent = 'Сохранить осмотр';
+  saveButton.textContent = 'Сохранить пример';
   saveMessage.textContent = '';
   saveMessage.dataset.error = 'false';
   byId('diagnosis').hidden = true;
@@ -100,7 +100,9 @@ async function loadPassport(requestedSerial) {
   scenarioInput.replaceChildren();
   scenarioInput.disabled = runButton.disabled = lookupButton.disabled = true;
   clearDiagnosis();
-  setMessage('Загружаем паспорт…');
+  setMessage();
+  lookupMessage.textContent = 'Открываем журнал…';
+  lookupMessage.dataset.error = 'false';
   try {
     const data = await api('scenarios', { serial: requestedSerial });
     const equipment = data.passport;
@@ -108,6 +110,7 @@ async function loadPassport(requestedSerial) {
     serialInput.value = serial;
     passport.replaceChildren(term('Модель', equipment.model), term('Серийный номер', serial),
       term('Срок службы', equipment.serviceLife), term('Следующее ТО', equipment.nextService));
+    if (equipment.source === 'Демонстрационные данные') passport.append(term('Источник', 'Пример паспорта'));
     passport.hidden = false;
     const url = new URL(location.href);
     url.searchParams.set('serial', serial);
@@ -122,9 +125,11 @@ async function loadPassport(requestedSerial) {
       qr.hidden = false;
     }
     setMessage(data.scenarios.length ? '' : 'Для этого насоса пока нет сценариев.');
+    lookupMessage.textContent = '';
     loadHistory(serial);
   } catch (error) {
-    setMessage(error.message, true);
+    lookupMessage.textContent = error.message;
+    lookupMessage.dataset.error = 'true';
   } finally {
     lookupButton.disabled = false;
   }
@@ -136,74 +141,85 @@ function severityBadge(level) {
   return badge;
 }
 
+function historyEntry(record, date, scenarios) {
+  const entry = element('li', undefined, 'history-entry');
+  const captured = record.provenance?.source === 'camera_inspection';
+  const scenario = scenarios.get(record.scenarioId) ?? record.scenarioId ?? 'Проверка правил';
+  const evidence = record.evidence;
+  const result = evidence?.result;
+  const findings = Array.isArray(record.findings) ? record.findings : [];
+  const source = { camera: 'Осмотр с камеры', uploaded_photo: 'Фото', uploaded_video: 'Видеокадр' }[record.provenance?.captureSource] || 'Осмотр с камеры';
+  const title = captured ? result?.finding || findings[0]?.title || source : scenario;
+  const heading = element('div', undefined, 'history-entry-heading');
+  if (Number.isFinite(date.getTime())) {
+    const time = element('time', historyTime.format(date));
+    time.dateTime = record.capturedAt;
+    heading.append(time);
+  }
+  heading.append(element('strong', title));
+  entry.append(heading);
+  if (!captured) {
+    entry.append(element('p', 'Пример показаний'));
+  } else {
+    const details = element('details', undefined, 'data-note history-entry-details');
+    details.append(element('summary', 'Данные осмотра'));
+    if (title !== source) details.append(element('p', source));
+    if (record.provenance.telemetry === 'demo_scenario') entry.append(element('p', `Пример показаний · ${scenario}`));
+    else details.append(element('p', record.provenance.telemetry === 'manual' ? 'Показания введены вручную.' : 'Показаний датчиков нет.'));
+    if (typeof result?.model === 'string') details.append(element('p', `${result.model}. Оборудование выбрано инженером.`));
+    if (Number.isFinite(result?.media?.videoTimeSeconds)) details.append(element('p', `Время в видео — ${result.media.videoTimeSeconds} с.`));
+    if (typeof result?.observation === 'string' && result.observation) entry.append(element('p', result.observation));
+    const confirmed = Object.entries(record.vision ?? {}).filter(([, value]) => value !== null && value !== undefined);
+    details.append(element('p', confirmed.length ? confirmed.map(([key, value]) => `${labels[key] ?? key}: ${observationValue(key, value)}`).join(' · ') : 'Признаки инженером не оценены.'));
+    for (const recommendation of record.provenance.manufacturer?.recommendations || []) {
+      details.append(element('p', `${recommendation.title}: ${recommendation.text} Применимость: ${recommendation.appliesTo}`));
+      for (const source of recommendation.sources || []) {
+        if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(source.documentId) || !Number.isInteger(source.page) || source.page < 1) continue;
+        const link = element('a', `${source.title} · стр. ${source.page}`);
+        link.href = `/api/customer/documents/${source.documentId}/pdf#page=${source.page}`;
+        link.target = '_blank'; link.rel = 'noopener';
+        details.append(link, element('blockquote', source.quote));
+      }
+    }
+    if (!findings.length) details.append(element('p', 'Правила не сработали. Неоценённые признаки остаются неизвестными.'));
+    entry.append(details);
+    if (typeof evidence?.analysisId === 'string' && /^[0-9a-f-]{36}$/.test(evidence.analysisId)) {
+      const link = element('a', 'Открыть кадр', 'history-evidence');
+      link.href = `/api/analyses/${evidence.analysisId}/image`;
+      link.target = '_blank'; link.rel = 'noopener';
+      entry.append(link);
+    }
+  }
+  if (record.note) entry.append(element('p', record.note, 'history-note'));
+  if (findings.length) {
+    const list = element('ul');
+    for (const finding of findings) {
+      const row = element('li');
+      row.append(severityBadge(finding.severity), document.createTextNode(finding.title));
+      list.append(row);
+    }
+    entry.append(list);
+  }
+  return entry;
+}
+
 function renderHistory(records) {
   const scenarios = new Map(Array.from(scenarioInput.options, ({ value, text }) => [value, text]));
-  const sourceLabel = historyPanel.querySelector('.panel-heading .source');
-  if (sourceLabel) sourceLabel.textContent = records.some((record) => record.provenance?.source === 'camera_inspection') ?
-    'Осмотры и демо' : 'Демо';
-  historyRecords.replaceChildren(...records.map((record) => {
-    const entry = element('li', undefined, 'history-entry');
-    const time = element('time', historyDate.format(new Date(record.capturedAt)));
-    time.dateTime = record.capturedAt;
-    const cameraInspection = record.provenance?.source === 'camera_inspection';
-    const scenarioName = scenarios.get(record.scenarioId) ?? record.scenarioId ?? 'Осмотр';
-    const captureLabel = { camera: 'Осмотр с камеры', uploaded_photo: 'Осмотр загруженного фото', uploaded_video: 'Осмотр кадра видео' }[record.provenance?.captureSource] || 'Осмотр с камеры';
-    entry.append(time, element('strong', cameraInspection ? captureLabel : scenarioName));
-    if (cameraInspection) {
-      entry.append(element('p', record.provenance.telemetry === 'manual' ?
-        'Показания введены вручную.' : record.provenance.telemetry === 'demo_scenario' ?
-        `Показания: демо · ${scenarioName}` :
-        'Показаний нет — оценка ограничена.'));
-      const evidence = record.evidence;
-      if (Number.isFinite(evidence?.result?.media?.videoTimeSeconds)) {
-        entry.append(element('p', `Позиция в загруженном видео: ${evidence.result.media.videoTimeSeconds} с.`));
-      }
-      if (typeof evidence?.result?.model === 'string') {
-        const details = element('details', undefined, 'data-note');
-        details.append(element('summary', 'Данные осмотра'), element('p', `${evidence.result.model}. Оборудование выбрано инженером.`));
-        entry.append(details);
-      }
-      if (typeof evidence?.result?.observation === 'string') entry.append(element('p', evidence.result.observation));
-      // Evidence links are generated from server UUIDs, never arbitrary result URLs.
-      if (typeof evidence?.analysisId === 'string' && /^[0-9a-f-]{36}$/.test(evidence.analysisId)) {
-        const link = element('a', 'Открыть сохранённый кадр');
-        link.href = `/api/analyses/${evidence.analysisId}/image`;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        entry.append(link);
-      }
-      const confirmed = Object.entries(record.vision ?? {}).filter(([, value]) => value !== null && value !== undefined);
-      entry.append(element('p', confirmed.length ?
-        `Отмечено инженером: ${confirmed.map(([key, value]) => `${labels[key] ?? key}: ${observationValue(key, value)}`).join('; ')}.` :
-        'Визуальные признаки инженером не оценены.'));
-      for (const recommendation of record.provenance.manufacturer?.recommendations || []) {
-        entry.append(element('p', `${recommendation.title}: ${recommendation.text} Применимость: ${recommendation.appliesTo}`));
-        for (const source of recommendation.sources || []) {
-          if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(source.documentId) || !Number.isInteger(source.page) || source.page < 1) continue;
-          const link = element('a', `${source.title} · стр. ${source.page}`);
-          link.href = `/api/customer/documents/${source.documentId}/pdf#page=${source.page}`;
-          link.target = '_blank'; link.rel = 'noopener';
-          entry.append(link, element('blockquote', source.quote));
-        }
-      }
-    } else {
-      entry.append(element('p', 'Сохранённый демонстрационный сценарий.'));
+  const groups = new Map();
+  const fragment = document.createDocumentFragment();
+  for (const record of records) {
+    const date = new Date(record.capturedAt);
+    const day = Number.isFinite(date.getTime()) ? historyDay.format(date) : 'Дата не указана';
+    if (!groups.has(day)) {
+      const group = element('li', undefined, 'history-day-group');
+      const list = element('ol', undefined, 'history-day-records');
+      group.append(element('h3', day, 'history-day-title'), list);
+      groups.set(day, list);
+      fragment.append(group);
     }
-    if (record.note) entry.append(element('p', record.note));
-    if (record.findings.length) {
-      const findings = element('ul');
-      for (const finding of record.findings) {
-        const row = element('li');
-        row.append(severityBadge(finding.severity), document.createTextNode(finding.title));
-        findings.append(row);
-      }
-      entry.append(findings);
-    } else {
-      entry.append(element('p', cameraInspection ?
-        'Ни одно правило не сработало. Неоценённые признаки не считаются нормой.' : 'Ни одно правило не сработало.'));
-    }
-    return entry;
-  }));
+    groups.get(day).append(historyEntry(record, date, scenarios));
+  }
+  historyRecords.replaceChildren(fragment);
 }
 
 async function loadHistory(requestedSerial) {
@@ -342,7 +358,8 @@ byId('lookup').addEventListener('submit', (event) => {
   event.preventDefault();
   const requested = serialInput.value.trim();
   if (!requested) {
-    setMessage('Введите серийный номер.', true);
+    lookupMessage.textContent = 'Введите серийный номер.';
+    lookupMessage.dataset.error = 'true';
     return;
   }
   loadPassport(requested);
@@ -379,7 +396,7 @@ byId('save-inspection').addEventListener('submit', async (event) => {
     });
     if (context.serial === serial) loadHistory(serial);
     if (saveContext !== context) return;
-    saveButton.textContent = 'Осмотр сохранён';
+    saveButton.textContent = 'Пример сохранён';
     saveMessage.textContent = 'Запись добавлена в историю.';
   } catch (error) {
     if (saveContext !== context) return;

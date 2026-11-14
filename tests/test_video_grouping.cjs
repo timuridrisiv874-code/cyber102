@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { groupObservations } = require('../web/video-review.js');
+const { groupObservations, summarize, evidenceTime } = require('../web/video-review.js');
 
 function frame(index, component = 'pipe', condition = 'corrosion', status = 'defect') {
   return { frameIndex: index, timestampSeconds: index * 2 + 1, component, condition, status,
@@ -48,13 +48,38 @@ test('mixed clear and uncertain evidence never becomes an all-clear conclusion',
   assert.equal(grouped.groups.length, 0);
 });
 
-test('empty, uncertain and inconsistent labels do not produce a clear result', () => {
-  for (const rows of [[], [frame(0, 'none', 'uncertain', 'unusable')],
+test('uncertain and inconsistent labels do not produce a clear result', () => {
+  for (const rows of [[frame(0, 'none', 'uncertain', 'unusable')],
     [frame(0, 'none', 'no_visible_defect', 'clear')], [frame(0, 'pump', 'corrosion', 'clear')],
     [frame(0, 'unknown_component', 'no_visible_defect', 'clear')]]) {
     assert.equal(groupObservations(rows).mode, 'uncertain');
     assert.equal(groupObservations(rows).groups.length, 0);
   }
+});
+
+test('one finding can recur after clean, uncertain or other findings; all actual moments remain reachable', () => {
+  const rows = [frame(0), frame(1), frame(2, 'pump', 'no_visible_defect', 'clear'), frame(3),
+    frame(4, 'none', 'uncertain', 'unusable'), frame(5), frame(6, 'valve', 'wet_patch'), frame(7)];
+  const result = groupObservations(rows);
+  assert.deepEqual(result.groups.map(group => group.episodes.map(episode => episode.map(row => row.frameIndex))),
+    [[[0, 1], [3], [5], [7]], [[6]]]);
+  assert.equal(summarize(result), 'Модель отметила коррозию и следы жидкости на 6 из 8 выбранных кадров. Кадров без оценки: 1.');
+  assert.deepEqual(result.clearFrames, [rows[2]]);
+  assert.deepEqual(result.uncertainFrames, [rows[4]]);
+});
+
+test('empty response, every frame unusable and partially assessable footage have different summaries', () => {
+  const clear = frame(0, 'pump', 'no_visible_defect', 'clear');
+  const unclear = frame(1, 'none', 'uncertain', 'unusable');
+  assert.equal(groupObservations([]).mode, 'empty');
+  const summaries = [[], [unclear], [clear], [clear, unclear]].map(rows => summarize(groupObservations(rows)));
+  assert.equal(new Set(summaries).size, 4);
+  assert.match(summaries[3], /1 из 2/);
+});
+
+test('short clip timecodes keep distinct fractional moments and minute rounding', () => {
+  assert.deepEqual([0.03125, 0.09375, 0.25, 59.9997, 65.5].map(evidenceTime),
+    ['0:00.031', '0:00.094', '0:00.25', '1:00', '1:05.5']);
 });
 
 test('uncertain frames remain counted alongside grouped defects', () => {

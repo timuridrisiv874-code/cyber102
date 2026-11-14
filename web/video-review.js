@@ -30,28 +30,56 @@
       return row;
     }).sort((a, b) => a.timestampSeconds - b.timestampSeconds || a.frameIndex - b.frameIndex);
     const grouped = new Map();
-    let clearCount = 0, uncertainCount = 0;
+    const clearFrames = [], uncertainFrames = [];
     for (const row of ordered) {
       const componentKnown = Object.prototype.hasOwnProperty.call(COMPONENTS, row.component) && row.component !== 'none';
       if (componentKnown && row.status === 'defect' && ['corrosion', 'wet_patch', 'visible_damage'].includes(row.condition)) {
         const key = `${row.component}:${row.condition}`;
-        if (!grouped.has(key)) grouped.set(key, { component: row.component, condition: row.condition, observations: [] });
-        grouped.get(key).observations.push(row);
-      } else if (componentKnown && row.status === 'clear' && row.condition === 'no_visible_defect') clearCount += 1;
-      else uncertainCount += 1;
+        if (!grouped.has(key)) grouped.set(key, { component: row.component, condition: row.condition, observations: [], episodes: [] });
+        const group = grouped.get(key);
+        const previous = group.observations.at(-1);
+        // Adjacent sampled frames form one episode. A gap starts another,
+        // without inferring when the defect appeared or disappeared.
+        if (!previous || previous.frameIndex + 1 !== row.frameIndex) group.episodes.push([]);
+        group.episodes.at(-1).push(row);
+        group.observations.push(row);
+      } else if (componentKnown && row.status === 'clear' && row.condition === 'no_visible_defect') clearFrames.push(row);
+      else uncertainFrames.push(row);
     }
     const groups = [...grouped.values()];
-    const mode = groups.length ? 'defects' : clearCount && !uncertainCount ? 'clear' : clearCount ? 'partial' : 'uncertain';
+    const clearCount = clearFrames.length, uncertainCount = uncertainFrames.length;
+    const mode = !ordered.length ? 'empty' : groups.length ? 'defects' : clearCount && !uncertainCount ? 'clear' : clearCount ? 'partial' : 'uncertain';
     return { mode, groups, visibleGroups: groups.slice(0, 3), additionalGroups: groups.slice(3),
-      clearCount, uncertainCount, frameCount: ordered.length };
+      clearFrames, uncertainFrames, clearCount, uncertainCount, frameCount: ordered.length };
   }
 
-  if (typeof module !== 'undefined' && module.exports) module.exports = { groupObservations };
+  function summarize(grouped) {
+    const { mode, groups, frameCount, clearCount, uncertainCount } = grouped;
+    if (mode === 'empty') return 'Нет проверенных кадров.';
+    if (mode === 'uncertain') return 'Ни один из выбранных кадров не позволил оценить состояние узла.';
+    if (mode === 'clear') return 'На выбранных кадрах явных внешних дефектов не замечено.';
+    if (mode === 'partial') return `Явных дефектов не замечено на ${clearCount} из ${frameCount} кадров. Остальные оценить не удалось.`;
+    const withFindings = frameCount - clearCount - uncertainCount;
+    const labels = { corrosion: 'коррозию', wet_patch: 'следы жидкости', visible_damage: 'видимые повреждения' };
+    const findings = [...new Set(groups.map(group => labels[group.condition]))];
+    const list = new Intl.ListFormat('ru', {type: 'conjunction'}).format(findings);
+    const counts = `Модель отметила ${list} на ${withFindings} из ${frameCount} выбранных кадров.`;
+    return uncertainCount ? `${counts} Кадров без оценки: ${uncertainCount}.` : counts;
+  }
+
+  function evidenceTime(seconds) {
+    const ms = Math.round(seconds * 1000);
+    const fraction = String(ms % 1000).padStart(3, '0').replace(/0+$/, '');
+    return `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}${fraction ? '.' + fraction : ''}`;
+  }
+
+  if (typeof module !== 'undefined' && module.exports) module.exports = { groupObservations, summarize, evidenceTime };
   if (typeof window === 'undefined') return;
 
   window.CyberVideoReview = {
     groupObservations,
-    create({ media, beforeStart = () => {}, onBusyChange = () => {} }) {
+    create({ media, beforeStart = () => {}, onBusyChange = () => {}, onSelectFrame = beforeStart,
+             onInspectFrame, isInspecting = () => false }) {
       const panel = document.getElementById('video-review-panel');
       const runButton = document.getElementById('video-review-run');
       const cancelButton = document.getElementById('video-review-cancel');
@@ -68,7 +96,13 @@
       const active = token => token === generation && sourceVersion === media.version;
       function syncButtons() {
         if (panel) panel.hidden = media.kind !== 'uploaded_video';
-        if (runButton) runButton.disabled = busy || !ready() || !available;
+        const blocked = busy || isInspecting() || !ready() || !available;
+        if (runButton) runButton.disabled = blocked;
+        if (results && !results.hidden) {
+          for (const button of results.querySelectorAll('button')) {
+            button.disabled = blocked || Boolean(seekController && button.classList.contains('video-review-inspect'));
+          }
+        }
         if (cancelButton) cancelButton.hidden = !busy;
         panel?.setAttribute('aria-busy', String(busy));
       }
@@ -79,7 +113,7 @@
         generation += 1;
         controller?.abort(); controller = null; busy = false;
         if (clear && results) { results.replaceChildren(); results.hidden = true; }
-        if (clear) message('Разбор сравнит 8 кадров и покажет общий вывод и кадры с возможными дефектами.');
+        if (clear) message('Проверяем восемь кадров, выбранных равномерно по ролику.');
         else if (wasBusy) message('Разбор видео отменён.');
         syncButtons();
         if (announce && wasBusy) onBusyChange();
@@ -160,6 +194,7 @@
       }
 
       async function renderResult(data, captured, token) {
+        if (Array.isArray(data?.observations) && !data.observations.length) throw new Error('Модель не вернула наблюдений по отправленным кадрам. Повторите разбор.');
         if (!data || typeof data.summary !== 'string' || typeof data.model !== 'string'
             || !Array.isArray(data.observations) || data.observations.length !== captured.frames.length) {
           throw new Error('Сервер вернул неполный разбор видео. Повторите попытку.');
@@ -172,61 +207,101 @@
           }
         }
         const grouped = groupObservations(data.observations);
-        let summary;
-        if (grouped.mode === 'clear') summary = 'На выбранных кадрах явных внешних дефектов не обнаружено.';
-        else if (grouped.mode === 'partial') summary = 'На части кадров явных внешних дефектов не обнаружено. Остальные кадры не позволяют уверенно оценить состояние.';
-        else if (grouped.mode === 'uncertain') summary = 'По выбранным кадрам не удалось уверенно оценить состояние оборудования. Снимите один узел крупнее.';
-        else {
-          summary = data.summary.trim().replace(/\s+/g, ' ');
-          if (summary.length > 300) summary = `${summary.slice(0, 300).replace(/\s+\S*$/, '')}…`;
-          if (!summary) summary = 'На выбранных кадрах отмечены возможные внешние дефекты.';
-          if (grouped.uncertainCount) summary += ' Часть кадров не позволяет сделать уверенный вывод.';
-        }
         const fragment = document.createDocumentFragment();
-        const shownText = [summary, ...grouped.groups.map(group => group.observations[0].observation || '')].join(' ');
-        if (/[\u3400-\u9fff\u3040-\u30ff]/u.test(shownText)) {
+        fragment.append(text('p', 'video-review-summary', summarize(grouped)));
+        fragment.append(text('p', 'video-review-meta', `Длительность ${evidenceTime(captured.durationSeconds)} · Проверено кадров: ${grouped.frameCount}. Промежутки между ними не проверялись.`));
+        if (grouped.groups.some(group => group.observations.some(row => /[\u3400-\u9fff\u3040-\u30ff]/u.test(row.observation)))) {
           fragment.append(text('p', 'video-review-meta', 'В описании модели есть языковые ошибки. Сверяйте наблюдения с кадрами.'));
         }
-        fragment.append(text('p', 'video-review-summary', summary));
-        fragment.append(text('p', 'video-review-meta', `${captured.frames.length} выбранных кадров · ${window.CyberMedia.time(captured.durationSeconds)}`));
-        function bindSeek(button, frame) {
-          button.addEventListener('click', async () => {
-            if (!active(token) || busy || !ready()) return;
-            seekController?.abort();
-            const navigation = new AbortController(); seekController = navigation;
-            beforeStart();
-            if (!active(token) || !ready()) return;
-            try { await media.seek(frame.timestampSeconds, navigation.signal); }
-            catch (error) { if (active(token) && error.name !== 'AbortError') message(error.message, true); }
-            finally { if (seekController === navigation) seekController = null; }
+        const previews = new Map();
+        function preview(row) {
+          if (!previews.has(row.frameIndex)) previews.set(row.frameIndex, thumbnail(captured.frames[row.frameIndex], row, token));
+          return previews.get(row.frameIndex);
+        }
+        async function navigate(row, showSelected, inspect = false) {
+          if (!active(token) || busy || isInspecting() || !ready()) return;
+          if (inspect && seekController) return;
+          seekController?.abort();
+          const navigation = new AbortController(); seekController = navigation;
+          syncButtons();
+          try {
+            onSelectFrame();
+            if (!active(token) || navigation.signal.aborted || isInspecting()) return;
+            const frame = captured.frames[row.frameIndex];
+            const [url] = await Promise.all([showSelected ? preview(row) : null, media.seek(frame.timestampSeconds, navigation.signal)]);
+            if (!active(token) || navigation.signal.aborted || busy || isInspecting() || !ready()) return;
+            if (Math.abs(media.element.currentTime - frame.timestampSeconds) >= 0.1) {
+              message('Позиция видео изменилась. Откройте выбранный момент ещё раз.', true);
+              return;
+            }
+            showSelected?.(row, url);
+            if (inspect) await onInspectFrame();
+          } catch (error) {
+            if (active(token) && !navigation.signal.aborted && error.name !== 'AbortError') message(error.message, true);
+          } finally {
+            if (seekController === navigation) { seekController = null; syncButtons(); }
+          }
+        }
+        function timeButton(row, select, label) {
+          const time = evidenceTime(row.timestampSeconds);
+          const button = text('button', 'video-review-time-link', time);
+          button.type = 'button';
+          button.setAttribute('aria-label', `${label}. Открыть кадр ${time}`);
+          button.addEventListener('click', () => select(row));
+          return button;
+        }
+        function inspectButton(getSelected) {
+          const button = text('button', 'button secondary video-review-inspect', 'Уточнить кадр');
+          button.type = 'button';
+          button.addEventListener('click', () => {
+            const row = getSelected();
+            if (row) navigate(row, null, true);
           });
+          return button;
         }
         async function groupCard(group) {
-          const observation = group.observations[0];
-          const frame = captured.frames[observation.frameIndex];
+          const name = `${COMPONENTS[group.component]} · ${CONDITIONS[group.condition]}`;
           const card = document.createElement('article'); card.className = 'video-review-frame';
+          card.append(text('h4', 'video-review-finding', name));
           const seekButton = document.createElement('button'); seekButton.type = 'button'; seekButton.className = 'video-review-seek';
-          seekButton.setAttribute('aria-label', `Открыть кадр ${window.CyberMedia.time(frame.timestampSeconds)}`);
           const image = document.createElement('img');
-          image.src = await thumbnail(frame, observation, token);
-          image.alt = `${COMPONENTS[observation.component] || 'Узел'} · ${window.CyberMedia.time(frame.timestampSeconds)}`;
-          image.width = frame.width; image.height = frame.height;
-          seekButton.append(image, text('span', 'video-review-time', window.CyberMedia.time(frame.timestampSeconds)));
-          bindSeek(seekButton, frame);
-          card.append(seekButton, text('p', 'video-review-finding', `${COMPONENTS[observation.component] || 'Узел не определён'} · ${CONDITIONS[observation.condition] || 'Недостаточно данных'}`));
-          card.append(text('p', 'video-review-observation', observation.observation || 'По этому кадру нельзя сделать уверенное наблюдение.'));
-          if (group.observations.length > 1) {
-            const times = document.createElement('div'); times.className = 'video-review-times';
-            times.append(text('span', '', 'Похожие признаки:'));
-            for (const next of group.observations.slice(1, 4)) {
-              const button = text('button', 'video-review-time-link', window.CyberMedia.time(next.timestampSeconds));
-              button.type = 'button';
-              button.setAttribute('aria-label', `Открыть кадр ${window.CyberMedia.time(next.timestampSeconds)}`);
-              bindSeek(button, captured.frames[next.frameIndex]); times.append(button);
+          const caption = text('span', 'video-review-time', '');
+          const observation = text('p', 'video-review-observation', '');
+          seekButton.append(image, caption);
+          card.append(seekButton, observation);
+          let selected = group.observations[0];
+          const buttons = new Map();
+          function showSelected(row, url) {
+            selected = row;
+            const time = evidenceTime(row.timestampSeconds);
+            const frame = captured.frames[row.frameIndex];
+            image.src = url; image.alt = `${COMPONENTS[row.component]} · ${time}`;
+            image.width = frame.width; image.height = frame.height;
+            caption.textContent = `Кадр ${time}`;
+            seekButton.setAttribute('aria-label', `Открыть кадр ${time} в видео. ${name}`);
+            observation.textContent = row.observation;
+            for (const [index, button] of buttons) {
+              if (index === row.frameIndex) button.setAttribute('aria-current', 'true');
+              else button.removeAttribute('aria-current');
             }
-            if (group.observations.length > 4) times.append(text('span', '', `и ещё ${group.observations.length - 4}`));
-            card.append(times);
           }
+          seekButton.addEventListener('click', () => navigate(selected));
+          if (group.observations.length > 1) {
+            const episodes = document.createElement('div'); episodes.className = 'video-review-episodes';
+            group.episodes.forEach((rows, index) => {
+              const episode = document.createElement('div'); episode.className = 'video-review-episode video-review-times';
+              const label = group.episodes.length > 1 ? `Эпизод ${index + 1}` : 'Проверенные моменты';
+              episode.append(text('span', 'video-review-episode-label', label));
+              for (const row of rows) {
+                const button = timeButton(row, next => navigate(next, showSelected), `${name}. ${label}`);
+                buttons.set(row.frameIndex, button); episode.append(button);
+              }
+              episodes.append(episode);
+            });
+            card.append(episodes);
+          }
+          if (onInspectFrame) card.append(inspectButton(() => selected));
+          showSelected(selected, await preview(selected));
           return card;
         }
         if (grouped.groups.length) {
@@ -240,14 +315,45 @@
             for (const group of grouped.additionalGroups) extra.append(await groupCard(group));
             more.append(extra); fragment.append(more);
           }
-          fragment.append(text('p', 'video-review-meta', 'Проверены выбранные кадры. Разбор не сохранён в историю.'));
         }
+        if (grouped.clearCount || grouped.uncertainCount) {
+          const other = document.createElement('details'); other.className = 'video-review-more video-review-evidence';
+          const label = grouped.clearCount && grouped.uncertainCount ? 'Кадры без находок и без оценки'
+            : grouped.clearCount ? 'Кадры без явных дефектов' : 'Кадры без оценки';
+          other.append(text('summary', '', label));
+          const otherButtons = [];
+          let selected = null;
+          const inspect = onInspectFrame ? inspectButton(() => selected) : null;
+          if (inspect) inspect.hidden = true;
+          const selectedText = text('p', 'video-review-observation', '');
+          selectedText.setAttribute('aria-live', 'polite');
+          for (const [label, rows] of [['Без явных дефектов', grouped.clearFrames], ['Не удалось оценить', grouped.uncertainFrames]]) {
+            if (!rows.length) continue;
+            const line = document.createElement('div'); line.className = 'video-review-times';
+            line.append(text('span', 'video-review-episode-label', `${label} (${rows.length})`));
+            for (const row of rows) {
+              const button = timeButton(row, next => navigate(next, () => {
+                selected = next;
+                if (inspect) inspect.hidden = false;
+                for (const item of otherButtons) item.removeAttribute('aria-current');
+                button.setAttribute('aria-current', 'true');
+                selectedText.textContent = `${evidenceTime(next.timestampSeconds)} · ${label}${next.observation ? '. ' + next.observation : ''}`;
+              }), label);
+              otherButtons.push(button); line.append(button);
+            }
+            other.append(line);
+          }
+          other.append(selectedText);
+          if (inspect) other.append(inspect);
+          fragment.append(other);
+        }
+        fragment.append(text('p', 'video-review-meta', 'Разбор не сохранён в историю.'));
         if (!active(token)) throw aborted();
         results.replaceChildren(fragment); results.hidden = false;
       }
 
       async function run() {
-        if (busy || !ready() || !available || !results) return;
+        if (busy || isInspecting() || !ready() || !available || !results) return;
         seekController?.abort(); seekController = null;
         beforeStart();
         if (!ready()) return;
@@ -277,9 +383,7 @@
             ? 'Модель занята другим осмотром. Повторите через несколько секунд.'
             : typeof data.error === 'string' ? data.error : 'Не удалось разобрать видео. Повторите попытку.');
           await renderResult(data, captured, token);
-          if (active(token)) message(groupObservations(data.observations).groups.length
-            ? 'Разбор готов. Нажмите на кадр или отметку времени, чтобы вернуться к этому моменту видео.'
-            : 'Готово.');
+          if (active(token)) message('Разбор готов.');
         } catch (error) {
           if (active(token)) message(timedOut ? 'Модель не ответила вовремя. Повторите разбор позже.'
             : error.name === 'AbortError' ? 'Разбор видео отменён.' : error.message || 'Не удалось разобрать видео.', error.name !== 'AbortError' || timedOut);
@@ -291,7 +395,7 @@
       runButton?.addEventListener('click', run);
       cancelButton?.addEventListener('click', state.cancel);
       window.addEventListener('pagehide', state.cancel);
-      message('Разбор сравнит 8 кадров и покажет общий вывод и кадры с возможными дефектами.');
+      message('Проверяем восемь кадров, выбранных равномерно по ролику.');
       state.update();
       return state;
     },

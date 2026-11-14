@@ -3,46 +3,55 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f1f2ef">
+  <meta name="theme-color" content="#f6f3ec">
   <title>Осмотр оборудования — Cyber102</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="workspace.css?v=equipment-20261114">
+  <link rel="stylesheet" href="styles.css?v=field-20261114">
+  <link rel="stylesheet" href="workspace.css?v=field-20261114">
+  <link rel="stylesheet" href="region-review.css?v=field-20261114">
   <script src="offline.js" defer></script>
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="analysis-jobs.js" defer></script>
-  <script src="inspection.js?v=local-file-20261114" defer></script>
-  <script src="media.js" defer></script>
-  <script src="video-review.js" defer></script>
-  <script src="app.js?v=local-file-20261114" defer></script>
-  <script src="shell.js?v=local-file-20261114" defer></script>
+  <script src="inspection.js?v=field-20261114" defer></script>
+  <script src="media.js?v=field-20261114" defer></script>
+  <script src="video-review.js?v=field-20261114" defer></script>
+  <script src="region-review.js?v=field-20261114" defer></script>
+  <script src="app.js?v=field-20261114" defer></script>
+  <script src="shell.js?v=field-20261114" defer></script>
 </head>
 <body data-page="inspection">
   <a class="skip-link" href="#main-content">К основному содержимому</a>
   <aside class="app-sidebar" aria-label="Навигация Cyber102">
     <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
-    <p class="brand-caption">Инженерный контроль</p>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" aria-current="page" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Оборудование</span></a><a href="checkpoint.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="telemetry.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
-    <div class="sidebar-foot"><span class="sidebar-foot-mark" aria-hidden="true"></span>Визуальная диагностика</div>
   </aside>
   <p class="sr-only" id="mode" role="status">Готово к осмотру</p>
   <main class="page" id="main-content" data-analysis-endpoint="/analyze">
     <header class="intro">
-      <div class="page-heading-group"><h1>Осмотр оборудования</h1><p>Найдите видимые дефекты. Зафиксируйте результат.</p></div>
-      <a class="button secondary" id="inspection-journal-link" href="checkpoint.html">Открыть журнал ↗</a>
+      <div class="page-heading-group"><h1>Осмотр оборудования</h1></div>
     </header>
 
     <section class="active-equipment-bar" aria-label="Оборудование текущего осмотра">
-      <div class="field"><label for="active-equipment">Серийный номер</label><input id="active-equipment" value="P-102" list="inspection-equipment-options" maxlength="128" autocomplete="off" autocapitalize="characters"></div>
-      <div class="equipment-context"><strong id="shell-selected-equipment">P-102 · демонстрация</strong><p id="shell-equipment-hint" class="sr-only">Сверьте номер с табличкой</p></div>
-      <a href="documents.html">Паспорта ↗</a>
+      <div class="field"><label for="active-equipment">Серийный номер</label><input id="active-equipment" aria-describedby="shell-equipment-hint" value="P-102" list="inspection-equipment-options" maxlength="128" autocomplete="off" autocapitalize="characters"></div>
+      <p id="shell-equipment-hint" class="sr-only">Сверьте номер с табличкой оборудования.</p>
+      <a href="documents.html">Паспорта</a>
     </section>
 
     <div class="workspace">
       <section class="capture panel" aria-labelledby="capture-title">
-        <div class="panel-heading"><h2 id="capture-title">Кадр осмотра</h2><span class="source" id="source"><i aria-hidden="true"></i><span id="source-text">Выберите источник</span></span></div>
+        <div class="panel-heading"><h2 id="capture-title">Фото и видео</h2><span class="source" id="source" hidden><span id="source-text"></span></span></div>
+        <div class="capture-source-controls" role="group" aria-label="Источник осмотра">
+          <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Камера</span></button>
+          <label class="button secondary media-upload-control" for="media-file"><span>Загрузить файл</span><input id="media-file" type="file" accept="image/*,video/*" aria-label="Загрузить фото или видео"></label>
+          <button id="media-clear" class="button secondary" type="button" hidden>Убрать файл</button>
+        </div>
         <div class="viewfinder" id="viewfinder">
-          <div class="camera-idle" id="camera-idle"><span class="idle-source">Пример оборудования</span><div class="idle-caption"><span class="camera-idle-mark" aria-hidden="true"><i class="camera-icon"></i></span><strong>Начните с кадра</strong><p>Откройте камеру или загрузите файл</p></div></div>
-          <img id="example" src="demo-pump.jpg" alt="Демонстрационный кадр промышленного насоса" decoding="async" hidden>
+          <div class="camera-idle" id="camera-idle">
+            <button class="example-photo" type="button" id="open-example-photo" data-photo-url="/api/customer/images/15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8" aria-label="Открыть фото насосных агрегатов из подборки">
+              <img id="example-photo-preview" src="/api/customer/images/15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8" alt="Два насосных агрегата с трубами и арматурой" decoding="async">
+              <span class="example-photo-action">Открыть фото</span>
+            </button>
+          </div>
+          <img id="example" src="demo-pump.jpg" alt="Насос из примера осмотра" decoding="async" hidden>
           <video id="video" aria-label="Изображение с камеры" muted autoplay playsinline hidden></video>
           <img id="uploaded-image" alt="Выбранное фото оборудования" hidden>
           <video id="uploaded-video" aria-label="Выбранное видео оборудования" controls muted playsinline preload="auto" hidden></video>
@@ -55,11 +64,7 @@
             <button class="button primary" id="check" type="button" disabled><i class="scan-icon" aria-hidden="true"></i><span id="check-label">Проверить кадр</span></button>
             <button class="button primary" id="video-toggle" type="button" hidden><i class="scan-icon" aria-hidden="true"></i><span id="video-toggle-label">Начать проверку</span></button>
             <button class="button secondary" id="analysis-cancel" type="button" hidden>Отмена</button>
-            <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Включить камеру</span></button>
-          </div>
-          <div class="media-picker">
-            <div class="field"><label for="media-file">Фото или видео</label><input id="media-file" type="file" accept="image/*,video/*"></div>
-            <button id="media-clear" class="button secondary" type="button" hidden>Убрать файл</button>
+            <button class="button secondary" id="choose-region" type="button" hidden>Выбрать область</button>
           </div>
           <p class="message" id="message" role="status"></p>
           <p class="video-metrics" id="media-progress" role="status" hidden></p>
@@ -68,7 +73,7 @@
           <section class="video-review-panel" id="video-review-panel" aria-labelledby="video-review-title" hidden>
             <h3 id="video-review-title">Обзор видео</h3>
 
-            <div class="actions"><button type="button" class="button primary" id="video-review-run" disabled>Разобрать всё видео</button><button type="button" class="button secondary" id="video-review-cancel" hidden>Отменить</button></div>
+            <div class="actions"><button type="button" class="button primary" id="video-review-run" disabled>Проверить видео</button><button type="button" class="button secondary" id="video-review-cancel" hidden>Отменить</button></div>
             <p class="message" id="video-review-status" role="status" aria-live="polite"></p>
             <div id="video-review-results" hidden></div>
           </section>
@@ -79,8 +84,8 @@
             <div class="camera-options" id="camera-options" hidden>
               <label for="camera-mode" id="camera-mode-label">Проверка</label>
               <select id="camera-mode"><option value="single">Один кадр</option><option value="video">Видеопроверка</option></select>
-              <label for="analysis-profile">Ответ модели</label>
-              <select id="analysis-profile"><option value="standard" selected>Подробный</option><option value="fast">Быстрый · краткий ответ</option></select>
+              <label for="analysis-profile">Описание</label>
+              <select id="analysis-profile"><option value="standard" selected>Подробный</option><option value="fast">Краткий</option></select>
               <label for="frame-interval" id="frame-interval-label" hidden>Интервал</label>
               <select id="frame-interval" hidden><option value="2000">2 секунды</option><option value="5000" selected>5 секунд</option><option value="10000">10 секунд</option></select>
             </div>
@@ -88,11 +93,11 @@
 
             <p class="video-metrics" id="analysis-timing" hidden></p><p class="video-metrics" id="video-metrics" hidden></p>
           </details>
-          <details class="capture-settings demo-examples" id="demo-options">
-            <summary>Посмотреть демо</summary>
-            <div class="demo-options"><label for="demo-scenario">Сценарий</label><select id="demo-scenario"><option value="defect" data-image="demo-pump.jpg" data-response="mock-analysis.json">Признаки коррозии</option><option value="clear" data-image="demo-pump-clean.jpg" data-response="mock-analysis-clear.json">Чистый узел</option><option value="no_marker" data-image="demo-pump.jpg" data-response="mock-analysis-no-marker.json">Кадр без метки</option></select></div>
+          <details class="capture-settings demo-examples" id="demo-options" hidden>
+            <summary>Пример осмотра</summary>
+            <div class="demo-options"><label for="demo-scenario">Снимок</label><select id="demo-scenario"><option value="defect" data-image="demo-pump.jpg" data-response="mock-analysis.json">Признаки коррозии</option><option value="clear" data-image="demo-pump-clean.jpg" data-response="mock-analysis-clear.json">Чистый узел</option><option value="no_marker" data-image="demo-pump.jpg" data-response="mock-analysis-no-marker.json">Кадр без метки</option></select></div>
             <button type="button" class="button secondary" id="show-example">Открыть пример</button>
-            <p class="video-help">Демонстрация с заранее подготовленным ответом.</p>
+            <p class="video-help">Ответ для этого примера подготовлен заранее.</p>
           </details>
         </div>
       </section>
@@ -101,10 +106,10 @@
         <div class="panel-heading"><h2 id="result-title" tabindex="-1">Результат осмотра</h2></div>
         <div class="checked-frame" id="checked-frame" hidden><p class="source">Последний проверенный кадр</p><div class="viewfinder checked-viewfinder" id="checked-viewfinder"></div></div>
         <div class="empty" id="empty">
-          <div class="empty-icon" aria-hidden="true"><i></i></div><h3 id="empty-title">Ожидает кадр</h3><p id="empty-text">Добавьте фото или видео для проверки.</p>
+          <h3 id="empty-title">Ожидание кадра</h3><p id="empty-text"></p>
         </div>
         <div class="details" id="details" hidden>
-          <span class="finding" id="finding"></span><h3 id="equipment"></h3><p class="observation-text" id="vision-observation" hidden></p><details class="workspace-details result-provenance"><summary>О данных</summary><p class="equipment-id" id="equipment-id"></p><p class="equipment-id" id="capture-provenance" hidden></p><p class="equipment-id" id="analysis-model"></p></details>
+          <span class="finding" id="finding"></span><h3 id="equipment"></h3><p class="observation-text" id="vision-observation" hidden></p><details class="workspace-details result-provenance"><summary>О данных</summary><p class="equipment-id" id="equipment-id"></p><p class="equipment-id" id="capture-provenance" hidden></p><p class="equipment-id" id="analysis-model"></p><p id="original-observation" class="equipment-id" hidden></p></details>
           <dl class="facts"><div><dt>Узел</dt><dd id="component"></dd></div><div><dt>Нормативный срок службы</dt><dd id="service-life"></dd></div><div><dt>Обслуживание</dt><dd id="next-service"></dd></div></dl>
           <div class="recommendation"><h4>Следующий шаг</h4><p id="recommendation"></p></div>
         </div>
@@ -121,7 +126,7 @@
             <div class="actions"><button type="button" class="button secondary" id="inspection-preview">Сопоставить данные</button><button type="submit" class="button primary" id="inspection-save" disabled>Сохранить осмотр</button></div>
           </form>
           <p class="message" id="inspection-message" role="status"></p><div id="inspection-diagnosis" hidden><p class="equipment-id" id="inspection-diagnosis-source"></p><ul id="inspection-findings"></ul></div>
-          <p><a id="inspection-history" class="text-link" href="checkpoint.html?serial=P-102">Перейти к истории осмотров →</a></p>
+          <p><a id="inspection-history" class="text-link" href="checkpoint.html?serial=P-102">История осмотров</a></p>
         </section>
       </section>
     </div>

@@ -5,16 +5,12 @@
   const active = document.getElementById('active-equipment');
   const inspection = document.getElementById('inspection-serial');
   const lookup = document.getElementById('serial');
-  const selected = document.getElementById('shell-selected-equipment');
-  const hint = document.getElementById('shell-equipment-hint');
   const workspacePages = new Set(['/', '/index.html', '/documents.html', '/checkpoint.html', '/materials.html', '/telemetry.html']);
   let syncing = false;
   let serial = inspection?.value || lookup?.value || new URLSearchParams(location.search).get('serial') || '';
 
   function updateContext(value) {
     serial = value.trim();
-    if (selected) selected.textContent = serial === 'P-102' ? 'Демо · P-102' : serial ? serial : 'Оборудование не выбрано';
-    if (hint) hint.textContent = serial === 'P-102' ? 'Демонстрационные данные. Сверьте номер агрегата.' : 'Сверьте номер с табличкой перед осмотром.';
     for (const link of document.querySelectorAll('a[href]')) {
       const href = link.getAttribute('href');
       if (href.startsWith('#')) continue;

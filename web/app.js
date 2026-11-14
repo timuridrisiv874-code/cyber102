@@ -11,6 +11,7 @@ const detection = byId('detection');
 const checkButton = byId('check');
 const cameraButton = byId('camera');
 const demoScenario = byId('demo-scenario');
+const examplesRequested = new URLSearchParams(location.search).get('example') === '1';
 const cameraMode = byId('camera-mode');
 const intervalSelect = byId('frame-interval');
 const profileSelect = byId('analysis-profile');
@@ -38,6 +39,7 @@ let videoRun = null;
 let videoStats = null;
 let inputGeneration = 0;
 let frameMetadata = null;
+let regionController = null;
 let mediaProgress = '';
 let clipReview = null;
 let demoActive = false;
@@ -59,9 +61,23 @@ clipReview = offlineMode ? null : window.CyberVideoReview?.create({
     render();
   },
   onBusyChange: render,
+  isInspecting: () => checking || Boolean(analysisController || videoRun || regionController),
+  onSelectFrame: () => {
+    if (!frameSource || media.kind !== 'uploaded_video') return;
+    result = null; frameSource = null; frameMetadata = null;
+    viewfinder.append(snapshot, detection);
+    showMessage(); render();
+  },
+  onInspectFrame: async () => {
+    if (media.kind !== 'uploaded_video' || !media.ready || clipReview?.busy || checking || analysisController || videoRun) return;
+    cameraMode.value = 'single';
+    result = null; frameSource = null; frameMetadata = null;
+    await checkFrame({ profile: 'standard' });
+  },
 });
 
 function resetInput() {
+  regionController?.abort();
   clipReview?.reset();
   demoActive = false;
   inputGeneration += 1;
@@ -77,6 +93,8 @@ function captureMetadata() {
 }
 
 function sourceLabel(metadata) {
+  if (metadata?.regionLabel) return metadata.regionLabel;
+  if (media.catalogPhoto && metadata?.captureSource === 'uploaded_photo') return 'Фото из подборки';
   if (metadata?.captureSource === 'uploaded_video') return `Кадр из видео · ${window.CyberMedia.time(metadata.videoTimeSeconds || 0)}`;
   return metadata?.captureSource === 'uploaded_photo' ? 'Загруженное фото' : 'Кадр с камеры';
 }
@@ -142,11 +160,11 @@ function render() {
   byId('guide').hidden = (!live && !demoActive) || (!videoMode && frozen) || Boolean(media.kind);
   byId('source').dataset.live = String(live);
   byId('source').hidden = !(media.kind || live || demoActive || frameSource);
-  byId('source-text').textContent = media.kind ? sourceLabel(media.metadata()) : live ? 'Камера' : frameSource === 'camera' ? 'Кадр с камеры' : demoActive ? 'Тестовый пример' : 'Выберите источник';
+  byId('source-text').textContent = frozen && frameMetadata ? sourceLabel(frameMetadata) : media.kind ? sourceLabel(media.metadata()) : live ? 'Камера' : demoActive ? 'Сохранённый пример' : '';
   if (byId('mode')) byId('mode').textContent = offlineMode ? 'На телефоне · без сервера' :
     endpoint && (live || frameSource === 'camera' || media.kind) ? 'Модель на сервере' : demoActive ? 'Тестовый пример' : 'Готово к осмотру';
   if (demoScenario) {
-    byId('demo-options').hidden = !example || Boolean(stream || openingCamera || frameSource === 'camera' || media.kind);
+    byId('demo-options').hidden = !examplesRequested || !example || Boolean(stream || openingCamera || frameSource === 'camera' || media.kind);
     demoScenario.disabled = checking;
   }
   byId('camera-options').hidden = (!stream && !media.kind) || !endpoint;
@@ -173,16 +191,22 @@ function render() {
   }
   if (byId('video-summary')) renderVideoSummary();
   checkButton.hidden = videoMode || (!frameReady && !checking && !result);
+  const regionButton = byId('choose-region');
+  if (regionButton) {
+    regionButton.hidden = offlineMode || !window.CyberRegionReview || videoMode || !media.ready;
+    regionButton.disabled = checking || clipBusy || Boolean(videoRun || regionController || analysisController);
+  }
   cameraButton.classList.toggle('primary', !frameReady && !result);
   cameraButton.classList.toggle('secondary', frameReady || Boolean(result));
   document.body.dataset.hasResult = String(Boolean(result));
+  document.body.dataset.inspectionLayout = videoOverview || result || checking || videoRun ? 'review' : 'capture';
   checkButton.disabled = clipBusy || openingCamera || checking || media.loading || Boolean(analysisController) || (!frozen && !frameReady);
   cameraButton.disabled = false;
   if (byId('analysis-cancel')) byId('analysis-cancel').hidden = !checking || frameSource === 'example';
   byId('check-label').textContent = checking ? 'Проверяем…' :
-    result ? (['camera', 'uploaded_video'].includes(frameSource) ? 'Новый кадр' : 'Проверить ещё раз') : 'Проверить кадр';
+    frameMetadata?.regionLabel ? 'Весь кадр' : result ? (['camera', 'uploaded_video'].includes(frameSource) ? 'Новый кадр' : 'Проверить ещё раз') : 'Проверить кадр';
   byId('camera-label').textContent = openingCamera ? 'Отменить запуск' :
-    stream ? 'Выключить камеру' : 'Включить камеру';
+    stream ? 'Выключить камеру' : 'Камера';
   byId('capture-provenance').hidden = !result || !frameMetadata;
   byId('capture-provenance').textContent = frameMetadata ? sourceLabel(frameMetadata) : '';
 
@@ -196,15 +220,25 @@ function render() {
   if (detected) {
     detection.dataset.status = result.status;
     detection.setAttribute('aria-label', `Открыть карточку узла: ${result.component}`);
-    byId('detection-label').textContent = 'Узел';
+    byId('detection-label').textContent = result.component;
     byId('finding').dataset.status = result.status;
     byId('finding').textContent = result.finding;
-    byId('equipment').textContent = result.equipment.name;
+    const genericName = result.source === 'local_vision' && result.equipment.name === 'Оборудование на снимке';
+    byId('equipment').textContent = genericName ? result.component : result.equipment.name;
+    byId('component').parentElement.hidden = genericName;
     byId('equipment-id').textContent = result.equipment.id;
-    byId('vision-observation').hidden = !result.observation;
-    const languageNote = /[\u3400-\u9fff\u3040-\u30ff]/u.test(result.observation || '') ? 'В описании есть языковые ошибки; сверяйте его с кадром. ' : '';
-    byId('vision-observation').textContent = result.observation ? `${languageNote}${result.observation}` : '';
-    if (byId('analysis-model')) byId('analysis-model').textContent = `${result.model || 'Демонстрационный ответ'}${result.observationKind === 'template' ? ' · описание по классу' : ''}`;
+    const observation = result.observation || '';
+    const cyrillicCount = (observation.match(/[а-яё]/gi) || []).length;
+    const foreignCount = (observation.match(/[a-z\u3400-\u9fff\u3040-\u30ff]/gi) || []).length;
+    const originalOnly = foreignCount > 4 && foreignCount > cyrillicCount;
+    byId('vision-observation').hidden = !observation || originalOnly;
+    byId('vision-observation').textContent = originalOnly ? '' : observation;
+    const original = byId('original-observation');
+    if (original) {
+      original.hidden = !originalOnly;
+      original.textContent = originalOnly ? `Исходное описание модели — ${observation}` : '';
+    }
+    if (byId('analysis-model')) byId('analysis-model').textContent = result.model || 'Сохранённый ответ';
     byId('component').textContent = result.component;
     if (byId('service-life')) byId('service-life').textContent = result.serviceLife;
     if (byId('next-service')) byId('next-service').textContent = result.nextService;
@@ -326,7 +360,7 @@ function drawFrame(canvas, source) {
   canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
 }
 
-async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camera' }) {
+async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camera' }, profile = profileSelect.value) {
   const controller = new AbortController();
   const started = performance.now();
   analysisController = controller;
@@ -351,7 +385,7 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
       if (!image) throw new Error('Не удалось подготовить кадр.');
       const body = new FormData();
       body.append('file', image, 'frame.jpg');
-      body.append('profile', profileSelect.value);
+      body.append('profile', profile);
       body.append('captureSource', metadata.captureSource);
       if (metadata.captureSource === 'uploaded_video') body.append('videoTimeSeconds', String(metadata.videoTimeSeconds));
       Object.assign(options, { method: 'POST', body });
@@ -396,10 +430,10 @@ function readResult(data) {
   return data;
 }
 
-async function checkFrame() {
+async function checkFrame({ profile = profileSelect.value } = {}) {
   if (clipReview?.busy || openingCamera || checking || videoRun || analysisController || media.loading) return;
   showMessage();
-  if (result && frameSource === 'uploaded_video') {
+  if (frameMetadata?.regionLabel || (result && frameSource === 'uploaded_video')) {
     result = null; frameSource = null; frameMetadata = null; render(); return;
   }
   if (result && frameSource === 'camera') {
@@ -425,15 +459,66 @@ async function checkFrame() {
     }
     const useServer = frameSource !== 'example';
     if (useServer && !endpoint && !offlineMode) throw new Error('Не задан адрес сервера анализа.');
-    if (useServer) showMessage(offlineMode ? 'SmolVLM анализирует кадр на телефоне…' : 'Модель анализирует кадр. Задержка появится после ответа.');
+    if (useServer) showMessage(offlineMode ? 'SmolVLM анализирует кадр на телефоне…' : 'Проверяем кадр…');
     render();
-    const nextResult = await analyzeFrame(useServer, snapshot, frameMetadata);
+    const nextResult = await analyzeFrame(useServer, snapshot, frameMetadata, profile);
     if (generation !== inputGeneration) return;
     result = nextResult;
-    showMessage('Проверка завершена.');
+    showMessage();
   } catch (error) {
     if (generation === inputGeneration && error.name !== 'AbortError') showMessage(error.message || 'Не удалось проверить кадр. Повторите попытку.', true);
   } finally {
+    if (generation === inputGeneration) checking = false;
+    render();
+  }
+}
+
+async function checkSelectedRegion() {
+  if (!media.ready || videoRun || checking || clipReview?.busy || regionController || analysisController) return;
+  const generation = inputGeneration;
+  const selection = new AbortController();
+  regionController = selection;
+  const original = media.element;
+  const isVideo = media.kind === 'uploaded_video';
+  const fullFrame = document.createElement('canvas');
+  try {
+    media.pause();
+    if (isVideo && frameMetadata?.videoTimeSeconds != null) {
+      await media.seek(frameMetadata.videoTimeSeconds, selection.signal);
+    }
+    if (selection.signal.aborted || generation !== inputGeneration) return;
+    const metadata = captureMetadata();
+    // The dialog uses a bounded preview. The analysis always samples original pixels.
+    drawFrame(fullFrame, original);
+    const area = await window.CyberRegionReview.choose(fullFrame, { signal: selection.signal });
+    if (!area || generation !== inputGeneration || selection.signal.aborted) return;
+    const width = original.videoWidth || original.naturalWidth;
+    const height = original.videoHeight || original.naturalHeight;
+    const left = Math.round(area.x * width / fullFrame.width);
+    const top = Math.round(area.y * height / fullFrame.height);
+    const right = Math.round((area.x + area.width) * width / fullFrame.width);
+    const bottom = Math.round((area.y + area.height) * height / fullFrame.height);
+    const w = right - left, h = bottom - top;
+    if (w < 1 || h < 1 || left < 0 || top < 0 || right > width || bottom > height) throw new Error('Выберите область внутри кадра.');
+    const cropped = document.createElement('canvas');
+    const scale = Math.min(1, 1280 / Math.max(w, h));
+    cropped.width = Math.max(1, Math.round(w * scale));
+    cropped.height = Math.max(1, Math.round(h * scale));
+    cropped.getContext('2d').drawImage(original, left, top, w, h, 0, 0, cropped.width, cropped.height);
+    checking = true;
+    render(); showMessage('Проверяем выбранную область…');
+    const answer = await analyzeFrame(true, cropped, metadata, 'standard');
+    if (generation !== inputGeneration || selection.signal.aborted) return;
+    snapshot.width = cropped.width; snapshot.height = cropped.height;
+    snapshot.getContext('2d').drawImage(cropped, 0, 0);
+    frameSource = media.kind;
+    frameMetadata = { ...metadata, regionLabel: isVideo ? `Фрагмент видео · ${window.CyberMedia.time(metadata.videoTimeSeconds)}` : 'Фрагмент фотографии' };
+    result = { ...answer, regionNote: `Область осмотра: x=${left}, y=${top}, ${w}×${h} пикс. Исходный кадр ${width}×${height}.` };
+    showMessage();
+  } catch (error) {
+    if (generation === inputGeneration && error.name !== 'AbortError') showMessage(error.message || 'Не удалось проверить область.', true);
+  } finally {
+    if (regionController === selection) regionController = null;
     if (generation === inputGeneration) checking = false;
     render();
   }
@@ -569,6 +654,22 @@ function toggleVideoRun() {
 }
 
 cameraButton.addEventListener('click', toggleCamera);
+byId('choose-region')?.addEventListener('click', checkSelectedRegion);
+const catalogButton = byId('open-example-photo');
+catalogButton?.addEventListener('click', async () => {
+  if (await media.openCatalogPhoto(catalogButton.dataset.photoUrl)) {
+    checkButton.focus({ preventScroll: true });
+  }
+});
+const catalogPreview = byId('example-photo-preview');
+function hideUnavailablePhoto() {
+  if (catalogPreview && !catalogPreview.naturalWidth) {
+    if (catalogButton) catalogButton.hidden = true;
+    cameraIdle.dataset.unavailable = 'true';
+  }
+}
+catalogPreview?.addEventListener('error', hideUnavailablePhoto);
+if (catalogPreview?.complete) hideUnavailablePhoto();
 checkButton.addEventListener('click', checkFrame);
 byId('analysis-cancel')?.addEventListener('click', () => {
   if (!checking) return;
@@ -604,6 +705,7 @@ detection.addEventListener('click', () => {
   byId('result').scrollIntoView({ block: 'nearest' });
 });
 function releaseCamera() {
+  regionController?.abort();
   clipReview?.cancel();
   media.pause();
   if (!stream && !openingCamera && !analysisController && !videoRun) return;

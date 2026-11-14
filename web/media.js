@@ -20,20 +20,43 @@
     time(seconds) { const ticks = Math.round(Math.max(0, Number(seconds) || 0) * 10); return `${Math.floor(ticks / 600)}:${((ticks % 600) / 10).toFixed(1).padStart(4, '0')}`; },
     create({ input, image, video, beforeChange, changed, message }) {
       let kind = null, url = null, loading = false, generation = 0, loader = null;
+      let catalogPhoto = false;
       function clear() {
         generation += 1;
         loader?.abort(); loader = null;
         video.pause(); video.removeAttribute('src'); video.load();
         image.removeAttribute('src');
         if (url) URL.revokeObjectURL(url);
-        url = null; kind = null; loading = false; input.value = '';
+        url = null; kind = null; catalogPhoto = false; loading = false; input.value = '';
       }
       const state = {
         get kind() { return kind; }, get loading() { return loading; },
         get version() { return generation; },
+        get catalogPhoto() { return catalogPhoto; },
         get element() { return kind === 'uploaded_video' ? video : image; },
         get ready() { return !loading && (kind === 'uploaded_video' ? video.readyState >= 2 && video.videoWidth > 0 : kind === 'uploaded_photo' && image.complete && image.naturalWidth > 0); },
         clear,
+        async openCatalogPhoto(path) {
+          beforeChange(); clear();
+          const token = generation;
+          kind = 'uploaded_photo'; catalogPhoto = true; loading = true;
+          loader = new AbortController();
+          changed();
+          try {
+            const loaded = waitFor(image, 'load', loader.signal);
+            image.src = path;
+            await loaded;
+            if (token !== generation) return false;
+            loading = false; loader = null;
+            message(); changed();
+            return true;
+          } catch (error) {
+            if (token !== generation) return false;
+            clear(); changed();
+            message('Фото из подборки недоступно. Можно загрузить своё.', true);
+            return false;
+          }
+        },
         pause() { video.pause(); },
         metadata() { return { captureSource: kind, ...(kind === 'uploaded_video' ? { videoTimeSeconds: Number(video.currentTime.toFixed(3)) } : {}) }; },
         async seek(seconds, signal) {
@@ -78,9 +101,7 @@
             ? kind === 'uploaded_video'
               ? 'Видео открыто. Выберите кадр и нажмите «Проверить кадр». Анализ выполняется на телефоне.'
               : 'Фото открыто. Нажмите «Проверить кадр»: снимок обработает SmolVLM на телефоне.'
-            : kind === 'uploaded_video'
-              ? 'Видео открыто. Выберите кадр или включите видеопроверку по интервалу. На сервер отправляются только выбранные кадры.'
-              : 'Фото открыто. Нажмите «Проверить кадр»: снимок обработает серверная модель.');
+            : '');
         } catch (error) {
           if (token !== generation) return;
           clear();

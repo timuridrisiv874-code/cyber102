@@ -3,25 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f1f2ef">
+  <meta name="theme-color" content="#f6f3ec">
   <title>Показания оборудования — Cyber102</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=field-20261114">
   <link rel="stylesheet" href="checkpoint.css">
-  <link rel="stylesheet" href="workspace.css?v=equipment-20261114">
+  <link rel="stylesheet" href="workspace.css?v=field-20261114">
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
-  <script src="telemetry.js?v=local-file-20261114" defer></script>
-  <script src="shell.js?v=local-file-20261114" defer></script>
+  <script src="telemetry.js?v=field-20261114" defer></script>
+  <script src="shell.js?v=field-20261114" defer></script>
 </head>
 <body data-page="readings">
   <a class="skip-link" href="#main-content">К основному содержимому</a>
   <aside class="app-sidebar" aria-label="Навигация Cyber102">
     <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
-    <p class="brand-caption">Инженерный контроль</p>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Оборудование</span></a><a href="checkpoint.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="telemetry.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
-    <div class="sidebar-foot"><span class="sidebar-foot-mark" aria-hidden="true"></span>Визуальная диагностика</div>
   </aside>
   <main id="main-content" class="page workspace-page">
-    <header class="intro"><div class="page-heading-group"><h1>Показания оборудования</h1><p>Вибрация и температура по записям организаторов.</p></div><a class="button secondary" href="materials.html#measurements">Посмотреть графики ↗</a></header><p class="data-tag">Пример данных · без подключения к оборудованию</p>
+    <header class="intro"><div class="page-heading-group"><h1>Показания оборудования</h1><p>Архив измерений организаторов</p></div><a class="button secondary" href="materials.html#measurements">Все графики</a></header>
     <section class="panel" aria-labelledby="playback-title">
       <div class="panel-heading"><h2 id="playback-title">Просмотр записей</h2><span class="source" id="playback-state">Пауза</span></div>
       <div class="section-body">
@@ -53,7 +51,7 @@
       </div>
     </section>
     <section class="panel" aria-labelledby="channels-title">
-      <div class="panel-heading"><h2 id="channels-title">Измерительные каналы</h2><span class="source">Пороги из описаний баз</span></div>
+      <div class="panel-heading"><h2 id="channels-title">Измерительные каналы</h2></div>
       <div class="section-body"><div id="telemetry-channels" class="workspace-grid"></div><p class="workspace-note" id="telemetry-disagreement"></p></div>
     </section>
     <details class="data-note data-note-panel"><summary id="source-title">О данных</summary><div>
@@ -61,7 +59,7 @@
         <p class="workspace-note">Часовой пояс записей не указан. В этих таблицах отсутствуют токи фаз, давление, КПД и наработка. Они остаются неизвестными. Превышение порога не означает, что величина растёт; полная диагностическая связка требует всех её условий.</p>
 
         <details class="workspace-details"><summary>Происхождение текущей строки</summary><pre id="replay-provenance"></pre></details>
-        <a href="materials.html#manual" class="text-link">Проверить диагностические связки по подтверждённым данным →</a>
+        <a href="materials.html#manual" class="text-link">Открыть проверку правил</a>
       </div>
     </details>
   </main>

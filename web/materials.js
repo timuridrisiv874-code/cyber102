@@ -165,7 +165,7 @@ function showPhotoResult(data) {
     photoBox.dataset.status = data.status;
     photoBox.hidden = false;
   }
-  message('photo-status', 'Предварительная оценка');
+  message('photo-status');
   const modelDetails = element('details', undefined, 'data-note');
   modelDetails.append(element('summary', 'О результате'), element('p', `${data.model || 'Модель не указана'}. Наблюдение требует подтверждения инженером.`, 'material-note'));
   photoResult.append(modelDetails);
@@ -207,7 +207,7 @@ analyzePhoto.addEventListener('click', async () => {
   analyzePhoto.disabled = true;
   byId('photo-cancel').hidden = false;
   photoResult.hidden = photoBox.hidden = true;
-  message('photo-status', 'Модель проверяет фотографию…');
+  message('photo-status', 'Проверяем фото…');
   try {
     const response = await fetch(selectedPhoto.url, { signal: controller.signal });
     if (!response.ok) throw new Error('Не удалось загрузить изображение для анализа.');
@@ -219,7 +219,7 @@ analyzePhoto.addEventListener('click', async () => {
     if (photoAnalysis === controller) showPhotoResult(result);
   } catch (error) {
     if (photoAnalysis !== controller) return;
-    message('photo-status', error.name === 'AbortError' ? 'Модель не ответила вовремя. Повторите проверку.' : error.message, true);
+    message('photo-status', error.name === 'AbortError' ? 'Проверка заняла слишком много времени. Попробуйте ещё раз.' : error.message, true);
   } finally {
     clearTimeout(timeout);
     if (photoAnalysis === controller) {
@@ -298,7 +298,7 @@ function thresholdText(threshold) {
 function readingsTable(rows, group, channel, field, unit) {
   const wrapper = element('div', undefined, 'sensor-table-wrap');
   const table = element('table', undefined, 'sensor-table');
-  table.append(element('caption', 'Последние 20 строк примера'));
+  table.append(element('caption', 'Последние 20 записей'));
   const headings = element('tr');
   for (const name of ['Дата и время', unit, 'Оценка канала', 'Метка XLSX', 'Строка XLSX']) {
     const th = element('th', name);

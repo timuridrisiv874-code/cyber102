@@ -3,44 +3,44 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#f1f2ef">
+    <meta name="theme-color" content="#f6f3ec">
     <title>Журнал осмотров — Cyber102</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=field-20261114">
     <link rel="stylesheet" href="checkpoint.css">
-  <link rel="stylesheet" href="workspace.css?v=equipment-20261114">
+  <link rel="stylesheet" href="workspace.css?v=field-20261114">
     <script src="bootstrap.js?v=local-file-20261114" defer></script>
-  <script src="checkpoint.js?v=local-file-20261114" defer></script>
-    <script src="shell.js?v=local-file-20261114" defer></script>
+  <script src="checkpoint.js?v=field-20261114" defer></script>
+    <script src="shell.js?v=field-20261114" defer></script>
 </head>
   <body data-page="journal">
     <a class="skip-link" href="#main-content">К основному содержимому</a>
   <aside class="app-sidebar" aria-label="Навигация Cyber102">
     <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
-    <p class="brand-caption">Инженерный контроль</p>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Оборудование</span></a><a href="checkpoint.html" aria-current="page" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="telemetry.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
-    <div class="sidebar-foot"><span class="sidebar-foot-mark" aria-hidden="true"></span>Визуальная диагностика</div>
   </aside>
 
     <main id="main-content" class="page">
-      <header class="intro"><div class="page-heading-group"><h1>Журнал осмотров</h1><p>История проверок и решения инженера.</p></div><a class="button primary" href="index.html" data-serial-link>Новый осмотр</a></header>
+      <header class="intro"><div class="page-heading-group"><h1>Журнал осмотров</h1></div><a class="button primary" href="index.html" data-serial-link>Новый осмотр</a></header>
 
+      <form id="lookup" class="lookup journal-lookup">
+                <div class="field"><label for="serial">Серийный номер</label><input id="serial" maxlength="80" value="P-102" required autocomplete="off" autocapitalize="characters"></div>
+                <button type="submit" class="button secondary" id="lookup-button">Открыть журнал</button>
+              </form>
+      <p class="message" id="lookup-message" role="status"></p>
       <section class="panel" id="inspection-history" aria-labelledby="history-title" hidden>
-            <div class="panel-heading"><h2 id="history-title">История осмотров</h2><span class="source">Демо</span></div>
+            <div class="panel-heading"><h2 id="history-title">Записи</h2></div>
             <div class="section-body">
               <p class="message history-message" id="history-message" role="status"></p>
               <ol class="history-list" id="history-records"></ol>
             </div>
           </section>
-      <div class="journal-demo-heading"><h2>Проверка сценария</h2><span class="data-tag">Демо · P-102</span><details class="data-note"><summary>О данных</summary><p>Сценарии показывают работу правил. Паспорта AMS и измерения организаторов не привязаны к P-102.</p></details></div>
+      <details class="journal-tools">
+        <summary>Паспорт и проверка правил</summary>
       <div class="dashboard">
         <div class="inspection-column">
           <section class="panel" aria-labelledby="passport-title">
-            <div class="panel-heading"><h2 id="passport-title">Оборудование</h2></div>
+            <div class="panel-heading"><h2 id="passport-title">Паспорт оборудования</h2></div>
             <div class="section-body">
-              <form id="lookup" class="lookup">
-                <div class="field"><label for="serial">Серийный номер</label><input id="serial" maxlength="80" value="P-102" required autocomplete="off" autocapitalize="characters"></div>
-                <button type="submit" class="button secondary" id="lookup-button">Открыть паспорт</button>
-              </form>
               <dl class="passport" id="passport" hidden></dl>
               <details class="qr" id="qr" hidden>
                 <summary>QR для телефона</summary>
@@ -52,7 +52,7 @@
           </section>
 
           <section class="panel" aria-labelledby="diagram-title">
-            <div class="panel-heading"><h2 id="diagram-title">Узлы агрегата</h2><span class="source">Вид сбоку</span></div>
+            <div class="panel-heading"><h2 id="diagram-title">Узлы агрегата</h2></div>
             <div class="schematic">
               <canvas id="pump-diagram" width="1000" height="500" role="img" aria-label="Схема насоса и двигателя с муфтой, установленными на общей раме"></canvas>
               <div class="zones" id="zones" aria-hidden="true"></div>
@@ -66,7 +66,7 @@
             <div class="panel-heading"><h2 id="analysis-title">Диагностические правила</h2></div>
             <div class="section-body">
               <form id="analysis-form" class="lookup scenario-form">
-                <div class="field"><label for="scenario">Сценарий</label><select id="scenario" disabled></select></div>
+                <div class="field"><label for="scenario">Пример показаний</label><select id="scenario" disabled></select></div>
                 <button type="submit" class="button primary" id="run" disabled>Проверить</button>
               </form>
               <p class="message" id="checkpoint-message" role="status"></p>
@@ -82,7 +82,7 @@
                     <label for="inspection-note">Заметка инженера</label>
                     <textarea id="inspection-note" maxlength="1000" rows="2"></textarea>
                   </div>
-                  <button type="submit" class="button secondary" id="save-button">Сохранить осмотр</button>
+                  <button type="submit" class="button secondary" id="save-button">Сохранить пример</button>
                   <p class="message" id="save-message" role="status"></p>
                 </form>
               </div>
@@ -92,6 +92,7 @@
 
         </div>
       </div>
+      </details>
     </main>
   </body>
 </html>

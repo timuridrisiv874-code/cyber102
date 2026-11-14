@@ -4,14 +4,15 @@
   color-scheme: light;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 15px;
-  color: #252827;
-  background: #f2f4f2;
-  --ink: #202b25;
-  --muted: #627067;
-  --line: #dce3dd;
-  --accent: #195d46;
-  --accent-hover: #124a37;
-  --soft: #f3f5f3;
+  color: #22231f;
+  background: var(--paper);
+  --paper: #f6f3ec;
+  --ink: #22231f;
+  --muted: #5f6058;
+  --line: #d9d6cc;
+  --accent: #9d401b;
+  --accent-hover: #793014;
+  --soft: #f1eee7;
   --target: #ffc96d;
   --surface: #fff;
 }
@@ -23,11 +24,11 @@ button, input, select, textarea { font: inherit; }
 button, a, input, select, textarea, summary { -webkit-tap-highlight-color: transparent; }
 a { color: var(--accent); text-underline-offset: 3px; }
 @media (hover: hover) { a:hover { text-decoration-thickness: 2px; } }
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 3px solid #32774f; outline-offset: 3px; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 3px solid #874319; outline-offset: 3px; }
 button { cursor: pointer; }
 button:disabled { cursor: default; }
 h1, h2, h3, h4, p, dd { margin: 0; }
-h1 { font-size: clamp(28px, 2.5vw, 36px); line-height: 1.15; letter-spacing: -.6px; font-weight: 500; }
+h1 { font-size: clamp(32px, 3.7vw, 56px); line-height: 1.08; letter-spacing: -.045em; font-weight: 650; }
 h2 { font-size: 16px; line-height: 1.35; letter-spacing: 0; font-weight: 500; }
 h3 { font-size: 16px; line-height: 1.35; letter-spacing: 0; font-weight: 500; }
 h4 { font-size: 14px; font-weight: 500; }
@@ -41,7 +42,7 @@ strong { font-weight: 500; }
 .mode { color: var(--muted); padding: 4px 0; }
 .mode i, .source i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: 0 0 auto; }
 .source[data-live="true"] i { background: #2a8960; box-shadow: none; }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; min-width: 0; box-shadow: 0 2px 4px #14251a03; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
 .panel-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 16px; padding: 16px 20px; min-height: 64px; }
 .panel-heading h2 { display: flex; gap: 8px; align-items: center; }
 .section-number { display: grid; place-items: center; width: 20px; height: 20px; flex: 0 0 auto; color: var(--muted); font: 400 11px/1 ui-monospace, monospace; font-variant-numeric: tabular-nums; }
@@ -83,11 +84,14 @@ summary::marker { color: #626a60; }
 .capture { overflow: hidden; }
 .viewfinder { position: relative; aspect-ratio: 4 / 3; overflow: hidden; isolation: isolate; margin-inline: 12px; border-radius: 8px; background: #242927; }
 .viewfinder img, .viewfinder video, .viewfinder canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-.camera-idle { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; padding: 24px; color: #fff; background: linear-gradient(180deg, #14221b1a 20%, #101b15dc 100%), url("demo-pump.jpg") center / cover; }
-.idle-source { display: inline-flex; padding: 4px 8px; font-size: 11px; line-height: 1.4; background: #1b2821d9; border: 1px solid #ffffff30; border-radius: 4px; }
-.idle-caption { display: grid; grid-template-columns: 32px minmax(0,1fr); gap: 6px 12px; text-align: start; }
-.camera-idle strong { font-size: clamp(20px, 2.3vw, 28px); line-height: 1.15; font-weight: 500; letter-spacing: -.3px; }
-.camera-idle p { grid-column: 2; color: #e0e9e3; font-size: 13px; max-width: 32ch; }
+.camera-idle { position: absolute; inset: 0; background: var(--ink); }
+#open-example-photo { position: absolute; inset: 0; width: 100%; padding: 0; border: 0; background: var(--ink); color: #fff; }
+#open-example-photo img { object-fit: cover; }
+#open-example-photo:focus-visible { outline: 3px solid var(--target); outline-offset: -4px; z-index: 1; }
+.example-photo-action { position: absolute; bottom: 16px; left: 16px; display: inline-flex; align-items: center; gap: 12px; padding: 8px 14px; background: #fff; color: var(--ink); border-radius: 4px; font-size: 14px; font-weight: 600; }
+.example-photo-action::after { content: "↗"; }
+@media (hover: hover) { #open-example-photo:hover .example-photo-action { background: #f5e4d6; } }
+
 .camera-idle-mark { display: grid; place-items: center; width: 32px; height: 32px; color: #d7e8dd; }
 .finder-guide { position: absolute; inset: 12% 11%; pointer-events: none; }
 .finder-guide i { position: absolute; width: 24px; height: 24px; border: 1.5px solid #f7fbf7a0; }
@@ -218,7 +222,7 @@ summary::marker { color: #626a60; }
 /* Quiet instrument labels; image observations carry the visual emphasis. */
 #capture-provenance, .video-review-seek span { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 @media (max-width: 740px) {
-  h1 { font-size: 26px; }
+  h1 { font-size: clamp(30px, 6.2vw, 40px); }
   .eyebrow { display: none; }
   .intro { margin-bottom: 16px; }
   body[data-page="inspection"] .intro { margin-bottom: 12px; }

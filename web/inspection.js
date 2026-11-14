@@ -140,10 +140,8 @@
     const selected = telemetry.value;
     manual.hidden = selected !== 'manual';
     manual.querySelectorAll('input, select').forEach((input) => { input.disabled = manual.hidden; });
-    byId('inspection-source').textContent = selected === 'manual' ?
-      'Показания введены вручную.' : selected ?
-      'Демо: показания не относятся к этому кадру.' :
-      'Без показаний. Неизвестные параметры не считаются нормой.';
+    byId('inspection-source').textContent = selected && selected !== 'manual' ?
+      'Показания из примера, снятого отдельно от кадра.' : '';
     byId('inspection-history').href = `/checkpoint.html?${new URLSearchParams({ serial: serial.value.trim() })}`;
   }
 
@@ -194,7 +192,7 @@
       serialReady = requested;
       telemetry.querySelector('option[value="manual"]').disabled = !manualFields.length;
       for (const item of data.scenarios) {
-        if (typeof item.id === 'string' && typeof item.label === 'string') telemetry.append(new Option(`Демо: ${item.label}`, item.id));
+        if (typeof item.id === 'string' && typeof item.label === 'string') telemetry.append(new Option(`Пример · ${item.label}`, item.id));
       }
       if (referenceData?.availableComponents?.length) {
         component.replaceChildren(...referenceData.availableComponents.map((item) => new Option(item.label, item.key)));
@@ -358,7 +356,7 @@
     }
     const captureLabel = { camera: 'Кадр камеры', uploaded_photo: 'Загруженное фото', uploaded_video: 'Кадр загруженного видео' }[data.provenance?.captureSource] || 'Кадр';
     byId('inspection-diagnosis-source').textContent = `${captureLabel} + подтверждение инженера. ` +
-      ({ demo_scenario: 'Демонстрационная телеметрия.', manual: 'Показания введены оператором.', none: 'Телеметрии нет.' }[data.provenance?.telemetry] || '');
+      ({ demo_scenario: 'Показания из примера.', manual: 'Показания введены оператором.', none: 'Телеметрии нет.' }[data.provenance?.telemetry] || '');
     renderGuidance(data.guidance);
     renderReferences(data.manufacturer);
     byId('inspection-diagnosis').hidden = false;
@@ -431,7 +429,8 @@
         for (const select of confirms.querySelectorAll('select')) select.value = '';
         gauge.value = note.value = '';
         if (valid) {
-          byId('inspection-frame').textContent = 'Сохранится последний проверенный кадр.';
+          byId('inspection-frame').textContent = result.regionNote ? 'В журнале сохранится выбранный фрагмент.' : 'В журнале сохранится проверенный кадр.';
+          if (result.regionNote) note.value = result.regionNote;
           if (!serialReady) loadSerial();
         }
       }

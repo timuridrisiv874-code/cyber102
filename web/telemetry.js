@@ -262,7 +262,7 @@
     const disagreements = ['vibration', 'temperature'].filter(group => row.assessments?.[group]?.disagreement);
     $('telemetry-disagreement').textContent = disagreements.length
       ? 'Исходная метка и оценка по порогам расходятся.'
-      : 'Оценка по порогам из описания набора.';
+      : '';
     $('replay-provenance').textContent = JSON.stringify({
       emittedAt: snapshot.emittedAt, sourceTimestamp: snapshot.sourceTimestamp, timezone: 'Не указан', source: snapshot.source, datasetId: snapshot.datasetId, quality: snapshot.quality,
       sourceLabels: {vibration: row.vibration.source_label, temperature: row.temperature.source_label},
