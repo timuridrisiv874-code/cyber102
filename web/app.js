@@ -62,6 +62,7 @@ const sourceModes = offlineMode ? null : window.CyberInspectionMesh?.create({
   },
   openMedia: render,
   onModeChange: mode => mediaLibrary?.setMode(mode),
+  onEquipment: label => mediaLibrary?.setEquipment(label),
 });
 mediaLibrary = offlineMode ? null : window.CyberInspectionLibrary?.create({media, sourceModes});
 clipReview = offlineMode ? null : window.CyberVideoReview?.create({

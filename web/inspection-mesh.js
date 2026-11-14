@@ -3,12 +3,13 @@
   if (window.CyberWebBoot?.blocked) return;
   const endpoint = '/api/mesh-jobs';
   async function request(path, options) {
-    const response = await fetch(endpoint + path, { cache: 'no-store', ...options });
+    const response = await fetch(endpoint + path, { cache: path.endsWith('/mesh') ? 'default' : 'no-store', ...options });
     if (response.ok) return response;
     let error;
     try { error = (await response.json()).message; } catch {}
     throw new Error(error || 'Сервис 3D временно недоступен.');
   }
+  const cachedMesh = window.CyberMeshCache?.create({request});
 
   function renderer(canvas, meta, buffer) {
     const { vertices, triangles, indexBytes } = meta;
@@ -132,7 +133,7 @@
     return { draw, pick, project };
   }
 
-  function model(panel) {
+  function model(panel, onEquipment) {
     const canvas = panel.querySelector('canvas');
     const upload = panel.querySelector('.mesh-start');
     const input = panel.querySelector('input');
@@ -375,6 +376,7 @@
         return;
       }
       busy = true;
+      onEquipment(null);
       input.disabled = true;
       hoveredMark = null;
       tooltip.hidden = true;
@@ -388,7 +390,7 @@
       const signal = controller.signal;
       try {
         message('Загружаем видео…');
-        let job = await (await request('', { method: 'POST', body: file, signal,
+        let job = cachedMesh ? await cachedMesh.start(file, signal) : await (await request('', { method: 'POST', body: file, signal,
           headers: { 'Content-Type': file.type || 'application/octet-stream',
             'X-Cyber102-Mesh-Profile': 'fast' } })).json();
         if (!/^[0-9a-f]{40}$/.test(job.id)) throw new Error('Сервис 3D недоступен.');
@@ -429,6 +431,7 @@
         }
         Object.assign(view, initialView);
         activate();
+        onEquipment(job.equipmentLabel);
       } catch (error) {
         currentFile = null;
         message(error.name === 'AbortError' ? 'Сервер не успел завершить 3D. Попробуйте видео покороче.' : error.message, true);
@@ -450,13 +453,13 @@
   }
 
   window.CyberInspectionMesh = {
-    create({ media, openModel, openMedia, onModeChange = () => {} }) {
+    create({ media, openModel, openMedia, onModeChange = () => {}, onEquipment = () => {} }) {
       const modes = document.getElementById('inspection-modes');
       const panel = document.getElementById('inspection-mesh');
       if (!modes || !panel) return null;
       const input = document.getElementById('media-file');
       const label = document.getElementById('media-file-label');
-      const preview = model(panel);
+      const preview = model(panel, onEquipment);
       let mode = 'photo', mediaVersion = media.version;
       function display() {
         for (const button of modes.querySelectorAll('button')) {

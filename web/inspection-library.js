@@ -5,10 +5,19 @@
       const home = document.querySelector('.capture-source-controls');
       const meshHome = document.getElementById('mesh-library-home');
       if (!picker || !home || !meshHome || !sourceModes) return null;
+      const summary = picker.querySelector('summary');
       const status = picker.querySelector('[role=status]');
       const buttons = [...picker.querySelectorAll('button[data-url]')];
       const cached = new Map();
       let mode = sourceModes.mode, generation = 0, controller = null;
+      let equipment = null, shownMeshChoices = false;
+
+      function updateSummary() {
+        summary.textContent = mode === 'mesh'
+          ? equipment ? `Предполагаемое оборудование: ${equipment}` : 'Выбрать готовое видео'
+          : 'Готовые материалы';
+        picker.toggleAttribute('data-equipment', mode === 'mesh' && Boolean(equipment));
+      }
 
       function message(value = '') {
         status.textContent = value;
@@ -26,6 +35,8 @@
         mode = next;
         const destination = mode === 'mesh' ? meshHome : home;
         if (picker.parentElement !== destination) destination.append(picker);
+        if (mode === 'mesh' && !shownMeshChoices) { picker.open = true; shownMeshChoices = true; }
+        updateSummary();
         for (const button of buttons) button.hidden = button.dataset.kind !== (mode === 'photo' ? 'photo' : 'video');
         const featured = buttons.find(button => !button.hidden);
         const cover = document.getElementById('open-example-photo');
@@ -96,7 +107,10 @@
       window.addEventListener('pagehide', cancel);
       setMode(mode);
       picker.hidden = false;
-      return {setMode, cancel, openFeatured() {
+      return {setMode, cancel, setEquipment(label) {
+        equipment = typeof label === 'string' && label.length <= 60 ? label : null;
+        updateSummary();
+      }, openFeatured() {
         const button = buttons.find(button => !button.hidden);
         if (button) return choose(button);
       }};

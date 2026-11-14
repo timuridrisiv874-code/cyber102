@@ -1,5 +1,6 @@
 """Local, single-worker video reconstruction service for the inspection UI."""
 import argparse
+import hashlib
 import json
 import logging
 import os
@@ -9,6 +10,7 @@ import shutil
 import subprocess
 import threading
 import time
+import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -22,10 +24,26 @@ else:
     import mesh_annotations
 
 UPLOAD_LIMIT = 40 * 1024 * 1024
-RETENTION = 7200
+RETENTION = 7 * 86400
+MAX_CACHE_BYTES = 512 * 1024 * 1024
+MAX_CACHE_ENTRIES = 64
 ROUTE = '/api/mesh-jobs'
 JOB_PATH = re.compile(r'/api/mesh-jobs/([0-9a-f]{40})(/mesh)?')
 FRAME_PROFILES = {'fast': (4, 20), 'detailed': (8, 42)}
+
+
+def pipeline_version():
+    root = next((parent for parent in Path(__file__).resolve().parents
+                 if (parent / 'vision_runtime/qwen38_download.py').is_file()),
+                Path(__file__).resolve().parents[1])
+    sources = [Path(__file__), Path(mesh_annotations.__file__), root / 'vision_runtime/qwen38_download.py',
+               root / 'var/vlm-model.txt']
+    versions = [hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None for path in sources]
+    return hashlib.sha256(json.dumps(versions, separators=(',', ':')).encode()).hexdigest()
+
+
+def input_key(digest, profile):
+    return hashlib.sha256(json.dumps([digest, profile, pipeline_version()], separators=(',', ':')).encode()).hexdigest()
 
 
 def frame_plan(duration, profile):
@@ -136,9 +154,11 @@ def export_mesh(work, ffmpeg, detections=()):
 class Jobs:
     def __init__(self, root, ffmpeg, meshroom):
         self.root, self.ffmpeg, self.meshroom = root, ffmpeg, meshroom
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
         self.active = threading.BoundedSemaphore(1)
+        self.upload_slots = threading.BoundedSemaphore(2)
         self.jobs = {}
+        self.inputs = {}
         root.mkdir(parents=True, exist_ok=True)
         self.cleanup()
         for status in self.root.glob('*/result.json'):
@@ -146,15 +166,22 @@ class Jobs:
                 continue
             try:
                 job = json.loads(status.read_text(encoding='utf-8'))
-                if job['id'] == status.parent.name and job['state'] == 'ready':
+                if job['id'] == status.parent.name and job['state'] == 'ready' and self._ready_valid(job):
                     self.jobs[job['id']] = job
+                    if isinstance(job.get('_inputKey'), str):
+                        self.inputs[job['_inputKey']] = job['id']
             except (OSError, ValueError, KeyError):
                 logging.exception('Could not restore mesh metadata from %s', status)
 
     def cleanup(self):
         now = time.time()
         with self.lock:
+            retained = []
             for path in self.root.iterdir():
+                if re.fullmatch(r'upload-[a-f0-9]{32}', path.name) and path.is_dir():
+                    if now - path.stat().st_mtime > 180:
+                        shutil.rmtree(path, ignore_errors=True)
+                    continue
                 if not re.fullmatch(r'[0-9a-f]{40}', path.name) or not path.is_dir():
                     continue
                 job = self.jobs.get(path.name)
@@ -163,17 +190,60 @@ class Jobs:
                 if now - path.stat().st_mtime > RETENTION:
                     shutil.rmtree(path, ignore_errors=True)
                     self.jobs.pop(path.name, None)
+                else:
+                    size = sum(item.stat().st_size for item in path.rglob('*') if item.is_file())
+                    retained.append((path.stat().st_mtime, size, path))
+            total = sum(size for _, size, _ in retained)
+            count = len(retained)
+            for _, size, path in sorted(retained):
+                if total <= MAX_CACHE_BYTES and count <= MAX_CACHE_ENTRIES:
+                    break
+                shutil.rmtree(path, ignore_errors=True)
+                self.jobs.pop(path.name, None)
+                total -= size
+                count -= 1
+            self.inputs = {key: token for key, token in self.inputs.items() if token in self.jobs}
 
     def set(self, token, state, **fields):
-        job = {'id': token, 'state': state, **fields}
-        if state == 'ready':
-            (self.root / token / 'result.json').write_text(json.dumps(job), encoding='utf-8')
         with self.lock:
+            job = {**self.jobs.get(token, {}), 'id': token, 'state': state, **fields}
+            if state == 'ready':
+                temporary = self.root / token / 'result.tmp'
+                temporary.write_text(json.dumps(job), encoding='utf-8')
+                temporary.replace(self.root / token / 'result.json')
             self.jobs[token] = job
+
+    def _ready_valid(self, job):
+        vertices, triangles = job.get('vertices'), job.get('triangles')
+        if (type(vertices) is not int or vertices < 3 or type(triangles) is not int or triangles < 1
+                or job.get('indexBytes') != 4):
+            return False
+        try:
+            return (self.root / job['id'] / 'mesh.bin').stat().st_size == vertices * 15 + triangles * 12
+        except OSError:
+            return False
 
     def get(self, token):
         with self.lock:
-            return self.jobs.get(token)
+            job = self.jobs.get(token)
+            if job and job['state'] == 'ready' and not self._ready_valid(job):
+                self.jobs.pop(token, None)
+                return None
+            if job and job['state'] == 'ready' and (self.root / token).is_dir():
+                (self.root / token).touch()
+            return {key: value for key, value in job.items() if not key.startswith('_')} if job else None
+
+    def accept(self, key, token, profile):
+        with self.lock:
+            existing = self.jobs.get(self.inputs.get(key))
+            if existing and existing['state'] in ('queued', 'frames', 'building', 'exporting', 'ready'):
+                if existing['state'] != 'ready' or self._ready_valid(existing):
+                    return self.get(existing['id']), True
+            if not self.active.acquire(blocking=False):
+                return None, False
+            self.inputs[key] = token
+            self.set(token, 'queued', profile=profile, _inputKey=key)
+            return self.get(token), False
 
     def build(self, token, work, profile='fast'):
         started = time.monotonic()
@@ -205,8 +275,14 @@ class Jobs:
                  '--cache', work / 'cache'], work / 'meshroom.log', 1200, env=env)
             self.set(token, 'exporting', profile=profile, framesUsed=frame_count)
             detected = mesh_annotations.detect_samples(work / 'frames', frame_count, fps)
+            equipment_label = mesh_annotations.identify_equipment(work / 'frames' / '003.jpg')
             meta = export_mesh(work, self.ffmpeg, detected)
+            # Keep the job in exporting state until the large reconstruction cache is gone.
+            # HTTP polling calls cleanup(), which must only count the compact final result.
+            for directory in ('frames', 'cache', 'publish'):
+                shutil.rmtree(work / directory, ignore_errors=True)
             self.set(token, 'ready', **meta, profile=profile, framesUsed=frame_count,
+                     equipmentLabel=equipment_label,
                      processingSeconds=round(time.monotonic() - started))
         except (ValueError, OSError, KeyError) as error:
             logging.exception('Mesh job %s failed', token)
@@ -262,20 +338,22 @@ class Handler(BaseHTTPRequestHandler):
             self.reply(413, {'message': 'Выберите видео до 40 МБ.'})
             return
         jobs = self.server.jobs
-        if not jobs.active.acquire(blocking=False):
-            self.reply(429, {'message': 'На сервере уже строится модель. Повторите чуть позже.'})
+        if not jobs.upload_slots.acquire(blocking=False):
+            self.reply(429, {'message': 'Сервер принимает другие видео. Повторите чуть позже.'})
             return
-        token = secrets.token_hex(20)
-        work = jobs.root / token
+        upload = jobs.root / ('upload-' + uuid.uuid4().hex)
+        work = None
         handed_off = False
+        acquired = False
         try:
             jobs.cleanup()
             if shutil.disk_usage(jobs.root).free < 3 * 1024**3:
                 self.reply(503, {'message': 'На сервере сейчас недостаточно места для 3D.'})
                 return
-            work.mkdir()
+            upload.mkdir()
+            digest = hashlib.sha256()
             expires = time.monotonic() + 90
-            with (work / 'input.video').open('wb') as video:
+            with (upload / 'input.video').open('wb') as video:
                 while size:
                     if time.monotonic() > expires:
                         raise TimeoutError
@@ -283,8 +361,19 @@ class Handler(BaseHTTPRequestHandler):
                     if not chunk:
                         raise OSError('Incomplete upload')
                     video.write(chunk)
+                    digest.update(chunk)
                     size -= len(chunk)
-            jobs.set(token, 'queued', profile=profile)
+            token = secrets.token_hex(20)
+            work = jobs.root / token
+            job, cached = jobs.accept(input_key(digest.hexdigest(), profile), token, profile)
+            if job is None:
+                self.reply(429, {'message': 'На сервере уже строится модель. Повторите чуть позже.'})
+                return
+            if cached:
+                self.reply(200, job)
+                return
+            acquired = True
+            upload.replace(work)
             threading.Thread(target=jobs.build, args=(token, work, profile), daemon=True).start()
             handed_off = True
             self.reply(202, {'id': token, 'state': 'queued'})
@@ -293,10 +382,18 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply(400, {'message': 'Не удалось получить видео целиком.'})
         finally:
             if not handed_off:
-                shutil.rmtree(work, ignore_errors=True)
-                jobs.active.release()
+                if work is not None and acquired:
+                    shutil.rmtree(work, ignore_errors=True)
+                    jobs.set(token, 'failed', message='Загрузка прервалась. Повторите попытку.')
+                if acquired:
+                    jobs.active.release()
+            shutil.rmtree(upload, ignore_errors=True)
+            jobs.upload_slots.release()
 
     def do_GET(self):
+        if urlsplit(self.path).path == ROUTE + '/capabilities':
+            self.reply(200, {'cacheVersion': pipeline_version(), 'cacheTtlSeconds': RETENTION})
+            return
         route = JOB_PATH.fullmatch(urlsplit(self.path).path)
         jobs = self.server.jobs
         jobs.cleanup()
@@ -313,7 +410,7 @@ class Handler(BaseHTTPRequestHandler):
                     self.send_response(200)
                     self.send_header('Content-Type', 'application/octet-stream')
                     self.send_header('Content-Length', str(os.fstat(data.fileno()).st_size))
-                    self.send_header('Cache-Control', 'no-store')
+                    self.send_header('Cache-Control', 'private, max-age=86400, immutable')
                     self.end_headers()
                     shutil.copyfileobj(data, self.wfile)
             except OSError:

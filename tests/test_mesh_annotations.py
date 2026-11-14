@@ -7,6 +7,12 @@ from server import mesh_annotations
 
 
 class MeshAnnotationsTest(unittest.TestCase):
+    def test_equipment_name_comes_from_model_and_is_whitelisted(self):
+        with patch.object(mesh_annotations, 'native_completion', return_value='{"equipment":"pump"}'):
+            self.assertEqual(mesh_annotations.identify_equipment('unused.jpg'), 'насос')
+        with patch.object(mesh_annotations, 'native_completion', return_value='{"equipment":"unknown"}'):
+            self.assertIsNone(mesh_annotations.identify_equipment('unused.jpg'))
+
     def test_model_boxes_need_second_confirmation(self):
         proposal = '''```json
         [{"kind":"corrosion","part":"tank","box":[200,500,700,720]},

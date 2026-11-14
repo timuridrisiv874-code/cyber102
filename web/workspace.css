@@ -355,6 +355,7 @@ body[data-inspection-layout=capture] #result { display: none; }
   background: var(--surface);
   box-shadow: 0 1px 1px #22231f12;
 }
+#inspection-library[data-equipment] > summary { color: var(--ink); font-size: 16px; font-weight: 500; }
 body[data-capture-source=mesh] .workspace { grid-template-columns: minmax(0, 1fr); }
 body[data-capture-source=mesh] :is(.active-equipment-bar, #asset-telemetry, #motor-resource-home),
 body[data-capture-source=mesh] .workspace > #result,
