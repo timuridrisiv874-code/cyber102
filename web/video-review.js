@@ -335,7 +335,6 @@
         const fragment = document.createDocumentFragment();
         const summary = text('p', 'video-review-summary', summarize(grouped));
         fragment.append(summary);
-        fragment.append(text('p', 'video-review-meta', `Длительность ${evidenceTime(captured.durationSeconds)} · Проверено кадров: ${grouped.frameCount}. Промежутки между ними не проверялись.`));
         const context = data.equipmentContext;
         if (context?.references?.length) {
           const sources = document.createElement('details');

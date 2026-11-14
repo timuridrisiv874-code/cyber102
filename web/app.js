@@ -47,9 +47,10 @@ let regionController = null;
 let mediaProgress = '';
 let clipReview = null;
 let demoActive = false;
+let defaultMediaVersion = null, defaultMediaKind = null;
 const media = window.CyberMedia.create({
   input: byId('media-file'), image: byId('uploaded-image'), video: byId('uploaded-video'),
-  beforeChange: resetInput, changed: render, message: showMessage,
+  beforeChange: resetInput, changed: mediaChanged, message: showMessage,
 });
 const sourceModes = offlineMode ? null : window.CyberInspectionMesh?.create({
   media,
@@ -67,7 +68,6 @@ clipReview = offlineMode ? null : window.CyberVideoReview?.create({
     stopVideoRun();
     analysisController?.abort();
     checking = false;
-    cameraMode.value = 'single';
     frameSource = null; frameMetadata = null; result = null; videoStats = null; mediaProgress = '';
     viewfinder.append(snapshot, detection);
     showMessage();
@@ -101,6 +101,18 @@ clipReview = offlineMode ? null : window.CyberVideoReview?.create({
   },
 });
 
+function mediaChanged() {
+  // Apply defaults once per source, retaining a manually selected mode on seek
+  // and decode events from the same file.
+  if (media.version !== defaultMediaVersion || media.kind !== defaultMediaKind) {
+    defaultMediaVersion = media.version;
+    defaultMediaKind = media.kind;
+    cameraMode.value = !offlineMode && media.kind === 'uploaded_video' ? 'video' : 'single';
+    intervalSelect.value = '10000';
+  }
+  render();
+}
+
 function resetInput() {
   regionController?.abort();
   clipReview?.reset();
@@ -111,7 +123,7 @@ function resetInput() {
   frameSource = null; frameMetadata = null; result = null; videoStats = null; mediaProgress = '';
   cameraMode.value = 'single';
   byId('analysis-settings').open = false;
-  intervalSelect.value = '5000';
+  intervalSelect.value = '10000';
   viewfinder.append(snapshot, detection);
 }
 
@@ -239,7 +251,7 @@ function render() {
   cameraMode.disabled = clipBusy || media.loading || openingCamera || checking || Boolean(videoRun || analysisController || regionController);
   byId('frame-interval-label').hidden = !videoMode;
   intervalSelect.hidden = !videoMode;
-  intervalSelect.disabled = Boolean(videoRun);
+  intervalSelect.disabled = cameraMode.disabled;
   byId('video-help').hidden = !videoMode;
   byId('video-help').textContent = media.kind === 'uploaded_video' ?
     'С начала ролика с выбранным интервалом, максимум 20 кадров за запуск.' :

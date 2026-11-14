@@ -149,6 +149,8 @@ async function run(browser, engine, android) {
       assert.equal(await primary.getAttribute('id'), 'video-review-run');
       assert.equal(await primary.innerText(), 'Проверить всё видео');
       assert.equal(await page.locator('#check').isVisible(), false);
+      assert.equal(await page.locator('#camera-mode').inputValue(), 'video');
+      assert.equal(await page.locator('#frame-interval').inputValue(), '10000');
       assert.equal(state.posts.length + state.photoPosts.length, 0);
       await page.locator('#uploaded-video').evaluate(async video => {
         await new Promise(resolve => {
@@ -177,6 +179,11 @@ async function run(browser, engine, android) {
     await page.waitForFunction(() => [...document.querySelectorAll('.video-review-seek img')].every(image => image.complete && image.naturalWidth > 0));
     assert.deepEqual(violations, [], 'Bundled Android CSP must allow generated local thumbnails');
     const resultText = await page.locator('#video-review-results').textContent();
+    if (!android) {
+      assert.equal(await page.locator('#camera-mode').inputValue(), 'video', 'A whole-video review must retain the selected video mode');
+      assert.equal(await page.locator('#frame-interval').inputValue(), '10000');
+      assert.doesNotMatch(resultText, /Длительность|Промежутки между ними не проверялись/);
+    }
     if (android) assert.match(resultText, /не сохранён в историю/);
     else assert.doesNotMatch(resultText, /не сохранён в историю/);
     assert.equal(await page.locator('#inspection-workflow').isVisible(), false);
@@ -227,6 +234,7 @@ async function run(browser, engine, android) {
       assert.equal(await image.getAttribute('src'), thumbnails[2]);
       assert.equal(state.photoPosts.length,0);
       await page.locator('#analysis-settings > summary').click();
+      await page.locator('#camera-mode').selectOption('single');
       await checkRegion(page, post.body.frames[7].timestampSeconds);
       await slide.getByRole('button',{name:'Уточнить кадр'}).press('Enter');
       await until(() => state.photoPosts.length===2 && state.pending.length===1);

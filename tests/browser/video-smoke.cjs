@@ -144,7 +144,7 @@ async function run(browser, name, options, mock) {
     await page.locator('#analysis-settings > summary').click();
     await page.locator('#camera-mode').selectOption('video');
     const interval = page.getByLabel('Интервал');
-    assert.equal(await interval.inputValue(), '5000');
+    assert.equal(await interval.inputValue(), android ? '5000' : '10000');
     await interval.selectOption('2000');
 
     const first = await startFrame(start);

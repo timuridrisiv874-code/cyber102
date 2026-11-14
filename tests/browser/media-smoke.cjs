@@ -90,6 +90,9 @@ async function run(browser, engine, android) {
       assert.equal(await page.locator('#video-review-run').isVisible(), true);
       assert.equal(await page.locator('#check').isVisible(), false);
       await page.locator('#analysis-settings > summary').click();
+      assert.equal(await page.locator('#camera-mode').inputValue(), 'video');
+      assert.equal(await page.locator('#frame-interval').inputValue(), '10000');
+      await page.locator('#camera-mode').selectOption('single');
     }
     await page.locator('#check').click();
     await page.locator('#details').waitFor();
@@ -131,8 +134,8 @@ async function run(browser, engine, android) {
     await page.locator('#uploaded-video').waitFor();
     if (!android) {
       await page.locator('#analysis-settings > summary').click();
-      assert.equal(await page.locator('#camera-mode').inputValue(), 'single');
-      assert.equal(await page.locator('#frame-interval').inputValue(), '5000');
+      assert.equal(await page.locator('#camera-mode').inputValue(), 'video');
+      assert.equal(await page.locator('#frame-interval').inputValue(), '10000');
     }
     await page.locator('#camera-mode').selectOption('video');
     await page.locator('#frame-interval').selectOption('2000');
