@@ -1,5 +1,7 @@
 # Готовые материалы Cyber102
 
+Android 0.14 для коллеги — [полная сборка с моделями](https://github.com/timuridrisiv874-code/cyber102/releases/tag/android-v0.14-test), [лёгкий APK](android/Cyber102_0.14-test.apk) и [проверка QR в авиарежиме](../TIMUR/ANDROID_OFFLINE.md).
+
 - [Android 0.6-test](android/Brovi_Resnitsy_0.6-test.apk): загрузка фото/видео через системный выбор файлов, ручные показания, навигатор следующей проверки и паспортные рекомендации. [Сценарий показа](../TIMUR/GOLD_DEMO.md). Обновляет нашу 0.5 с тем же debug-сертификатом; для сборки 0.4 с другой подписью потребуется удаление старой версии.
 
 - [Описание продукта для команды](documents/cyber102-product-guide.docx) — интерфейс, сервер, модель, правила, Android APK и ближайшие задачи.
