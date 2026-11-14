@@ -33,14 +33,14 @@ def labeled_frames(dataset, split, names, excluded=None):
     return rows, images, hashes
 
 
-def fit(rows, predictions, labels, min_instances, iou):
+def fit(rows, predictions, labels, min_instances, iou, *, min_precision=0):
     support = Counter(item['class'] for row in rows for item in row['objects'])
     report = {label: {'validation_instances': support[label], 'threshold': None} for label in labels}
     for step in range(1, 20):
         threshold = step / 20
         summary = measurements(rows, predictions, labels, threshold, iou)['classes']
         for label, counts in summary.items():
-            if support[label] < min_instances or not counts['tp']:
+            if support[label] < min_instances or not counts['tp'] or counts['precision'] < min_precision:
                 continue
             tp, fp, fn = (counts[k] for k in ('tp', 'fp', 'fn'))
             f05 = 5 * tp / (5 * tp + 4 * fp + fn)
