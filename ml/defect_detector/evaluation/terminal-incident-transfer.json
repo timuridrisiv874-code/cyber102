@@ -1,0 +1,170 @@
+[
+  {
+    "file": "panel-two-lugs.jpg",
+    "scene": "panel-overheat",
+    "domain": "switchgear",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blte15aa052436a4c01/63327010389c5e03512c5141/F_7048-682766_R28-NOV-2019.pdf#page=9",
+    "sourceImage": "tsbc-682766-016.jpg",
+    "sourceSha256": "c9bac75b6e5db1a96221964da3dec8ffc0beeb5316b5ee594393b69700d5eb78",
+    "sha256": "c9bac75b6e5db1a96221964da3dec8ffc0beeb5316b5ee594393b69700d5eb78",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.117,
+          0.276,
+          0.334,
+          0.413
+        ]
+      },
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.13,
+          0.64,
+          0.302,
+          0.775
+        ]
+      }
+    ],
+    "note": "Two burned lugs in the foreground. The shiny replacement in the middle is excluded."
+  },
+  {
+    "file": "switchboard-lug-wires.jpg",
+    "scene": "switchboard-fire",
+    "domain": "switchgear",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt4367416202831991/68e0061bb01de931a5a01a97/II-1672647-2024_%28_44259%29-1.pdf#page=7",
+    "sourceImage": "tsbc-1672647-021.jpg",
+    "sourceSha256": "4356b2f3fee228bbc7df7f078702cede1ba4421864bf91f3bcaa0af7b5a6cc84",
+    "sha256": "4356b2f3fee228bbc7df7f078702cede1ba4421864bf91f3bcaa0af7b5a6cc84",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.486,
+          0.298,
+          0.558,
+          0.49
+        ]
+      },
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.487,
+          0.537,
+          0.594,
+          0.674
+        ]
+      }
+    ],
+    "note": "Visible damaged conductor sections immediately above their two lugs. The melted bus bar and other distant wires are excluded."
+  },
+  {
+    "file": "relay-label-control.jpg",
+    "scene": "switchboard-fire",
+    "domain": "switchgear",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt4367416202831991/68e0061bb01de931a5a01a97/II-1672647-2024_%28_44259%29-1.pdf#page=8",
+    "sourceImage": "tsbc-1672647-026.jpg",
+    "sourceSha256": "7dc41ad3e01c2dc5293b74fe641b428ba03648b17490da28fa3e13865b48ca88",
+    "sha256": "7dc41ad3e01c2dc5293b74fe641b428ba03648b17490da28fa3e13865b48ca88",
+    "objects": [],
+    "note": "The disconnected trip-unit state described by the report is outside this visible physical damage label. Terminations in view show no clear break or melting."
+  },
+  {
+    "file": "charred-lug.jpg",
+    "scene": "exterior-junction",
+    "domain": "removed-part",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt4e03b10bae1e7e60/66d2051a76e16e372f51336c/II-1588168-2023_%2837421%29.pdf#page=5",
+    "sourceImage": "tsbc-1588168-013.jpg",
+    "sourceSha256": "91a2c3aef9f516194a9098dc6742ca54d0ed130398dc574f7b1fc182d49248e7",
+    "sha256": "91a2c3aef9f516194a9098dc6742ca54d0ed130398dc574f7b1fc182d49248e7",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.288,
+          0.078,
+          0.928,
+          0.61
+        ]
+      }
+    ],
+    "note": "Charred termination lug on the bench. Excludes oxidized protruding stud and the support below it."
+  },
+  {
+    "file": "repaired-box-control.jpg",
+    "scene": "exterior-junction",
+    "domain": "switchgear",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/blt4e03b10bae1e7e60/66d2051a76e16e372f51336c/II-1588168-2023_%2837421%29.pdf#page=6",
+    "sourceImage": "tsbc-1588168-017.jpg",
+    "sourceSha256": "370a784f3f9f1eef9e0a4ee1e7c7e2aa1c4574ac0dadc870f1ca5ba5ecb71f60",
+    "sha256": "370a784f3f9f1eef9e0a4ee1e7c7e2aa1c4574ac0dadc870f1ca5ba5ecb71f60",
+    "objects": [],
+    "note": "Replacement junction box with reterminated conductors. Shadows, taping and normal bare terminals are controls."
+  },
+  {
+    "file": "heat-damaged-lug.jpg",
+    "scene": "windshield-terminal",
+    "domain": "removed-part",
+    "source": "https://data.ntsb.gov/Docket/Document/docBLOB?FileExtension=.PDF&FileName=Fire+Investigation+Factual+Report-Master.PDF&ID=40335231#page=6",
+    "sourceImage": "ntsb-10076-014.jpg",
+    "sourceSha256": "48d16d2c8b578f9363add10a4746342213cddbc55d64995d791d1302a972a2ed",
+    "sha256": "d2dceac5906b5190ac6ef4859693044bd9df1536b64eccb2eec9da5776ee7914",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.234,
+          0.137,
+          0.767,
+          0.746
+        ]
+      }
+    ],
+    "note": "Top-left panel of figure 6, viewed from the front. Visible pitted and thermally damaged lug; excludes adjacent pictures in the published montage.",
+    "sourceCropPixels": [
+      0,
+      0,
+      326,
+      300
+    ]
+  },
+  {
+    "file": "intact-lug-control.jpg",
+    "scene": "windshield-terminal",
+    "domain": "removed-part",
+    "source": "https://data.ntsb.gov/Docket/Document/docBLOB?FileExtension=.PDF&FileName=Fire+Investigation+Factual+Report-Master.PDF&ID=40335231#page=6",
+    "sourceImage": "ntsb-10076-014.jpg",
+    "sourceSha256": "48d16d2c8b578f9363add10a4746342213cddbc55d64995d791d1302a972a2ed",
+    "sha256": "88b4c37deefbea5d308f1093ea7ca34ed4b1121f96127df0f6b13d4f1c1b2788",
+    "objects": [],
+    "note": "Lower-left panel of figure 6. An intact lug with exposed metal around its normal circular opening.",
+    "sourceCropPixels": [
+      0,
+      315,
+      326,
+      600
+    ]
+  },
+  {
+    "file": "melted-apu-conductor.jpg",
+    "scene": "apu-terminal",
+    "domain": "removed-part",
+    "source": "https://data.ntsb.gov/Docket/Document/docBLOB?FileExtension=.PDF&FileName=Materials+Laboratory+Factual+Report+09-103-Master.PDF&ID=40324785#page=5",
+    "sourceImage": "ntsb-09103-007.jpg",
+    "sourceSha256": "7a83143ae3ae72de81d3e5e444fb67d15d6c0f30db44484496dbb7875eafa835",
+    "sha256": "7a83143ae3ae72de81d3e5e444fb67d15d6c0f30db44484496dbb7875eafa835",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.358,
+          0.32,
+          0.693,
+          0.805
+        ]
+      }
+    ],
+    "note": "NTSB figure 6 shows visible melting around the conductor-to-terminal connection."
+  }
+]

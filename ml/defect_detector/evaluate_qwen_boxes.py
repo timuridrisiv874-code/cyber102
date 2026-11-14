@@ -1,6 +1,7 @@
 """Benchmark defect-level grounding with the local Qwen3-VL worker's weights."""
 import argparse
 from collections import Counter
+import hashlib
 import json
 from pathlib import Path
 import statistics
@@ -185,6 +186,21 @@ def guard_metrics(rows, states):
     return {truth: dict(counts) for truth, counts in outcomes.items()}
 
 
+def checked_images(rows, folder):
+    paths = {}
+    for row in rows:
+        name = row['file']
+        if not name or Path(name).name != name or name in paths:
+            raise ValueError(f'Expected unique image basenames: {name!r}')
+        path = folder / name
+        if 'sha256' in row and hashlib.sha256(path.read_bytes()).hexdigest() != row['sha256']:
+            raise ValueError(f'Image contents differ from annotations: {name}')
+        paths[name] = path
+    if not paths:
+        raise ValueError('No annotated images')
+    return paths
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('repo', type=Path, help='Local Cyber102 checkout with the Qwen vision worker')
@@ -201,6 +217,8 @@ def main():
     required_label = {'terminal': 'terminal_damage', 'crack': 'crack'}.get(args.mode)
     if required_label and args.labels != [required_label]:
         parser.error(f'--mode {args.mode} requires --labels {required_label}')
+    rows = json.loads(args.annotations.read_text(encoding='utf-8'))
+    paths = checked_images(rows, args.images)
     sys.path.insert(0, str(args.repo.resolve(strict=True)))
     from PIL import Image, ImageOps
     from vision_runtime.qwen_worker import Engine, PHOTO_MAX_PIXELS
@@ -220,7 +238,6 @@ def main():
         return engine._run(frame, prompt, max_pixels=PHOTO_MAX_PIXELS,
                            max_new_tokens=MAX_NEW_TOKENS[args.mode], max_time=85, parse=parse)
 
-    rows = json.loads(args.annotations.read_text(encoding='utf-8'))
     with Image.new('RGB', (512, 384), 'white') as warmup:
         try:
             detect(warmup)
@@ -229,7 +246,7 @@ def main():
     predictions, samples, timings, errors, states = {}, {}, {}, {}, {}
     for row in rows:
         name = row['file']
-        with Image.open(args.images / name) as source:
+        with Image.open(paths[name]) as source:
             frame = ImageOps.exif_transpose(source).convert('RGB')
         started = time.perf_counter()
         try:
