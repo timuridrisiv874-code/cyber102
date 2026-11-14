@@ -25,3 +25,9 @@
 .measure-actions button:disabled { opacity:.5; cursor:default; }
 
 #measure-qr { display: block; min-height: 44px; margin: 8px 0; padding: 6px 12px; color: var(--ink); background: var(--surface,#fff); border: 1px solid var(--line); border-radius: 5px; font: inherit; cursor: pointer; }
+#motor-resource { margin: 12px 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface, white); }
+#motor-resource h3 { margin: 0 0 12px; }
+#motor-resource p { margin: 8px 0; }
+#motor-resource label { display: block; margin: 12px 0 4px; }
+#motor-resource input { width: min(100%, 20rem); min-height: 44px; }
+#motor-resource-remaining { font-weight: 600; }

@@ -23,6 +23,7 @@ FIELD_LABELS = {
     "year": "Год выпуска", "technical_specification": "Технические условия", "purpose": "Назначение",
     "design_resource_before_writeoff": "Паспортный ресурс до списания, не менее",
     "design_lifetime": "Паспортный срок службы", "flow_range": "Паспортный диапазон подачи",
+    "assigned_resource": "Назначенный ресурс", "assigned_lifetime": "Назначенный срок службы",
     "product_temperature_max_steaming_pump_off": "Макс. температура продукта при пропарке и выключенном насосе",
     "product_density_max": "Макс. плотность продукта", "solid_fraction_max": "Макс. концентрация твёрдой фазы",
     "dimensions": "Габариты Д × Ш × В", "mass": "Масса", "pressure_max": "Давление, до",
@@ -263,6 +264,8 @@ def component_records(group):
         "manufacturer": field("АО «Ярославский электромашиностроительный завод»", None, doc, motor_page, "Изготовитель — АО «Ярославский электромашиностроительный завод»"),
         "manufacture_date": field("2023-03-01", None, doc, motor_page, "Дата изготовления 2023.03.01"),
         "protection_rating": field("IP55", None, doc, motor_page, "Степень защиты IP 55"),
+        "assigned_resource": field(60000, "ч", doc, motor_page + 1, "Назначенный ресурс - 60000 ч."),
+        "assigned_lifetime": field(20, "лет", doc, motor_page + 1, "Назначенный срок службы - 20 лет."),
     }
     gear_fields = {
         "serial": field(gear_number, None, doc, gear_page, f"Редуктор {GEAR_MODEL} №{gear_number}"),

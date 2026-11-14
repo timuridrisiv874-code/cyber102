@@ -45,6 +45,16 @@ def analyze_video_job(payload):
     return video_review._analyze_prepared(payload)
 
 
+def save_video_job(payload, result, *, database):
+    frame = video_review.inspection_frame(payload, result)
+    if frame is None:
+        return result
+    jpeg, observation = frame
+    with closing(connect(database)) as connection, connection:
+        evidence = inspections.store_analysis(connection, jpeg, observation)
+    return {**result, 'representativeFrame': {**observation, **evidence}}
+
+
 def bounded_analysis_upload(method):
     @wraps(method)
     def bounded(self, *args, **kwargs):
@@ -615,13 +625,14 @@ class Handler(SimpleHTTPRequestHandler):
             body = self.rfile.read(length)
             if len(body) != length:
                 raise ValueError('Кадры получены не полностью. Повторите отправку.')
+            payload = video_review.prepare_request(video_review.strict_json(body))
+            finalize = partial(save_video_job, database=self.database)
             if asynchronous:
-                payload = video_review.prepare_request(video_review.strict_json(body))
                 canonical = json.dumps(payload, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()
-                self.enqueue_analysis('video', payload, canonical, analyze_video_job)
+                self.enqueue_analysis('video', payload, canonical, analyze_video_job, finalize)
                 return
             with self.server.analysis_queue.legacy():
-                result = video_review.analyze_request(self.headers.get('Content-Type', ''), body)
+                result = finalize(payload, analyze_video_job(payload))
         except TimeoutError:
             self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить кадры за отведённое время.')
         except (ValueError, UnicodeError, RecursionError) as error:

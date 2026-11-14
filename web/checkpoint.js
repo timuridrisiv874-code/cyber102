@@ -387,6 +387,33 @@ workForm.addEventListener('submit', async event => {
   }
 });
 
+function videoEvidence(review) {
+  const format = window.CyberVideoReview;
+  if (!format || !Array.isArray(review?.observations) || !review.observations.length) return null;
+  const grouped = format.groupObservations(review.observations);
+  const details = element('details', undefined, 'data-note history-entry-details journal-video');
+  details.append(element('summary', `Видео · ${format.evidenceTime(review.clipDurationSeconds)} · Проверено кадров: ${grouped.frameCount}`));
+  const extras = review.defectDetails || [];
+  const secondaryOnly = !grouped.groups.length && extras.some(row => row.boxes.length);
+  details.append(element('p', secondaryOnly ? 'Повторная проверка выделила признаки повреждений на отдельных кадрах.'
+    : format.summarize(grouped)));
+  for (const group of grouped.groups) {
+    const times = group.observations.map(row => format.evidenceTime(row.timestampSeconds)).join(', ');
+    details.append(element('p', `${format.components[group.component]} · ${format.conditions[group.condition]} · ${times}`));
+  }
+  const timedDetails = new Map();
+  for (const row of extras) {
+    for (const kind of new Set(row.boxes.map(item => item.kind))) {
+      if (!Object.hasOwn(format.detailNames, kind)) continue;
+      if (!timedDetails.has(kind)) timedDetails.set(kind, []);
+      timedDetails.get(kind).push(format.evidenceTime(row.timestampSeconds));
+    }
+  }
+  for (const [kind, times] of timedDetails) details.append(element('p', format.detailNames[kind] + ' · ' + times.join(', ')));
+  if (review.summary?.trim()) details.append(element('p', review.summary));
+  return details;
+}
+
 function historyEntry(record, date, scenarios) {
   const entry = element('li', undefined, 'history-entry');
   entry.dataset.recordId = record.id;
@@ -396,7 +423,7 @@ function historyEntry(record, date, scenarios) {
   const result = evidence?.result;
   const findings = Array.isArray(record.findings) ? record.findings : [];
   const source = { camera: 'Осмотр с камеры', uploaded_photo: 'Фото', uploaded_video: 'Видеокадр' }[record.provenance?.captureSource] || 'Осмотр с камеры';
-  const title = captured ? result?.finding || findings[0]?.title || source : scenario;
+  const title = captured ? (result?.videoReview ? 'Видеоосмотр' : result?.finding || findings[0]?.title || source) : scenario;
   const heading = element('div', undefined, 'history-entry-heading');
   if (Number.isFinite(date.getTime())) {
     const time = element('time', historyTime.format(date));
@@ -410,6 +437,8 @@ function historyEntry(record, date, scenarios) {
   } else {
     const details = element('details', undefined, 'data-note history-entry-details');
     details.append(element('summary', 'Данные осмотра'));
+    const clip = videoEvidence(result?.videoReview);
+    if (clip) entry.append(clip);
     if (record.provenance.telemetry === 'demo_scenario') entry.append(element('p', `Пример показаний · ${scenario}`));
     const videoTime = result?.media?.videoTimeSeconds;
     const moment = Number.isFinite(videoTime) ? `Время в видео — ${videoTime.toLocaleString('ru-RU')} с` : '';
@@ -453,7 +482,7 @@ function historyEntry(record, date, scenarios) {
     if (uuid.test(evidence?.analysisId)) {
       const context = [record.serial, nodeName, Number.isFinite(date.getTime()) && `${historyDay.format(date)} · ${historyTime.format(date)}`, moment].filter(Boolean).join(' · ');
       const photos = element('div', undefined, 'journal-photos');
-      photos.append(frameButton(closeup || record.work?.length ? 'Общий вид' : 'Открыть кадр',
+      photos.append(frameButton(clip ? 'Опорный кадр видео' : closeup || record.work?.length ? 'Общий вид' : 'Открыть кадр',
         `/api/analyses/${evidence.analysisId}/image`, context, {box: result?.box, point: closeup?.point}));
       if (closeup) photos.append(frameButton('Крупный план', `/api/history/${record.id}/closeup/image`, context, {measurement: closeup.measurement}));
       entry.append(photos);

@@ -176,6 +176,7 @@ class VideoWorkerRelayTests(unittest.TestCase):
         self.assertEqual(result['status'], 'unusable')
         self.assertTrue(all(item['status'] == 'unusable' for item in result['observations']))
         self.assertEqual(result['observations'][0]['observation'], 'Нужен более крупный план.')
+        self.assertIsNone(video_review.inspection_frame(data, result))
 
     def test_partial_abstention_is_not_reported_as_a_clear_clip(self):
         data = request_data()
@@ -184,6 +185,21 @@ class VideoWorkerRelayTests(unittest.TestCase):
         result = video_review.result_from_envelope(envelope, data)
         self.assertEqual(result['status'], 'unusable')
         self.assertEqual([item['status'] for item in result['observations']], ['clear', 'unusable'])
+        _, frame = video_review.inspection_frame(data, result)
+        self.assertEqual(frame['status'], 'clear')
+        self.assertEqual(frame['videoReview']['status'], 'unusable')
+
+    def test_second_pass_evidence_selects_a_frame_without_changing_overview_status(self):
+        data = request_data()
+        envelope = worker_response(data, condition='no_visible_defect')
+        details = [{'frameIndex': i, 'timestampSeconds': f['timestampSeconds'], 'status': 'checked', 'boxes': []}
+                   for i, f in enumerate(data['frames'])]
+        details[1]['boxes'] = [{'kind': 'crack', 'box': [10, 20, 35, 48]}]
+        review = video_review.result_from_envelope({**envelope, 'defectDetails': details}, data)
+        _, frame = video_review.inspection_frame(data, review)
+        self.assertEqual(frame['media']['frameIndex'], 1)
+        self.assertEqual(frame['status'], 'clear')
+        self.assertEqual(frame['videoReview']['defectDetails'], details)
 
     def test_worker_metrics_are_validated_without_rejecting_real_worker_envelope(self):
         data = request_data()

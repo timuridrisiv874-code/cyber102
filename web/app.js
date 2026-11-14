@@ -69,6 +69,15 @@ clipReview = offlineMode ? null : window.CyberVideoReview?.create({
   },
   onBusyChange: render,
   isInspecting: () => checking || Boolean(analysisController || videoRun || regionController),
+  onUseOverview: (representative, image) => {
+    window.CyberCamera.validateModel(representative);
+    const inspected = readResult(representative);
+    media.pause();
+    drawFrame(snapshot, image);
+    frameSource = 'uploaded_video'; frameMetadata = inspected.media; result = inspected;
+    showMessage(); render();
+    byId('inspection-title').focus();
+  },
   onSelectFrame: () => {
     if (!frameSource || media.kind !== 'uploaded_video') return;
     result = null; frameSource = null; frameMetadata = null;

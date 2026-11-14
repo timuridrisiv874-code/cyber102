@@ -3,6 +3,32 @@
   'use strict';
   const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
 
+  function citedField(record, key, units) {
+    const field = record?.fields?.[key];
+    const ref = field?.source;
+    return Number.isFinite(field?.value) && field.value > 0 && units.includes(field.unit) &&
+      typeof ref?.documentId === 'string' && /^[a-zA-Z0-9_-]+$/.test(ref.documentId) &&
+      Number.isSafeInteger(ref.page) && ref.page > 0 ? field : null;
+  }
+
+  function motorThreshold(catalog, serial, reading) {
+    const motor = catalog?.equipment?.find(item => item.kind === 'motor' && item.serial === serial);
+    const life = citedField(motor, 'assigned_lifetime', ['лет', 'года', 'год']);
+    const hours = citedField(motor, 'assigned_resource', ['ч']);
+    if (!hours && !life) return null;
+    const terms = [], sources = new Map();
+    for (const [field, label] of [[life, 'Назначенный срок службы'], [hours, 'Назначенный ресурс']]) {
+      if (!field) continue;
+      terms.push(`${label} — ${number.format(field.value)} ${field.unit}`);
+      sources.set(`/api/customer/documents/${field.source.documentId}/pdf#page=${field.source.page}`, `Паспорт двигателя · стр. ${field.source.page}`);
+    }
+    const valid = Number.isFinite(reading) && reading >= 0;
+    const remaining = !valid || !hours ? '' : reading >= hours.value
+      ? 'Назначенный ресурс по наработке достигнут.'
+      : `До назначенного ресурса — ${number.format(hours.value - reading)} ч.`;
+    return {terms: terms.join('. ') + '.', remaining, acceptsHours: Boolean(hours), sources};
+  }
+
   function pumpThreshold(catalog, serial, source, reading) {
     const pump = catalog?.equipment?.find(item => item.kind === 'pump' && item.serial === serial);
     if (!pump) return null;
@@ -10,10 +36,9 @@
     const sources = new Map();
     let minimum;
     for (const [key, units] of [['design_lifetime', ['год', 'года', 'лет']], ['design_resource_before_writeoff', ['ч']]]) {
-      const field = pump.fields?.[key];
-      const ref = field?.source;
-      if (!Number.isFinite(field?.value) || field.value <= 0 || !units.includes(field.unit) ||
-          !/^[a-zA-Z0-9_-]+$/.test(ref?.documentId ?? '') || !Number.isSafeInteger(ref.page) || ref.page < 1) continue;
+      const field = citedField(pump, key, units);
+      if (!field) continue;
+      const ref = field.source;
       const amount = `${number.format(field.value)} ${field.unit}`;
       if (key === 'design_lifetime') terms.push(`Срок службы — ${amount}`);
       else {
@@ -36,7 +61,7 @@
     return { terms: terms.join('. ') + '.', hours, sources };
   }
 
-  if (typeof module !== 'undefined' && module.exports) module.exports = { pumpThreshold };
+  if (typeof module !== 'undefined' && module.exports) module.exports = { pumpThreshold, motorThreshold };
   if (typeof window === 'undefined' || window.CyberWebBoot?.blocked) return;
   const byId = (id) => document.getElementById(id);
 
@@ -138,6 +163,10 @@
   let passportsPromise = null;
   let passports = null;
   const resource = byId('inspection-resource');
+  const motorPanel = byId('motor-resource');
+  const motorSerial = byId('motor-resource-serial');
+  const motorHours = byId('motor-resource-reading');
+  let motorContext = '';
   const visionLabels = {
     seal_leak: 'Жидкость именно в зоне уплотнения вала',
     foundation_issue: 'Коррозия рамы / отсутствие или ослабление анкеров',
@@ -271,6 +300,47 @@
     message.dataset.error = String(error);
   }
 
+  function syncMotorResource() {
+    if (!motorPanel) return;
+    const selectedSerial = serial.value.trim();
+    const equipment = passports?.equipment.find(item => item.serial === selectedSerial);
+    const direct = equipment?.kind === 'motor';
+    const onPump = equipment?.kind === 'pump' && serialReady === selectedSerial && component.value === 'motor';
+    const context = direct ? 'motor:' + selectedSerial : onPump ? 'pump:' + selectedSerial : '';
+    if (context !== motorContext) {
+      motorContext = context;
+      motorSerial.value = '';
+      motorHours.value = '';
+    }
+    motorPanel.hidden = !context;
+    if (!context) return;
+    const home = direct ? byId('motor-resource-home') : componentRow.parentElement;
+    if (motorPanel.parentElement !== home) {
+      if (direct) home.append(motorPanel); else componentRow.after(motorPanel);
+    }
+    const lookup = direct ? selectedSerial : motorSerial.value.trim();
+    const data = motorThreshold(passports, lookup, motorHours.valueAsNumber);
+    byId('motor-resource-title').textContent = direct || data ? `Электродвигатель · ${lookup}` : 'Ресурс электродвигателя';
+    byId('motor-resource-confirm').hidden = direct;
+    byId('motor-resource-values').hidden = !data;
+    byId('motor-resource-missing').hidden = !lookup || Boolean(data);
+    if (!data) return;
+    byId('motor-resource-terms').textContent = data.terms;
+    byId('motor-resource-hour-field').hidden = !data.acceptsHours;
+    byId('motor-resource-remaining').textContent = data.remaining;
+    const links = byId('motor-resource-sources');
+    if (links.dataset.serial !== lookup) {
+      links.replaceChildren();
+      for (const [href, label] of data.sources) {
+        const a = textNode('a', label);
+        a.href = href; a.target = '_blank'; a.rel = 'noopener'; a.className = 'text-link';
+        if (links.childNodes.length) links.append(' · ');
+        links.append(a);
+      }
+      links.dataset.serial = lookup;
+    }
+  }
+
   function sync() {
     fields.disabled = pending || cameraBusy || Boolean(savePayload) || Boolean(saved);
     const ready = Boolean(current && serialReady && serialReady === serial.value.trim());
@@ -293,7 +363,7 @@
     historyLink.href = ready ? `/checkpoint.html?${query}` : '/checkpoint.html';
     historyLink.textContent = saved ? 'Открыть осмотр в журнале' : 'История осмотров';
     if (resource) {
-      const data = ready ? pumpThreshold(passports, serialReady, selected, byId('inspection-telemetry-hours')?.valueAsNumber) : null;
+      const data = ready && component.value !== 'motor' ? pumpThreshold(passports, serialReady, selected, byId('inspection-telemetry-hours')?.valueAsNumber) : null;
       resource.hidden = !data;
       byId('service-life-fallback').hidden = Boolean(data);
       if (data) {
@@ -318,6 +388,7 @@
         }
       }
     }
+    syncMotorResource();
   }
 
   function invalidate() {
@@ -359,11 +430,17 @@
     if (!requested) return;
     setMessage('Проверяем серийный номер…');
     try {
+      await loadPassports().catch(() => null);
+      if (load !== serialLoad || requested !== serial.value.trim()) return;
+      if (passports?.equipment.some(item => item.serial === requested && item.kind === 'motor')) {
+        component.replaceChildren(new Option('Электродвигатель', 'motor'));
+        setMessage('Для записи осмотра укажите номер насосного агрегата.');
+        return;
+      }
       const [data, referenceData] = await Promise.all([
         api(`/api/scenarios?${new URLSearchParams({ serial: requested })}`),
         api(`/api/recommendations?${new URLSearchParams({ serial: requested })}`).catch(() => null),
         loadCatalog().catch(() => null),
-        resource && loadPassports().catch(() => null),
       ]);
       if (load !== serialLoad || requested !== serial.value.trim()) return;
       if (data.passport?.serial !== requested || !Array.isArray(data.scenarios)) throw new Error('Сервер не подтвердил серийный номер.');
@@ -416,7 +493,7 @@
         row.append(label, input);
         manual.append(row);
       }
-      serialChoices.replaceChildren(...equipment.equipment.filter((item) => !item.kind || item.kind === 'pump')
+      serialChoices.replaceChildren(...equipment.equipment.filter((item) => !item.kind || item.kind === 'pump' || item.kind === 'motor')
         .map((item) => new Option(`${item.serial} · ${item.model}`, item.serial)));
     }).catch((error) => { catalogPromise = null; throw error; });
     return catalogPromise;
@@ -629,7 +706,8 @@
         for (const select of confirms.querySelectorAll('select')) select.value = '';
         gauge.value = note.value = '';
         if (valid) {
-          byId('inspection-frame').textContent = result.regionNote ? 'В журнале сохранится выбранный фрагмент.' : 'В журнале сохранится проверенный кадр.';
+          byId('inspection-frame').textContent = result.videoReview ? 'В журнале сохранятся сводка, таймкоды и опорный кадр видео.'
+            : result.regionNote ? 'В журнале сохранится выбранный фрагмент.' : 'В журнале сохранится проверенный кадр.';
           if (result.regionNote) note.value = result.regionNote;
           if (!serialReady) loadSerial();
         }
@@ -675,11 +753,20 @@
   serial.addEventListener('input', () => {
     if (closeupPoint && closeupPanel.dataset.serial && serial.value.trim() !== closeupPanel.dataset.serial) resetCloseup();
     serialReady = ''; serialLoad += 1; invalidate();
+    if (serial.value.trim() && !passports) loadPassports().then(syncMotorResource).catch(() => {});
   });
   for (const input of [serial, activeEquipment]) input?.addEventListener('focus', () => {
     loadCatalog().catch(() => setMessage('Список оборудования не загрузился. Введите серийный номер вручную.', true));
   });
   serial.addEventListener('change', loadSerial);
+  motorHours?.addEventListener('input', syncMotorResource);
+  motorSerial?.addEventListener('input', () => { motorHours.value = ''; syncMotorResource(); });
+  if (motorPanel && serial.value.trim()) loadPassports().then(() => {
+    if (passports?.equipment.some(item => item.kind === 'motor' && item.serial === serial.value.trim()) && !current) {
+      component.replaceChildren(new Option('Электродвигатель', 'motor'));
+    }
+    syncMotorResource();
+  }).catch(() => {});
   telemetry.addEventListener('change', invalidate);
   manual.addEventListener('input', invalidate);
   component.addEventListener('change', invalidate);

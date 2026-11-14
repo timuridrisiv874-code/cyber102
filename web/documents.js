@@ -58,10 +58,11 @@
         list.append(entry);
       }
       details.append(list); card.append(details);
-      if (item.kind === 'pump' && item.serial) {
-        const inspect = node('a', 'Начать осмотр', 'text-link');
+      if (item.serial && (item.kind === 'pump' || item.kind === 'motor')) {
+        const action = item.kind === 'motor' ? 'Рассчитать ресурс двигателя' : 'Начать осмотр';
+        const inspect = node('a', action, 'text-link');
         inspect.href = `index.html?${new URLSearchParams({serial: item.serial})}`;
-        inspect.setAttribute('aria-label', `Начать осмотр ${item.serial}`);
+        inspect.setAttribute('aria-label', `${action} ${item.serial}`);
         card.append(inspect);
       }
       $('equipment-grid').append(card);

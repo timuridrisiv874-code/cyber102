@@ -65,8 +65,21 @@ def main():
             with Image.open(ROOT / 'web/demo-pump.jpg') as photo:
                 photo.crop((722, 220, 1032, 742)).save(closeup, 'JPEG', quality=92)
             fixture['closeup'] = str(closeup)
+        exercise_video = '--video-history' in sys.argv
+        if exercise_video:
+            def fixture_video(endpoint, payload, timeout):
+                spec = app.vision.model_spec()
+                return {'model': spec.model_id, 'revision': spec.revision,
+                        'durationSeconds': 0.2, 'summary': 'Проверить фланец на двух кадрах.',
+                        'observations': [
+                            {'frameIndex': i, 'timestampSeconds': frame['timestampSeconds'],
+                             'component': 'pipe', 'condition': 'corrosion' if i in (2, 5) else 'no_visible_defect',
+                             'observation': 'Результат контрольного кадра', 'box': [200, 250, 600, 750]}
+                            for i, frame in enumerate(payload['frames'])]}
+            app.vision.request_json = fixture_video
         handler = partial(FixtureHandler, database=database, public_url='',
-                          vision_enabled=exercise_uploads, customer_root=customer.ROOT)
+                          vision_enabled=exercise_uploads or exercise_video,
+                          vision_backend='internvl3' if exercise_video else 'ollama', customer_root=customer.ROOT)
         with app.BoundedHTTPServer(('127.0.0.1', 0), handler) as server:
             print(json.dumps({'url': f'http://127.0.0.1:{server.server_port}', **fixture}), flush=True)
             server.serve_forever(poll_interval=.05)

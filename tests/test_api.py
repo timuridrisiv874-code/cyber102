@@ -224,7 +224,7 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(caps['vision']['videoReview'])
         self.assertEqual(caps['vision']['model'], vision.INTERNVL_MODEL)
         self.assertEqual(caps['media']['maxReviewFrames'], 8)
-        with patch.object(video_review, 'analyze_request') as analyze:
+        with patch.object(video_review, '_analyze_prepared') as analyze:
             for status, headers in (
                 (403, {'Origin': 'https://elsewhere.example.test'}),
                 (415, {'Content-Type': 'text/plain'}),
@@ -245,19 +245,20 @@ class ApiTest(unittest.TestCase):
             self.assertTrue(caps['videoReview'])
 
     def test_video_review_returns_preview_and_busy_without_writing_history(self):
+        from tests.test_video_review import request_data, worker_response
         self.handler.keywords.update(vision_enabled=True, vision_backend='internvl3')
-        body = {'frames': [{'image': 'validated-by-adapter', 'timestampSeconds': 0}], 'durationSeconds': 1}
-        result = {'source': 'local_vision', 'model': vision.INTERNVL_MODEL,
-                  'summary': 'Видимые признаки требуют проверки.', 'observations': [], 'preliminary': True}
-        with patch.object(video_review, 'analyze_request', return_value=result) as analyze:
-            self.assertEqual(self.json_request('POST', '/api/video-review', body=body), result)
-            analyze.assert_called_once()
-            self.assertEqual(json.loads(analyze.call_args.args[1]), body)
+        body = request_data()
+        envelope = worker_response(body, condition='no_visible_defect')
+        with patch.object(vision, 'request_json', return_value=envelope):
+            result = self.json_request('POST', '/api/video-review', body=body)
+        self.assertEqual(result['representativeFrame']['status'], 'clear')
+        self.assertEqual(result['representativeFrame']['media']['frameIndex'], 0)
+        self.assertFalse(result['saved'])
         self.assertEqual(self.json_request('GET', '/api/history?serial=P-102'), {'records': []})
         for error, status in ((ValueError('Invalid frames'), 400),
                               (vision.VisionUnavailable('Model unavailable'), 503),
                               (vision.VisionBusy('Busy'), 503)):
-            with self.subTest(error=type(error)), patch.object(video_review, 'analyze_request', side_effect=error):
+            with self.subTest(error=type(error)), patch.object(video_review, '_analyze_prepared', side_effect=error):
                 payload = self.json_request('POST', '/api/video-review', status, body=body)
                 if isinstance(error, vision.VisionBusy):
                     self.assertEqual(payload['code'], 'vision_busy')

@@ -10,18 +10,18 @@
   <link rel="stylesheet" href="styles.css?v=field-20261114">
   <link rel="stylesheet" href="workspace.css?v=inspection-photos-1">
   <link rel="stylesheet" href="region-review.css?v=field-20261114">
-  <link rel="stylesheet" href="inspection-tools.css?v=2">
+  <link rel="stylesheet" href="inspection-tools.css?v=motor-resource-1">
   <script src="offline.js" defer></script>
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="analysis-jobs.js" defer></script>
   <script src="inspection-photo.js?v=1" defer></script>
-  <script src="inspection.js?v=inspection-photos-1" defer></script>
+  <script src="inspection.js?v=motor-resource-1" defer></script>
   <script src="media.js?v=mobile-recovery-20261114" defer></script>
-  <script src="video-review.js?v=resource-20261114" defer></script>
+  <script src="video-review.js?v=video-journal-1" defer></script>
   <script src="region-review.js?v=field-20261114" defer></script>
-  <script src="app.js?v=inspection-photos-1" defer></script>
+  <script src="app.js?v=video-journal-1" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
-  <script src="equipment-qr.js?v=2" defer></script>
+  <script src="equipment-qr.js?v=motor-resource-1" defer></script>
   <script src="photo-measure.js?v=1" defer></script>
 </head>
 <body data-page="inspection">
@@ -42,6 +42,25 @@
       <a href="documents.html">Паспорта</a>
     </section>
 
+    <div id="motor-resource-home">
+      <section id="motor-resource" aria-labelledby="motor-resource-title" hidden>
+        <h3 id="motor-resource-title">Ресурс электродвигателя</h3>
+        <div id="motor-resource-confirm" hidden>
+          <label for="motor-resource-serial">Серийный номер установленного двигателя</label>
+          <input id="motor-resource-serial" maxlength="128" placeholder="Номер с таблички двигателя" autocomplete="off">
+        </div>
+        <p id="motor-resource-missing" role="status" hidden>Для этого номера паспортный ресурс не найден.</p>
+        <div id="motor-resource-values" hidden>
+          <p id="motor-resource-terms"></p>
+          <p id="motor-resource-sources"></p>
+          <div id="motor-resource-hour-field">
+            <label for="motor-resource-reading">Суммарная наработка этого двигателя, ч</label>
+            <input id="motor-resource-reading" type="number" min="0" step="any" inputmode="decimal" placeholder="По счётчику или журналу">
+          </div>
+          <p><output id="motor-resource-remaining" for="motor-resource-reading"></output></p>
+        </div>
+      </section>
+    </div>
     <div class="workspace">
       <section class="capture panel" aria-labelledby="capture-title">
         <div class="panel-heading"><h2 id="capture-title">Фото и видео</h2><span class="source" id="source" hidden><span id="source-text"></span></span></div>
@@ -130,7 +149,7 @@
           <button id="closeup-open" type="button" class="button secondary" hidden aria-controls="inspection-closeup">Добавить крупный план</button>
         </div>
         <section class="details" id="inspection-workflow" aria-labelledby="inspection-title" hidden>
-          <h3 id="inspection-title">Зафиксировать осмотр</h3><p class="equipment-id" id="inspection-frame"></p><p class="message" id="inspection-paused" hidden>Остановите видеопроверку, чтобы подтвердить и сохранить последний кадр.</p>
+          <h3 id="inspection-title" tabindex="-1">Зафиксировать осмотр</h3><p class="equipment-id" id="inspection-frame"></p><p class="message" id="inspection-paused" hidden>Остановите видеопроверку, чтобы подтвердить и сохранить последний кадр.</p>
           <form id="inspection-form">
             <fieldset id="inspection-fields"><legend>Оборудование и показания</legend>
               <section id="inspection-closeup" class="inspection-closeup" aria-labelledby="closeup-title" hidden>

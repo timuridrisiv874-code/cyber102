@@ -376,6 +376,26 @@
             "quote": "Степень защиты IP 55"
           },
           "label": "Степень защиты"
+        },
+        "assigned_resource": {
+          "value": 60000,
+          "unit": "ч",
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 2,
+            "quote": "Назначенный ресурс - 60000 ч."
+          },
+          "label": "Назначенный ресурс"
+        },
+        "assigned_lifetime": {
+          "value": 20,
+          "unit": "лет",
+          "source": {
+            "documentId": "drive-1-passports",
+            "page": 2,
+            "quote": "Назначенный срок службы - 20 лет."
+          },
+          "label": "Назначенный срок службы"
         }
       },
       "sources": [
@@ -413,6 +433,20 @@
           "quote": "Степень защиты IP 55",
           "field": "protection_rating",
           "label": "Степень защиты"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 2,
+          "quote": "Назначенный ресурс - 60000 ч.",
+          "field": "assigned_resource",
+          "label": "Назначенный ресурс"
+        },
+        {
+          "documentId": "drive-1-passports",
+          "page": 2,
+          "quote": "Назначенный срок службы - 20 лет.",
+          "field": "assigned_lifetime",
+          "label": "Назначенный срок службы"
         }
       ]
     },
@@ -1000,6 +1034,26 @@
             "quote": "Степень защиты IP 55"
           },
           "label": "Степень защиты"
+        },
+        "assigned_resource": {
+          "value": 60000,
+          "unit": "ч",
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 2,
+            "quote": "Назначенный ресурс - 60000 ч."
+          },
+          "label": "Назначенный ресурс"
+        },
+        "assigned_lifetime": {
+          "value": 20,
+          "unit": "лет",
+          "source": {
+            "documentId": "drive-2-passports",
+            "page": 2,
+            "quote": "Назначенный срок службы - 20 лет."
+          },
+          "label": "Назначенный срок службы"
         }
       },
       "sources": [
@@ -1037,6 +1091,20 @@
           "quote": "Степень защиты IP 55",
           "field": "protection_rating",
           "label": "Степень защиты"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 2,
+          "quote": "Назначенный ресурс - 60000 ч.",
+          "field": "assigned_resource",
+          "label": "Назначенный ресурс"
+        },
+        {
+          "documentId": "drive-2-passports",
+          "page": 2,
+          "quote": "Назначенный срок службы - 20 лет.",
+          "field": "assigned_lifetime",
+          "label": "Назначенный срок службы"
         }
       ]
     },
@@ -1570,6 +1638,26 @@
             "quote": "Степень защиты IP 55"
           },
           "label": "Степень защиты"
+        },
+        "assigned_resource": {
+          "value": 60000,
+          "unit": "ч",
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 4,
+            "quote": "Назначенный ресурс - 60000 ч."
+          },
+          "label": "Назначенный ресурс"
+        },
+        "assigned_lifetime": {
+          "value": 20,
+          "unit": "лет",
+          "source": {
+            "documentId": "drive-3-passports",
+            "page": 4,
+            "quote": "Назначенный срок службы - 20 лет."
+          },
+          "label": "Назначенный срок службы"
         }
       },
       "sources": [
@@ -1607,6 +1695,20 @@
           "quote": "Степень защиты IP 55",
           "field": "protection_rating",
           "label": "Степень защиты"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 4,
+          "quote": "Назначенный ресурс - 60000 ч.",
+          "field": "assigned_resource",
+          "label": "Назначенный ресурс"
+        },
+        {
+          "documentId": "drive-3-passports",
+          "page": 4,
+          "quote": "Назначенный срок службы - 20 лет.",
+          "field": "assigned_lifetime",
+          "label": "Назначенный срок службы"
         }
       ]
     },
@@ -2194,6 +2296,26 @@
             "quote": "Степень защиты IP 55"
           },
           "label": "Степень защиты"
+        },
+        "assigned_resource": {
+          "value": 60000,
+          "unit": "ч",
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 2,
+            "quote": "Назначенный ресурс - 60000 ч."
+          },
+          "label": "Назначенный ресурс"
+        },
+        "assigned_lifetime": {
+          "value": 20,
+          "unit": "лет",
+          "source": {
+            "documentId": "drive-4-passports",
+            "page": 2,
+            "quote": "Назначенный срок службы - 20 лет."
+          },
+          "label": "Назначенный срок службы"
         }
       },
       "sources": [
@@ -2231,6 +2353,20 @@
           "quote": "Степень защиты IP 55",
           "field": "protection_rating",
           "label": "Степень защиты"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 2,
+          "quote": "Назначенный ресурс - 60000 ч.",
+          "field": "assigned_resource",
+          "label": "Назначенный ресурс"
+        },
+        {
+          "documentId": "drive-4-passports",
+          "page": 2,
+          "quote": "Назначенный срок службы - 20 лет.",
+          "field": "assigned_lifetime",
+          "label": "Назначенный срок службы"
         }
       ]
     },

@@ -76,6 +76,22 @@ class CustomerDocumentPackageTests(unittest.TestCase):
             for reference in requirement["sources"]:
                 self.assert_source(reference)
 
+    def test_assigned_limits_match_each_motor_passport(self):
+        pages_by_serial = {
+            "230201068": ("drive-1-passports", 2), "230201069": ("drive-2-passports", 2),
+            "230201067": ("drive-3-passports", 4), "230201070": ("drive-4-passports", 2),
+        }
+        for item in self.passports["equipment"]:
+            for key, value, unit in (("assigned_resource", 60000, "ч"), ("assigned_lifetime", 20, "лет")):
+                if item["kind"] != "motor":
+                    self.assertNotIn(key, item["fields"])
+                    continue
+                with self.subTest(serial=item["serial"], field=key):
+                    field = item["fields"][key]
+                    self.assertEqual((field["value"], field["unit"]), (value, unit))
+                    source = field["source"]
+                    self.assertEqual((source["documentId"], source["page"]), pages_by_serial[item["serial"]])
+
     def test_originals_when_present_have_matching_bytes_and_hash(self):
         raw = DATA / "documents"
         if not raw.is_dir():

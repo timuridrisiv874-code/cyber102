@@ -9,6 +9,7 @@
   const CONDITIONS = { corrosion: 'Видимая коррозия', wet_patch: 'Видимые следы жидкости',
     visible_damage: 'Видимое повреждение', no_visible_defect: 'Явных внешних дефектов не замечено',
     uncertain: 'Недостаточно данных' };
+  const DETAIL_NAMES = { crack: 'Признаки трещины', terminal_damage: 'Признаки повреждения клеммы или проводки' };
   const aborted = () => new DOMException('Операция отменена', 'AbortError');
   const text = (tag, className, value) => {
     const element = document.createElement(tag);
@@ -77,9 +78,10 @@
   if (typeof window === 'undefined') return;
 
   window.CyberVideoReview = {
-    groupObservations,
+    groupObservations, summarize, evidenceTime, components: COMPONENTS, conditions: CONDITIONS,
+    detailNames: DETAIL_NAMES,
     create({ media, beforeStart = () => {}, onBusyChange = () => {}, onSelectFrame = beforeStart,
-             onInspectFrame, isInspecting = () => false }) {
+             onInspectFrame, onUseOverview, isInspecting = () => false }) {
       const panel = document.getElementById('video-review-panel');
       const runButton = document.getElementById('video-review-run');
       const cancelButton = document.getElementById('video-review-cancel');
@@ -217,8 +219,33 @@
         const summary = text('p', 'video-review-summary', summarize(grouped));
         fragment.append(summary);
         fragment.append(text('p', 'video-review-meta', `Длительность ${evidenceTime(captured.durationSeconds)} · Проверено кадров: ${grouped.frameCount}. Промежутки между ними не проверялись.`));
+        const representative = data.representativeFrame;
+        if (onUseOverview && representative) {
+          const index = representative.media?.frameIndex;
+          const frame = Number.isInteger(index) && captured.frames[index];
+          if (!frame || representative.media.captureSource !== 'uploaded_video' ||
+              representative.media.videoTimeSeconds !== frame.timestampSeconds ||
+              !['defect', 'clear'].includes(representative.status) ||
+              representative.status !== data.observations[index].status || !representative.analysisId ||
+              representative.videoReview?.sampledFrameCount !== captured.frames.length) {
+            throw new Error('Не удалось связать обзор с опорным кадром. Повторите разбор.');
+          }
+          const image = new Image();
+          image.src = frame.dataUrl;
+          await image.decode();
+          if (!active(token)) throw aborted();
+          const use = text('button', 'button primary', 'Оформить видеоосмотр');
+          use.type = 'button';
+          use.addEventListener('click', () => {
+            if (!active(token) || busy || isInspecting() || !ready()) return;
+            seekController?.abort(); seekController = null;
+            try { onUseOverview(representative, image); }
+            catch (error) { message(error.message, true); }
+          });
+          fragment.append(use);
+        }
         if (Array.isArray(data.defectDetails)) {
-          const names = { crack: 'Признаки трещины', terminal_damage: 'Признаки повреждения клеммы или проводки' };
+          const names = DETAIL_NAMES;
           const findings = new Map();
           if (data.defectDetails.length !== captured.frames.length) throw new Error('Сервер вернул неполную повторную проверку.');
           for (const [index, row] of data.defectDetails.entries()) {

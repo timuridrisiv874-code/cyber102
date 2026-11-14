@@ -115,8 +115,8 @@
               stop();
               field.value = serial;
               field.dispatchEvent(new Event('input', {bubbles:true}));
-              // Input invalidates the previous inspection. Only pumps have a server journal.
-              if (hasJournal(passport)) field.dispatchEvent(new Event('change', {bubbles:true}));
+              // Motors open their own passport calculator; journals remain scoped to pumps.
+              if (hasJournal(passport) || passport.kind === 'motor') field.dispatchEvent(new Event('change', {bubbles:true}));
               if (field.value === serial) {
                 showPassport(passport);
                 announce(hasJournal(passport) ? 'Выбрано оборудование ' + serial : 'Найден объект ' + serial + '. Для него доступна паспортная карточка.');

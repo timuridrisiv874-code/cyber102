@@ -176,6 +176,35 @@ def result_from_envelope(envelope, payload):
     return result
 
 
+def inspection_frame(payload, review):
+    """Pair one usable joint observation with the exact bytes used for that observation."""
+    rows = review['observations']
+    selected = next((row for row in rows if row['status'] == 'defect'), None)
+    if selected is None:
+        selected = next((rows[item['frameIndex']] for item in review.get('defectDetails', ())
+                         if item['boxes'] and rows[item['frameIndex']]['status'] == 'clear'), None)
+    if selected is None:
+        selected = next((row for row in rows if row['status'] == 'clear'), None)
+    if selected is None:
+        return None
+
+    index = selected['frameIndex']
+    frame = payload['frames'][index]
+    result = vision.result_from_observation({key: selected[key] for key in vision.SCHEMA['required']},
+                                            model=review['model'])
+    result['media'] = {'captureSource': 'uploaded_video', 'frameIndex': index,
+                       'videoTimeSeconds': frame['timestampSeconds']}
+    overview = {key: review[key] for key in
+                ('summary', 'model', 'revision', 'clipDurationSeconds', 'sampledFrameCount', 'status')}
+    overview['observations'] = [{key: row[key] for key in
+                                  ('component', 'condition', 'status', 'frameIndex', 'timestampSeconds')}
+                                 for row in rows]
+    if 'defectDetails' in review:
+        overview['defectDetails'] = review['defectDetails']
+    result['videoReview'] = overview
+    return base64.b64decode(frame['image'], validate=True), result
+
+
 def _analyze_prepared(payload):
     # Share the single-frame gate: a clip and a camera frame cannot contend here.
     if not vision._slot.acquire(blocking=False):

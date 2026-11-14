@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const {pumpThreshold} = require('../web/inspection.js');
+const {pumpThreshold, motorThreshold} = require('../web/inspection.js');
 const catalog = require('../data/customer/equipment-passports.json');
 const serial = '21031004-1';
 const digits = text => text.replace(/[\u00a0\u202f]/g, ' ');
@@ -54,4 +54,39 @@ test('unsupported unit or missing/unsafe citation does not produce a calculation
   other.fields.design_lifetime.source.documentId = '../outside';
   result = pumpThreshold({equipment:[other]}, serial, 'manual', 500);
   assert.equal(result, null);
+});
+
+test('each exact motor serial resolves its own assigned hours, years and source page', () => {
+  for (const [motor, source] of Object.entries({'230201068':'drive-1-passports/pdf#page=2',
+    '230201069':'drive-2-passports/pdf#page=2', '230201067':'drive-3-passports/pdf#page=4',
+    '230201070':'drive-4-passports/pdf#page=2'})) {
+    const result = motorThreshold(catalog, motor, 12000);
+    assert.equal(digits(result.terms), 'Назначенный срок службы — 20 лет. Назначенный ресурс — 60 000 ч.');
+    assert.equal(digits(result.remaining), 'До назначенного ресурса — 48 000 ч.');
+    assert.deepEqual([...result.sources.keys()], ['/api/customer/documents/' + source]);
+  }
+  assert.equal(motorThreshold(catalog, serial, 12000), null);
+  assert.equal(motorThreshold(catalog, 'missing', 12000), null);
+});
+
+test('motor hours require their own reading; blank, negative and zero values have separate meanings', () => {
+  for (const reading of [undefined, null, '', NaN, -1, Infinity]) {
+    assert.equal(motorThreshold(catalog, '230201068', reading).remaining, '');
+  }
+  assert.match(digits(motorThreshold(catalog, '230201068', 0).remaining), /60 000 ч/);
+  for (const reading of [60000, 61000]) {
+    assert.equal(motorThreshold(catalog, '230201068', reading).remaining, 'Назначенный ресурс по наработке достигнут.');
+  }
+});
+
+test('unsupported motor resource unit or citation suppresses only the affected field', () => {
+  const motor = structuredClone(catalog.equipment.find(item => item.serial === '230201068'));
+  motor.fields.assigned_resource.source.documentId = '../wrong';
+  const limited = {equipment: [motor]};
+  const result = motorThreshold(limited, motor.serial, 500);
+  assert.equal(result.acceptsHours, false);
+  assert.equal(result.remaining, '');
+  assert.equal(result.terms, 'Назначенный срок службы — 20 лет.');
+  motor.fields.assigned_lifetime.unit = 'месяцы';
+  assert.equal(motorThreshold(limited, motor.serial, 500), null);
 });

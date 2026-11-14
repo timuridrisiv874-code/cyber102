@@ -130,6 +130,43 @@ class QueueApiTest(unittest.TestCase):
             self.assertEqual(analyze.call_args.args[0]['frames'][0]['timestampSeconds'], 0)
         self.assertEqual(self.evidence_count(), 1)
 
+    def test_review_snapshot_survives_reload_bound_to_exact_frame(self):
+        from tests.test_video_review import encoded_image, request_data, worker_response
+        self.fixture()
+        video = request_data()
+        video['frames'][1]['image'] = encoded_image((48, 32), 'PNG')
+        envelope = worker_response(video)
+        envelope['observations'][0]['condition'] = 'no_visible_defect'
+        headers = {**self.headers, 'Content-Type': 'application/json'}
+        with patch.object(vision, 'request_json', return_value=envelope) as worker:
+            job = self.json_request('POST', '/api/video-review', 202, body=video, headers=headers)['job']
+            result = self.wait_job(job, 'succeeded')['result']
+            frame = result['representativeFrame']
+            self.assertEqual(frame['media'], {'captureSource': 'uploaded_video', 'frameIndex': 1,
+                                               'videoTimeSeconds': 8.75})
+            self.assertEqual(frame['status'], 'defect')
+            status, _, jpeg = self.request('GET', frame['imageUrl'])
+            self.assertEqual(status, 200)
+            exact_input = worker.call_args.args[1]['frames'][1]['image']
+            self.assertEqual(jpeg, base64.b64decode(exact_input))
+            retry = self.json_request('POST', '/api/video-review', 202, body=video, headers=headers)['job']
+            self.assertEqual(retry['result']['representativeFrame']['analysisId'], frame['analysisId'])
+            worker.assert_called_once()
+        self.assertEqual(self.evidence_count(), 1)
+        self.assertEqual(self.json_request('GET', '/api/history?serial=P-102')['records'], [])
+        inspection = {'serial': 'P-102', 'telemetrySource': {'kind': 'none'}, 'confirmedVision': {},
+                      'requestId': 'clip-once', 'analysisId': frame['analysisId']}
+        self.json_request('POST', '/api/inspections', 400, body={**inspection, 'videoReview': result})
+        record = self.json_request('POST', '/api/inspections', 201, body=inspection)['record']
+        self.assertFalse(self.json_request('POST', '/api/inspections', body=inspection)['created'])
+        loaded = self.json_request('GET', '/api/history?serial=P-102')['records']
+        self.assertEqual(loaded, [record])
+        snapshot = record['evidence']['result']['videoReview']
+        self.assertEqual(snapshot['summary'], envelope['summary'])
+        self.assertEqual([(row['condition'], row['timestampSeconds']) for row in snapshot['observations']],
+                         [('no_visible_defect', 1.25), ('corrosion', 8.75)])
+        self.assertEqual(snapshot, frame['videoReview'])
+
     def test_bad_tokens_nested_json_and_upload_saturation_never_enqueue(self):
         self.fixture()
         with patch.object(self.server.analysis_queue, 'submit') as submit:
