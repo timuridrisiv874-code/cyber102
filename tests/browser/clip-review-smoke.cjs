@@ -41,6 +41,10 @@ const server = http.createServer(async (req, res) => {
           observation: `Тестовое наблюдение ${index + 1}`, box: status === 'unusable' ? [0,0,0,0] : [100+index,100,500,500]};
       }) };
     if (state.mode === 'mismatch') result.observations[0].timestampSeconds += 1;
+    if (state.mode === 'one' || state.mode === 'clear') for (const row of result.observations) {
+      if (state.mode === 'one' && row.frameIndex === 0) continue;
+      Object.assign(row, {status: 'clear', component: 'pump', condition: 'no_visible_defect'});
+    }
     if (state.mode === 'separated-details') {
       for (const [index, component] of [[0,'pump'],[1,'motor'],[4,'valve'],[5,'other'],[7,'pipe']]) {
         result.observations[index].component = component;
@@ -119,7 +123,7 @@ async function checkRegion(page, timestamp) {
   await page.locator('#uploaded-video').waitFor();
   assert.ok(Math.abs(await page.locator('#uploaded-video').evaluate(v=>v.currentTime)-timestamp)<.001);
   assert.equal(await page.locator('#details').isVisible(),false);
-  assert.equal(await page.locator('.video-review-frame').count(),3);
+  assert.equal(await page.locator('.video-review-frame').count(),1);
   assert.equal(state.posts.length,1);
   await page.locator('#choose-region').click();
   await dialog.getByRole('button',{name:'Отмена'}).press('Enter');
@@ -169,7 +173,7 @@ async function run(browser, engine, android) {
       hashes.push(createHash('sha256').update(bytes).digest('hex'));
     });
     assert.equal(new Set(hashes).size, 8, 'Sampling decodes eight distinct actual frames');
-    assert.equal(await page.locator('.video-review-frame').count(), android ? 8 : 3);
+    assert.equal(await page.locator('.video-review-frame').count(), android ? 8 : 1);
     await page.waitForFunction(() => [...document.querySelectorAll('.video-review-seek img')].every(image => image.complete && image.naturalWidth > 0));
     assert.deepEqual(violations, [], 'Bundled Android CSP must allow generated local thumbnails');
     const resultText = await page.locator('#video-review-results').textContent();
@@ -181,24 +185,50 @@ async function run(browser, engine, android) {
       await page.locator('.video-review-seek').nth(3).click();
       await page.waitForFunction(time => Math.abs(document.getElementById('uploaded-video').currentTime - time) < .01, 5 * 3.5 / 8);
     } else {
-      const episodes = page.locator('.video-review-frame');
-      assert.deepEqual(await episodes.locator('.video-review-observation').allTextContents(),
-        ['Тестовое наблюдение 1','Тестовое наблюдение 5','Тестовое наблюдение 8']);
-      const thumbnails = await episodes.locator('img').evaluateAll(images => images.map(image => image.src));
-      assert.equal(new Set(thumbnails).size, 3, 'Every nonconsecutive episode starts with its own evidence');
-      const firstEpisode = episodes.first(), lastEpisode = episodes.last();
-      assert.equal(await firstEpisode.locator('.video-review-time-link').count(), 2);
-      await firstEpisode.locator('.video-review-time-link').last().press('Enter');
-      await firstEpisode.getByText('Тестовое наблюдение 2', {exact:true}).waitFor();
-      const last = lastEpisode.locator('.video-review-seek');
+      const gallery = page.locator('.video-review-gallery');
+      const slide = gallery.locator('.video-review-frame'), next = gallery.locator('.video-review-next');
+      const previous = gallery.locator('.video-review-prev'), position = gallery.locator('.video-review-position');
+      const image = slide.locator('img');
+      await position.getByText('1 из 3', {exact:true}).waitFor();
+      assert.equal(await previous.isDisabled(), true);
+      await slide.getByText('Тестовое наблюдение 1', {exact:true}).waitFor();
+      const thumbnails = [await image.getAttribute('src')];
+      const swipe = (x, y, trailingClick = false) => slide.locator('img').evaluate((img, move) => {
+        const options = {bubbles:true, pointerType:'touch', pointerId:17, isPrimary:true, button:0};
+        img.dispatchEvent(new PointerEvent('pointerdown', {...options, clientX:160, clientY:100}));
+        img.dispatchEvent(new PointerEvent('pointerup', {...options, clientX:160 + move.x, clientY:100 + move.y}));
+        if (move.trailingClick) document.querySelector('.video-review-slide img').dispatchEvent(
+          new MouseEvent('click', {bubbles:true, cancelable:true, detail:1}));
+      }, {x, y, trailingClick});
+      const playhead = await page.locator('#uploaded-video').evaluate(video => video.currentTime);
+      await swipe(-10, 85);
+      assert.equal(await position.innerText(), '1 из 3', 'Vertical scrolling keeps the selected finding');
+      await swipe(-95, 6, true);
+      await position.getByText('2 из 3', {exact:true}).waitFor();
+      assert.equal(await page.locator('#uploaded-video').evaluate(video => video.currentTime), playhead, 'Swiping should not seek the player');
+      await swipe(90, -7);
+      await position.getByText('1 из 3', {exact:true}).waitFor();
+      assert.equal(await slide.locator('.video-review-time-link').count(), 2);
+      await slide.locator('.video-review-time-link').last().press('Enter');
+      await slide.getByText('Тестовое наблюдение 2', {exact:true}).waitFor();
+      await next.click();
+      await slide.getByText('Тестовое наблюдение 5', {exact:true}).waitFor();
+      thumbnails.push(await image.getAttribute('src'));
+      await slide.locator('.video-review-seek').press('ArrowRight');
+      await slide.getByText('Тестовое наблюдение 8', {exact:true}).waitFor();
+      await position.getByText('3 из 3', {exact:true}).waitFor();
+      assert.equal(await next.isDisabled(), true);
+      thumbnails.push(await image.getAttribute('src'));
+      assert.equal(new Set(thumbnails).size, 3, 'Each slide keeps the image of its own episode');
+      const last = slide.locator('.video-review-seek');
       await last.focus(); await last.press('Enter');
       await page.waitForFunction(time => Math.abs(document.querySelector('#uploaded-video').currentTime-time)<.001, post.body.frames[7].timestampSeconds);
-      await lastEpisode.getByText('Тестовое наблюдение 8', {exact:true}).waitFor();
-      assert.equal(await lastEpisode.locator('img').getAttribute('src'), thumbnails[2]);
+      await slide.getByText('Тестовое наблюдение 8', {exact:true}).waitFor();
+      assert.equal(await image.getAttribute('src'), thumbnails[2]);
       assert.equal(state.photoPosts.length,0);
       await page.locator('#analysis-settings > summary').click();
       await checkRegion(page, post.body.frames[7].timestampSeconds);
-      await lastEpisode.getByRole('button',{name:'Уточнить кадр'}).press('Enter');
+      await slide.getByRole('button',{name:'Уточнить кадр'}).press('Enter');
       await until(() => state.photoPosts.length===2 && state.pending.length===1);
       assert.match(state.photoPosts.at(-1), /name="profile"\r?\n\r?\nstandard/);
       const sentTime = /name="videoTimeSeconds"\r?\n\r?\n([\d.]+)/.exec(state.photoPosts.at(-1));
@@ -210,10 +240,14 @@ async function run(browser, engine, android) {
       state.pending.shift()();
       await page.locator('#details').waitFor();
       assert.equal(await page.locator('#video-review-results').isVisible(), true, 'Refining a frame keeps the overview and its evidence available');
-      assert.equal(await episodes.count(), 3);
-      await firstEpisode.locator('.video-review-time-link').first().press('Enter');
+      assert.equal(await slide.count(), 1);
+      await previous.click();
+      await position.getByText('2 из 3', {exact:true}).waitFor();
+      await previous.click();
+      await position.getByText('1 из 3', {exact:true}).waitFor();
+      await slide.locator('.video-review-time-link').first().press('Enter');
       await page.locator('#uploaded-video').waitFor();
-      await firstEpisode.getByText('Тестовое наблюдение 1', {exact:true}).waitFor();
+      await slide.getByText('Тестовое наблюдение 1', {exact:true}).waitFor();
       assert.equal(await page.locator('#details').isVisible(), false);
       const residual=page.locator('.video-review-evidence');
       await residual.locator('summary').press('Enter');
@@ -222,23 +256,31 @@ async function run(browser, engine, android) {
       assert.equal(state.photoPosts.length,2);
       state.mode='separated-details';
       await page.locator('#video-review-run').click();
-      const checked = page.locator('.video-review-evidence').filter({hasText:'Уточнённые признаки'});
-      const checkedEpisodes = checked.locator('.video-review-frame');
-      await checked.waitFor();
+      await gallery.waitFor();
       const headline = await page.locator('.video-review-summary').innerText();
       assert.match(headline, /При уточнении отмечены признаки трещины\./);
       assert.doesNotMatch(headline, /проводки/);
-      const allOverview = page.locator('#video-review-results > .video-review-grid .video-review-frame');
-      assert.equal(await allOverview.count(),5);
-      for (const index of [3,4]) assert.equal(await allOverview.nth(index).isVisible(), true,
-        'The fourth and fifth findings must be visible without expanding anything');
-      await allOverview.last().getByText('Трубопровод или фланец · Видимые следы жидкости').waitFor();
-      assert.equal(await checkedEpisodes.count(),2);
-      assert.equal(await checkedEpisodes.first().locator('.video-review-time-link').count(),2);
-      assert.notEqual(await checkedEpisodes.first().locator('img').getAttribute('src'),
-        await checkedEpisodes.last().locator('img').getAttribute('src'));
-      await checkedEpisodes.last().locator('.video-review-seek').click();
+      const pages = [], total = Number((await position.innerText()).split(' из ')[1]);
+      assert.ok(total >= 5 && total <= 7);
+      for (let n = 1; n <= total; n++) {
+        await position.getByText(n + ' из ' + total, {exact:true}).waitFor();
+        assert.equal(await gallery.locator('img').count(), 1);
+        pages.push(await slide.innerText());
+        if (n < total) await next.click();
+      }
+      assert.match(pages.join(' '), /трещин/i);
+      assert.match(pages.join(' '), /Трубопровод или фланец/);
+      assert.match(pages.join(' '), /видимые следы жидкости/i);
+      await slide.locator('.video-review-seek').click();
       await page.waitForFunction(time => Math.abs(document.querySelector('#uploaded-video').currentTime-time)<.001, post.body.frames[7].timestampSeconds);
+      state.mode = 'one';
+      await page.locator('#video-review-run').click();
+      await slide.waitFor();
+      assert.equal(await gallery.locator('.video-review-gallery-nav').count(), 0);
+      state.mode = 'clear';
+      await page.locator('#video-review-run').click();
+      await page.locator('.video-review-summary').getByText(/явных внешних дефектов не замечено/i).waitFor();
+      assert.equal(await gallery.count(), 0);
       state.mode='empty';
       await page.locator('#video-review-run').click();
       await page.locator('#video-review-status').getByText('Модель не вернула наблюдений',{exact:false}).waitFor();

@@ -232,6 +232,54 @@ body[data-inspection-layout=capture] #result { display: none; }
 .video-review-evidence { margin-top: 12px; }
 .video-review-frame { padding: 12px; border-radius: 6px; background: #faf9f6; }
 .video-review-finding { font-size: 15px; font-weight: 650; }
+.video-review-gallery {
+  margin-top: 16px;
+  min-width: 0;
+  border-block-start: 1px solid var(--line);
+}
+.video-review-gallery-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-block: 4px;
+}
+.video-review-position {
+  min-width: 6ch;
+  text-align: center;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.video-review-gallery-nav button {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.video-review-gallery-nav button:disabled {
+  color: var(--muted);
+  opacity: .45;
+  cursor: default;
+}
+@media (hover: hover) {
+  .video-review-gallery-nav button:enabled:hover { background: var(--surface); border-color: var(--line); }
+}
+.video-review-slide-host { min-width: 0; touch-action: pan-y pinch-zoom; }
+.video-review-slide {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.video-review-slide-title { margin: 10px 0 8px; overflow-wrap: anywhere; }
+.video-review-slide .video-review-seek img { display: block; max-height: min(50svh, 440px); user-select: none; }
+.video-review-slide .video-review-inspect { margin-top: 8px; }
 
 .inspection-closeup { margin: 12px 0 20px; padding: 12px 0; border-block: 1px solid var(--line); }
 .inspection-closeup > h4 { margin: 0 0 12px; font-size: 16px; }
