@@ -1,0 +1,260 @@
+{
+  "source": "https://doi.org/10.1007/s10921-025-01186-w",
+  "archive": "https://drive.google.com/drive/folders/1LNUt101wufTBJpRAgrZAU1h-Tfx629wO",
+  "initialTrainWindows": 142,
+  "expandedTrainWindows": 224,
+  "validationWindows": 54,
+  "acquisitionDates": {
+    "test": [
+      "20220622",
+      "20220711",
+      "20220810",
+      "20221215",
+      "20221226",
+      "20230109",
+      "20230110",
+      "20230214",
+      "20230220",
+      "20230227",
+      "20230315",
+      "20230321",
+      "20230410",
+      "20230418",
+      "20230712",
+      "20230910",
+      "20230919",
+      "20230920",
+      "20230927"
+    ],
+    "val": [
+      "20220621",
+      "20220623",
+      "20220708",
+      "20220725",
+      "20220726",
+      "20220727",
+      "20220822",
+      "20221209",
+      "20230327",
+      "20230720"
+    ],
+    "train": [
+      "20220823",
+      "20221216",
+      "20221227",
+      "20230106",
+      "20230221",
+      "20230224",
+      "20230306",
+      "20230328",
+      "20230704",
+      "20230706",
+      "20230707",
+      "20230711",
+      "20230714",
+      "20230717",
+      "20230718",
+      "20230719",
+      "20230721",
+      "20230801",
+      "20230803",
+      "20230804",
+      "20230918",
+      "20230921",
+      "20231007",
+      "20231009",
+      "20240104",
+      "20240106"
+    ]
+  },
+  "initialTrainBoxes": {
+    "weld_porosity": 257,
+    "weld_lack_of_fusion": 20,
+    "weld_undercut": 22,
+    "weld_slag": 29,
+    "weld_crack": 11
+  },
+  "expandedTrainBoxes": {
+    "weld_porosity": 291,
+    "weld_lack_of_fusion": 55,
+    "weld_undercut": 36,
+    "weld_slag": 60,
+    "weld_crack": 40
+  },
+  "addedTrainingEntries": [
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-20230221-34.tif",
+      "crc32": "1b42b51c",
+      "width": 550,
+      "height": 1322
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-T-20230803-20.tif",
+      "crc32": "f21ddaac",
+      "width": 765,
+      "height": 1234
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-T-20230803-19.tif",
+      "crc32": "0c17bb5d",
+      "width": 671,
+      "height": 1775
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-T-20230921-4.tif",
+      "crc32": "034df06a",
+      "width": 645,
+      "height": 1153
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-T-20230921-3.tif",
+      "crc32": "473f9789",
+      "width": 465,
+      "height": 1150
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/A_DJ-RT-T-20230801-41.tif",
+      "crc32": "fc2418c0",
+      "width": 6934,
+      "height": 465
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/A_DJ-RT-T-20230801-39.tif",
+      "crc32": "a39fd082",
+      "width": 6976,
+      "height": 572
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/L/1/A_DJ-RT-20230921-4.tif",
+      "crc32": "5297a02d",
+      "width": 7012,
+      "height": 501
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/L/1/A_DJ-RT-20230717-11.tif",
+      "crc32": "76f33c0f",
+      "width": 6945,
+      "height": 553
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/L/2/A_DJ-RT-20240106-40.tif",
+      "crc32": "7d3b2236",
+      "width": 7057,
+      "height": 597
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/L/1/A_DJ-RT-20230718-23.tif",
+      "crc32": "26562f58",
+      "width": 7005,
+      "height": 645
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-T-20231007-31.tif",
+      "crc32": "e9da782b",
+      "width": 878,
+      "height": 1392
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-20230706-163.tif",
+      "crc32": "921a882a",
+      "width": 687,
+      "height": 1287
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-20230224-76.tif",
+      "crc32": "e909c781",
+      "width": 543,
+      "height": 1319
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/A_DJ-RT-T-20230804-67.tif",
+      "crc32": "234371c2",
+      "width": 5849,
+      "height": 789
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-20230106-75.tif",
+      "crc32": "d43e6af2",
+      "width": 734,
+      "height": 1707
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-T-20230804-21.tif",
+      "crc32": "2fc49aeb",
+      "width": 635,
+      "height": 1787
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/A_DJ-RT-T-20231009-12.tif",
+      "crc32": "14a0b428",
+      "width": 6961,
+      "height": 617
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-20230704-64.tif",
+      "crc32": "3131f938",
+      "width": 1126,
+      "height": 1608
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-T-20231009-12.tif",
+      "crc32": "528eeb07",
+      "width": 791,
+      "height": 1161
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-20230221-21.tif",
+      "crc32": "bbd1d7a3",
+      "width": 865,
+      "height": 1225
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/A_DJ-RT-20230707-192.tif",
+      "crc32": "548e4855",
+      "width": 6111,
+      "height": 595
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/L/1/A_DJ-RT-20230711-37.tif",
+      "crc32": "76706212",
+      "width": 7037,
+      "height": 569
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-20230707-54.tif",
+      "crc32": "b8829368",
+      "width": 603,
+      "height": 1281
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-20230106-58.tif",
+      "crc32": "c5b4ebc7",
+      "width": 844,
+      "height": 1432
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-T-20231007-21.tif",
+      "crc32": "f873a120",
+      "width": 702,
+      "height": 1327
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-T-20231007-33.tif",
+      "crc32": "984546bc",
+      "width": 784,
+      "height": 1115
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/A_DJ-RT-20230106-6.tif",
+      "crc32": "3e49a425",
+      "width": 5946,
+      "height": 685
+    },
+    {
+      "member": "crop_weld_data/crop_weld_images/T/1/B_DJ-RT-20230306-53.tif",
+      "crc32": "0cae063d",
+      "width": 638,
+      "height": 1777
+    }
+  ]
+}
