@@ -18,5 +18,6 @@ with (root / 'var' / 'server.log').open('a', encoding='utf-8', buffering=1) as l
     sys.stderr = log
     sys.argv = ['server.app', '--vision', '--vision-backend', backend, '--telemetry-emulator',
                 '--bind', '127.0.0.1', '--port', '8102',
+                '--result-cache-dir', str(root / 'var' / 'analysis-cache'),
                 '--public-url', 'https://cyber102.94.41.87.102.sslip.io']
     runpy.run_module('server.app', run_name='__main__')

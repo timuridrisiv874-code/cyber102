@@ -16,7 +16,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 from .demo_data import PASSPORT, SCENARIOS
 from . import history
 from . import vision
-from . import inspections, customer, recommendations, assessment, video_review, analysis_queue, knowledge, emulator
+from . import inspections, customer, recommendations, assessment, video_review, analysis_queue, knowledge, emulator, result_cache
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -30,12 +30,25 @@ def connect(database):
     return connection
 
 
-def analyze_photo_job(payload):
+def cached_inference(cache, kind, payload):
+    if cache is None:
+        return None
+    result = cache.get(result_cache.inference_key(kind, payload, vision.model_spec()))
+    return {**result, 'media': payload['media']} if result is not None and kind == 'photo' else result
+
+
+def analyze_photo_job(payload, *, cache=None):
+    key = result_cache.inference_key('photo', payload, vision.model_spec()) if cache else None
+    cached = cache.get(key) if cache else None
+    if cached is not None:
+        return {**cached, 'media': payload['media']}
     context = payload.get('equipmentContext')
     options = {'context': context['text']} if context else {}
     result = vision.analyze(payload['image'], backend=payload['backend'], profile=payload['profile'], **options)
     if context:
         result['equipmentContext'] = {key: context[key] for key in ('serial', 'references')}
+    if cache is not None:
+        cache.put(key, result)
     return {**result, 'media': payload['media']}
 
 
@@ -46,13 +59,21 @@ def save_photo_job(payload, result):
     return result
 
 
-def analyze_video_job(payload):
+def analyze_video_job(payload, *, cache=None):
+    key = result_cache.inference_key('video', payload, vision.model_spec()) if cache else None
+    cached = cache.get(key) if cache else None
+    if cached is not None:
+        return cached
     if 'equipmentContext' not in payload:
-        return video_review._analyze_prepared(payload)
-    context = payload['equipmentContext']
-    request = {key: payload[key] for key in ('frames', 'durationSeconds')} | {'context': context['text']}
-    result = video_review._analyze_prepared(request)
-    return {**result, 'equipmentContext': {key: context[key] for key in ('serial', 'references')}}
+        result = video_review._analyze_prepared(payload)
+    else:
+        context = payload['equipmentContext']
+        request = {key: payload[key] for key in ('frames', 'durationSeconds')} | {'context': context['text']}
+        result = video_review._analyze_prepared(request)
+        result['equipmentContext'] = {key: context[key] for key in ('serial', 'references')}
+    if cache is not None:
+        cache.put(key, result)
+    return result
 
 
 def save_video_job(payload, result, *, database):
@@ -131,11 +152,12 @@ def initialize(database, customer_root=None):
 class BoundedHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, result_cache_directory=None, **kwargs):
         self.slots = threading.BoundedSemaphore(24)
         self.analysis_upload_slots = threading.BoundedSemaphore(2)
         super().__init__(*args, **kwargs)
         self.analysis_queue = analysis_queue.AnalysisQueue()
+        self.result_cache = result_cache.ResultCache(result_cache_directory) if result_cache_directory else None
 
     def server_close(self):
         if hasattr(self, 'analysis_queue'):
@@ -395,7 +417,7 @@ class Handler(SimpleHTTPRequestHandler):
         with closing(connect(self.database)) as connection:
             if target.path == '/api/health':
                 connection.execute('SELECT serial FROM pumps LIMIT 1').fetchone()
-                self.send_json({'status': 'ok', 'source': 'demo'})
+                self.send_json({'status': 'ok', 'source': 'demo', 'analysis': self.server.analysis_queue.activity()})
             elif target.path == '/api/capabilities':
                 self.send_json({'vision': {'enabled': self.vision_enabled, 'backend': self.vision_backend,
                     'model': vision.model_spec().model_id if self.vision_backend == 'internvl3' else None,
@@ -631,13 +653,19 @@ class Handler(SimpleHTTPRequestHandler):
             context = self.equipment_context(serial) if profile == 'standard' else None
             payload = {'image': image, 'backend': self.vision_backend, 'profile': profile,
                        'media': media, 'database': self.database, 'equipmentContext': context}
+            cache = self.server.result_cache
+            cached = cached_inference(cache, 'photo', payload)
+            if cached is not None:
+                self.send_json(save_photo_job(payload, cached), headers={'X-Analysis-Cache': 'hit'})
+                return
+            run = partial(analyze_photo_job, cache=cache)
             if asynchronous:
                 canonical = json.dumps({'backend': self.vision_backend, 'profile': profile, 'media': media, 'equipmentContext': context},
                                        sort_keys=True).encode() + b'\0' + image
-                self.enqueue_analysis('photo', payload, canonical, analyze_photo_job, save_photo_job)
+                self.enqueue_analysis('photo', payload, canonical, run, save_photo_job)
                 return
             with self.server.analysis_queue.legacy():
-                result = save_photo_job(payload, analyze_photo_job(payload))
+                result = save_photo_job(payload, run(payload))
         except TimeoutError:
             self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить кадр за отведённое время.')
         except ValueError as error:
@@ -697,12 +725,18 @@ class Handler(SimpleHTTPRequestHandler):
             if context:
                 payload['equipmentContext'] = context
             finalize = partial(save_video_job, database=self.database)
+            cache = self.server.result_cache
+            cached = cached_inference(cache, 'video', payload)
+            if cached is not None:
+                self.send_json(finalize(payload, cached), headers={'X-Analysis-Cache': 'hit'})
+                return
+            run = partial(analyze_video_job, cache=cache)
             if asynchronous:
                 canonical = json.dumps(payload, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()
-                self.enqueue_analysis('video', payload, canonical, analyze_video_job, finalize)
+                self.enqueue_analysis('video', payload, canonical, run, finalize)
                 return
             with self.server.analysis_queue.legacy():
-                result = finalize(payload, analyze_video_job(payload))
+                result = finalize(payload, run(payload))
         except TimeoutError:
             self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить кадры за отведённое время.')
         except (ValueError, UnicodeError, RecursionError) as error:
@@ -773,6 +807,7 @@ def main():
     parser.add_argument('--bind', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=8000)
     parser.add_argument('--database', type=Path, default=ROOT / 'var' / 'cyber102.sqlite3')
+    parser.add_argument('--result-cache-dir', type=Path, help='Папка кеша результатов без фотографий и записей осмотров')
     parser.add_argument('--public-url', default='', help='HTTPS-адрес вебки для QR, без пути')
     parser.add_argument('--telemetry-emulator', action='store_true', help='Записывать эмулированные показания насосов в SQLite')
     parser.add_argument('--without-vision-knowledge', action='store_true', help='Не добавлять контекст базы знаний в анализ фото и видео')
@@ -789,7 +824,7 @@ def main():
     handler = partial(Handler, database=args.database, public_url=public_url,
                       vision_enabled=args.vision, vision_backend=args.vision_backend, telemetry_emulator=args.telemetry_emulator,
                       vision_knowledge=not args.without_vision_knowledge)
-    with BoundedHTTPServer((args.bind, args.port), handler) as server:
+    with BoundedHTTPServer((args.bind, args.port), handler, result_cache_directory=args.result_cache_dir) as server:
         stop_emulator = threading.Event()
         if args.telemetry_emulator:
             reference = emulator.replay_template(customer.ROOT)

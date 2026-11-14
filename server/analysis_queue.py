@@ -100,6 +100,11 @@ class AnalysisQueue:
                 'maxWaitSeconds': self.max_wait, 'resultTtlSeconds': self.result_ttl,
                 'pollIntervalSeconds': 2}
 
+    def activity(self):
+        with self._condition:
+            self._housekeep()
+            return {'running': bool(self._running or self._legacy), 'waiting': len(self._pending)}
+
     def _release_payload(self, job):
         self._bytes -= job.size
         job.payload = job.run = job.finalize = None
