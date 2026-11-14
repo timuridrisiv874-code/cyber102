@@ -58,12 +58,23 @@ def main():
     p.add_argument('--baseline', required=True)
     p.add_argument('--baseline-onnx', type=Path, required=True)
     p.add_argument('--candidate', action='append', nargs=2, required=True, metavar=('NAME', 'PRUNING_JSON'))
+    p.add_argument('--export-evaluation', type=Path,
+                   help='Benchmark using --square, with ONNX runs named <model>-onnx')
     p.add_argument('--size', type=int, default=960)
     p.add_argument('--max-bytes', type=int, help='Require a specific deployment size in addition to compression')
     args = p.parse_args()
     if args.max_bytes is not None and args.max_bytes < 1:
         p.error('--max-bytes must be positive')
-    runs = json.loads(args.evaluation.read_bytes())['runs']
+    evaluation = json.loads(args.evaluation.read_bytes())
+    runs = evaluation['runs']
+    exported = json.loads(args.export_evaluation.read_bytes()) if args.export_evaluation else None
+    if exported is not None:
+        if not exported['squarePadding'] or exported['imageHashes'] != evaluation['imageHashes']:
+            raise ValueError('ONNX evaluation needs square padding and identical benchmark images')
+        baseline_onnx = exported['runs'][f'{args.baseline}-onnx']
+        with args.baseline_onnx.open('rb') as file:
+            if baseline_onnx['sha256'] != file_digest(file, 'sha256').hexdigest():
+                raise ValueError('Full ONNX export differs from the benchmark')
     baseline = runs[args.baseline]
     baseline_bytes = args.baseline_onnx.stat().st_size
     limit = min(baseline_bytes - 1, args.max_bytes or baseline_bytes)
@@ -86,9 +97,28 @@ def main():
                 or not pruning['onnxOutputShape']):
             raise ValueError(f'Expected verified ONNX export: {name}')
         unsupported = sorted(label for label, hits in support.items() if not hits)
-        passed = bool(support and not unsupported and not failures and 0 < onnx_bytes <= limit
-                      and pruning['parametersAfter'] < pruning['parametersBefore'])
-        results[name] = {'passed': passed, 'regressions': failures, 'baselineHitsByClass': support,
+        checkpoint_passed = bool(support and not unsupported and not failures and 0 < onnx_bytes <= limit
+                                 and pruning['parametersAfter'] < pruning['parametersBefore'])
+        export_check = None
+        if exported is not None:
+            square_pt = exported['runs'][name]
+            square_onnx = exported['runs'][f'{name}-onnx']
+            if (square_pt['sha256'] != run['sha256'] or square_onnx['sha256'] != digest
+                    or Path(square_onnx['artifact']).suffix.lower() != '.onnx'):
+                raise ValueError(f'Artifact differs from ONNX evaluation: {name}')
+            runtime = square_onnx['variants'][size]
+            parity, _ = compare(square_pt['variants'][size], runtime, thresholds)
+            baseline_regressions, export_support = compare(baseline_onnx['variants'][size], runtime, thresholds)
+            native_regressions, _ = compare(baseline['variants'][size], runtime, thresholds)
+            missing = sorted(label for label in support if not export_support[label])
+            export_check = {'passed': not (parity or baseline_regressions or native_regressions or missing),
+                            'exportRegressions': parity, 'fullExportRegressions': baseline_regressions,
+                            'fullCheckpointRegressions': native_regressions, 'unverifiedClasses': missing,
+                            'device': exported['device'],
+                            'medianMsByDataset': {key: row['medianMs'] for key, row in runtime.items()}}
+        passed = checkpoint_passed and bool(export_check and export_check['passed'])
+        results[name] = {'passed': passed, 'checkpointPassed': checkpoint_passed, 'onnxEvaluation': export_check,
+                         'regressions': failures, 'baselineHitsByClass': support,
                          'unverifiedClasses': unsupported,
                          'onnxBytes': onnx_bytes, 'onnx': str(onnx),
                          'parameters': pruning['parametersAfter'],

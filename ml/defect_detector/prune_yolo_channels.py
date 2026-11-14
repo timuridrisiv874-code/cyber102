@@ -1,9 +1,11 @@
 """Prune private channels in YOLO11 and YOLO26 bottlenecks and attention feed-forward layers."""
 import argparse
 from copy import deepcopy
+from datetime import datetime
 from hashlib import file_digest
 import json
 from pathlib import Path
+import shutil
 
 import torch
 from torch import nn
@@ -11,6 +13,7 @@ from ultralytics import YOLO, settings
 from ultralytics.models.yolo.detect import DetectionTrainer
 from ultralytics.nn.modules import Bottleneck
 from ultralytics.nn.modules.block import C3k2, PSABlock
+from ultralytics.utils.torch_utils import convert_optimizer_state_dict_to_fp16, unwrap_model
 
 
 def shrink_pair(first, second, fraction):
@@ -66,6 +69,30 @@ class PreservePrunedShapes(DetectionTrainer):
             raise ValueError('Recovery data must have the checkpoint class order')
         # Rebuilding from the original YAML would recreate all removed channels.
         return deepcopy(weights).float()
+
+    def save_model(self):
+        # Stream to disk instead of keeping a serialized checkpoint in memory.
+        self.wdir.mkdir(parents=True, exist_ok=True)
+        temporary = self.last.with_suffix('.tmp')
+        try:
+            torch.save({
+                'model': None, 'ema': deepcopy(unwrap_model(self.ema.ema)).half(),
+                'epoch': self.epoch, 'best_fitness': self.best_fitness, 'updates': self.ema.updates,
+                'optimizer': convert_optimizer_state_dict_to_fp16(deepcopy(self.optimizer.state_dict())),
+                'scaler': self.scaler.state_dict(), 'train_args': vars(self.args),
+                'train_results': self.read_results_csv(), 'train_metrics': {**self.metrics, 'fitness': self.fitness},
+                'date': datetime.now().isoformat(),
+            }, temporary)
+            if self.best_fitness == self.fitness or not self.best.exists():
+                best_temporary = self.best.with_suffix('.tmp')
+                try:
+                    shutil.copyfile(temporary, best_temporary)
+                    best_temporary.replace(self.best)
+                finally:
+                    best_temporary.unlink(missing_ok=True)
+            temporary.replace(self.last)
+        finally:
+            temporary.unlink(missing_ok=True)
 
 
 def count_parameters(model):

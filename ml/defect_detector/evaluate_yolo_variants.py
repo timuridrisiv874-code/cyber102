@@ -81,6 +81,7 @@ def main():
                         required=True)
     parser.add_argument('--size', type=int, action='append', required=True)
     parser.add_argument('--tiles', action='store_true', help='Also test tiled inference at the first size')
+    parser.add_argument('--square', action='store_true', help='Use identical square padding for native and ONNX models')
     parser.add_argument('--device', default='0')
     args = parser.parse_args()
     if any(size < 32 or size % 32 for size in args.size):
@@ -100,25 +101,29 @@ def main():
 
     settings.update({'sync': False})
     device = select_device(args.device, verbose=False)
-    report = {'device': args.device, 'excluded': excluded, 'runs': {}}
+    if device.type == 'cpu':
+        torch.set_num_threads(min(4, torch.get_num_threads()))
+    report = {'device': args.device, 'excluded': excluded, 'squarePadding': args.square,
+              'imageHashes': {name: {row['file']: row['sha256'] for row in rows}
+                              for name, (rows, _) in datasets.items()}, 'runs': {}}
     variants = [(str(size), size, False) for size in dict.fromkeys(args.size)]
     if args.tiles:
         variants.append((f'{args.size[0]}-tiles', args.size[0], True))
     for name, filename in args.models:
         path = Path(filename).resolve(strict=True)
-        model = YOLO(str(path))
+        model = YOLO(str(path), task='detect')
         with path.open('rb') as weights:
-            result = {'sha256': file_digest(weights, 'sha256').hexdigest(), 'variants': {}}
+            result = {'artifact': str(path), 'sha256': file_digest(weights, 'sha256').hexdigest(), 'variants': {}}
         report['runs'][name] = result
         for mode, size, tiles in variants:
             variant = result['variants'][mode] = {}
             for key, (rows, paths) in datasets.items():
+                if device.type == 'cuda':
+                    torch.cuda.reset_peak_memory_stats(device)
+                predictions, timings = infer(model, paths, args.device, size, tiles=tiles, rect=not args.square)
                 labels = sorted({obj['class'] for row in rows for obj in row['objects']} & set(model.names.values()))
                 if not labels:
                     continue
-                if device.type == 'cuda':
-                    torch.cuda.reset_peak_memory_stats(device)
-                predictions, timings = infer(model, paths, args.device, size, tiles=tiles)
                 if device.type == 'cuda':
                     torch.cuda.synchronize(device)
                     peak_gpu_bytes = torch.cuda.max_memory_allocated(device)
