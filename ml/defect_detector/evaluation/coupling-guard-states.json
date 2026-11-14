@@ -1,0 +1,290 @@
+[
+  {
+    "file": "sault-open.jpg",
+    "scene": "sault-coupling",
+    "site": "sault-coupling",
+    "expectedState": "guard_issue",
+    "source": "https://machineguard.com/coupling-guards-pump-motor-assembly/",
+    "asset": "https://machineguard.com/wp-content/uploads/2016/04/coupling-guard-pump-motor-assembly-before-after-1024x370.jpg",
+    "sourceSha256": "5851fbe001b267e72ffa9651c2d875293ad0a05f72fc6994c37f3d17ae193d14",
+    "sha256": "1759f2ec4430c5be19b3b4058d27f0e1d899d9f9ff249bbc67a9814bf7e9c101",
+    "sourceCropPx": [
+      3,
+      3,
+      510,
+      368
+    ],
+    "objects": [
+      {
+        "class": "guard_issue",
+        "xyxy": [
+          0.29,
+          0.275,
+          0.745,
+          0.705
+        ]
+      }
+    ],
+    "note": "Exposed coupling and shaft; photo does not establish running state."
+  },
+  {
+    "file": "sault-covered.jpg",
+    "scene": "sault-coupling",
+    "site": "sault-coupling",
+    "expectedState": "guard_visible",
+    "source": "https://machineguard.com/coupling-guards-pump-motor-assembly/",
+    "asset": "https://machineguard.com/wp-content/uploads/2016/04/coupling-guard-pump-motor-assembly-before-after-1024x370.jpg",
+    "sourceSha256": "5851fbe001b267e72ffa9651c2d875293ad0a05f72fc6994c37f3d17ae193d14",
+    "sha256": "6b3777909a6ec25b862912a10c39d4892aec166b348c4d2882cff15c07a0b9b4",
+    "sourceCropPx": [
+      516,
+      3,
+      1020,
+      368
+    ],
+    "objects": [
+      {
+        "class": "guard_visible",
+        "xyxy": [
+          0.28,
+          0.054,
+          0.635,
+          0.994
+        ]
+      }
+    ],
+    "note": "Same installation with a solid coupling cover."
+  },
+  {
+    "file": "patterson-green-cover.jpg",
+    "scene": "patterson-coupling",
+    "site": "patterson-coupling",
+    "expectedState": "guard_visible",
+    "source": "https://www.uniguardmgc.com/machine-guarding-solution-for-patterson-pump/",
+    "asset": "https://www.uniguardmgc.com/wp-content/uploads/2019/05/patterson-pump-machine-guard-before-after-1024x640.jpg?x58268",
+    "sourceSha256": "949b6c892a98e7b1a8db09a6d66561d670eac910262cfaac3a7d21f5485a54d1",
+    "sha256": "d69ea66bd2cf4697b14c43bb5b652124ab5fbb06e090598ed9d1b617ce18ab4f",
+    "sourceCropPx": [
+      5,
+      4,
+      507,
+      557
+    ],
+    "objects": [
+      {
+        "class": "guard_visible",
+        "xyxy": [
+          0.305,
+          0.437,
+          0.608,
+          0.995
+        ]
+      }
+    ],
+    "note": "Original coupling cover is visible. Exposed area on the pump side is outside the drive coupling."
+  },
+  {
+    "file": "patterson-orange-cover.jpg",
+    "scene": "patterson-coupling",
+    "site": "patterson-coupling",
+    "expectedState": "guard_visible",
+    "source": "https://www.uniguardmgc.com/machine-guarding-solution-for-patterson-pump/",
+    "asset": "https://www.uniguardmgc.com/wp-content/uploads/2019/05/patterson-pump-machine-guard-before-after-1024x640.jpg?x58268",
+    "sourceSha256": "949b6c892a98e7b1a8db09a6d66561d670eac910262cfaac3a7d21f5485a54d1",
+    "sha256": "a98838565baee1a277aa6cae6d01a41482ceb23e199a1511df3656e4d03194a6",
+    "sourceCropPx": [
+      517,
+      4,
+      1019,
+      557
+    ],
+    "objects": [
+      {
+        "class": "guard_visible",
+        "xyxy": [
+          0.047,
+          0.425,
+          0.579,
+          0.862
+        ]
+      }
+    ],
+    "note": "New coupling cover visible, with an additional smaller cover on the pump side."
+  },
+  {
+    "file": "loxahatchee-open.jpg",
+    "scene": "loxahatchee-injection-pump",
+    "site": "loxahatchee-injection-pump",
+    "expectedState": "guard_issue",
+    "source": "https://loxahatcheeriver.org/wp-content/uploads/2021/04/04-April2021Notebook-1.pdf",
+    "asset": null,
+    "pdfPage": 88,
+    "pdfSha256": "192cd5cd5022aa43e9faeef55d8d4ffc195f4e8adf8a1fb783cf89b6f9548162",
+    "sourceSha256": "0e1a100dbeb87ed816fd26ded90de1e7c5b0f53a28e2f871c174577cf8a7cbad",
+    "sha256": "c286d5a479ce3df7ad56cb39c141237747dc3e98449f612ec11742599930932c",
+    "sourceCropPx": [
+      3,
+      3,
+      439,
+      932
+    ],
+    "objects": [
+      {
+        "class": "guard_issue",
+        "xyxy": [
+          0.273,
+          0.3,
+          0.742,
+          0.77
+        ]
+      }
+    ],
+    "note": "Report documents coupling guard replacement. Visible opening exposes the drive coupling."
+  },
+  {
+    "file": "loxahatchee-mesh.jpg",
+    "scene": "loxahatchee-injection-pump",
+    "site": "loxahatchee-injection-pump",
+    "expectedState": "guard_visible",
+    "source": "https://loxahatcheeriver.org/wp-content/uploads/2021/04/04-April2021Notebook-1.pdf",
+    "asset": null,
+    "pdfPage": 88,
+    "pdfSha256": "192cd5cd5022aa43e9faeef55d8d4ffc195f4e8adf8a1fb783cf89b6f9548162",
+    "sourceSha256": "0e1a100dbeb87ed816fd26ded90de1e7c5b0f53a28e2f871c174577cf8a7cbad",
+    "sha256": "78ab15d444c7add9bc687ad7a39722280110b81972d8ba134f36033d7373e3e2",
+    "sourceCropPx": [
+      562,
+      3,
+      993,
+      931
+    ],
+    "objects": [
+      {
+        "class": "guard_visible",
+        "xyxy": [
+          0.188,
+          0.28,
+          0.683,
+          0.755
+        ]
+      }
+    ],
+    "note": "Replacement metal mesh visibly covers the coupling opening."
+  },
+  {
+    "file": "commons-electric.jpg",
+    "scene": "commons-electric",
+    "site": "commons-electric",
+    "expectedState": "guard_visible",
+    "source": "https://commons.wikimedia.org/wiki/File:Kreiselpumpe-Elektromotor.jpg",
+    "asset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Kreiselpumpe-Elektromotor.jpg/960px-Kreiselpumpe-Elektromotor.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "author": "HopuWiki",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceSha256": "7d7cc502d018aade82931635d5cf052692f62ca0f9153bd0e6f4848d9339c322",
+    "sha256": "4f4719ca6e0f04fa0025b5ea07fd8b5edc21e014d6e7d5f29197c83a2be636bc",
+    "sourceCropPx": null,
+    "objects": [
+      {
+        "class": "guard_visible",
+        "xyxy": [
+          0.482,
+          0.42,
+          0.633,
+          0.584
+        ]
+      }
+    ],
+    "note": "Long external cover between the motor and pump is visible."
+  },
+  {
+    "file": "commons-ksb.jpg",
+    "scene": "commons-ksb",
+    "site": "commons-ksb",
+    "expectedState": "guard_visible",
+    "source": "https://commons.wikimedia.org/wiki/File:KSB_09_Etanorm_mit_Motor_und_Frequenzumrichter.jpg",
+    "asset": "https://upload.wikimedia.org/wikipedia/commons/6/69/KSB_09_Etanorm_mit_Motor_und_Frequenzumrichter.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "author": "KSB Aktiengesellschaft, Frankenthal",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceSha256": "deff97407aad41f38909e89c7ea7047345feba2d6b645ef2a35ccb27eef498aa",
+    "sha256": "d0ffb7ffc34824430a6e3823e53a65733777b3714f733d0b4247de6580b0ddc9",
+    "sourceCropPx": null,
+    "objects": [
+      {
+        "class": "guard_visible",
+        "xyxy": [
+          0.481,
+          0.405,
+          0.623,
+          0.603
+        ]
+      }
+    ],
+    "note": "The shiny cylindrical cover is visible between drive and pump."
+  },
+  {
+    "file": "commons-nwo.jpg",
+    "scene": "commons-nwo",
+    "site": "commons-nwo",
+    "expectedState": "not_assessable",
+    "source": "https://commons.wikimedia.org/wiki/File:NWO-Pumpe2.JPG",
+    "asset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/NWO-Pumpe2.JPG/960px-NWO-Pumpe2.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "author": "Wilfra",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "sourceSha256": "b8324a61305a25456bc8f99172fe82ae345ab47725489fcf4412d90963acf263",
+    "sha256": "88ff08722b74379564f364cbb763427356ff206145b759945a1703ab5a0be64a",
+    "sourceCropPx": null,
+    "objects": [],
+    "note": "Pipes and access railings obstruct the coupling zone."
+  },
+  {
+    "file": "commons-victor.jpg",
+    "scene": "commons-victor",
+    "site": "commons-victor",
+    "expectedState": "not_assessable",
+    "source": "https://commons.wikimedia.org/wiki/File:Victor_zelfaanzuigende_vuilwaterpomp_(01).JPG",
+    "asset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Victor_zelfaanzuigende_vuilwaterpomp_%2801%29.JPG/960px-Victor_zelfaanzuigende_vuilwaterpomp_%2801%29.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "author": "S.J. de Waard",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceSha256": "5065090229ad6d5d04375fa545e6eb49aec8863ebd14cc940c86c070d03d251e",
+    "sha256": "bd62973219fd8b2ed3a1907f8b876ca6ef28c97069d43d4533c2e8f1966fa209",
+    "sourceCropPx": null,
+    "objects": [],
+    "note": "Cutaway display, with internal parts exposed for demonstration."
+  },
+  {
+    "file": "commons-water.jpg",
+    "scene": "commons-water",
+    "site": "commons-water",
+    "expectedState": "not_assessable",
+    "source": "https://commons.wikimedia.org/wiki/File:Pompa_wody2.jpg",
+    "asset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Pompa_wody2.jpg/960px-Pompa_wody2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "author": "Maly LOLek",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceSha256": "ce215c6fd0d8948cf2ab4165cf679e12c5062b3e59bf2fd6444d202ec672aab0",
+    "sha256": "46a96201f65dab730fedb29e6c3872633032bd85d4b5883ccaaf9e5c3954af35",
+    "sourceCropPx": null,
+    "objects": [],
+    "note": "Standalone water-pump part. The installed pump and motor coupling cannot be assessed."
+  },
+  {
+    "file": "commons-submersible.jpg",
+    "scene": "commons-submersible",
+    "site": "commons-submersible",
+    "expectedState": "not_assessable",
+    "source": "https://commons.wikimedia.org/wiki/File:Tauchmotorpumpe_f%C3%BCr_die_Abwasserwirtschaft.jpg",
+    "asset": "https://upload.wikimedia.org/wikipedia/commons/1/19/Tauchmotorpumpe_f%C3%BCr_die_Abwasserwirtschaft.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "author": "KSB Aktiengesellschaft, Frankenthal",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceSha256": "926f22dbf962acbcec55ee5d1031953e0a5462ddfb0cef5b3a47fdf442976d29",
+    "sha256": "2751098a5b817876da7761a195960d664a9a366e54e966ede2a858820d0d8065",
+    "sourceCropPx": null,
+    "objects": [],
+    "note": "Cutaway of an integrated submersible unit."
+  }
+]
