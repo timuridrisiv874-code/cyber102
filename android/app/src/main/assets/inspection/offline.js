@@ -8,7 +8,7 @@
   let controls, message, progress, loadButton, cancelButton, importButton, resultCard;
   let frameCancelButton;
   let modelDescription;
-  let historyPanel, renderedResult = null;
+  let historyPanel, journalView, journalTab, inspectionTab, renderedResult = null;
   const HISTORY_KEY = 'cyber102.offline.inspections.v1';
   const CURRENT_MODEL = 'LFM3-VL-2B';
   const profileName = profile => profile === 'quick' ? 'Быстрый' : 'Подробный';
@@ -48,26 +48,44 @@
     historyPanel.replaceChildren();
     try {
       const records = readHistory();
-      historyPanel.append(text('summary', `Осмотры на телефоне · ${records.length}`),
-        text('p', 'Последние 10 текстовых осмотров сохранены только на этом устройстве. Фото и видео в эту историю не записываются; синхронизации с сервером нет.', 'video-help'));
+      journalTab.textContent = records.length ? `Журнал · ${records.length}` : 'Журнал';
+      if (!records.length) historyPanel.append(text('p', 'Записей пока нет. После анализа нажмите «Сохранить на телефоне».', 'offline-history-empty'));
       const list = text('ol');
       for (const record of records) {
         const item = text('li');
         item.style.overflowWrap = 'anywhere';
-        item.append(text('strong', new Date(record.createdAt).toLocaleString('ru-RU')), text('p', record.observation));
-        if (record.truncated) item.append(text('p', 'Достигнут лимит ответа. Описание может быть неполным.', 'offline-warning'));
-        if (record.media?.equipmentTag) item.append(text('p', (record.media.equipmentName || 'Метка') + ' · ' + record.media.equipmentTag, 'equipment-id'));
+        const details = text('details');
+        const summary = text('summary');
+        const preview = record.observation.length > 96 ? record.observation.slice(0, 96).trimEnd() + '…' : record.observation;
+        summary.append(text('strong', new Date(record.createdAt).toLocaleString('ru-RU')), text('span', preview));
+        details.append(summary, text('p', record.observation));
+        if (record.truncated) details.append(text('p', 'Достигнут лимит ответа. Описание может быть неполным.', 'offline-warning'));
+        if (record.media?.equipmentTag) details.append(text('p', (record.media.equipmentName || 'Метка') + ' · ' + record.media.equipmentTag, 'equipment-id'));
         if (record.observationLanguage === 'ru' && typeof record.originalEnglish === 'string') {
-          item.append(englishOriginal(record.originalEnglish));
+          details.append(englishOriginal(record.originalEnglish));
         }
-        item.append(text('p', record.note || 'Заметка не добавлена', 'equipment-id'),
+        details.append(text('p', record.note || 'Заметка не добавлена', 'equipment-id'),
           text('p', `${modelName(record.model)} · анализ на устройстве`, 'video-help'));
+        item.append(details);
         list.append(item);
       }
       historyPanel.append(list);
     } catch (_) {
-      historyPanel.append(text('summary', 'История на телефоне недоступна'), text('p', 'Браузер не разрешил прочитать локальное хранилище. Результат анализа остаётся на экране.', 'video-help'));
+      historyPanel.append(text('p', 'Не удалось прочитать записи на этом телефоне.', 'video-help'));
     }
+  }
+
+  function showView(name) {
+    const journal = name === 'journal';
+    journalView.hidden = !journal;
+    controls.hidden = journal;
+    document.querySelector('.workspace').hidden = journal;
+    document.querySelector('.inspection-boundary').hidden = journal;
+    document.querySelector('.intro h1').textContent = journal ? 'Журнал на телефоне' : 'Осмотр оборудования';
+    inspectionTab.setAttribute('aria-current', journal ? 'false' : 'page');
+    journalTab.setAttribute('aria-current', journal ? 'page' : 'false');
+    if (journal) renderHistory();
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   function updateStatus(state) {
@@ -76,9 +94,10 @@
     if (!controls) return;
     const size = Number.isSafeInteger(modelState.modelBytes) && modelState.modelBytes > 0 ?
       `Размер двух файлов модели: ${displayBytes(modelState.modelBytes)}. ` : '';
-    modelDescription.textContent = `${modelName(modelState.model)} работает без подключения к сети. ${size}При первом запуске файлы проверяются и копируются в память приложения. Проверка выполняется по одному кадру.`;
+    modelDescription.textContent = `${modelName(modelState.model)} работает без подключения к сети. ${size}При первом запуске файлы проверяются и копируются в память приложения.`;
     message.textContent = modelState.message || 'Подготовьте модель для офлайн-анализа.';
     message.dataset.error = String(modelState.state === 'error');
+    if (modelState.state === 'error') controls.querySelector('#offline-model-settings').open = true;
     progress.hidden = !modelState.busy;
     progress.value = Number.isFinite(modelState.progress) ? modelState.progress : 0;
     loadButton.hidden = Boolean(modelState.loaded || modelState.busy);
@@ -163,9 +182,8 @@
     const requestId = `frame_${Date.now()}_${++counter}`;
     onProgress?.('Анализ на телефоне. Кадр не отправляется в сеть…');
     return new Promise((resolve, reject) => {
-      let timer;
       const finish = (callback, value) => {
-        clearTimeout(timer); signal?.removeEventListener('abort', cancel); pending.delete(requestId); callback(value);
+        signal?.removeEventListener('abort', cancel); pending.delete(requestId); callback(value);
       };
       const cancel = () => {
         window.CyberSmolNative.cancel();
@@ -176,10 +194,6 @@
         resolve: value => finish(resolve, value), reject: error => finish(reject, error),
       });
       signal?.addEventListener('abort', cancel, { once: true });
-      timer = setTimeout(() => {
-        window.CyberSmolNative.cancel();
-        finish(reject, new Error('За 3 минуты телефон не успел подготовить полный результат. Попробуйте быстрый режим или другой кадр.'));
-      }, 180000);
       try {
         if (withProfile) window.CyberSmolNative.analyzeWithProfile(requestId, encoded, profile);
         else window.CyberSmolNative.analyze(requestId, encoded);
@@ -288,12 +302,12 @@
 
   function setup() {
     if (!enabled) return;
+    document.body.classList.add('on-device');
     const profileControl = document.getElementById('offline-analysis-mode');
     if (profileControl) profileControl.hidden = typeof window.CyberSmolNative.analyzeWithProfile !== 'function';
     controls = text('section', undefined, 'panel'); controls.id = 'offline-controls';
     modelDescription = text('p', 'Определяем модель из комплекта приложения…', 'video-help'); modelDescription.id = 'offline-model-description';
-    controls.append(text('h2', 'Модель на телефоне'), modelDescription);
-    controls.style.padding = '16px'; controls.style.marginBottom = '16px';
+    controls.style.padding = '12px 16px'; controls.style.marginBottom = '12px';
     const actions = text('div', undefined, 'actions');
     loadButton = text('button', 'Подготовить модель', 'button primary'); loadButton.type = 'button'; loadButton.id = 'offline-load';
     cancelButton = text('button', 'Остановить', 'button secondary'); cancelButton.type = 'button'; cancelButton.id = 'offline-cancel';
@@ -309,12 +323,26 @@
     frameCancelButton.addEventListener('click', cancel);
     document.getElementById('check')?.after(frameCancelButton);
     importButton.addEventListener('click', () => window.CyberSmolNative.importModel());
-    actions.append(loadButton, cancelButton, importButton);
+    actions.append(loadButton, importButton);
     progress = text('progress'); progress.max = 100; progress.hidden = true; progress.setAttribute('aria-label', 'Подготовка модели');
     message = text('p', '', 'message'); message.id = 'offline-status'; message.setAttribute('role', 'status');
-    controls.append(actions, progress, message);
-    historyPanel = text('details'); historyPanel.id = 'offline-history'; controls.append(historyPanel); renderHistory();
+    const modelSettings = text('details'); modelSettings.id = 'offline-model-settings';
+    modelSettings.append(text('summary', 'Настройки модели'), modelDescription, actions);
+    controls.append(message, progress, cancelButton, modelSettings);
     const workspace = document.querySelector('.workspace'); workspace?.before(controls);
+    const tabs = text('nav', undefined, 'offline-tabs'); tabs.setAttribute('aria-label', 'Разделы на телефоне');
+    inspectionTab = text('button', 'Осмотр'); inspectionTab.type = 'button';
+    journalTab = text('button', 'Журнал'); journalTab.type = 'button';
+    inspectionTab.addEventListener('click', () => showView('inspection'));
+    journalTab.addEventListener('click', () => showView('journal'));
+    tabs.append(inspectionTab, journalTab);
+    controls.before(tabs);
+    journalView = text('section', undefined, 'panel'); journalView.id = 'offline-journal'; journalView.hidden = true;
+    historyPanel = text('div'); historyPanel.id = 'offline-history';
+    journalView.append(historyPanel);
+    workspace.after(journalView);
+    renderHistory();
+    showView('inspection');
     resultCard = text('section', undefined, 'details'); resultCard.id = 'offline-result'; resultCard.hidden = true;
     document.getElementById('result')?.append(resultCard);
     for (const selector of ['.active-equipment-bar', '#inspection-journal-link', '#demo-options', '#video-review-panel', '#camera-mode', '#camera-mode-label', '#analysis-profile', 'label[for="analysis-profile"]', '#profile-help']) {
@@ -328,8 +356,6 @@
     for (const link of document.querySelectorAll('a[href]')) {
       if (link.getAttribute('href')?.startsWith('index.html')) link.href = '/offline/index.html';
     }
-    const intro = document.querySelector('.intro p');
-    if (intro) intro.textContent = 'Камера и фото на устройстве · без отправки кадров на сервер';
     const mediaHelp = document.getElementById('media-help');
     if (mediaHelp) mediaHelp.textContent = 'Фото до 20 МБ · видео до 150 МБ и 2 минут. Выбранный кадр анализируется прямо на телефоне.';
     updateStatus(JSON.parse(window.CyberSmolNative.state()));

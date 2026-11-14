@@ -240,3 +240,30 @@ summary::marker { color: #626a60; }
 .qr-selected strong { display: block; margin-bottom: 4px; font-size: 16px; }
 .qr-selected button { min-width: 44px; min-height: 44px; border: 0; background: transparent; color: inherit; font-size: 23px; }
 .qr-camera-button[hidden], .qr-selected[hidden] { display: none; }
+
+/* The native header carries the brand. Keep the offline task and journal in view. */
+.on-device { --ink: #22231f; --muted: #5f6058; --line: #d9d6cc; --accent: #9d401b; --accent-hover: #793014; --soft: #f1eee7; background: #f6f3ec; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.on-device .app-sidebar, .on-device .topbar, .on-device .intro .eyebrow, .on-device .intro p, .on-device .intro-actions, .on-device .inspection-boundary, .on-device #media-help { display: none; }
+.on-device .page { padding-top: 16px; }
+.on-device .intro { margin-bottom: 12px; }
+.on-device .workspace { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.on-device[data-analysis-state=idle] #result[data-result-ready=false] { display: none; }
+.on-device .panel { border-radius: 12px; }
+.offline-tabs { display: flex; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.offline-tabs button { flex: 1; min-height: 48px; border: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--muted); font-family: inherit; font-size: 15px; font-weight: 600; }
+.offline-tabs button[aria-current=page] { border-bottom-color: var(--accent); color: var(--ink); }
+#offline-controls > .message { margin: 0; }
+#offline-controls > progress { width: 100%; margin-top: 8px; accent-color: var(--accent); }
+#offline-controls > #offline-cancel { margin-top: 8px; }
+#offline-model-settings { margin-top: 8px; }
+#offline-model-settings > summary { min-height: 44px; display: flex; align-items: center; }
+#offline-model-settings .actions { margin-top: 8px; }
+#offline-journal { padding: 16px; }
+#offline-history ol { list-style: none; padding: 0; margin: 16px 0 0; }
+#offline-history li { padding: 8px 0; border-top: 1px solid var(--line); }
+#offline-history li summary { display: grid; gap: 4px; min-height: 44px; padding: 8px 0; color: var(--ink); font-size: 14px; }
+#offline-history li summary strong { font-size: 13px; color: var(--muted); }
+#offline-history li p { margin-top: 8px; }
+#offline-history li .offline-original { margin-top: 8px; }
+#offline-history .offline-history-empty { margin-top: 16px; color: var(--muted); }

@@ -279,26 +279,8 @@ public final class MainActivity extends ComponentActivity {
                     if (path == null || path.contains("..")) return missingAsset();
                     return bundledAsset(path.substring(1));
                 }
-                if (!"GET".equals(request.getMethod()) || path == null) return null;
-                if (request.isForMainFrame() && "/index.html".equals(path)) {
-                    return bundledAsset("inspection/index.html");
-                }
-                if (path.startsWith("/__mobile_inspection/")) {
-                    String asset = path.substring("/__mobile_inspection/".length());
-                    return inspectionAssetAllowed(asset) ? bundledAsset("inspection/" + asset) : missingAsset();
-                }
-                switch (path) {
-                    case "/__mobile_inspection/app.js":
-                        return bundledAsset("inspection/app.js");
-                    case "/__mobile_inspection/media.js":
-                        return bundledAsset("inspection/media.js");
-                    case "/__mobile_inspection/inspection.js":
-                        return bundledAsset("inspection/inspection.js");
-                    case "/__mobile_inspection/styles.css":
-                        return bundledAsset("inspection/styles.css");
-                    default:
-                        return null;
-                }
+                // Let the selected server provide the same pages and styles for every tab.
+                return null;
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 if (isOffline()) {
@@ -331,6 +313,7 @@ public final class MainActivity extends ComponentActivity {
                 progress.setVisibility(View.GONE);
                 if (!failed && sameOrigin(Uri.parse(url), Uri.parse(activeUrl))) {
                     status.setText(isOffline() ? "На телефоне · LFM3 · без сети" : isDemo() ? "Демо · ответы заданы заранее" : "Сервер · " + Uri.parse(activeUrl).getHost());
+                    status.setVisibility(View.GONE);
                     if (isOffline()) onOfflineEvent(offline.snapshot());
                 }
             }
@@ -499,6 +482,7 @@ public final class MainActivity extends ComponentActivity {
         if (web == null) return;
         web.setVisibility(View.VISIBLE);
         status.setText(isOffline() ? "Открываем офлайн-анализ…" : isDemo() ? "Демо · ответы заданы заранее" : "Подключение к серверу…");
+        status.setVisibility(View.VISIBLE);
         progress.setVisibility(View.VISIBLE);
         if (isDemo() || isOffline()) {
             web.loadUrl(activeUrl);
@@ -585,6 +569,7 @@ public final class MainActivity extends ComponentActivity {
         content.removeAllViews();
         content.addView(scroll);
         status.setText("Экран недоступен");
+        status.setVisibility(View.VISIBLE);
     }
     private void showSettings() {
         releaseCamera();
@@ -787,7 +772,7 @@ public final class MainActivity extends ComponentActivity {
     }
     @Override public void onTrimMemory(int level) {
         super.onTrimMemory(level);
-        if (offline != null && (level == TRIM_MEMORY_RUNNING_CRITICAL || level >= TRIM_MEMORY_BACKGROUND)) offline.unload();
+        if (offline != null && (level == TRIM_MEMORY_RUNNING_CRITICAL || level >= TRIM_MEMORY_COMPLETE)) offline.unload();
     }
     @Override protected void onDestroy() {
         network.shutdownNow();

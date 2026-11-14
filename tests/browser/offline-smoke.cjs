@@ -57,7 +57,8 @@ async function run(browser, name, android) {
   }, { model, modelBytes, android });
   try {
     await page.goto(origin + '/offline/index.html');
-    await page.locator('#offline-load:disabled').waitFor();
+    if (android) await page.locator('#offline-status').waitFor();
+    else await page.locator('#offline-load:disabled').waitFor();
     if (name === 'Chromium' && android) {
       fs.mkdirSync('/private/tmp/cyber102-design-preview', { recursive: true });
       await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); });
@@ -109,6 +110,12 @@ async function run(browser, name, android) {
       assert.equal(history[0].observation, 'На металлической трубе возле соединения видна длинная открытая трещина.');
       assert.equal(history[0].originalEnglish, 'The metal pipe has a long open crack near the joint.');
       assert.equal(history[0].observationLanguage, 'ru');
+      await page.locator('.offline-tabs').getByRole('button', { name: /Журнал/ }).click();
+      assert.equal(await page.locator('.workspace').isVisible(), false);
+      await page.locator('#offline-history > ol > li:first-child > details > summary').click();
+      assert.match(await page.locator('#offline-history').innerText(), /Подтверждение инженера/);
+      await page.locator('.offline-tabs').getByRole('button', { name: 'Осмотр' }).click();
+      assert.equal(await page.locator('#offline-result').isVisible(), true);
       assert.equal(history[0].translatorModel, 'fixture-enru');
       assert.equal(history[0].translationMs, 810);
     }

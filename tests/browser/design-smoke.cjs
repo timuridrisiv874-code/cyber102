@@ -66,7 +66,7 @@ async function run(browser, engine, android, width, reducedMotion) {
     if (!android) {
       await page.locator('#open-example-photo').click();
       await page.locator('#check:not([disabled])').waitFor();
-      assert.match(await page.locator('#source-text').innerText(), /Фото из подборки/);
+      assert.equal(await page.locator('#source-text').count(), 0, 'Selected photo is visible without a repeated source label');
       assert.equal(await page.locator('#details').isVisible(), false, 'Opening a source must wait for an explicit analysis');
       assert.equal(requests.some(url => url.pathname === '/analyze'), false);
       await page.locator('#choose-region').click();

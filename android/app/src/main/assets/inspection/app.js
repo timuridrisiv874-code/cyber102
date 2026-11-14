@@ -133,10 +133,6 @@ function render() {
   checkedViewfinder.dataset.portrait = String(frozen && snapshot.height > snapshot.width);
   byId('checked-frame').hidden = !videoMode || !frozen;
   byId('guide').hidden = (!live && !demoActive) || (!videoMode && frozen) || Boolean(media.kind);
-  byId('source').dataset.live = String(live);
-  byId('source-text').textContent = media.kind ? sourceLabel(media.metadata()) : live ? 'Камера' : frameSource === 'camera' ? 'Кадр с камеры' : demoActive ? 'Тестовый пример' : 'Выберите источник';
-  if (byId('mode')) byId('mode').textContent = offlineMode ? 'На телефоне · без сервера' :
-    endpoint && (live || frameSource === 'camera' || media.kind) ? 'Модель на сервере' : demoActive ? 'Тестовый пример' : 'Готово к осмотру';
   if (demoScenario) {
     byId('demo-options').hidden = !example || Boolean(stream || openingCamera || frameSource === 'camera' || media.kind);
     demoScenario.disabled = checking;
@@ -315,10 +311,10 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
   const started = performance.now();
   analysisController = controller;
   let timedOut = false;
-  const timeout = setTimeout(() => {
+  const timeout = offlineMode ? null : setTimeout(() => {
     timedOut = true;
     controller.abort();
-  }, offlineMode ? 180000 : useServer ? 120000 : 12000);
+  }, useServer ? 120000 : 12000);
   try {
     if (offlineMode) {
       const profile = byId('offline-analysis-profile').value;
@@ -364,7 +360,7 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
     }
     return readResult(data);
   } catch (error) {
-    if (timedOut) throw new Error(offlineMode ? 'За 3 минуты телефон не успел подготовить полный результат. Попробуйте быстрый режим или другой кадр.' : 'Сервер не ответил вовремя. Повторите проверку.');
+    if (timedOut) throw new Error('Сервер не ответил вовремя. Повторите проверку.');
     throw error;
   } finally {
     clearTimeout(timeout);
@@ -593,6 +589,18 @@ detection.addEventListener('click', () => {
 function releaseCamera() {
   clipReview?.cancel();
   media.pause();
+  if (offlineMode && checking) {
+    // The captured JPEG is already independent of the camera and selected file.
+    // Release the preview while the native model finishes in the background.
+    cameraRequest += 1;
+    openingCamera = false;
+    const previousStream = stream;
+    stream = null;
+    video.srcObject = null;
+    previousStream?.getTracks().forEach(track => track.stop());
+    render();
+    return;
+  }
   if (!stream && !openingCamera && !analysisController && !videoRun) return;
   inputGeneration += 1;
   checking = false;

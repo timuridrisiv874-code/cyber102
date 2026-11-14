@@ -20,11 +20,11 @@
   <a class="skip-link" href="#main-content">К основному содержимому</a>
   <aside class="app-sidebar" aria-label="Навигация Cyber102">
     <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
-    <p class="brand-caption">Инженерный контроль</p>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" aria-current="page" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nav-label-wide">Оборудование</span><span class="nav-label-short">Объекты</span></a><a href="checkpoint.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="materials.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M8 13h8m-8 4h5"/></svg><span>Материалы</span></a><a href="telemetry.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
     <div class="sidebar-foot"><strong>Осмотр оборудования</strong>Предварительный осмотр<br>Решение принимает инженер</div>
   </aside>
-  <header class="topbar"><div class="topbar-inner"><div class="topbar-location"><span class="workspace-name">Cyber102</span><span class="divider">/</span><strong>Осмотр</strong></div><span class="mode"><i aria-hidden="true"></i><span id="mode">Выберите кадр</span></span></div></header>
+  <header class="topbar"><div class="topbar-inner"><div class="topbar-location"><span class="workspace-name">Cyber102</span><span class="divider">/</span><strong>Осмотр</strong></div></div></header>
+  <p class="sr-only" id="mode" role="status">На телефоне</p>
   <main class="page" id="main-content" data-analysis-endpoint="/analyze">
     <header class="intro">
       <div class="page-heading-group"><div class="eyebrow">Рабочее место инженера</div><h1>Осмотр оборудования</h1><p>Осмотр внешних узлов с фотофиксацией и историей проверок</p></div>
@@ -39,7 +39,7 @@
 
     <div class="workspace">
       <section class="capture panel" aria-labelledby="capture-title">
-        <div class="panel-heading"><h2 id="capture-title"><span class="section-number" aria-hidden="true">01</span>Кадр осмотра</h2><span class="source" id="source"><i aria-hidden="true"></i><span id="source-text">Выберите источник</span></span></div>
+        <div class="panel-heading"><h2 id="capture-title"><span class="section-number" aria-hidden="true">01</span>Кадр осмотра</h2></div>
         <div class="viewfinder" id="viewfinder">
           <div class="camera-idle" id="camera-idle"><span class="camera-idle-mark" aria-hidden="true"><i class="camera-icon"></i></span><strong>Готово к осмотру</strong><p>Включите камеру или выберите фото и видео с устройства.</p></div>
           <img id="example" src="/__mobile_inspection/demo-pump.jpg" alt="Демонстрационный кадр промышленного насоса" decoding="async" hidden>

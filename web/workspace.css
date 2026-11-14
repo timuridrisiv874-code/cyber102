@@ -208,6 +208,7 @@ body[data-inspection-layout=capture] #result { display: none; }
   .capture-source-controls .button { flex: 1 1 110px; }
   .capture-source-controls { padding-inline: 12px; }
   #viewfinder { aspect-ratio: 4 / 3; }
+  #viewfinder:has(.camera-idle:not([hidden])) { aspect-ratio: auto; height: 180px; }
   #viewfinder[data-portrait=true] { max-height: 56svh; }
 }
 @media (min-width: 741px) {

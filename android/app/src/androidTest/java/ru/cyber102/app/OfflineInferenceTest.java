@@ -118,6 +118,19 @@ public final class OfflineInferenceTest {
                 return;
             }
             js("document.getElementById('check').click(); true");
+            if ("true".equals(InstrumentationRegistry.getArguments().getString("backgroundDuringAnalysis"))) {
+                await("analysis started before leaving app",
+                        "JSON.parse(CyberSmolNative.state()).state === 'analyzing'", 30000);
+                Intent home = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                target.startActivity(home);
+                instrumentation.waitForIdleSync();
+                SystemClock.sleep(3000);
+                target.startActivity(new Intent(target, MainActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                await("original offline screen resumes",
+                        "!document.hidden && location.pathname === '/offline/index.html' && !!window.CyberSmolNative", 15000);
+            }
             await("real model observation", "!document.getElementById('offline-result').hidden", 240000);
             String observation = stringJs("document.querySelector('#offline-result .offline-observation').textContent");
             assertTrue(observation.trim().length() > 2);
@@ -150,6 +163,21 @@ public final class OfflineInferenceTest {
             assertEquals(english, saved.getString("originalEnglish"));
             assertEquals("ru", saved.getString("observationLanguage"));
             assertEquals(OfflineTranslator.MODEL_ID, saved.getString("translatorModel"));
+            js("document.querySelector('.offline-tabs button:last-child').click();true");
+            assertEquals("true", js("!document.getElementById('offline-journal').hidden && "
+                    + "getComputedStyle(document.querySelector('.workspace')).display === 'none' && "
+                    + "getComputedStyle(document.getElementById('offline-journal')).display !== 'none' && "
+                    + "document.getElementById('offline-history').textContent.includes('Android instrumentation')"));
+            CountDownLatch journalPainted = new CountDownLatch(1);
+            instrumentation.runOnMainSync(() -> web.postVisualStateCallback(
+                    SystemClock.uptimeMillis(), new WebView.VisualStateCallback() {
+                        @Override public void onComplete(long requestId) { journalPainted.countDown(); }
+                    }));
+            assertTrue(journalPainted.await(10, TimeUnit.SECONDS));
+            instrumentation.getUiAutomation().waitForIdle(350, 4000);
+            SystemClock.sleep(750);
+            capture(target, "offline-journal.png");
+            js("document.querySelector('.offline-tabs button:first-child').click();true");
             assertTrue("Translation latency captured", saved.getDouble("translationMs") > 0);
             if (videoSecond != null) {
                 JSONObject media = saved.getJSONObject("media");
