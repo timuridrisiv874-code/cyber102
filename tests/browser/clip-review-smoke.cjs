@@ -185,6 +185,27 @@ async function run(browser, engine, android) {
       await page.locator('.video-review-seek').nth(3).click();
       await page.waitForFunction(time => Math.abs(document.getElementById('uploaded-video').currentTime - time) < .01, 5 * 3.5 / 8);
     } else {
+      const spatial = page.locator('.video-spatial-review');
+      await spatial.getByText('3D-обзор находок', {exact:true}).click();
+      const current = spatial.locator('.video-spatial-frame.is-current');
+      await page.waitForFunction(() => document.querySelector('.video-spatial-frame.is-current')?.naturalWidth > 0);
+      const initialFrame = await current.getAttribute('src');
+      await spatial.getByRole('button', {name:'Следующая находка'}).click();
+      await page.waitForFunction(src => {
+        const image = document.querySelector('.video-spatial-frame.is-current');
+        return image?.naturalWidth > 0 && image.src !== src;
+      }, initialFrame);
+      await spatial.getByRole('button', {name:/Открыть кадр/}).click();
+      await page.waitForFunction(time => Math.abs(document.querySelector('#uploaded-video').currentTime - time) < .01,
+        post.body.frames[1].timestampSeconds);
+      assert.equal(await spatial.locator('.video-spatial-frame').count(), 5);
+      assert.equal(state.posts.length, 1, 'The 3D overview reuses the existing video analysis');
+      await spatial.getByText('3D-обзор находок', {exact:true}).click();
+      if (process.env.VIDEO_SPATIAL_ONLY === '1') {
+        assert.deepEqual(errors, []);
+        console.log(engine + ' PASS: 3D preview, video seek, one analysis request');
+        return;
+      }
       const gallery = page.locator('.video-review-gallery');
       const slide = gallery.locator('.video-review-frame'), next = gallery.locator('.video-review-next');
       const previous = gallery.locator('.video-review-prev'), position = gallery.locator('.video-review-position');

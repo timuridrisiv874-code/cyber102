@@ -285,6 +285,44 @@ body[data-inspection-layout=capture] #result { display: none; }
   background: transparent;
 }
 .video-review-slide-title { margin: 10px 0 8px; overflow-wrap: anywhere; }
+.video-spatial-review { margin-block: 12px; }
+.video-spatial-review > summary { min-height: 44px; align-content: center; cursor: pointer; font-weight: 650; }
+.video-spatial-viewport {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: clamp(130px, 47vw, 280px);
+  perspective: 600px;
+  overflow: hidden;
+  touch-action: pan-y pinch-zoom;
+  border-radius: 12px;
+  background: #202626;
+}
+.video-spatial-scene {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  width: 56%;
+  height: 84%;
+  transform-style: preserve-3d;
+}
+.video-spatial-frame {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  transform: translate3d(var(--frame-x), 0, var(--frame-depth)) rotateY(var(--frame-angle));
+  opacity: .55;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+.video-spatial-frame.is-current { opacity: 1; z-index: 1; }
+.video-spatial-frame[hidden] { display: none; }
+.video-spatial-caption { margin-block: 8px; font-weight: 600; overflow-wrap: anywhere; }
+.video-spatial-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  .video-spatial-frame { transition: none; }
+}
 .video-review-slide .video-review-seek img { display: block; max-height: min(50svh, 440px); user-select: none; }
 .video-review-slide .video-review-inspect { margin-top: 8px; }
 

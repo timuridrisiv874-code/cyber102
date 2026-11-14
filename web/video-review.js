@@ -503,6 +503,95 @@
         if (slides.length) {
           const cards = await Promise.all(slides.map(episodeCard));
           fragment.append(createGallery(cards, () => active(token) && ready() && !busy && !isInspecting()));
+          if (CSS.supports('transform-style', 'preserve-3d')) {
+            fragment.append(spatialReview(slides));
+          }
+        }
+        function spatialReview(episodes) {
+          const rows = episodes.flatMap(({name, rows}) => rows.map(row => ({row, name})));
+          const view = document.createElement('details');
+          view.className = 'video-spatial-review';
+          view.append(text('summary', '', '3D-обзор находок'));
+
+          const viewport = document.createElement('div');
+          viewport.className = 'video-spatial-viewport';
+          viewport.setAttribute('aria-hidden', 'true');
+          const scene = document.createElement('div');
+          scene.className = 'video-spatial-scene';
+          viewport.append(scene);
+
+          const caption = text('p', 'video-spatial-caption', '');
+          caption.setAttribute('aria-live', 'polite');
+          const navigation = document.createElement('div');
+          navigation.className = 'video-spatial-controls';
+          const previous = text('button', 'button secondary', '‹');
+          const next = text('button', 'button secondary', '›');
+          previous.setAttribute('aria-label', 'Предыдущая находка');
+          next.setAttribute('aria-label', 'Следующая находка');
+          const open = text('button', 'button secondary', 'Открыть кадр');
+          for (const button of [previous, open, next]) button.type = 'button';
+          navigation.append(previous, open, next);
+          view.append(viewport, caption, navigation,
+            text('p', 'video-review-meta', 'Кадры расположены по времени. Рамки отмечают область находки.'));
+
+          let selected = 0;
+          let planes;
+          let drag = null;
+          function select(index) {
+            selected = Math.max(0, Math.min(rows.length - 1, index));
+            const {row, name} = rows[selected];
+            const details = [...new Set((detailBoxes.get(row.frameIndex) || []).map(item => DETAIL_NAMES[item.kind]))];
+            caption.textContent = [evidenceTime(row.timestampSeconds), name, ...details].join(' · ');
+            open.textContent = 'Открыть кадр ' + evidenceTime(row.timestampSeconds);
+            for (const [button, boundary] of [[previous, selected === 0], [next, selected === rows.length - 1]]) {
+              button.dataset.galleryBoundary = String(boundary);
+              button.disabled = boundary;
+            }
+            planes?.forEach((plane, position) => {
+              const offset = position - selected;
+              plane.style.setProperty('--frame-x', (offset * 52) + '%');
+              plane.style.setProperty('--frame-depth', (-Math.abs(offset) * 110) + 'px');
+              plane.style.setProperty('--frame-angle', (-Math.sign(offset) * 32) + 'deg');
+              plane.hidden = Math.abs(offset) > 1;
+              plane.classList.toggle('is-current', offset === 0);
+            });
+          }
+          previous.addEventListener('click', () => select(selected - 1));
+          next.addEventListener('click', () => select(selected + 1));
+          open.addEventListener('click', () => navigate(rows[selected].row));
+          viewport.addEventListener('pointerdown', event => {
+            if (!event.isPrimary || event.button !== 0) return;
+            drag = {id: event.pointerId, start: event.clientX};
+            viewport.setPointerCapture(event.pointerId);
+          });
+          viewport.addEventListener('pointerup', event => {
+            if (drag?.id !== event.pointerId) return;
+            const distance = event.clientX - drag.start;
+            drag = null;
+            if (Math.abs(distance) >= 32 && active(token) && !busy && !isInspecting() && ready()) {
+              select(selected - Math.sign(distance));
+            }
+          });
+          viewport.addEventListener('lostpointercapture', () => { drag = null; });
+          view.addEventListener('toggle', () => {
+            if (!view.open || planes) return;
+            planes = rows.map(({row}) => {
+              const plane = document.createElement('img');
+              plane.className = 'video-spatial-frame';
+              plane.alt = '';
+              plane.draggable = false;
+              preview(row).then(url => {
+                if (active(token)) plane.src = url;
+              }).catch(() => {
+                if (active(token)) plane.src = captured.frames[row.frameIndex].dataUrl;
+              });
+              scene.append(plane);
+              return plane;
+            });
+            select(selected);
+          });
+          select(0);
+          return view;
         }
         const clear = grouped.clearFrames.filter(row => !detailBoxes.has(row.frameIndex));
         const uncertain = grouped.uncertainFrames.filter(row => !detailBoxes.has(row.frameIndex));
