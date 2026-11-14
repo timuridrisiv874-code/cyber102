@@ -14,6 +14,7 @@
   <script src="/__mobile_inspection/video-review.js" defer></script>
   <script src="/__mobile_inspection/app.js" defer></script>
   <script src="/__mobile_inspection/shell.js" defer></script>
+  <script src="/__mobile_inspection/equipment-qr.js" defer></script>
 </head>
 <body data-page="inspection">
   <a class="skip-link" href="#main-content">К основному содержимому</a>
@@ -46,10 +47,13 @@
           <img id="uploaded-image" alt="Выбранное фото оборудования" hidden>
           <video id="uploaded-video" aria-label="Выбранное видео оборудования" controls muted playsinline preload="auto" hidden></video>
           <canvas id="snapshot" role="img" aria-label="Зафиксированный кадр осмотра" hidden></canvas>
+          <button class="qr-camera-button" type="button" id="equipment-qr" aria-label="Считать QR-код оборудования" aria-pressed="false" hidden>QR</button>
           <div class="finder-guide" id="guide" aria-hidden="true" hidden><i></i><i></i><i></i><i></i></div>
           <button type="button" class="detection" id="detection" aria-controls="result" hidden><span id="detection-label"></span></button>
         </div>
         <div class="capture-footer">
+          <p class="video-help" id="qr-scan-status" role="status" hidden></p>
+          <div class="qr-selected" id="qr-selected" role="status" hidden><div><strong id="qr-name"></strong><div id="qr-value"></div><div id="qr-model" hidden></div><div id="qr-maker" hidden></div><small id="qr-demo" hidden>Демонстрационный объект</small></div><button type="button" id="qr-clear" aria-label="Убрать выбранный объект">×</button></div>
           <div class="actions">
             <button class="button primary" id="check" type="button" disabled><i class="scan-icon" aria-hidden="true"></i><span id="check-label">Проверить кадр</span></button>
             <button class="button primary" id="video-toggle" type="button" hidden><i class="scan-icon" aria-hidden="true"></i><span id="video-toggle-label">Начать проверку</span></button>

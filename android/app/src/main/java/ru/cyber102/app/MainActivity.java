@@ -23,6 +23,8 @@ import android.webkit.*;
 import android.widget.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -328,7 +330,7 @@ public final class MainActivity extends ComponentActivity {
                 updateBackNavigation();
                 progress.setVisibility(View.GONE);
                 if (!failed && sameOrigin(Uri.parse(url), Uri.parse(activeUrl))) {
-                    status.setText(isOffline() ? "На телефоне · VisionPsy · без сети" : isDemo() ? "Демо · ответы заданы заранее" : "Сервер · " + Uri.parse(activeUrl).getHost());
+                    status.setText(isOffline() ? "На телефоне · LFM3 · без сети" : isDemo() ? "Демо · ответы заданы заранее" : "Сервер · " + Uri.parse(activeUrl).getHost());
                     if (isOffline()) onOfflineEvent(offline.snapshot());
                 }
             }
@@ -825,6 +827,18 @@ public final class MainActivity extends ComponentActivity {
         private final WebView owner;
         OfflineBridge(WebView owner) { this.owner = owner; }
         private boolean allowed() { return isOffline() && web == owner && !failed && !isFinishing() && !isDestroyed(); }
+        @JavascriptInterface public String equipmentCatalog() {
+            if (!allowed()) return null;
+            try (InputStreamReader input = new InputStreamReader(getAssets().open("equipment-catalog.json"), StandardCharsets.UTF_8)) {
+                StringBuilder catalog = new StringBuilder();
+                char[] block = new char[2048];
+                int count;
+                while ((count = input.read(block)) != -1) catalog.append(block, 0, count);
+                return catalog.toString();
+            } catch (IOException error) {
+                return null;
+            }
+        }
         @JavascriptInterface public String state() {
             return allowed() ? offline.snapshot().toString() : "{}";
         }

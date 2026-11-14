@@ -9,8 +9,8 @@ const origin = 'https://appassets.androidplatform.net';
 const mime = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.jpg': 'image/jpeg', '.json': 'application/json' };
 
 async function run(browser, name, android) {
-  const model = android ? 'VisionPsy-Nano-460M' : name === 'WebKit' ? 'SmolVLM-500M-Instruct' : 'SmolVLM-256M-Instruct';
-  const modelBytes = android ? 364547104 : name === 'WebKit' ? 546000000 : 278824384;
+  const model = android ? 'LFM3-VL-2B' : name === 'WebKit' ? 'SmolVLM-500M-Instruct' : 'SmolVLM-256M-Instruct';
+  const modelBytes = android ? 1478623840 : name === 'WebKit' ? 546000000 : 278824384;
   const page = await browser.newPage({ ...devices['iPhone 13'], defaultBrowserType: undefined });
   page.setDefaultTimeout(15000);
   const errors = [], unexpected = [];
@@ -44,10 +44,12 @@ async function run(browser, name, android) {
           mockSmol.busy = false;
           CyberOffline.onNativeEvent({ type: 'result', requestId, model, modelVersion: 'fixture-revision',
             result: { text: android
-              ? 'visible crack or opening\npossible damage to electrical contacts'
+              ? (mockSmol.answer || 'The metal pipe has a long open crack near the joint.')
               : '<script>alert("unsafe")</script> A blue machine with a visible surface.',
-              visualFindings: android, totalMs: 200, promptMs: 150, generateMs: android ? 0 : 50,
-              generatedTokens: android ? 0 : 12, inputTokens: 89, cancelled: false } });
+              russian: android ? (mockSmol.ru === undefined ? 'На металлической трубе возле соединения видна длинная открытая трещина.' : mockSmol.ru) : undefined,
+              translatorModel: android ? 'fixture-enru' : undefined, translationMs: 810, translationLoadMs: 240,
+              truncated: mockSmol.truncated === true, totalMs: 200, promptMs: 150, generateMs: 50,
+              generatedTokens: 12, inputTokens: 89, cancelled: false } });
           CyberOffline.onNativeEvent(snapshot());
         }, mockSmol.delay);
       },
@@ -63,7 +65,7 @@ async function run(browser, name, android) {
     }
     assert.equal(await page.evaluate(() => CyberOffline.enabled), true);
     assert.ok((await page.locator('#offline-model-description').textContent()).includes(model));
-    if (android) assert.match(await page.locator('#offline-model-description').textContent(), /365 МБ/);
+    if (android) assert.match(await page.locator('#offline-model-description').textContent(), /1,48 ГБ/);
     assert.equal(await page.locator('.active-equipment-bar').isVisible(), false);
     assert.equal(await page.locator('#demo-options').isVisible(), false);
     await page.locator('#media-file').setInputFiles(path.join(root, 'web/demo-pump.jpg'));
@@ -71,9 +73,14 @@ async function run(browser, name, android) {
     await page.locator('#check').click();
     await page.locator('#offline-result:not([hidden])').waitFor();
     if (android) {
-      assert.match(await page.locator('#offline-result').textContent(), /Признаки VisionPsy/);
-      assert.deepEqual(await page.locator('#offline-result .offline-caption').allTextContents(),
-        ['Возможная трещина или разрыв', 'Возможное повреждение клеммы или контактов']);
+      assert.match(await page.locator('#offline-result .offline-observation').textContent(), /длинная открытая трещина/);
+      assert.equal(await page.locator('#offline-result .offline-observation').getAttribute('lang'), 'ru');
+      assert.match(await page.locator('#offline-result .video-metrics').textContent(), /Перевод 0,81 с/);
+      const original = page.locator('#offline-result .offline-original-text');
+      assert.equal(await original.isVisible(), false);
+      await page.locator('#offline-result .offline-original > summary').click();
+      assert.equal(await original.isVisible(), true);
+      assert.equal(await original.textContent(), 'The metal pipe has a long open crack near the joint.');
     } else {
       assert.match(await page.locator('#offline-result').textContent(), /Исходный ответ модели на английском/);
       assert.match(await page.locator('#offline-result').textContent(), /<script>alert/);
@@ -98,7 +105,13 @@ async function run(browser, name, android) {
     assert.equal(history[0].source, 'on_device');
     assert.match(history[0].note, /Подтверждение инженера/);
     assert.equal(history[0].modelVersion, 'fixture-revision');
-    if (android) assert.equal(history[0].visualFindings, true);
+    if (android) {
+      assert.equal(history[0].observation, 'На металлической трубе возле соединения видна длинная открытая трещина.');
+      assert.equal(history[0].originalEnglish, 'The metal pipe has a long open crack near the joint.');
+      assert.equal(history[0].observationLanguage, 'ru');
+      assert.equal(history[0].translatorModel, 'fixture-enru');
+      assert.equal(history[0].translationMs, 810);
+    }
     assert.equal(history[0].model, model);
     assert.ok((await page.locator('#offline-history').textContent()).includes(model));
     assert.equal(history[9].id, 'old_8');
@@ -124,6 +137,21 @@ async function run(browser, name, android) {
     // Late native output after cancellation cannot replace the current result.
     await page.waitForTimeout(2100);
     assert.equal(await page.locator('#offline-result').isVisible(), false);
+    if (android) {
+      for (const testCase of [
+        { answer: 'No crack is visible.', ru: 'Трещина не видна.' },
+        { answer: 'No equipment is visible.', ru: '' },
+        { answer: 'The surface has', ru: 'На поверхности есть', truncated: true },
+      ]) {
+        await page.evaluate(fixture => Object.assign(mockSmol, fixture, { delay: 30 }), testCase);
+        await page.locator('#check:not([disabled])').click();
+        await page.locator('#offline-result:not([hidden])').waitFor();
+        assert.equal(await page.locator('#offline-result .offline-observation').textContent(), testCase.ru || testCase.answer);
+        assert.equal(await page.locator('#offline-result .offline-original').count(), testCase.ru ? 1 : 0);
+        if (testCase.ru) assert.equal(await page.locator('#offline-result .offline-original-text').textContent(), testCase.answer);
+        assert.equal(await page.locator('#offline-result .offline-warning').count(), testCase.truncated || !testCase.ru ? 1 : 0);
+      }
+    }
     assert.deepEqual(unexpected, []);
     assert.deepEqual(errors, []);
     console.log(`${name} ${android ? 'Android assets' : 'web'}: PASS — offline origin, no HTTP/API, real JPEG, native result, no false boxes, bounded local history, cancellation/stale result, safe text, narrow viewport`);
@@ -144,7 +172,7 @@ async function run(browser, name, android) {
   for (const [engine, name, options] of [[chromium, 'Chromium', process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}], [webkit, 'WebKit', {}]]) {
     if (process.env.OFFLINE_TEST_ENGINE && process.env.OFFLINE_TEST_ENGINE !== name) continue;
     const browser = await engine.launch(options);
-    try { for (const android of [false,true]) await run(browser, name, android); }
+    try { for (const android of process.env.OFFLINE_TEST_ANDROID_ONLY === '1' ? [true] : [false, true]) await run(browser, name, android); }
     finally { await browser.close(); }
   }
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

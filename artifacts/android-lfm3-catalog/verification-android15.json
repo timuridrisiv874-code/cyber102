@@ -1,0 +1,30 @@
+{
+  "android": "Android 15, API 35, ARM64 emulator",
+  "airplaneMode": true,
+  "qrSource": "QR images on a synthetic live camera stream, actual packaged decoder",
+  "cases": [
+    {
+      "scanned": "https://plant.example/checkpoint.html?serial=21031004-1",
+      "found": "21031004-1",
+      "kind": "pump"
+    },
+    {
+      "scanned": "https://plant.example/checkpoint.html?serial=PUMP-QA-17",
+      "found": null,
+      "previousSelection": "21031004-1"
+    },
+    {
+      "scanned": "230201068",
+      "found": "230201068",
+      "kind": "motor",
+      "savedMedia": {
+        "captureSource": "uploaded_photo",
+        "equipmentTag": "230201068",
+        "equipmentName": "Электродвигатель №1 · BRA160M4 FБУ1",
+        "declaredBy": "client"
+      }
+    }
+  ],
+  "passedInstrumentationTests": 2,
+  "catalogEntryCount": 17
+}

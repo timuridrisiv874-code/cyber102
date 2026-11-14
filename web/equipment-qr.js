@@ -17,8 +17,34 @@
   const video = document.getElementById('video'), button = document.getElementById('equipment-qr');
   if (!button) return;
   const field = document.getElementById('active-equipment'), status = document.getElementById('qr-scan-status');
+  const card = document.getElementById('qr-equipment-card');
   const canvas = document.createElement('canvas');
   let library, generation = 0, running = false, timeout, frameTimer, request;
+  const hasJournal = passport => passport.kind === 'pump' || passport.source === 'Демонстрационные данные';
+  function showPassport(passport) {
+    const fields = document.getElementById('qr-equipment-fields');
+    document.getElementById('qr-equipment-title').textContent = passport.name || passport.title || passport.typeLabel || 'Оборудование';
+    fields.replaceChildren();
+    const rows = [['Серийный номер', passport.serial], ['Модель', passport.model], ['Изготовитель', passport.manufacturer]];
+    if (passport.source === 'Демонстрационные данные') rows.push(['Источник', 'Демонстрационные данные']);
+    for (const [label, value] of rows) {
+      if (typeof value !== 'string' || !value.trim()) continue;
+      const term = document.createElement('dt'), description = document.createElement('dd');
+      term.textContent = label;
+      description.textContent = value;
+      fields.append(term, description);
+    }
+    const documentLink = document.getElementById('qr-equipment-passport');
+    const source = passport.fields?.serial?.source;
+    documentLink.hidden = typeof source?.documentId !== 'string' || !Number.isInteger(source.page) || source.page < 1;
+    if (!documentLink.hidden) documentLink.href = '/api/customer/documents/' + encodeURIComponent(source.documentId) + '/pdf#page=' + source.page;
+    else documentLink.removeAttribute('href');
+    const journal = document.getElementById('qr-equipment-journal');
+    journal.hidden = !hasJournal(passport);
+    if (!journal.hidden) journal.href = '/checkpoint.html?' + new URLSearchParams({serial: passport.serial});
+    else journal.removeAttribute('href');
+    card.hidden = false;
+  }
   function decoder() {
     if (window.jsQR) return Promise.resolve(window.jsQR);
     if (!library) library = new Promise((resolve, reject) => {
@@ -37,7 +63,7 @@
   }
   function stop(message = '') {
     generation++; running = false;
-    clearTimeout(timeout); clearTimeout(frameTimer); request?.abort();
+    clearTimeout(timeout); clearTimeout(frameTimer); request?.abort(); request = null;
     button.setAttribute('aria-pressed','false');
     announce(message);
   }
@@ -50,6 +76,7 @@
   async function start() {
     if (running) { stop(); return; }
     if (!activeCamera()) return;
+    card.hidden = true;
     running = true;
     const token = ++generation;
     button.setAttribute('aria-pressed','true');
@@ -71,32 +98,50 @@
             if (label) {
               const serial = serialFromLabel(label.data, location.origin);
               if (!serial) { stop('Это не метка оборудования стенда.'); return; }
+              clearTimeout(timeout);
+              announce('Ищем оборудование по номеру ' + serial);
+              timeout = setTimeout(() => stop('Каталог не ответил. Повторите поиск.'), 10000);
               request = new AbortController();
-              const response = await fetch('/api/scenarios?' + new URLSearchParams({serial}), {signal:request.signal, cache:'no-store'});
+              const response = await fetch('/api/equipment', {signal:request.signal, cache:'no-store'});
               if (token !== generation) return;
-              if (response.status === 404) { stop('Оборудование с таким номером отсутствует в журнале.'); return; }
               if (!response.ok) throw new Error();
               const data = await response.json();
               if (token !== generation || !activeCamera()) return;
-              if (data.passport?.serial !== serial) { stop('Не удалось подтвердить серийный номер.'); return; }
+              if (!Array.isArray(data?.equipment)) throw new Error();
+              const matches = data.equipment.filter(item => item?.serial === serial);
+              if (!matches.length) { stop('Оборудование с таким номером отсутствует в каталоге.'); return; }
+              if (matches.length !== 1) { stop('В каталоге несколько объектов с таким номером.'); return; }
+              const passport = matches[0];
+              stop();
               field.value = serial;
               field.dispatchEvent(new Event('input', {bubbles:true}));
-              field.dispatchEvent(new Event('change', {bubbles:true}));
-              stop('Выбрано оборудование ' + serial); return;
+              // Input invalidates the previous inspection. Only pumps have a server journal.
+              if (hasJournal(passport)) field.dispatchEvent(new Event('change', {bubbles:true}));
+              if (field.value === serial) {
+                showPassport(passport);
+                announce(hasJournal(passport) ? 'Выбрано оборудование ' + serial : 'Найден объект ' + serial + '. Для него доступна паспортная карточка.');
+              }
+              return;
             }
           }
           frameTimer = setTimeout(frame, 220);
-        } catch { if (token === generation) stop('Не удалось прочитать метку. Повторите или введите номер.'); }
+        } catch {
+          if (token === generation) stop(request ? 'Каталог оборудования недоступен. Повторите поиск.' : 'Не удалось прочитать метку. Повторите или введите номер.');
+        }
       }
       await frame();
     } catch { if (token === generation) stop('Сканер не загрузился. Повторите или введите номер.'); }
   }
   button.addEventListener('click', start);
+  for (const event of ['input','change']) field.addEventListener(event, () => {
+    card.hidden = true;
+    stop();
+  });
   const observer = new MutationObserver(sync);
   observer.observe(video, {attributes:true, attributeFilter:['hidden']});
   observer.observe(field, {attributes:true, attributeFilter:['disabled']});
   video.addEventListener('loadeddata', sync); video.addEventListener('emptied', sync);
   document.addEventListener('visibilitychange', sync);
-  window.addEventListener('pagehide', () => stop());
+  window.addEventListener('pagehide', () => { stop(); card.hidden = true; });
   sync();
 })();

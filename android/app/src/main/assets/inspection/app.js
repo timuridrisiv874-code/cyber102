@@ -71,7 +71,9 @@ function resetInput() {
 }
 
 function captureMetadata() {
-  return media.kind ? media.metadata() : { captureSource: 'camera' };
+  const metadata = media.kind ? media.metadata() : { captureSource: 'camera' };
+  const object = window.CyberEquipmentQR?.object();
+  return offlineMode && object ? { ...metadata, equipmentTag: object.serial, equipmentName: object.name } : metadata;
 }
 
 function sourceLabel(metadata) {
@@ -299,7 +301,7 @@ function drawFrame(canvas, source) {
   if (!width || !height || (source.tagName === 'VIDEO' && source.readyState < 2)) {
     throw new Error('Кадр недоступен. Дождитесь загрузки изображения.');
   }
-  const scale = Math.min(1, (offlineMode ? 512 : 1280) / Math.max(width, height));
+  const scale = Math.min(1, (offlineMode ? 1024 : 1280) / Math.max(width, height));
   canvas.width = Math.max(1, Math.round(width * scale));
   canvas.height = Math.max(1, Math.round(height * scale));
   canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
@@ -404,7 +406,7 @@ async function checkFrame() {
     }
     const useServer = frameSource !== 'example';
     if (useServer && !endpoint && !offlineMode) throw new Error('Не задан адрес сервера анализа.');
-    if (useServer) showMessage(offlineMode ? 'VisionPsy анализирует кадр на телефоне…' : 'Модель анализирует кадр. Задержка появится после ответа.');
+    if (useServer) showMessage(offlineMode ? 'LFM3 анализирует кадр на телефоне…' : 'Модель анализирует кадр. Задержка появится после ответа.');
     render();
     const nextResult = await analyzeFrame(useServer, snapshot, frameMetadata);
     if (generation !== inputGeneration) return;

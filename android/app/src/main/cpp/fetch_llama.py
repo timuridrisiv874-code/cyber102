@@ -4,8 +4,8 @@ from pathlib import Path
 import tarfile
 import urllib.request
 
-REVISION = 'b79696f1f556cb30b0c184838115007d929baca8'
-ARCHIVE_SHA256 = 'fc2a3fcb5901317b9e2bf94adcd3d6b624b6d4d7bd7069a5b57ada2aef2a9c7c'
+REVISION = 'b1b770d90d94cad9e9ea5b993bdbc383a522fb28'
+ARCHIVE_SHA256 = 'ae8556670b17c25931cd39eb7c95617650eaf6091bbcff206750583ddde1acb4'
 ROOT = Path(__file__).resolve().parents[5]
 DESTINATION = ROOT / 'var' / 'native'
 

@@ -1,0 +1,69 @@
+{
+  "models": {
+    "component": "Mozilla Firefox Translations English to Russian 2.1 (Android), 31,248,966 parameters",
+    "attribution": "Mozilla and Firefox Translations contributors",
+    "official_license_statement": "https://github.com/mozilla/translations/blob/main/README.md",
+    "source": "https://github.com/mozilla/firefox-translations-models/tree/e7957fc407441a5e3e35bbcbf9d60d9b35764618/models/base-memory/enru",
+    "model_metadata": "https://raw.githubusercontent.com/mozilla/firefox-translations-models/e7957fc407441a5e3e35bbcbf9d60d9b35764618/models/base-memory/enru/metadata.json",
+    "license": {
+      "id": "MPL-2.0",
+      "source": "https://raw.githubusercontent.com/mozilla/firefox-translations-models/e7957fc407441a5e3e35bbcbf9d60d9b35764618/LICENSE",
+      "license_sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    "registry": "https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/translations-models/records",
+    "files": [
+      {
+        "name": "lex.50.50.enru.s2t.bin",
+        "bytes": 2774540,
+        "sha256": "4d91839726b960e70b6d05c53d0cffd16262832b1c0e1ea99d66f412dcc6a239",
+        "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models/e88cc45c-0e0b-45d3-a957-8d1ba3a9b5aa.bin",
+        "official_registry_id": "e2879167-64d6-4e4f-b42b-470ce160614c"
+      },
+      {
+        "name": "vocab.enru.spm",
+        "bytes": 904455,
+        "sha256": "56ee63e14e8cb926c394242adc3ed7cc602644c3d33058cff2ce2959d52a6258",
+        "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models/568807dd-9620-4c4d-a0b5-d651d64c0ab0.spm",
+        "official_registry_id": "07333d13-cbf8-4960-970a-49513b3722ca"
+      },
+      {
+        "name": "model.enru.intgemm.alphas.bin",
+        "bytes": 31561787,
+        "sha256": "184cb5cda528eeefc0f75f5d0035d787b71d74af135e3c5608d01ae02ecfb920",
+        "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models/db6b48bb-b563-4ea1-bbf4-b033fa9cc482.bin",
+        "official_registry_id": "46d9d154-ed71-4d5b-9c21-ca59dd300a1a"
+      }
+    ]
+  },
+  "runtime": {
+    "component": "Bergamot v0.4.5+321be8a WASM and JavaScript",
+    "attribution": "Mozilla and Bergamot Translator contributors",
+    "website_source": "https://github.com/mozilla/translate/tree/14fdf57e323e532c3e11c75618e676c96d93df00",
+    "website_pinned_archive": "https://codeload.github.com/mozilla/translate/tar.gz/14fdf57e323e532c3e11c75618e676c96d93df00",
+    "website_license": {
+      "id": "MPL-2.0",
+      "source": "https://raw.githubusercontent.com/mozilla/translate/14fdf57e323e532c3e11c75618e676c96d93df00/LICENSE",
+      "license_sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    "engine_source": "https://github.com/browsermt/bergamot-translator/tree/321be8ae0486de3af67307c4cb2e005994593597",
+    "engine_license": {
+      "id": "MPL-2.0",
+      "source": "https://raw.githubusercontent.com/browsermt/bergamot-translator/321be8ae0486de3af67307c4cb2e005994593597/LICENSE",
+      "license_sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    "files": [
+      {
+        "name": "bergamot-translator-worker.js",
+        "bytes": 82410,
+        "sha256": "2cb354e739ba02cb04ee93da0c24f4b4d9de5e17c26fc41f1aeed4fb41811a5c",
+        "url": "https://raw.githubusercontent.com/mozilla/translate/14fdf57e323e532c3e11c75618e676c96d93df00/js/bergamot-translator-worker.js"
+      },
+      {
+        "name": "bergamot-translator-worker.wasm",
+        "bytes": 5243384,
+        "sha256": "65cf5be754ea6d44db018a38e1f4a5c2fb2d7ef601d0e0067abde4e3d145386f",
+        "url": "https://raw.githubusercontent.com/mozilla/translate/14fdf57e323e532c3e11c75618e676c96d93df00/js/bergamot-translator-worker.wasm"
+      }
+    ]
+  }
+}

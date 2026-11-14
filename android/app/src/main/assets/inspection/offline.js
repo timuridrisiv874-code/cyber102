@@ -10,30 +10,10 @@
   let modelDescription;
   let historyPanel, renderedResult = null;
   const HISTORY_KEY = 'cyber102.offline.inspections.v1';
-  const MODELS = new Set(['SmolVLM-256M-Instruct', 'SmolVLM-500M-Instruct', 'SmolVLM2-2.2B-Instruct', 'VisionPsy-Nano-460M']);
-  const modelName = model => MODELS.has(model) ? model : 'VisionPsy-Nano-460M';
+  const CURRENT_MODEL = 'LFM3-VL-2B';
+  const PREVIOUS_MODELS = new Set(['SmolVLM-256M-Instruct', 'SmolVLM-500M-Instruct', 'SmolVLM2-2.2B-Instruct', 'VisionPsy-Nano-460M']);
+  const modelName = model => model === CURRENT_MODEL || PREVIOUS_MODELS.has(model) ? model : 'Офлайн-модель';
   const displayBytes = bytes => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(2).replace('.', ',')} ГБ` : `${Math.ceil(bytes / 1e6)} МБ`;
-  const findingLabels = new Map([
-    ['irregular split or hole', 'Неровная трещина или отверстие'],
-    ['electrical wires', 'Видна электропроводка'],
-    ['damaged electrical contacts', 'Повреждение электрических контактов'],
-    ['contact damaged', 'Повреждение контакта'],
-    ['electrical wires or contacts damaged', 'Повреждение проводки или контактов'],
-    ['heavy surface rust', 'Сильная поверхностная коррозия'],
-    ['liquid dripping', 'Видны капли жидкости'],
-    ['liquids dripping', 'Видны капли жидкости'],
-    ['normal', 'Явный дефект по кадру не различим'],
-    ['normal or unclear', 'Явный дефект по кадру не различим'],
-    ['unclear', 'Кадр не даёт однозначного наблюдения'],
-    ['indistinct', 'Кадр не даёт однозначного наблюдения'],
-  ]);
-  const visualFindingLabels = new Map([
-    ['visible crack or opening', 'Возможная трещина или разрыв'],
-    ['possible damage to electrical contacts', 'Возможное повреждение клеммы или контактов'],
-    ['visible surface corrosion', 'Признаки поверхностной коррозии'],
-    ['visible liquid or streaks', 'Видны следы жидкости или потёки'],
-    ['unclear', 'Кадр не даёт однозначного наблюдения'],
-  ]);
   let counter = 0;
   const text = (tag, value, className) => {
     const element = document.createElement(tag);
@@ -43,13 +23,21 @@
   };
   const aborted = () => new DOMException('Анализ отменён', 'AbortError');
 
+  function englishOriginal(english) {
+    const details = text('details', undefined, 'offline-original');
+    const copy = text('p', english, 'offline-original-text');
+    copy.lang = 'en';
+    details.append(text('summary', 'Оригинал на английском'), copy);
+    return details;
+  }
+
   function readHistory() {
     const raw = localStorage.getItem(HISTORY_KEY);
-    if (raw && raw.length > 150000) throw new Error('Локальная история повреждена.');
+    if (raw && raw.length > 250000) throw new Error('Локальная история повреждена.');
     const records = raw ? JSON.parse(raw) : [];
     if (!Array.isArray(records)) throw new Error('Локальная история повреждена.');
     return records.filter(record => record?.source === 'on_device' && typeof record.id === 'string' &&
-      typeof record.observation === 'string' && record.observation.length <= 4000 &&
+      typeof record.observation === 'string' && record.observation.length <= 12000 &&
       typeof record.note === 'string' && record.note.length <= 1000 &&
       typeof record.createdAt === 'string' && Number.isFinite(Date.parse(record.createdAt))).slice(0, 10);
   }
@@ -65,9 +53,13 @@
       for (const record of records) {
         const item = text('li');
         item.style.overflowWrap = 'anywhere';
-        item.append(text('strong', new Date(record.createdAt).toLocaleString('ru-RU')),
-          text('p', record.observation), text('p', record.note || 'Заметка не добавлена', 'equipment-id'),
-          text('p', `${modelName(record.model)} · анализ на устройстве · исходный ответ модели`, 'video-help'));
+        item.append(text('strong', new Date(record.createdAt).toLocaleString('ru-RU')), text('p', record.observation));
+        if (record.media?.equipmentTag) item.append(text('p', (record.media.equipmentName || 'Метка') + ' · ' + record.media.equipmentTag, 'equipment-id'));
+        if (record.observationLanguage === 'ru' && typeof record.originalEnglish === 'string') {
+          item.append(englishOriginal(record.originalEnglish));
+        }
+        item.append(text('p', record.note || 'Заметка не добавлена', 'equipment-id'),
+          text('p', `${modelName(record.model)} · анализ на устройстве`, 'video-help'));
         list.append(item);
       }
       historyPanel.append(list);
@@ -89,7 +81,7 @@
     loadButton.disabled = Boolean(modelState.busy || modelState.loaded);
     loadButton.textContent = modelState.loaded ? 'Модель готова' : 'Подготовить модель';
     cancelButton.hidden = !modelState.busy;
-    frameCancelButton.hidden = modelState.state !== 'analyzing' || !modelState.busy;
+    frameCancelButton.hidden = !['analyzing', 'translating'].includes(modelState.state) || !modelState.busy;
     importButton.disabled = Boolean(modelState.busy);
     controls.setAttribute('aria-busy', String(Boolean(modelState.busy)));
   }
@@ -101,18 +93,23 @@
     if (!job) return;
     if (event.type === 'result') {
       const raw = event.result;
-      if (!MODELS.has(event.model) || !raw || raw.cancelled || typeof raw.text !== 'string' || !raw.text.trim() || raw.text.length > 4000) {
+      if (event.model !== CURRENT_MODEL || !raw || raw.cancelled || typeof raw.text !== 'string' || !raw.text.trim() || raw.text.length > 4000) {
         job.reject(new Error('Модель не вернула пригодное наблюдение. Повторите кадр.'));
         return;
       }
       const timings = {};
-      for (const key of ['promptMs', 'generateMs', 'totalMs', 'generatedTokens', 'inputTokens']) {
+      for (const key of ['promptMs', 'generateMs', 'totalMs', 'generatedTokens', 'inputTokens', 'translationLoadMs', 'translationMs']) {
         if (Number.isFinite(raw[key]) && raw[key] >= 0) timings[key] = raw[key];
       }
+      const russian = typeof raw.russian === 'string' && raw.russian.length <= 12000 ? raw.russian.trim() : '';
+      const originalEnglish = raw.text.trim();
       job.resolve({ status: 'offline_observation', source: 'on_device', model: event.model,
         modelVersion: typeof event.modelVersion === 'string' ? event.modelVersion : '',
-        observation: raw.text.trim(), preliminary: true, observationLanguage: 'en',
-        visualFindings: raw.visualFindings === true,
+        observation: russian || originalEnglish, originalEnglish, preliminary: true,
+        observationLanguage: russian ? 'ru' : 'en',
+        translatorModel: russian && typeof raw.translatorModel === 'string' ? raw.translatorModel : undefined,
+        translationFailed: !russian,
+        truncated: raw.truncated === true,
         durationSeconds: Number.isFinite(raw.totalMs) ? raw.totalMs / 1000 : undefined,
         metrics: timings, media: job.metadata });
     } else if (event.type === 'error') {
@@ -176,7 +173,7 @@
       renderedResult = null;
       if (!checking) {
         const emptyText = document.getElementById('empty-text');
-        if (emptyText) emptyText.textContent = 'Проверьте кадр: VisionPsy даст предварительное описание видимого объекта прямо на телефоне.';
+        if (emptyText) emptyText.textContent = 'Нажмите «Проверить кадр», чтобы получить описание видимых признаков.';
       }
       return;
     }
@@ -185,18 +182,27 @@
     renderedResult = result;
     const capture = { camera: 'Кадр камеры', uploaded_photo: 'Загруженное фото', uploaded_video: 'Кадр загруженного видео' }[result.media?.captureSource] || 'Кадр на устройстве';
     const position = result.media?.captureSource === 'uploaded_video' && Number.isFinite(result.media.videoTimeSeconds) ? ` · ${result.media.videoTimeSeconds.toFixed(1)} с` : '';
-    const duration = Number.isFinite(result.durationSeconds) ? ` · Анализ ${result.durationSeconds.toFixed(1)} с` : '';
-    const labels = result.visualFindings
-      ? result.observation.split('\n').map(line => visualFindingLabels.get(line)).filter(Boolean)
-      : [findingLabels.get(result.observation.toLowerCase().replace(/[.!]+$/, '').trim())].filter(Boolean);
+    const seconds = ms => (ms / 1000).toLocaleString('ru-RU', { maximumFractionDigits: 2 });
+    const times = [];
+    if (Number.isFinite(result.metrics.totalMs)) times.push(`Анализ ${seconds(result.metrics.totalMs)} с`);
+    if (result.metrics.translationLoadMs > 0) times.push(`Загрузка переводчика ${seconds(result.metrics.translationLoadMs)} с`);
+    if (Number.isFinite(result.metrics.translationMs)) times.push(`Перевод ${seconds(result.metrics.translationMs)} с`);
     resultCard.replaceChildren(text('span', 'Офлайн · предварительное наблюдение', 'finding'),
       text('h3', `${modelName(result.model)} на этом телефоне`),
-      text('p', capture + position + duration, 'video-metrics'),
+      text('p', [capture + position, ...times].join(' · '), 'video-metrics'),
       checkedFrame());
-    for (const label of labels) resultCard.append(text('p', label, 'offline-caption'));
-    resultCard.append(text('p', result.visualFindings ? 'Признаки VisionPsy' : 'Исходный ответ модели на английском', 'equipment-id'),
-      text('p', result.observation, 'offline-observation'),
-      text('p', 'Сверьте описание с кадром. Оценка скрытых неисправностей, ресурса и безопасности эксплуатации требует отдельной проверки.', 'equipment-id'));
+    if (result.media?.equipmentTag) resultCard.append(text('p', (result.media.equipmentName || 'Метка') + ' · ' + result.media.equipmentTag, 'equipment-id'));
+    if (result.translationFailed) {
+      resultCard.append(text('p', 'Перевод не удался. Показан английский оригинал.', 'offline-warning'));
+    } else {
+      resultCard.append(text('p', 'Автоматический перевод', 'equipment-id'));
+    }
+    const description = text('p', result.observation, 'offline-observation');
+    description.lang = result.observationLanguage;
+    resultCard.append(description);
+    if (result.truncated) resultCard.append(text('p', 'Ответ прерван. Описание может быть неполным.', 'offline-warning'));
+    if (result.observationLanguage === 'ru') resultCard.append(englishOriginal(result.originalEnglish));
+    resultCard.append(text('p', 'Сверьте описание с кадром.', 'equipment-id'));
     const label = text('label', 'Заметка к осмотру на телефоне'); label.htmlFor = 'offline-note';
     const note = text('textarea'); note.id = label.htmlFor; note.rows = 3; note.maxLength = 1000;
     note.style.width = '100%'; note.style.font = 'inherit';
@@ -206,8 +212,11 @@
       try {
         const record = { id: `local_${Date.now()}_${++counter}`, source: 'on_device', createdAt: new Date().toISOString(),
           model: result.model, modelVersion: result.modelVersion, observation: result.observation,
+          observationLanguage: result.observationLanguage, originalEnglish: result.originalEnglish,
+          translatorModel: result.translatorModel, translationMs: result.metrics.translationMs,
+          translationLoadMs: result.metrics.translationLoadMs,
           note: note.value.slice(0,1000), media: result.media, durationSeconds: result.durationSeconds,
-          visualFindings: result.visualFindings };
+          truncated: result.truncated };
         localStorage.setItem(HISTORY_KEY, JSON.stringify([record, ...readHistory()].slice(0, 10)));
         save.disabled = note.disabled = true;
         saved.textContent = 'Сохранено на телефоне. На сервер ничего не отправлено.';

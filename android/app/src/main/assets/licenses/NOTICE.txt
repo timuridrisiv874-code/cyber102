@@ -1,2 +1,4 @@
-On-device model: Tether AI Research VisionPsy-Nano-460M, official QVAC GGUF files, Apache License 2.0.
-Native runtime: QVAC patched llama.cpp, MIT License. Pinned revisions in cpp/fetch_visionpsy.py and the model manifest.
+On-device model: Liquid AI, Inc., LFM3-VL-2B.
+Official GGUF weights: https://huggingface.co/LiquidAI/LFM3-VL-2B-GGUF/tree/1add221a5ea6c047fcf1eaaf2d247939d7cf8849
+License: LFM Open License v1.0, included in LFM-Open-License-v1.0.txt.
+Native runtime: llama.cpp by the ggml authors, MIT License, included in llama.cpp-MIT.txt.

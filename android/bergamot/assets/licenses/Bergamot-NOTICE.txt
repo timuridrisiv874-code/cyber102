@@ -1,0 +1,12 @@
+Cyber102 uses the English-to-Russian Firefox Translations Android model (2.1)
+and the Bergamot engine, both distributed under the Mozilla Public License 2.0.
+The license text is in Mozilla-Public-License-2.0.txt.
+
+Mozilla and Firefox Translations contributors:
+https://github.com/mozilla/firefox-translations-models/tree/e7957fc407441a5e3e35bbcbf9d60d9b35764618/models/base-memory/enru
+
+Bergamot project contributors, engine version v0.4.5+321be8a:
+https://github.com/browsermt/bergamot-translator/tree/321be8ae0486de3af67307c4cb2e005994593597
+
+Packaged JavaScript and WebAssembly from Mozilla's translation demo:
+https://github.com/mozilla/translate/tree/14fdf57e323e532c3e11c75618e676c96d93df00/js

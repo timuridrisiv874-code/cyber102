@@ -10,9 +10,8 @@ public final class SmolNative {
     /** Called only by the serial model executor. Status reads never load JNI. */
     static boolean initialize() {
         if (attempted) return available;
-        android.os.Trace.beginSection("Cyber102.smol.link");
+        android.os.Trace.beginSection("Cyber102.lfm.link");
         try {
-            if (!supportsDotProduct()) return false;
             System.loadLibrary("cyber_smol");
             available = true;
         } catch (UnsatisfiedLinkError | SecurityException error) {
@@ -22,22 +21,6 @@ public final class SmolNative {
             android.os.Trace.endSection();
         }
         return available;
-    }
-
-    private static boolean supportsDotProduct() {
-        // The Redmi build uses ARMv8.2 dot-product kernels. Check every listed
-        // core before dlopen. This read happens on the model worker.
-        try (java.io.BufferedReader cpu = new java.io.BufferedReader(new java.io.FileReader("/proc/cpuinfo"))) {
-            boolean found = false;
-            for (String line; (line = cpu.readLine()) != null;) {
-                if (!line.startsWith("Features")) continue;
-                found = true;
-                if (!java.util.Arrays.asList(line.trim().split("\\s+")).contains("asimddp")) return false;
-            }
-            return found;
-        } catch (java.io.IOException | SecurityException error) {
-            return false;
-        }
     }
 
     public static boolean isAvailable() { return available; }

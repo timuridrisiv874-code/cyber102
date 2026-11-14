@@ -94,6 +94,7 @@ public final class OfflineInferenceTest {
             js("window.networkProbe='pending'; fetch('https://example.com/cyber102-offline-probe').then(()=>networkProbe='leak',()=>networkProbe='blocked'); true");
             await("network isolation", "window.networkProbe === 'blocked'", 10000);
 
+            scanTestLabel();
             String videoSecond = InstrumentationRegistry.getArguments().getString("videoSecond");
             supplyMedia(target, videoSecond != null);
             if (videoSecond != null) {
@@ -114,6 +115,10 @@ public final class OfflineInferenceTest {
             await("real model observation", "!document.getElementById('offline-result').hidden", 240000);
             String observation = stringJs("document.querySelector('#offline-result .offline-observation').textContent");
             assertTrue(observation.trim().length() > 2);
+            assertEquals("ru", stringJs("document.querySelector('#offline-result .offline-observation').lang"));
+            assertTrue("Russian translation is visible", java.util.regex.Pattern.compile("[А-Яа-яЁё]").matcher(observation).find());
+            String english = stringJs("document.querySelector('#offline-result .offline-original-text').textContent");
+            assertTrue("Full English observation is available", english.length() > 5 && !english.equals(observation));
             assertEquals("true", js("(()=>{const p=document.querySelector('.offline-checked-frame');const s=document.getElementById('snapshot');return !!p && p.width===s.width && p.height===s.height && p.toDataURL()===s.toDataURL()})()"));
             if ("true".equals(InstrumentationRegistry.getArguments().getString("exportFrame"))) {
                 String jpeg = stringJs("document.getElementById('snapshot').toDataURL('image/jpeg', 0.85)").split(",", 2)[1];
@@ -129,7 +134,15 @@ public final class OfflineInferenceTest {
             js("document.getElementById('offline-note').value='Android instrumentation: actual GGUF in airplane mode';document.getElementById('offline-save').click();true");
             JSONObject saved = new JSONArray(stringJs("localStorage.getItem('cyber102.offline.inspections.v1')")).getJSONObject(0);
             assertEquals("on_device", saved.getString("source"));
+            assertEquals("230201068", saved.getJSONObject("media").getString("equipmentTag"));
+            assertTrue(saved.getJSONObject("media").getString("equipmentName").contains("Электродвигатель"));
+            assertEquals("LFM3-VL-2B", saved.getString("model"));
+            assertTrue(saved.getString("modelVersion").endsWith(".inspection-en-v1"));
             assertEquals(observation, saved.getString("observation"));
+            assertEquals(english, saved.getString("originalEnglish"));
+            assertEquals("ru", saved.getString("observationLanguage"));
+            assertEquals(OfflineTranslator.MODEL_ID, saved.getString("translatorModel"));
+            assertTrue("Translation latency captured", saved.getDouble("translationMs") > 0);
             if (videoSecond != null) {
                 JSONObject media = saved.getJSONObject("media");
                 assertEquals("uploaded_video", media.getString("captureSource"));
@@ -177,6 +190,55 @@ public final class OfflineInferenceTest {
                 assertTrue(restore.commit());
             }
         }
+    }
+
+    // Feed an encoded equipment label through a video stream, the real camera button and the packaged decoder.
+    private void scanTestLabel() throws Exception {
+        assertEquals("true", js("document.getElementById('equipment-qr').hidden"));
+        js("(()=>{const c=document.createElement('canvas');c.width=480;c.height=360;"
+                + "const g=c.getContext('2d');"
+                + "window.qaDrawLabel=png=>{window.qaLabelReady=false;const im=new Image();"
+                + "const b=Uint8Array.from(atob(png),c=>c.charCodeAt(0));"
+                + "const url=URL.createObjectURL(new Blob([b],{type:'image/png'}));"
+                + "im.onload=()=>{URL.revokeObjectURL(url);window.qaQrImage=im;draw();window.qaLabelReady=true;};im.src=url;};"
+                + "function draw(){g.fillStyle='white';g.fillRect(0,0,480,360);"
+                + "if(window.qaQrImage)g.drawImage(qaQrImage,100,40,280,280);}"
+                + "Object.defineProperty(navigator.mediaDevices,'getUserMedia',{configurable:true,value:async()=>{"
+                + "const s=c.captureStream(8);window.qaQrTimer=setInterval(draw,125);return s;}});"
+                + "document.getElementById('camera').click();return true;})()");
+        await("QR control appears on live camera only", "!document.getElementById('equipment-qr').hidden", 15000);
+        readCatalogLabel("qr-catalog-pump.png");
+        await("passport URL matches a pump", "CyberEquipmentQR.selected() === '21031004-1'", 15000);
+        assertTrue(stringJs("document.getElementById('qr-name').textContent").contains("Насосный агрегат"));
+        readCatalogLabel("qr-label.png");
+        await("unknown object is reported", "document.getElementById('qr-scan-status').textContent.includes('не найден')", 15000);
+        assertEquals("21031004-1", stringJs("CyberEquipmentQR.selected()"));
+        readCatalogLabel("qr-catalog-motor.png");
+        await("plain serial matches motor", "CyberEquipmentQR.selected() === '230201068'", 15000);
+        assertTrue(stringJs("document.getElementById('qr-name').textContent").contains("Электродвигатель"));
+        assertEquals("false", js("document.getElementById('qr-selected').hidden"));
+        js("window.scrollTo({top:scrollY+document.getElementById('viewfinder').getBoundingClientRect().top-20,behavior:'instant'});true");
+        await("live viewfinder visible", "(()=>{const b=document.getElementById('equipment-qr').getBoundingClientRect(),s=document.getElementById('qr-selected').getBoundingClientRect();return b.top>=0 && b.bottom<innerHeight && s.top<innerHeight})()", 5000);
+        SystemClock.sleep(400);
+        capture(instrumentation.getTargetContext(), "offline-qr-camera.png");
+        js("clearInterval(window.qaQrTimer); delete navigator.mediaDevices.getUserMedia;true");
+    }
+
+    private void readCatalogLabel(String filename) throws Exception {
+        String png;
+        try (InputStream input = instrumentation.getContext().getAssets().open(filename);
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[4096];
+            int count;
+            while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
+            png = Base64.encodeToString(output.toByteArray(), Base64.NO_WRAP);
+        }
+        js("qaDrawLabel(" + JSONObject.quote(png) + ");true");
+        await("label ready", "window.qaLabelReady === true", 5000);
+        // Wait for the next video frame from the test camera, after its canvas changed.
+        js("window.qaNewFrame=false;document.getElementById('video').requestVideoFrameCallback(()=>qaNewFrame=true);true");
+        await("label appears in video", "window.qaNewFrame", 5000);
+        js("document.getElementById('equipment-qr').click();true");
     }
 
     private void supplyMedia(Context target, boolean video) throws Exception {

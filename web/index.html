@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="styles.css?v=field-20261114">
   <link rel="stylesheet" href="workspace.css?v=inspection-photos-1">
   <link rel="stylesheet" href="region-review.css?v=field-20261114">
-  <link rel="stylesheet" href="inspection-tools.css?v=1">
+  <link rel="stylesheet" href="inspection-tools.css?v=2">
   <script src="offline.js" defer></script>
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="analysis-jobs.js" defer></script>
@@ -21,7 +21,7 @@
   <script src="region-review.js?v=field-20261114" defer></script>
   <script src="app.js?v=inspection-photos-1" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
-  <script src="equipment-qr.js?v=1" defer></script>
+  <script src="equipment-qr.js?v=2" defer></script>
   <script src="photo-measure.js?v=1" defer></script>
 </head>
 <body data-page="inspection">
@@ -74,6 +74,12 @@
             <button class="button secondary" id="choose-region" type="button" hidden>Выбрать область</button>
           </div>
           <p id="qr-scan-status" role="status" hidden></p>
+          <section id="qr-equipment-card" aria-labelledby="qr-equipment-title" hidden>
+            <h3 id="qr-equipment-title"></h3>
+            <dl id="qr-equipment-fields"></dl>
+            <a id="qr-equipment-passport" target="_blank" rel="noopener" hidden>Открыть паспорт</a>
+            <a id="qr-equipment-journal" hidden>Открыть журнал объекта</a>
+          </section>
           <p class="message" id="message" role="status"></p>
           <button type="button" id="retry-capture-load" class="button secondary" hidden>Повторить загрузку</button>
           <p class="video-metrics" id="media-progress" role="status" hidden></p>

@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
-  "modelId": "VisionPsy-Nano-460M",
-  "repository": "qvac/VisionPsy-Nano-460M-GGUFs",
-  "revision": "4138c5bd6e026d67cebf2dbd2d81c6229c14cdc1",
-  "license": "Apache-2.0",
+  "modelId": "LFM3-VL-2B",
+  "repository": "LiquidAI/LFM3-VL-2B-GGUF",
+  "revision": "1add221a5ea6c047fcf1eaaf2d247939d7cf8849",
+  "license": "LFM Open License v1.0",
   "files": [
     {
-      "asset": "models/visionpsy-nano-460m-q4_0.gguf",
+      "asset": "models/LFM3-VL-2B-Q4_K_M.gguf",
       "name": "model.gguf",
-      "fileName": "visionpsy-nano-460m-q4_0.gguf",
+      "fileName": "LFM3-VL-2B-Q4_K_M.gguf",
       "role": "model",
-      "size": 255764960,
-      "sha256": "803b0c846f63231fede7b98686e4ae837dd1b3a315c714482656e44ed8fa9598"
+      "size": 1099627808,
+      "sha256": "56dac2e192ff0d9ab8507f4f1aeb4aed0463449bbbefaac79497f041c95f21eb"
     },
     {
-      "asset": "models/mmproj-visionpsy-nano-460m-q8.gguf",
+      "asset": "models/mmproj-LFM3-VL-2B-F16.gguf",
       "name": "projector.gguf",
-      "fileName": "mmproj-visionpsy-nano-460m-q8.gguf",
+      "fileName": "mmproj-LFM3-VL-2B-F16.gguf",
       "role": "projector",
-      "size": 108782144,
-      "sha256": "92f1bb80acaba3e7b59b6534f47447b830330bc9051018d6d8b5d768e58503c2"
+      "size": 378996032,
+      "sha256": "1d8e6e58eefc093e09d6332f081516e1ddbd5b35cfca7f35463fb270db230b1e"
     }
   ]
 }

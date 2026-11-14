@@ -1,6 +1,13 @@
 plugins { id 'com.android.application' }
-def bundledSmol = providers.gradleProperty('bundleSmolModel').orElse('false').get().toBoolean()
-def smolAssets = layout.buildDirectory.dir('generated/smol-assets')
+def bundleOfflineModel = providers.gradleProperty('bundleOfflineModel')
+        .orElse(providers.gradleProperty('bundleSmolModel')).orElse('false').get().toBoolean()
+def offlineAssets = layout.buildDirectory.dir('generated/lfm3-assets')
+def catalogAssets = layout.buildDirectory.dir('generated/catalog-assets')
+def translationLibs = layout.buildDirectory.dir('generated/translation-libs')
+def translationEngine = providers.gradleProperty('translationEngine').orElse('bergamot').get()
+if (!(translationEngine in ['tiny', 'bergamot'])) {
+    throw new GradleException("Unknown translationEngine: ${translationEngine}")
+}
 android {
     namespace 'ru.cyber102.app'
     compileSdk 36
@@ -10,8 +17,8 @@ android {
         applicationId 'ru.cyber102.app'
         minSdk 26
         targetSdk 36
-        versionCode 11
-        versionName bundledSmol ? '0.11-offline' : '0.11-test'
+        versionCode 15
+        versionName bundleOfflineModel ? '0.14-lfm3-catalog-offline' : '0.14-lfm3-catalog-test'
         ndk { abiFilters 'arm64-v8a' }
         externalNativeBuild {
             cmake {
@@ -27,7 +34,41 @@ android {
     }
     externalNativeBuild { cmake { path file('src/main/cpp/CMakeLists.txt'); version '3.22.1' } }
     androidResources { noCompress += ['gguf'] }
-    if (bundledSmol) { sourceSets.main.assets.srcDir(smolAssets) }
+    sourceSets.main.assets.srcDir(catalogAssets)
+    if (bundleOfflineModel) { sourceSets.main.assets.srcDir(offlineAssets) }
+    sourceSets.main.java.srcDir(rootProject.file("${translationEngine}/java"))
+    sourceSets.main.assets.srcDir(rootProject.file("${translationEngine}/assets"))
+    if (translationEngine == 'tiny') {
+        sourceSets.main.jniLibs.srcDir(translationLibs)
+    } else {
+        sourceSets.main.assets.srcDir(rootProject.file('../var/models/bergamot-android/assets'))
+    }
+}
+
+def bundleEquipmentCatalog = tasks.register('bundleEquipmentCatalog', Sync) {
+    inputs.file(rootProject.file('../mobile/equipment-catalog.json'))
+    from(rootProject.file('../mobile/equipment-catalog.json'))
+    into(catalogAssets)
+}
+tasks.named('preBuild').configure { dependsOn bundleEquipmentCatalog }
+
+if (translationEngine == 'tiny') {
+    def buildOfflineTranslator = tasks.register('buildOfflineTranslator', Exec) {
+        def script = rootProject.file('../tools/build_android_translator.py')
+        inputs.file(script)
+        inputs.dir(file('src/main/cpp/translation'))
+        inputs.dir(rootProject.file('tiny/assets/en-ru'))
+        outputs.dir(translationLibs)
+        commandLine 'python3', script, '--sdk', android.sdkDirectory, '--ndk', android.ndkVersion,
+                '--output', translationLibs.get().asFile
+    }
+    tasks.named('preBuild').configure { dependsOn buildOfflineTranslator }
+} else {
+    def verifyTranslator = tasks.register('verifyOfflineTranslator', Exec) {
+        workingDir rootProject.file('..')
+        commandLine 'python3', 'tools/prepare_android_bergamot.py'
+    }
+    tasks.named('preBuild').configure { dependsOn verifyTranslator }
 }
 
 dependencies {
@@ -36,17 +77,17 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
 }
 
-if (bundledSmol) {
-    def prepareSmol = tasks.register('prepareBundledSmol') {
+if (bundleOfflineModel) {
+    def prepareOfflineModel = tasks.register('prepareBundledOfflineModel') {
         def manifest = file('src/main/assets/models/model-manifest.json')
-        def weights = rootProject.file('../var/models/visionpsy')
+        def weights = rootProject.file('../var/models/lfm3-vl-2b')
         inputs.file(manifest)
         inputs.dir(weights)
-        outputs.dir(smolAssets)
+        outputs.dir(offlineAssets)
         doLast {
             def catalog = new groovy.json.JsonSlurper().parse(manifest)
             // A model change must not leave older GGUFs inside the next APK.
-            delete(smolAssets.get().asFile)
+            delete(offlineAssets.get().asFile)
             catalog.files.each { entry ->
                 def source = new File(weights, entry.fileName as String)
                 if (!source.isFile() || source.length() != (entry.size as long)) {
@@ -61,7 +102,7 @@ if (bundledSmol) {
                 if (digest.digest().encodeHex().toString() != entry.sha256) {
                     throw new GradleException("Model checksum mismatch: ${source.name}")
                 }
-                def destination = new File(smolAssets.get().asFile, 'models/' + entry.fileName)
+                def destination = new File(offlineAssets.get().asFile, 'models/' + entry.fileName)
                 destination.parentFile.mkdirs()
                 // Link large assets when the generated directory shares the filesystem.
                 try {
@@ -72,5 +113,5 @@ if (bundledSmol) {
             }
         }
     }
-    tasks.named('preBuild').configure { dependsOn prepareSmol }
+    tasks.named('preBuild').configure { dependsOn prepareOfflineModel }
 }

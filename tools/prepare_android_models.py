@@ -2,13 +2,17 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
+import shutil
+import tempfile
 from urllib.parse import quote
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / 'android/app/src/main/assets/models/model-manifest.json'
+OFFICIAL_REPOSITORY = 'LiquidAI/LFM3-VL-2B-GGUF'
 
 
 def verify(path, entry):
@@ -21,14 +25,26 @@ def verify(path, entry):
     return digest.hexdigest() == entry['sha256']
 
 
+def download(url, destination, expected_size):
+    with urlopen(url, timeout=90) as response, destination.open('wb') as output:
+        received = 0
+        while chunk := response.read(1024 * 1024):
+            received += len(chunk)
+            if received > expected_size:
+                raise ValueError('Download exceeds the pinned size')
+            output.write(chunk)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--download', action='store_true', help='Download missing official weights; otherwise only verify local files')
-    parser.add_argument('--directory', type=Path, default=ROOT / 'var/models/visionpsy')
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument('--download', action='store_true', help='Download missing official weights')
+    source.add_argument('--from-directory', type=Path, help='Install the two official GGUF files from an existing local directory')
+    parser.add_argument('--directory', type=Path, default=ROOT / 'var/models/lfm3-vl-2b')
     args = parser.parse_args()
     catalog = json.loads(MANIFEST.read_text(encoding='utf-8'))
     repository, revision = catalog['repository'], catalog['revision']
-    if repository not in ('ggml-org/SmolVLM-256M-Instruct-GGUF', 'ggml-org/SmolVLM-500M-Instruct-GGUF', 'ggml-org/SmolVLM2-2.2B-Instruct-GGUF', 'qvac/VisionPsy-Nano-460M-GGUFs') or not re.fullmatch(r'[a-f0-9]{40}', revision):
+    if repository != OFFICIAL_REPOSITORY or not re.fullmatch(r'[a-f0-9]{40}', revision):
         raise ValueError('Expected an approved official repository and pinned revision')
     if {entry['role'] for entry in catalog['files']} != {'model', 'projector'} or len(catalog['files']) != 2:
         raise ValueError('Expected one model and its matching projector')
@@ -39,23 +55,22 @@ def main():
             raise ValueError('Invalid pinned model entry')
         target = args.directory / name
         if not verify(target, entry):
-            if not args.download:
-                raise FileNotFoundError(f'Verified weights missing: {target}. Use --download to prepare them.')
-            partial = target.with_suffix('.partial')
-            url = f'https://huggingface.co/{repository}/resolve/{revision}/{quote(name)}'
-            try:
-                with urlopen(url, timeout=90) as response, partial.open('wb') as output:
-                    received = 0
-                    while chunk := response.read(1024 * 1024):
-                        received += len(chunk)
-                        if received > entry['size']:
-                            raise ValueError('Download exceeds the pinned size')
-                        output.write(chunk)
+            if not (args.from_directory or args.download):
+                raise FileNotFoundError(f'Verified weights missing: {target}. Use --from-directory or --download.')
+            with tempfile.TemporaryDirectory(dir=args.directory) as workdir:
+                partial = Path(workdir) / name
+                if args.from_directory:
+                    local = args.from_directory / name
+                    try:
+                        os.link(local, partial)
+                    except OSError:
+                        shutil.copyfile(local, partial)
+                else:
+                    url = f'https://huggingface.co/{repository}/resolve/{revision}/{quote(name)}'
+                    download(url, partial, entry['size'])
                 if not verify(partial, entry):
                     raise ValueError(f'Weight checksum mismatch: {name}')
                 partial.replace(target)
-            finally:
-                partial.unlink(missing_ok=True)
         print(f'OK {name}: {entry["size"]} bytes, SHA-256 {entry["sha256"]}', flush=True)
 
 

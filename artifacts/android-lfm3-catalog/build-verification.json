@@ -1,0 +1,39 @@
+{
+  "test": {
+    "filename": "Cyber102-0.14-lfm3-catalog-test.apk",
+    "bytes": 39595772,
+    "sha256": "df6841ec025901361b9b39762b28a8276d2d788f9eedf453dae4517af3709aa8",
+    "signer_sha256": "8e9fea7460dbf58076d1d58566486300ad5921d6edb21104e4e3b45b82bfed9d",
+    "gguf_files": [],
+    "translator": "Firefox EN-RU Android 2.1 (Bergamot)",
+    "translation_assets_verified": [
+      "model.enru.intgemm.alphas.bin",
+      "lex.50.50.enru.s2t.bin",
+      "vocab.enru.spm",
+      "bergamot-translator-worker.js",
+      "bergamot-translator-worker.wasm"
+    ],
+    "includes_original_icon": true,
+    "catalog_entries_verified": 17
+  },
+  "offline": {
+    "filename": "Cyber102-0.14-lfm3-catalog-offline.apk",
+    "bytes": 1518219924,
+    "sha256": "a5a688b3fb05c3a90af63d271fe8eab7570b23703b041b184753b53b70fe1c93",
+    "signer_sha256": "8e9fea7460dbf58076d1d58566486300ad5921d6edb21104e4e3b45b82bfed9d",
+    "gguf_files": [
+      "assets/models/LFM3-VL-2B-Q4_K_M.gguf",
+      "assets/models/mmproj-LFM3-VL-2B-F16.gguf"
+    ],
+    "translator": "Firefox EN-RU Android 2.1 (Bergamot)",
+    "translation_assets_verified": [
+      "model.enru.intgemm.alphas.bin",
+      "lex.50.50.enru.s2t.bin",
+      "vocab.enru.spm",
+      "bergamot-translator-worker.js",
+      "bergamot-translator-worker.wasm"
+    ],
+    "includes_original_icon": true,
+    "catalog_entries_verified": 17
+  }
+}
