@@ -7,11 +7,12 @@ private enum CaptureSheet: String, Identifiable { case photo, qr, measurePhoto, 
 
 @MainActor
 struct InspectionView: View {
+    let openOnline: (String?) -> Void
     private static let en = Locale.Language(identifier: "en")
     private static let ru = Locale.Language(identifier: "ru")
     @Environment(\.scenePhase) private var scenePhase
     private let engine = InspectionEngine.shared
-    @State private var profile: InspectionProfile = .detailed
+    private let profile: InspectionProfile = .quick
     @StateObject private var store = InspectionStore()
     @State private var picked: PhotosPickerItem?
     @State private var clip: InspectionClip?
@@ -46,6 +47,24 @@ struct InspectionView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    Button { openOnline(equipment?.serial) } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "viewfinder")
+                                .font(.title3)
+                                .frame(width: 36, height: 36)
+                                .background(.tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("Онлайн-осмотр").font(.headline)
+                                Text("Фото, видео, 3D и общий журнал")
+                                    .font(.subheadline).foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 0)
+                            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
                 Section("Оборудование") {
                     HStack {
                         if let equipment {
@@ -66,7 +85,7 @@ struct InspectionView: View {
                     .disabled(analysis != nil)
                     if let equipment { equipmentDetails(equipment) }
                 }
-                Section("Фотография") {
+                Section("Кадр осмотра") {
                     if let jpeg, let photo = UIImage(data: jpeg) {
                         Image(uiImage: photo).resizable().scaledToFit()
                             .frame(maxWidth: .infinity, maxHeight: 280).accessibilityLabel("Фото осмотра")
@@ -108,13 +127,6 @@ struct InspectionView: View {
                         .accessibilityLabel("Время кадра")
                         .disabled(analysis != nil || translating)
                     }
-                    Picker("Режим анализа", selection: $profile) {
-                        Text("Подробный").tag(InspectionProfile.detailed)
-                        Text("Быстрый").tag(InspectionProfile.quick)
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityIdentifier("offline-analysis-profile")
-                    .disabled(analysis != nil || translating)
                     if analysis == nil && !translating {
                         Button(entry == nil ? "Проверить на iPhone" : "Проверить ещё раз", action: analyze)
                             .disabled(jpeg == nil || loadingFrame)
@@ -124,7 +136,7 @@ struct InspectionView: View {
                     if !phase.isEmpty { HStack { ProgressView(); Text(phase).font(.subheadline) } }
                 }
                 if let entry {
-                    Section("Предварительное наблюдение") {
+                    Section("Наблюдение и действия") {
                         if let timing = entry.timing { timingDetails(timing) }
                         Text(entry.russian ?? entry.english).textSelection(.enabled)
                         if entry.russian != nil {
@@ -149,7 +161,7 @@ struct InspectionView: View {
                     Section { Button("Журнал осмотров (\(store.entries.count))") { showHistory = true } }
                 }
             }
-            .navigationTitle("Осмотр")
+            .navigationTitle("Осмотр на iPhone")
             .navigationDestination(isPresented: $showHistory) {
                 List(store.entries) { row in
                     DisclosureGroup {
@@ -181,6 +193,7 @@ struct InspectionView: View {
             }
         }
         .onChange(of: scenePhase) { _, phase in
+            if phase == .background { saveDraft() }
             if phase == .background && (analysis != nil || translating) {
                 stop()
                 error = "Проверка остановлена при переходе в фон. Можно продолжить с этим кадром или выбрать другой."
@@ -253,6 +266,7 @@ struct InspectionView: View {
                 entry?.russian = response.targetText
                 missingLanguage = false
                 error = nil
+                saveDraft()
             } catch {
                 guard translationRun == token, translationEntryID == id, entry?.id == id else { return }
                 self.error = "Русский перевод недоступен. \(error.localizedDescription)"
@@ -286,6 +300,7 @@ struct InspectionView: View {
     }
     private func selectPhoto(_ bytes: Data) throws {
         let clean = try inspectionJPEG(bytes)
+        saveDraft()
         stop()
         pickEpoch = UUID(); picked = nil
         frameEpoch = UUID(); clip = nil; frameSeconds = nil; loadingFrame = false
@@ -297,6 +312,7 @@ struct InspectionView: View {
         entry = nil; error = nil; missingLanguage = false; note = ""
     }
     private func invalidateFrame() {
+        saveDraft()
         frameEpoch = UUID(); loadingFrame = false
         originalPhoto = nil; photoSource = nil; measurement = nil; draftID = UUID()
         jpeg = nil; frameSeconds = nil; entry = nil; note = ""; error = nil
@@ -354,6 +370,7 @@ struct InspectionView: View {
                 let inspectionDate = store.entries.first { $0.id == draftID }?.date ?? Date()
                 entry = InspectionEntry(id: draftID, date: inspectionDate, english: output.text, russian: nil, qr: equipment?.serial, note: note, videoSeconds: frameSeconds, equipment: equipment, timing: InspectionTiming(output))
                 phase = ""
+                saveDraft()
                 let status = await LanguageAvailability().status(from: Self.en, to: Self.ru)
                 guard run == id, !Task.isCancelled else { return }
                 if status == .installed { startTranslation(draftID) }

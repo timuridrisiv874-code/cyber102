@@ -1,0 +1,15 @@
+{
+  "description": "Визуальные образцы серий и типов оборудования. Не идентифицируют конкретный экземпляр.",
+  "entries": [
+    {"id":"ams-oil","file":"ams-pcp-oil.jpg","title":"Винтовой насос серии AMS PCP","scope":"progressive_cavity","sourceUrl":"https://am-systems.ru/nefteprodukty-i-nefteshlamy/"},
+    {"id":"ams-drilling","file":"ams-pcp-drilling.jpg","title":"Винтовой насос AMS PCP для бурового раствора","scope":"progressive_cavity","sourceUrl":"https://am-systems.ru/ams-pcp-gorizontalnye/"},
+    {"id":"knz-km","file":"knz-km.jpg","title":"Насос серии КМ","modelId":"knz-km80-65-160","scope":"centrifugal"},
+    {"id":"knz-d","file":"knz-d.jpg","title":"Насос серии Д","modelId":"knz-4d200-90","scope":"centrifugal"},
+    {"id":"motor-eldin","file":"eldin-ba-bra.jpg","title":"Электродвигатель серии ЭЛДИН ВА / ВРА","scope":"motor","sourceUrl":"https://uralenergotel.ru/product/ba160sa6"},
+    {"id":"gearbox-wxr","file":"wanshsin-wxr.jpg","title":"Мотор-редуктор WANSHSIN WXR","scope":"gearbox","sourceUrl":"https://www.wanshsin.com/hyzyjsj/511.html"},
+    {"id":"temperature-elemer","file":"elemer-pt0304.jpg","title":"Преобразователь температуры ПТ 0304-ВТ","scope":"temperature_transmitter","sourceUrl":"https://manometry.ru/pt-0304"},
+    {"id":"gate-valve","file":"gate-valve.jpg","title":"Запорная арматура · образец типа","scope":"valve"},
+    {"id":"industrial-pipe","file":"industrial-pipes-valves.jpg","title":"Промышленные трубопроводы · образец типа","scope":"pipe"},
+    {"id":"pressure-gauge","file":"wika-gauge.jpg","title":"Стрелочный манометр · образец типа","scope":"pressure"}
+  ]
+}

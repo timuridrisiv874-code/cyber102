@@ -17,6 +17,7 @@ from .demo_data import PASSPORT, SCENARIOS
 from . import history
 from . import vision
 from . import inspections, customer, recommendations, assessment, video_review, analysis_queue, knowledge, emulator, result_cache
+from . import visual_search
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -46,7 +47,7 @@ def analyze_photo_job(payload, *, cache=None):
     options = {'context': context['text']} if context else {}
     result = vision.analyze(payload['image'], backend=payload['backend'], profile=payload['profile'], **options)
     if context:
-        result['equipmentContext'] = {key: context[key] for key in ('serial', 'references')}
+        result['equipmentContext'] = knowledge.context_metadata(context)
     if cache is not None:
         cache.put(key, result)
     return {**result, 'media': payload['media']}
@@ -70,7 +71,7 @@ def analyze_video_job(payload, *, cache=None):
         context = payload['equipmentContext']
         request = {key: payload[key] for key in ('frames', 'durationSeconds')} | {'context': context['text']}
         result = video_review._analyze_prepared(request)
-        result['equipmentContext'] = {key: context[key] for key in ('serial', 'references')}
+        result['equipmentContext'] = knowledge.context_metadata(context)
     if cache is not None:
         cache.put(key, result)
     return result
@@ -281,6 +282,12 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         target = urlsplit(self.path)
+        if target.path == '/api/equipment/similar':
+            try:
+                self.send_json(visual_search.health())
+            except visual_search.SearchUnavailable:
+                self.send_json({'status': 'unavailable'}, HTTPStatus.SERVICE_UNAVAILABLE)
+            return
         if target.path.startswith('/api/analysis-jobs/'):
             self.analysis_job(target.path)
             return
@@ -444,7 +451,7 @@ class Handler(SimpleHTTPRequestHandler):
         route = urlsplit(self.path).path
         job_route = route.startswith('/api/analysis-jobs/')
         work = re.fullmatch(r'/api/history/([0-9a-f-]{36})/work', route)
-        if not job_route and not work and route not in ('/api/diagnose', '/api/history', '/analyze', '/api/video-review', '/api/inspections', '/api/inspections/preview'):
+        if not job_route and not work and route not in ('/api/diagnose', '/api/history', '/analyze', '/api/video-review', '/api/inspections', '/api/inspections/preview', '/api/equipment/similar'):
             self.error(HTTPStatus.NOT_FOUND, 'Маршрут не найден.')
             return
         origins = self.headers.get_all('Origin', [])
@@ -454,6 +461,9 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if job_route:
             self.analysis_job(route, cancel=True)
+            return
+        if route == '/api/equipment/similar':
+            self.similar_equipment()
             return
         if route == '/analyze':
             self.analyze_frame()
@@ -494,6 +504,34 @@ class Handler(SimpleHTTPRequestHandler):
             if passport:
                 self.send_json({'source': 'submitted', 'passport': passport,
                                 **assessment.diagnose(passport, data['telemetry'], data['vision'])})
+
+    @bounded_analysis_upload
+    def similar_equipment(self):
+        self.close_connection = True
+        try:
+            lengths = self.headers.get_all('Content-Length', [])
+            if (self.headers.get_all('Transfer-Encoding') or len(lengths) != 1 or
+                    not lengths[0].isascii() or not lengths[0].isdecimal()):
+                raise ValueError('Укажите длину запроса с фотографией.')
+            size = int(lengths[0])
+            if not 0 < size <= vision.MAX_IMAGE_BYTES + 8192:
+                self.error(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, 'Фотография должна занимать не более 3 МБ.')
+                return
+            body = self.rfile.read(size)
+            if len(body) != size:
+                raise ValueError('Фотография получена не полностью.')
+            image = vision.extract_image(self.headers.get('Content-Type', ''), body)
+            self.send_json(visual_search.search(image))
+        except TimeoutError:
+            self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить фотографию вовремя.')
+        except ValueError as error:
+            self.error(HTTPStatus.BAD_REQUEST, str(error))
+        except visual_search.SearchBusy:
+            self.send_json({'error': 'Поиск обрабатывает другое фото. Повторите через несколько секунд.',
+                            'code': 'visual_search_busy'}, HTTPStatus.SERVICE_UNAVAILABLE,
+                           headers={'Retry-After': '2'})
+        except visual_search.SearchUnavailable:
+            self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Поиск похожего оборудования временно недоступен.')
 
     @bounded_analysis_upload
     def save_with_photo(self, record_id):
@@ -650,7 +688,7 @@ class Handler(SimpleHTTPRequestHandler):
             if profile not in vision.supported_profiles(self.vision_backend):
                 raise ValueError('Выбранный режим не поддерживается моделью.')
             serial = media.pop('equipmentSerial', None)
-            context = self.equipment_context(serial) if profile == 'standard' else None
+            context = self.equipment_context(serial, image=image) if profile == 'standard' else None
             payload = {'image': image, 'backend': self.vision_backend, 'profile': profile,
                        'media': media, 'database': self.database, 'equipmentContext': context}
             cache = self.server.result_cache
@@ -660,7 +698,8 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             run = partial(analyze_photo_job, cache=cache)
             if asynchronous:
-                canonical = json.dumps({'backend': self.vision_backend, 'profile': profile, 'media': media, 'equipmentContext': context},
+                # Retried client requests retain their job even if reference retrieval is temporarily unavailable.
+                canonical = json.dumps({'backend': self.vision_backend, 'profile': profile, 'media': media, 'equipmentSerial': serial},
                                        sort_keys=True).encode() + b'\0' + image
                 self.enqueue_analysis('photo', payload, canonical, run, save_photo_job)
                 return
@@ -682,13 +721,15 @@ class Handler(SimpleHTTPRequestHandler):
         else:
             self.send_json(result)
 
-    def equipment_context(self, serial):
-        if not self.vision_knowledge or not serial or serial == PASSPORT['serial'] or self.vision_backend == 'detector':
+    def equipment_context(self, serial, *, image=None):
+        if not self.vision_knowledge or self.vision_backend == 'detector':
             return None
-        context = knowledge.photo_context(serial, self.customer_root)
-        if context is None:
-            raise ValueError('Серийный номер не найден в реестре оборудования.')
-        return context
+        context = None
+        if serial and serial != PASSPORT['serial']:
+            context = knowledge.photo_context(serial, self.customer_root)
+            if context is None:
+                raise ValueError('Серийный номер не найден в реестре оборудования.')
+        return visual_search.photo_context(image, context, root=self.customer_root) if image is not None else context
 
     @bounded_analysis_upload
     def analyze_video(self):

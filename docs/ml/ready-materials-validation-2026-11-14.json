@@ -1,0 +1,898 @@
+{
+  "date": "2026-11-14",
+  "model": "Qwen/Qwen3.8-27B",
+  "revision": "4af51b3542f775b0a8e4b310bfb3f17e01c306c9",
+  "protocol": "Same eight uniform midpoint frames per video, 1280px max JPEG78; photo JPEG85. API wall time on server; individual measurements, not a median.",
+  "evaluation": "Manual visual review; these assets were used for prompt tuning and are not an independent accuracy test.",
+  "promptCodeSha256": "f78fb929400158ad46afb070c5f045254a65005befca069996e907046c381534",
+  "assets": [
+    {
+      "reference": {
+        "id": "shaft-seal",
+        "sha256": "f86ded484267b8d6588cefef6e6ab54a605f04758c522b0dce9e9b1d49c2274e",
+        "visible": [
+          "Dark wet traces and an amber drop at the shaft seal"
+        ],
+        "doNotInfer": [
+          "Fluid composition",
+          "Continuous leak rate",
+          "Remaining life",
+          "Exact type of the partially shown machine"
+        ]
+      },
+      "runs": {
+        "baseline": {
+          "wallSeconds": 3.062,
+          "cacheHit": false,
+          "status": "defect",
+          "observations": [
+            {
+              "component": "Корпус насоса",
+              "finding": "Видимые следы жидкости",
+              "observation": "Из сальника насоса вытекает жидкость, оставляя тёмные следы на корпусе.",
+              "box": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 0.8,
+                "height": 1.0
+              }
+            }
+          ]
+        },
+        "serving-final": {
+          "wallSeconds": 4.14,
+          "cacheHit": false,
+          "status": "defect",
+          "observations": [
+            {
+              "component": "Корпус насоса",
+              "finding": "Видимые следы жидкости",
+              "observation": "Из сальника насоса вытекает жидкость, оставляя тёмные следы на корпусе.",
+              "box": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 0.8,
+                "height": 1.0
+              }
+            }
+          ]
+        },
+        "serving-warm": {
+          "wallSeconds": 0.047,
+          "cacheHit": true,
+          "status": "defect",
+          "observations": [
+            {
+              "component": "Корпус насоса",
+              "finding": "Видимые следы жидкости",
+              "observation": "Из сальника насоса вытекает жидкость, оставляя тёмные следы на корпусе.",
+              "box": {
+                "height": 1.0,
+                "width": 0.8,
+                "x": 0.0,
+                "y": 0.0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "reference": {
+        "id": "pump-station",
+        "sha256": "1433d2af3122d61cedb19f96dd8f226e12c7c58eef8ac32b6741c8e13359e7d8",
+        "visible": [
+          "Extensive rust and coating loss on the pressure tank",
+          "Rust on mounting feet"
+        ],
+        "localizationIssuesToCheck": [
+          "Tank must not be identified as the upper pump casing",
+          "Do not transfer front-side rust to a rear view containing mostly the motor",
+          "Exclude the dirty floor from defect evidence"
+        ],
+        "doNotInfer": [
+          "Internal motor faults",
+          "An active leak from floor stains",
+          "Normal open ports as broken parts"
+        ]
+      },
+      "runs": {
+        "baseline": {
+          "wallSeconds": 21.328,
+          "cacheHit": false,
+          "status": "defect",
+          "observations": [
+            {
+              "component": "pump",
+              "condition": "corrosion",
+              "box": [
+                215,
+                500,
+                790,
+                830
+              ],
+              "observation": "Корпус насоса: видимая коррозия.",
+              "frameIndex": 0,
+              "timestampSeconds": 0.4208333125,
+              "status": "defect"
+            },
+            {
+              "component": "pump",
+              "condition": "corrosion",
+              "box": [
+                140,
+                500,
+                760,
+                850
+              ],
+              "observation": "Корпус насоса: видимая коррозия.",
+              "frameIndex": 1,
+              "timestampSeconds": 1.2624999375,
+              "status": "defect"
+            },
+            {
+              "component": "pump",
+              "condition": "corrosion",
+              "box": [
+                150,
+                200,
+                850,
+                950
+              ],
+              "observation": "Корпус насоса: видимая коррозия.",
+              "frameIndex": 2,
+              "timestampSeconds": 2.1041665625,
+              "status": "defect"
+            },
+            {
+              "component": "pump",
+              "condition": "corrosion",
+              "box": [
+                100,
+                250,
+                900,
+                950
+              ],
+              "observation": "Корпус насоса: видимая коррозия.",
+              "frameIndex": 3,
+              "timestampSeconds": 2.9458331875,
+              "status": "defect"
+            },
+            {
+              "component": "pump",
+              "condition": "corrosion",
+              "box": [
+                180,
+                600,
+                990,
+                950
+              ],
+              "observation": "Корпус насоса: видимая коррозия.",
+              "frameIndex": 4,
+              "timestampSeconds": 3.7874998125,
+              "status": "defect"
+            },
+            {
+              "component": "pump",
+              "condition": "corrosion",
+              "box": [
+                180,
+                600,
+                990,
+                950
+              ],
+              "observation": "Корпус насоса: видимая коррозия.",
+              "frameIndex": 5,
+              "timestampSeconds": 4.6291664375,
+              "status": "defect"
+            },
+            {
+              "component": "pump",
+              "condition": "corrosion",
+              "box": [
+                0,
+                290,
+                880,
+                990
+              ],
+              "observation": "Корпус насоса: видимая коррозия.",
+              "frameIndex": 6,
+              "timestampSeconds": 5.4708330625,
+              "status": "defect"
+            },
+            {
+              "component": "pump",
+              "condition": "corrosion",
+              "box": [
+                0,
+                200,
+                880,
+                900
+              ],
+              "observation": "Корпус насоса: видимая коррозия.",
+              "frameIndex": 7,
+              "timestampSeconds": 6.3124996875,
+              "status": "defect"
+            }
+          ]
+        },
+        "serving-final": {
+          "wallSeconds": 27.5,
+          "cacheHit": false,
+          "status": "defect",
+          "observations": [
+            {
+              "component": "other",
+              "condition": "corrosion",
+              "box": [
+                200,
+                450,
+                800,
+                850
+              ],
+              "observation": "На синем резервуаре под насосом видны обширные пятна ржавчины.",
+              "frameIndex": 0,
+              "timestampSeconds": 0.4208333125,
+              "status": "defect"
+            },
+            {
+              "component": "other",
+              "condition": "corrosion",
+              "box": [
+                150,
+                450,
+                750,
+                850
+              ],
+              "observation": "Поверхность синего резервуара покрыта заметными пятнами ржавчины.",
+              "frameIndex": 1,
+              "timestampSeconds": 1.2624999375,
+              "status": "defect"
+            },
+            {
+              "component": "other",
+              "condition": "corrosion",
+              "box": [
+                220,
+                620,
+                480,
+                850
+              ],
+              "observation": "На металлической подставке под насосом видны заметные пятна ржавчины.",
+              "frameIndex": 2,
+              "timestampSeconds": 2.1041665625,
+              "status": "defect"
+            },
+            {
+              "component": "other",
+              "condition": "corrosion",
+              "box": [
+                220,
+                620,
+                480,
+                850
+              ],
+              "observation": "На металлической подставке под насосом видны заметные пятна ржавчины.",
+              "frameIndex": 3,
+              "timestampSeconds": 2.9458331875,
+              "status": "defect"
+            },
+            {
+              "component": "other",
+              "condition": "corrosion",
+              "box": [
+                440,
+                850,
+                620,
+                960
+              ],
+              "observation": "На опорной ножке резервуара видны явные следы ржавчины.",
+              "frameIndex": 4,
+              "timestampSeconds": 3.7874998125,
+              "status": "defect"
+            },
+            {
+              "component": "other",
+              "condition": "corrosion",
+              "box": [
+                330,
+                820,
+                780,
+                920
+              ],
+              "observation": "На обеих опорных ножках резервуара заметна сильная ржавчина.",
+              "frameIndex": 5,
+              "timestampSeconds": 4.6291664375,
+              "status": "defect"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                0,
+                250,
+                850,
+                980
+              ],
+              "observation": "На синем резервуаре и корпусе электродвигателя не обнаружено видимых повреждений или коррозии.",
+              "frameIndex": 6,
+              "timestampSeconds": 5.4708330625,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "corrosion",
+              "box": [
+                450,
+                450,
+                850,
+                850
+              ],
+              "observation": "На боковой поверхности синего резервуара видны обширные пятна ржавчины и следы коррозии.",
+              "frameIndex": 7,
+              "timestampSeconds": 6.3124996875,
+              "status": "defect"
+            }
+          ]
+        },
+        "serving-warm": {
+          "wallSeconds": 0.125,
+          "cacheHit": true,
+          "status": "defect",
+          "observations": [
+            {
+              "box": [
+                200,
+                450,
+                800,
+                850
+              ],
+              "component": "other",
+              "condition": "corrosion",
+              "frameIndex": 0,
+              "observation": "На синем резервуаре под насосом видны обширные пятна ржавчины.",
+              "status": "defect",
+              "timestampSeconds": 0.4208333125
+            },
+            {
+              "box": [
+                150,
+                450,
+                750,
+                850
+              ],
+              "component": "other",
+              "condition": "corrosion",
+              "frameIndex": 1,
+              "observation": "Поверхность синего резервуара покрыта заметными пятнами ржавчины.",
+              "status": "defect",
+              "timestampSeconds": 1.2624999375
+            },
+            {
+              "box": [
+                220,
+                620,
+                480,
+                850
+              ],
+              "component": "other",
+              "condition": "corrosion",
+              "frameIndex": 2,
+              "observation": "На металлической подставке под насосом видны заметные пятна ржавчины.",
+              "status": "defect",
+              "timestampSeconds": 2.1041665625
+            },
+            {
+              "box": [
+                220,
+                620,
+                480,
+                850
+              ],
+              "component": "other",
+              "condition": "corrosion",
+              "frameIndex": 3,
+              "observation": "На металлической подставке под насосом видны заметные пятна ржавчины.",
+              "status": "defect",
+              "timestampSeconds": 2.9458331875
+            },
+            {
+              "box": [
+                440,
+                850,
+                620,
+                960
+              ],
+              "component": "other",
+              "condition": "corrosion",
+              "frameIndex": 4,
+              "observation": "На опорной ножке резервуара видны явные следы ржавчины.",
+              "status": "defect",
+              "timestampSeconds": 3.7874998125
+            },
+            {
+              "box": [
+                330,
+                820,
+                780,
+                920
+              ],
+              "component": "other",
+              "condition": "corrosion",
+              "frameIndex": 5,
+              "observation": "На обеих опорных ножках резервуара заметна сильная ржавчина.",
+              "status": "defect",
+              "timestampSeconds": 4.6291664375
+            },
+            {
+              "box": [
+                0,
+                250,
+                850,
+                980
+              ],
+              "component": "other",
+              "condition": "no_visible_defect",
+              "frameIndex": 6,
+              "observation": "На синем резервуаре и корпусе электродвигателя не обнаружено видимых повреждений или коррозии.",
+              "status": "clear",
+              "timestampSeconds": 5.4708330625
+            },
+            {
+              "box": [
+                450,
+                450,
+                850,
+                850
+              ],
+              "component": "other",
+              "condition": "corrosion",
+              "frameIndex": 7,
+              "observation": "На боковой поверхности синего резервуара видны обширные пятна ржавчины и следы коррозии.",
+              "status": "defect",
+              "timestampSeconds": 6.3124996875
+            }
+          ]
+        }
+      }
+    },
+    {
+      "reference": {
+        "id": "heat-gun",
+        "sha256": "21c53fe701b90daa494676689dcea02435ba329b31a3979f991a9d82332e8907",
+        "visible": [
+          "Portable yellow heater, coiled cable, minor cosmetic scuffing"
+        ],
+        "notEstablished": [
+          "Clear corrosion",
+          "Cracks or broken casing",
+          "Leaking liquid",
+          "Exposed or torn conductor"
+        ],
+        "doNotInfer": [
+          "Operational safety",
+          "Hidden electrical defects",
+          "Dirt or normal paint as corrosion"
+        ]
+      },
+      "runs": {
+        "baseline": {
+          "wallSeconds": 21.485,
+          "cacheHit": false,
+          "status": "clear",
+          "observations": [
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                270,
+                370,
+                998,
+                680
+              ],
+              "observation": "Другой промышленный узел: явных внешних дефектов не замечено.",
+              "frameIndex": 0,
+              "timestampSeconds": 0.3270833125,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                100,
+                400,
+                998,
+                640
+              ],
+              "observation": "Другой промышленный узел: явных внешних дефектов не замечено.",
+              "frameIndex": 1,
+              "timestampSeconds": 0.9812499375,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                100,
+                340,
+                950,
+                840
+              ],
+              "observation": "Другой промышленный узел: явных внешних дефектов не замечено.",
+              "frameIndex": 2,
+              "timestampSeconds": 1.6354165625000001,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                150,
+                350,
+                650,
+                850
+              ],
+              "observation": "Другой промышленный узел: явных внешних дефектов не замечено.",
+              "frameIndex": 3,
+              "timestampSeconds": 2.2895831875,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                0,
+                350,
+                700,
+                850
+              ],
+              "observation": "Другой промышленный узел: явных внешних дефектов не замечено.",
+              "frameIndex": 4,
+              "timestampSeconds": 2.9437498125,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                0,
+                400,
+                750,
+                800
+              ],
+              "observation": "Другой промышленный узел: явных внешних дефектов не замечено.",
+              "frameIndex": 5,
+              "timestampSeconds": 3.5979164375,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                0,
+                440,
+                660,
+                880
+              ],
+              "observation": "Другой промышленный узел: явных внешних дефектов не замечено.",
+              "frameIndex": 6,
+              "timestampSeconds": 4.2520830625,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                0,
+                240,
+                760,
+                820
+              ],
+              "observation": "Другой промышленный узел: явных внешних дефектов не замечено.",
+              "frameIndex": 7,
+              "timestampSeconds": 4.9062496875,
+              "status": "clear"
+            }
+          ]
+        },
+        "serving-final": {
+          "wallSeconds": 27.563,
+          "cacheHit": false,
+          "status": "clear",
+          "observations": [
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                250,
+                300,
+                990,
+                720
+              ],
+              "observation": "Жёлтый цилиндрический корпус оборудования с оранжевым кабелем и чёрной ручкой без видимых повреждений.",
+              "frameIndex": 0,
+              "timestampSeconds": 0.3270833125,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                100,
+                350,
+                990,
+                700
+              ],
+              "observation": "Жёлтый цилиндрический корпус с наклейками и оранжевым кабелем, видимых дефектов на поверхности нет.",
+              "frameIndex": 1,
+              "timestampSeconds": 0.9812499375,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                100,
+                310,
+                950,
+                850
+              ],
+              "observation": "Жёлтый цилиндрический корпус с оранжевым кабелем, видимых повреждений или коррозии нет.",
+              "frameIndex": 2,
+              "timestampSeconds": 1.6354165625000001,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                150,
+                320,
+                700,
+                850
+              ],
+              "observation": "Жёлтый цилиндрический корпус с оранжевым кабелем, видимых повреждений или коррозии нет.",
+              "frameIndex": 3,
+              "timestampSeconds": 2.2895831875,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                0,
+                290,
+                780,
+                880
+              ],
+              "observation": "Жёлтый цилиндрический корпус оборудования с оранжевым кабелем не имеет видимых повреждений.",
+              "frameIndex": 4,
+              "timestampSeconds": 2.9437498125,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                0,
+                350,
+                850,
+                800
+              ],
+              "observation": "Жёлтый корпус оборудования с ручкой и кабелем выглядит целым, без видимых дефектов.",
+              "frameIndex": 5,
+              "timestampSeconds": 3.5979164375,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                0,
+                400,
+                680,
+                900
+              ],
+              "observation": "Жёлтый цилиндрический корпус с оранжевым шлангом, видимых повреждений или коррозии не обнаружено.",
+              "frameIndex": 6,
+              "timestampSeconds": 4.2520830625,
+              "status": "clear"
+            },
+            {
+              "component": "other",
+              "condition": "no_visible_defect",
+              "box": [
+                0,
+                200,
+                750,
+                850
+              ],
+              "observation": "Жёлтый цилиндрический корпус с вентиляционной решёткой, видимых повреждений или коррозии не обнаружено.",
+              "frameIndex": 7,
+              "timestampSeconds": 4.9062496875,
+              "status": "clear"
+            }
+          ]
+        },
+        "serving-warm": {
+          "wallSeconds": 0.109,
+          "cacheHit": true,
+          "status": "clear",
+          "observations": [
+            {
+              "box": [
+                250,
+                300,
+                990,
+                720
+              ],
+              "component": "other",
+              "condition": "no_visible_defect",
+              "frameIndex": 0,
+              "observation": "Жёлтый цилиндрический корпус оборудования с оранжевым кабелем и чёрной ручкой без видимых повреждений.",
+              "status": "clear",
+              "timestampSeconds": 0.3270833125
+            },
+            {
+              "box": [
+                100,
+                350,
+                990,
+                700
+              ],
+              "component": "other",
+              "condition": "no_visible_defect",
+              "frameIndex": 1,
+              "observation": "Жёлтый цилиндрический корпус с наклейками и оранжевым кабелем, видимых дефектов на поверхности нет.",
+              "status": "clear",
+              "timestampSeconds": 0.9812499375
+            },
+            {
+              "box": [
+                100,
+                310,
+                950,
+                850
+              ],
+              "component": "other",
+              "condition": "no_visible_defect",
+              "frameIndex": 2,
+              "observation": "Жёлтый цилиндрический корпус с оранжевым кабелем, видимых повреждений или коррозии нет.",
+              "status": "clear",
+              "timestampSeconds": 1.6354165625000001
+            },
+            {
+              "box": [
+                150,
+                320,
+                700,
+                850
+              ],
+              "component": "other",
+              "condition": "no_visible_defect",
+              "frameIndex": 3,
+              "observation": "Жёлтый цилиндрический корпус с оранжевым кабелем, видимых повреждений или коррозии нет.",
+              "status": "clear",
+              "timestampSeconds": 2.2895831875
+            },
+            {
+              "box": [
+                0,
+                290,
+                780,
+                880
+              ],
+              "component": "other",
+              "condition": "no_visible_defect",
+              "frameIndex": 4,
+              "observation": "Жёлтый цилиндрический корпус оборудования с оранжевым кабелем не имеет видимых повреждений.",
+              "status": "clear",
+              "timestampSeconds": 2.9437498125
+            },
+            {
+              "box": [
+                0,
+                350,
+                850,
+                800
+              ],
+              "component": "other",
+              "condition": "no_visible_defect",
+              "frameIndex": 5,
+              "observation": "Жёлтый корпус оборудования с ручкой и кабелем выглядит целым, без видимых дефектов.",
+              "status": "clear",
+              "timestampSeconds": 3.5979164375
+            },
+            {
+              "box": [
+                0,
+                400,
+                680,
+                900
+              ],
+              "component": "other",
+              "condition": "no_visible_defect",
+              "frameIndex": 6,
+              "observation": "Жёлтый цилиндрический корпус с оранжевым шлангом, видимых повреждений или коррозии не обнаружено.",
+              "status": "clear",
+              "timestampSeconds": 4.2520830625
+            },
+            {
+              "box": [
+                0,
+                200,
+                750,
+                850
+              ],
+              "component": "other",
+              "condition": "no_visible_defect",
+              "frameIndex": 7,
+              "observation": "Жёлтый цилиндрический корпус с вентиляционной решёткой, видимых повреждений или коррозии не обнаружено.",
+              "status": "clear",
+              "timestampSeconds": 4.9062496875
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "mesh": [
+    {
+      "asset": "pump-station",
+      "firstRequestStatus": 200,
+      "reusedReadyResult": true,
+      "repeatSeconds": 0.032,
+      "initialBuildSecondsFromMetadata": 82,
+      "vertices": 53957,
+      "triangles": 88570,
+      "autoMarks": [
+        {
+          "point": [
+            -0.02719,
+            0.52103,
+            0.06358
+          ],
+          "label": "Признаки коррозии бака",
+          "kind": "corrosion",
+          "time": 0.67
+        },
+        {
+          "point": [
+            0.16543,
+            0.91723,
+            0.41025
+          ],
+          "label": "Признаки коррозии опорной лапы",
+          "kind": "corrosion",
+          "time": 0.67
+        }
+      ],
+      "binarySizeVerified": true
+    },
+    {
+      "asset": "heat-gun",
+      "firstRequestStatus": 200,
+      "reusedReadyResult": true,
+      "repeatSeconds": 0.047,
+      "initialBuildSecondsFromMetadata": 97,
+      "vertices": 57208,
+      "triangles": 98028,
+      "autoMarks": [],
+      "binarySizeVerified": true
+    }
+  ],
+  "residualIssues": [
+    "Rear view still reported as corrosion with browser JPEG encoding in a separate live run.",
+    "One selected component/condition per frame; multiple same-frame faults and events between sampled frames may be missed.",
+    "Photo component identity and bounding box are approximate; visible liquid is established, composition and persistent flow are not.",
+    "Single-frame request experiment failed with HTTP 502 and was not deployed as the final version."
+  ],
+  "browserRepeat": {
+    "viewportWidth": 390,
+    "physicalPhone": false,
+    "pumpStationSeconds": 0.469,
+    "heatGunSeconds": 0.575,
+    "codeSha256": "2608c3d4f6d212f483464cd26bf40b0fb3085ebe6fcbae303cbca6598d5993fa"
+  },
+  "finalFallback": "Paired grounded descriptions; malformed pairs retry individual frames using the existing three-key compact contract."
+}

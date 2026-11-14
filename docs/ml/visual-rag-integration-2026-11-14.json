@@ -1,0 +1,57 @@
+{
+  "checkedAt": "2026-11-14T23:24:08.687840+03:00",
+  "origin": "https://cyber102.94.41.87.102.sslip.io",
+  "httpStatus": 200,
+  "elapsedSeconds": 3.418,
+  "analysisStatus": "clear",
+  "model": "Qwen/Qwen3.8-27B",
+  "selection": "visual_similarity",
+  "serial": null,
+  "sources": [
+    {
+      "title": "Заполнение насоса перед пуском",
+      "url": "https://knz.ru/wp-content/uploads/RE-tipa-KM.pdf#page=17",
+      "selection": "visual_similarity",
+      "targetSerial": null
+    },
+    {
+      "title": "Кавитация центробежного насоса",
+      "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/cavitation-1117364",
+      "selection": "visual_similarity",
+      "targetSerial": null
+    },
+    {
+      "title": "Кавитационный запас NPSH",
+      "url": "https://www.ksb.com/en-global/centrifugal-pump-lexicon/article/suction-characteristics-1117252",
+      "selection": "visual_similarity",
+      "targetSerial": null
+    }
+  ],
+  "visualMatches": [
+    {
+      "id": "knz-km",
+      "title": "Насос серии КМ",
+      "score": 0.9994,
+      "scope": "centrifugal"
+    }
+  ],
+  "retrieval": {
+    "model": "timm/vit_small_patch14_dinov2.lvd142m",
+    "revision": "4610ca143709d58a633b6397a74412c2c3842454",
+    "indexVersion": "e855544260ab63d0b99bfadcfccc5f1884a5d889d585886439ff7a7b9d06d61f"
+  },
+  "publicBrowserChecks": {
+    "chromium": "passed",
+    "webkit": "passed"
+  },
+  "unitChecks": {
+    "fullPythonSuite": 348,
+    "skipped": 1,
+    "visualSearchTests": 12,
+    "javascriptTests": 59
+  },
+  "notes": [
+    "Local excerpts are supplied to the VLM context, bounded to 1300 characters.",
+    "Visual suggestions do not assign asset identity or import lookalike numerical specifications."
+  ]
+}

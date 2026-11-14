@@ -12,6 +12,7 @@ __pycache__/
 
 # Local inference dependencies and downloaded model weights
 .venv-internvl/
+.venv-visual/
 /models/
 /runtime-llama/
 /output/android/*-offline.apk

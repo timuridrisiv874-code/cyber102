@@ -1,0 +1,107 @@
+{
+  "environment": {
+    "platform": "macOS-26.0-arm64-arm-64bit",
+    "processor": "arm64",
+    "device": "cpu",
+    "threads": 2,
+    "notWindowsServerBenchmark": true
+  },
+  "model": "timm/vit_small_patch14_dinov2.lvd142m",
+  "revision": "4610ca143709d58a633b6397a74412c2c3842454",
+  "weightsBytes": 88240510,
+  "indexBytes": 90126,
+  "referenceCount": 63,
+  "loadCachedIndexSeconds": 1.461,
+  "peakProcessRSSMiB": 540.9,
+  "searches": [
+    {
+      "reference": "ams-oil",
+      "top": "ams-oil",
+      "durationMs": 26,
+      "samePhotoFirst": true
+    },
+    {
+      "reference": "ams-drilling",
+      "top": "ams-drilling",
+      "durationMs": 24,
+      "samePhotoFirst": true
+    },
+    {
+      "reference": "knz-km",
+      "top": "knz-km",
+      "durationMs": 25,
+      "samePhotoFirst": true
+    },
+    {
+      "reference": "knz-d",
+      "top": "knz-d",
+      "durationMs": 25,
+      "samePhotoFirst": true
+    },
+    {
+      "reference": "motor-eldin",
+      "top": "motor-eldin",
+      "durationMs": 25,
+      "samePhotoFirst": true
+    },
+    {
+      "reference": "gearbox-wxr",
+      "top": "gearbox-wxr",
+      "durationMs": 22,
+      "samePhotoFirst": true
+    },
+    {
+      "reference": "temperature-elemer",
+      "top": "temperature-elemer",
+      "durationMs": 24,
+      "samePhotoFirst": true
+    },
+    {
+      "reference": "gate-valve",
+      "top": "gate-valve",
+      "durationMs": 25,
+      "samePhotoFirst": true
+    },
+    {
+      "reference": "industrial-pipe",
+      "top": "industrial-pipe",
+      "durationMs": 25,
+      "samePhotoFirst": true
+    },
+    {
+      "reference": "pressure-gauge",
+      "top": "pressure-gauge",
+      "durationMs": 24,
+      "samePhotoFirst": true
+    }
+  ],
+  "coarseCategoryLeaveOneOut": {
+    "count": 53,
+    "sameCategoryAt1": 34,
+    "sameCategoryAt3": 47,
+    "limitation": "Existing broad photo categories; no exact model or asset identity ground truth. Does not validate model identification."
+  },
+  "integrationChecks": {
+    "python": {
+      "run": 339,
+      "skipped": 1,
+      "failed": 0
+    },
+    "javascript": {
+      "passed": 59,
+      "failed": 0
+    },
+    "browsers": [
+      "Chromium 151 / Pixel 7 emulation",
+      "WebKit 26.0 / iPhone 13 emulation"
+    ],
+    "browserCoverage": [
+      "real CPU search through API",
+      "document links",
+      "selected serial preserved",
+      "stale responses ignored",
+      "retry after unavailable service",
+      "mobile overflow"
+    ]
+  }
+}

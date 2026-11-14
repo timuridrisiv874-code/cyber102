@@ -26,6 +26,7 @@ const checkedViewfinder = byId('checked-viewfinder');
 const videoMetrics = byId('video-metrics');
 const endpoint = document.querySelector('main').dataset.analysisEndpoint.trim();
 const offlineMode = window.CyberOffline?.enabled === true;
+const equipmentSearch = offlineMode ? null : window.CyberEquipmentSearch?.create();
 
 const unavailableResults = {
   no_marker: ['Оборудование не распознано', 'Метка не видна. Наведите камеру на метку и сделайте новый кадр.'],
@@ -114,10 +115,18 @@ function mediaChanged() {
     cameraMode.value = !offlineMode && media.kind === 'uploaded_video' ? 'video' : 'single';
     intervalSelect.value = '10000';
   }
+  if (media.ready && equipmentSearch && sourceModes?.mode !== 'mesh') {
+    const frame = document.createElement('canvas');
+    try {
+      drawFrame(frame, media.element);
+      equipmentSearch.search(frame, `${media.kind}:${media.version}`);
+    } catch { /* The next decode event retries an incomplete frame. */ }
+  }
   render();
 }
 
 function resetInput() {
+  equipmentSearch?.reset();
   mediaLibrary?.cancel();
   regionController?.abort();
   clipReview?.reset();
@@ -178,16 +187,20 @@ function render() {
     for (const item of result?.equipmentContext?.references || []) {
       const url = item.source?.url;
       const local = typeof url === 'string' && /^\/api\/customer\/documents\/[a-z0-9-]+\/pdf#page=\d+$/.test(url);
-      const external = item.applicability === 'technical_reference' && /^https:\/\/[a-z0-9.-]+\//i.test(url);
+      const external = ['technical_reference', 'manufacturer_model'].includes(item.applicability) && /^https:\/\/[a-z0-9.-]+\//i.test(url);
       if (!local && !external) continue;
       const li = document.createElement('li'), link = document.createElement('a');
       link.href = url; link.target = '_blank'; link.rel = 'noopener';
-      link.textContent = item.title + (local ? ' · стр. ' + item.source.page : ' · ' + item.source.publisher);
+      link.textContent = item.title + (local ? ' · стр. ' + item.source.page : ' · ' + (item.source.publisher || item.source.title))
+        + (item.selection === 'visual_similarity' ? ' · найдено по фото' : '');
       li.append(link); list.append(li);
     }
     knowledge.hidden = !list.childElementCount;
     const context = result?.equipmentContext;
-    knowledge.querySelector('summary').textContent = context ? 'Источники контекста · ' + context.serial : 'Источники контекста';
+    knowledge.querySelector('summary').textContent = context?.selection === 'passport_and_visual'
+      ? 'Модель использовала паспорт и справки по фото'
+      : context?.selection === 'visual_similarity' ? 'Модель использовала справки по фото'
+        : context?.serial ? 'Источники контекста · ' + context.serial : 'Источники контекста';
   }
   if (offlineMode) cameraMode.value = 'single';
   const clipBusy = Boolean(clipReview?.busy);
@@ -556,6 +569,9 @@ async function checkFrame() {
       frameMetadata = frameSource === 'example' ? null : captureMetadata();
     }
     const useServer = frameSource !== 'example';
+    if (useServer) equipmentSearch?.search(snapshot, frameSource === 'uploaded_photo'
+      ? `${media.kind}:${media.version}` : frameSource === 'uploaded_video'
+        ? `${frameSource}:${media.version}:${frameMetadata?.videoTimeSeconds}` : null);
     if (useServer && !endpoint && !offlineMode) throw new Error('Не задан адрес сервера анализа.');
     if (useServer) showMessage(offlineMode ? 'SmolVLM анализирует кадр на телефоне…' : 'Проверяем кадр…');
     render();
