@@ -113,6 +113,67 @@ class QwenEngineTest(unittest.TestCase):
         self.assertEqual(engine.last_input_metadata['maxPixels'], qwen_worker.VIDEO_MAX_PIXELS)
         engine.model.generate.assert_called_once()
 
+    def test_video_batches_keep_all_frame_indices_and_aggregate_metrics(self):
+        engine = self.make_engine()
+        images, timestamps = [object() for _ in range(8)], list(range(8))
+        rows = [dict(OBSERVATION, frameIndex=index) for index in range(4)]
+        engine.processor.decode.return_value = json.dumps({'observations': rows, 'summary': 'Коррозия.'})
+        result = engine.infer_video(images, timestamps)
+        self.assertEqual([row['frameIndex'] for row in result['observations']], list(range(8)))
+        self.assertEqual([row['timestampSeconds'] for row in result['observations']], timestamps)
+        self.assertIn('коррозия', result['summary'])
+        self.assertEqual(engine.last_metrics['frames'], 8)
+        self.assertEqual(engine.last_metrics['outputTokens'], 140)
+        self.assertEqual([call.kwargs['images'] for call in engine.processor.call_args_list],
+                         [images[:4], images[4:]])
+
+    def test_video_retries_smaller_batches_after_cuda_oom(self):
+        class OutOfMemoryError(RuntimeError):
+            pass
+
+        engine = self.make_engine()
+        engine.torch.cuda.OutOfMemoryError = OutOfMemoryError
+        rows = [dict(OBSERVATION, frameIndex=index) for index in range(2)]
+        engine.processor.decode.return_value = json.dumps({'observations': rows, 'summary': 'Коррозия.'})
+        tokens = engine.model.generate.return_value
+        engine.model.generate.side_effect = [OutOfMemoryError(), tokens, tokens, tokens, tokens]
+        images = [object() for _ in range(8)]
+        with patch.object(qwen_worker.time, 'monotonic', side_effect=[0, 0, 4, 8, 12, 16]):
+            result = engine.infer_video(images, list(range(8)))
+        self.assertEqual([row['frameIndex'] for row in result['observations']], list(range(8)))
+        self.assertEqual([row['timestampSeconds'] for row in result['observations']], list(range(8)))
+        self.assertEqual([call.kwargs['images'] for call in engine.processor.call_args_list],
+                         [images[:4], images[:2], images[2:4], images[4:6], images[6:]])
+        self.assertEqual([call.kwargs['max_time'] for call in engine.model.generate.call_args_list],
+                         [110, 106, 102, 98, 94])
+        self.assertEqual(engine.last_metrics['frames'], 8)
+        self.assertEqual(engine.torch.cuda.empty_cache.call_count, 2)
+
+    def test_video_single_frame_oom_is_propagated_without_looping(self):
+        class OutOfMemoryError(RuntimeError):
+            pass
+
+        engine = self.make_engine()
+        engine.torch.cuda.OutOfMemoryError = OutOfMemoryError
+        engine.model.generate.side_effect = OutOfMemoryError('No memory for one frame')
+        with self.assertRaises(OutOfMemoryError):
+            engine.infer_video([object()], [0])
+        engine.model.generate.assert_called_once()
+        engine.torch.cuda.empty_cache.assert_called_once()
+
+    def test_invalid_batch_response_falls_back_to_grounded_single_frames(self):
+        engine = self.make_engine()
+        engine.torch.cuda.OutOfMemoryError = RuntimeError
+        compact = {key: value for key, value in OBSERVATION.items() if key != 'observation'}
+        engine.processor.decode.side_effect = [json.dumps({'observations': [], 'summary': 'Кадры.'}),
+                                               json.dumps(compact), json.dumps(compact)]
+        result = engine.infer_video([object(), object()], [1.25, 4.75])
+        self.assertEqual([row['timestampSeconds'] for row in result['observations']], [1.25, 4.75])
+        self.assertEqual([row['frameIndex'] for row in result['observations']], [0, 1])
+        self.assertEqual(engine.last_metrics['frames'], 2)
+        self.assertTrue(all(row['observation'] for row in result['observations']))
+        self.assertEqual(engine.model.generate.call_count, 3)
+
     def test_invalid_model_json_is_not_repaired_and_raw_is_available_only_on_engine(self):
         engine = self.make_engine()
         engine.last_metrics = {'old': True}
