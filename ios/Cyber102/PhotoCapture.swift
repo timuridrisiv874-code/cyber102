@@ -2,11 +2,11 @@ import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 
-func inspectionJPEG(_ data: Data) throws -> Data {
+func inspectionJPEG(_ data: Data, maximumPixels: Int = 1024) throws -> Data {
     guard let source = CGImageSourceCreateWithData(data as CFData, nil),
           let thumbnail = CGImageSourceCreateThumbnailAtIndex(source, 0, [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceThumbnailMaxPixelSize: 1024,
+            kCGImageSourceThumbnailMaxPixelSize: maximumPixels,
             kCGImageSourceCreateThumbnailWithTransform: true
           ] as CFDictionary)
     else { throw InspectionError("Не удалось открыть фотографию.") }

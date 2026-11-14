@@ -3,7 +3,7 @@ import PhotosUI
 import SwiftUI
 import Translation
 
-private enum CaptureSheet: String, Identifiable { case photo, qr; var id: String { rawValue } }
+private enum CaptureSheet: String, Identifiable { case photo, qr, measurePhoto, lidar; var id: String { rawValue } }
 
 @MainActor
 struct InspectionView: View {
@@ -20,6 +20,11 @@ struct InspectionView: View {
     @State private var movingSlider = false
     @State private var frameEpoch = UUID()
     @State private var jpeg: Data?
+    @State private var originalPhoto: Data?
+    @State private var photoSource: PhotoMeasurementSource?
+    @State private var measurement: InspectionMeasurement?
+    @State private var draftID = UUID()
+    @State private var historyPhoto: InspectionEntry?
     @State private var pickEpoch = UUID()
     @State private var sheet: CaptureSheet?
     @State private var equipment: RegisteredEquipment?
@@ -64,10 +69,29 @@ struct InspectionView: View {
                             .frame(maxWidth: .infinity, maxHeight: 280).accessibilityLabel("Фото осмотра")
                     }
                     HStack {
-                        PhotosPicker(selection: $picked, matching: .any(of: [.images, .videos])) { Label("Фото или видео", systemImage: "photo.on.rectangle") }
+                        PhotosPicker(selection: $picked, matching: .any(of: [.images, .videos]), preferredItemEncoding: .current) { Label("Фото или видео", systemImage: "photo.on.rectangle") }
                         Spacer()
                         Button { openCamera(.photo) } label: { Label("Камера", systemImage: "camera") }
                     }.buttonStyle(.borderless).disabled(analysis != nil || translating)
+                    if photoSource != nil, measurement?.method != .lidar {
+                        Button { sheet = .measurePhoto } label: { Label("Замер по фото", systemImage: "ruler") }
+                            .disabled(analysis != nil || translating)
+                    }
+                    if LidarMeasurementView.isSupported {
+                        Button { openCamera(.lidar) } label: { Label("Снять с LiDAR", systemImage: "viewfinder") }
+                            .disabled(analysis != nil || translating)
+                    }
+                    if let measurement {
+                        LabeledContent(measurement.methodLabel, value: measurement.displayText)
+                            .monospacedDigit()
+                        if entry == nil {
+                            let saved = store.entries.first { $0.id == draftID }
+                            Button(saved == nil ? "Сохранить замер в журнал" : "Обновить замер в журнале") {
+                                saveDraft()
+                            }
+                            .disabled(saved?.measurement == measurement && saved?.qr == equipment?.serial || analysis != nil)
+                        }
+                    }
                     if clip != nil, duration > 0 {
                         let upper = max(0.001, duration - min(0.1, duration / 2))
                         Text("Кадр видео · " + String(format: "%.2f с", position)).font(.caption).monospacedDigit()
@@ -101,9 +125,7 @@ struct InspectionView: View {
                         }
                         TextField("Заметка", text: $note, axis: .vertical)
                         Button(store.entries.first(where: { $0.id == entry.id }) == nil ? "Сохранить осмотр" : "Обновить запись") {
-                            var saved = entry
-                            saved.qr = equipment?.serial; saved.equipment = equipment; saved.note = note
-                            store.save(saved)
+                            saveDraft()
                         }
                     }
                 }
@@ -122,13 +144,24 @@ struct InspectionView: View {
                             equipmentDetails(equipment)
                         } else if let qr = row.qr { LabeledContent("QR", value: qr) }
                         if let time = row.videoSeconds { Text("Кадр видео · " + String(format: "%.2f с", time)) }
-                        Text(row.russian ?? row.english).textSelection(.enabled)
+                        if let measurement = row.measurement {
+                            LabeledContent(measurement.methodLabel, value: measurement.displayText).monospacedDigit()
+                            if row.measuredPhoto != nil {
+                                Button("Открыть кадр с точками") { historyPhoto = row }
+                            }
+                        }
+                        if !row.english.isEmpty { Text(row.russian ?? row.english).textSelection(.enabled) }
                         if row.russian != nil {
                             DisclosureGroup("Английский оригинал") { Text(row.english).textSelection(.enabled) }
                         }
                         if !row.note.isEmpty { Text(row.note).foregroundStyle(.secondary) }
                     } label: { Text(row.date.formatted(date: .abbreviated, time: .shortened)) }
                 }.navigationTitle("Журнал осмотров")
+                .sheet(item: $historyPhoto) { item in
+                    if let data = item.measuredPhoto, let value = item.measurement {
+                        SavedMeasurementView(jpeg: data, measurement: value)
+                    }
+                }
             }
         }
         .onChange(of: picked) { _, value in
@@ -156,20 +189,37 @@ struct InspectionView: View {
             }
         }
         .sheet(item: $sheet) { source in
-            NavigationStack {
-                InspectionCamera(qrOnly: source == .qr, equipment: equipment) { value in
-                    equipment = value
-                    if source == .qr, value != nil { sheet = nil }
-                } picked: { bytes in
-                    sheet = nil
-                    do { try selectPhoto(bytes) } catch { self.error = error.localizedDescription }
-                } failed: { message in
-                    error = message; sheet = nil
+            switch source {
+            case .measurePhoto:
+                if let originalPhoto, let photoSource {
+                    PhotoMeasurementView(imageData: originalPhoto, source: photoSource,
+                                        previous: measurement?.method == .lidar ? nil : measurement) { value in
+                        measurement = value
+                    }
                 }
-                .ignoresSafeArea(edges: .bottom)
-                .navigationTitle(source == .qr ? "QR-код оборудования" : "Камера")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Закрыть") { sheet = nil } } }
+            case .lidar:
+                LidarMeasurementView { bytes, value in
+                    do {
+                        try selectPhoto(bytes)
+                        measurement = value
+                    } catch { self.error = error.localizedDescription }
+                }
+            case .photo, .qr:
+                NavigationStack {
+                    InspectionCamera(qrOnly: source == .qr, equipment: equipment) { value in
+                        equipment = value
+                        if source == .qr, value != nil { sheet = nil }
+                    } picked: { bytes in
+                        sheet = nil
+                        do { try selectPhoto(bytes) } catch { self.error = error.localizedDescription }
+                    } failed: { message in
+                        error = message; sheet = nil
+                    }
+                    .ignoresSafeArea(edges: .bottom)
+                    .navigationTitle(source == .qr ? "QR-код оборудования" : "Камера")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Закрыть") { sheet = nil } } }
+                }
             }
         }
         .translationTask(translationConfig) { session in
@@ -198,11 +248,16 @@ struct InspectionView: View {
         stop()
         pickEpoch = UUID(); picked = nil
         frameEpoch = UUID(); clip = nil; frameSeconds = nil; loadingFrame = false
+        originalPhoto = bytes
+        photoSource = PhotoMeasurementSource(data: bytes)
+        measurement = nil
+        draftID = UUID()
         jpeg = clean
         entry = nil; error = nil; missingLanguage = false; note = ""
     }
     private func invalidateFrame() {
         frameEpoch = UUID(); loadingFrame = false
+        originalPhoto = nil; photoSource = nil; measurement = nil; draftID = UUID()
         jpeg = nil; frameSeconds = nil; entry = nil; note = ""; error = nil
     }
     private func loadFrame() {
@@ -229,6 +284,20 @@ struct InspectionView: View {
             sheet = mode
         }
     }
+    private func saveDraft() {
+        guard entry != nil || measurement != nil else { return }
+        var saved = entry ?? store.entries.first { $0.id == draftID } ??
+            InspectionEntry(id: draftID, date: Date(), english: "", russian: nil,
+                            qr: nil, note: "", videoSeconds: frameSeconds)
+        saved.qr = equipment?.serial
+        saved.equipment = equipment
+        saved.note = note
+        saved.measurement = measurement
+        saved.measuredPhoto = measurement == nil ? nil : jpeg
+        saved.photoGeometry = measurement == nil ? nil : photoSource
+        store.save(saved)
+    }
+
     private func analyze() {
         guard let jpeg else { return }
         let id = UUID(); run = id
@@ -240,11 +309,12 @@ struct InspectionView: View {
             do {
                 let english = try await engine.describe(jpeg, epoch: epoch)
                 guard run == id, !Task.isCancelled else { return }
-                entry = InspectionEntry(id: id, date: Date(), english: english, russian: nil, qr: equipment?.serial, note: "", videoSeconds: frameSeconds, equipment: equipment)
+                let inspectionDate = store.entries.first { $0.id == draftID }?.date ?? Date()
+                entry = InspectionEntry(id: draftID, date: inspectionDate, english: english, russian: nil, qr: equipment?.serial, note: "", videoSeconds: frameSeconds, equipment: equipment)
                 phase = ""
                 let status = await LanguageAvailability().status(from: Self.en, to: Self.ru)
                 guard run == id, !Task.isCancelled else { return }
-                if status == .installed { startTranslation(id) }
+                if status == .installed { startTranslation(draftID) }
                 else if status == .supported { missingLanguage = true }
                 else { error = "На этом iPhone системный перевод с английского на русский недоступен." }
             } catch {

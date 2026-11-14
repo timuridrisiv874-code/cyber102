@@ -1,0 +1,246 @@
+{
+  "recording": "TUM freiburg3_checkerboard_large",
+  "sensor": "Asus Xtion (structured light, no ARKit confidence map)",
+  "rgbFrames": 1591,
+  "rgbStep": 60,
+  "groundTruthMm": 89.2,
+  "pattern": [
+    9,
+    7
+  ],
+  "cornerRowColZeroBased": [
+    [
+      3,
+      4
+    ],
+    [
+      3,
+      5
+    ]
+  ],
+  "maxPairSkewMs": 20,
+  "opencv": "4.12.0",
+  "counts": {
+    "measured": 21,
+    "board_not_visible": 4,
+    "depth_unreliable": 2
+  },
+  "meanAbsoluteErrorMm": 7.521,
+  "medianAbsoluteErrorMm": 1.872,
+  "maxAbsoluteErrorMm": 64.573,
+  "meanAbsoluteErrorPercent": 8.431,
+  "minMeasuredMm": 88.475,
+  "maxMeasuredMm": 153.773,
+  "samples": [
+    {
+      "rgbIndex": 0,
+      "rgbTimestamp": 1341835195.40972,
+      "depthTimestamp": 1341835195.409757,
+      "pairSkewMs": 0.037,
+      "status": "measured",
+      "lengthMm": 104.469
+    },
+    {
+      "rgbIndex": 60,
+      "rgbTimestamp": 1341835197.42197,
+      "depthTimestamp": 1341835197.422,
+      "pairSkewMs": 0.03,
+      "status": "measured",
+      "lengthMm": 90.443
+    },
+    {
+      "rgbIndex": 120,
+      "rgbTimestamp": 1341835199.433964,
+      "depthTimestamp": 1341835199.433985,
+      "pairSkewMs": 0.021,
+      "status": "measured",
+      "lengthMm": 92.819
+    },
+    {
+      "rgbIndex": 180,
+      "rgbTimestamp": 1341835201.509693,
+      "depthTimestamp": 1341835201.509708,
+      "pairSkewMs": 0.015,
+      "status": "board_not_visible"
+    },
+    {
+      "rgbIndex": 240,
+      "rgbTimestamp": 1341835203.521739,
+      "depthTimestamp": 1341835203.521751,
+      "pairSkewMs": 0.012,
+      "status": "board_not_visible"
+    },
+    {
+      "rgbIndex": 300,
+      "rgbTimestamp": 1341835205.533799,
+      "depthTimestamp": 1341835205.533813,
+      "pairSkewMs": 0.014,
+      "status": "board_not_visible"
+    },
+    {
+      "rgbIndex": 360,
+      "rgbTimestamp": 1341835207.541745,
+      "depthTimestamp": 1341835207.541756,
+      "pairSkewMs": 0.011,
+      "status": "measured",
+      "lengthMm": 89.808
+    },
+    {
+      "rgbIndex": 420,
+      "rgbTimestamp": 1341835209.553843,
+      "depthTimestamp": 1341835209.553864,
+      "pairSkewMs": 0.021,
+      "status": "measured",
+      "lengthMm": 88.497
+    },
+    {
+      "rgbIndex": 480,
+      "rgbTimestamp": 1341835211.56582,
+      "depthTimestamp": 1341835211.565832,
+      "pairSkewMs": 0.012,
+      "status": "measured",
+      "lengthMm": 88.475
+    },
+    {
+      "rgbIndex": 540,
+      "rgbTimestamp": 1341835213.573741,
+      "depthTimestamp": 1341835213.573749,
+      "pairSkewMs": 0.008,
+      "status": "measured",
+      "lengthMm": 89.543
+    },
+    {
+      "rgbIndex": 600,
+      "rgbTimestamp": 1341835215.590746,
+      "depthTimestamp": 1341835215.590763,
+      "pairSkewMs": 0.017,
+      "status": "measured",
+      "lengthMm": 89.528
+    },
+    {
+      "rgbIndex": 660,
+      "rgbTimestamp": 1341835217.59796,
+      "depthTimestamp": 1341835217.597975,
+      "pairSkewMs": 0.015,
+      "status": "measured",
+      "lengthMm": 112.053
+    },
+    {
+      "rgbIndex": 720,
+      "rgbTimestamp": 1341835219.609762,
+      "depthTimestamp": 1341835219.609791,
+      "pairSkewMs": 0.029,
+      "status": "measured",
+      "lengthMm": 91.119
+    },
+    {
+      "rgbIndex": 780,
+      "rgbTimestamp": 1341835221.653771,
+      "depthTimestamp": 1341835221.653815,
+      "pairSkewMs": 0.044,
+      "status": "measured",
+      "lengthMm": 90.559
+    },
+    {
+      "rgbIndex": 840,
+      "rgbTimestamp": 1341835223.661859,
+      "depthTimestamp": 1341835223.661894,
+      "pairSkewMs": 0.035,
+      "status": "measured",
+      "lengthMm": 153.773
+    },
+    {
+      "rgbIndex": 900,
+      "rgbTimestamp": 1341835225.709775,
+      "depthTimestamp": 1341835225.709786,
+      "pairSkewMs": 0.011,
+      "status": "depth_unreliable"
+    },
+    {
+      "rgbIndex": 960,
+      "rgbTimestamp": 1341835227.722795,
+      "depthTimestamp": 1341835227.722905,
+      "pairSkewMs": 0.11,
+      "status": "depth_unreliable"
+    },
+    {
+      "rgbIndex": 1020,
+      "rgbTimestamp": 1341835229.738673,
+      "depthTimestamp": 1341835229.738687,
+      "pairSkewMs": 0.014,
+      "status": "measured",
+      "lengthMm": 91.072
+    },
+    {
+      "rgbIndex": 1080,
+      "rgbTimestamp": 1341835231.746747,
+      "depthTimestamp": 1341835231.746762,
+      "pairSkewMs": 0.015,
+      "status": "measured",
+      "lengthMm": 88.952
+    },
+    {
+      "rgbIndex": 1140,
+      "rgbTimestamp": 1341835233.758842,
+      "depthTimestamp": 1341835233.75887,
+      "pairSkewMs": 0.028,
+      "status": "measured",
+      "lengthMm": 89.492
+    },
+    {
+      "rgbIndex": 1200,
+      "rgbTimestamp": 1341835235.797889,
+      "depthTimestamp": 1341835235.798918,
+      "pairSkewMs": 1.029,
+      "status": "measured",
+      "lengthMm": 95.326
+    },
+    {
+      "rgbIndex": 1260,
+      "rgbTimestamp": 1341835237.805917,
+      "depthTimestamp": 1341835237.805945,
+      "pairSkewMs": 0.028,
+      "status": "measured",
+      "lengthMm": 91.491
+    },
+    {
+      "rgbIndex": 1320,
+      "rgbTimestamp": 1341835239.817884,
+      "depthTimestamp": 1341835239.817892,
+      "pairSkewMs": 0.008,
+      "status": "board_not_visible"
+    },
+    {
+      "rgbIndex": 1380,
+      "rgbTimestamp": 1341835241.834889,
+      "depthTimestamp": 1341835241.834922,
+      "pairSkewMs": 0.033,
+      "status": "measured",
+      "lengthMm": 89.092
+    },
+    {
+      "rgbIndex": 1440,
+      "rgbTimestamp": 1341835243.873688,
+      "depthTimestamp": 1341835243.873701,
+      "pairSkewMs": 0.013,
+      "status": "measured",
+      "lengthMm": 110.888
+    },
+    {
+      "rgbIndex": 1500,
+      "rgbTimestamp": 1341835245.886048,
+      "depthTimestamp": 1341835245.886061,
+      "pairSkewMs": 0.013,
+      "status": "measured",
+      "lengthMm": 95.233
+    },
+    {
+      "rgbIndex": 1560,
+      "rgbTimestamp": 1341835247.893812,
+      "depthTimestamp": 1341835247.893837,
+      "pairSkewMs": 0.025,
+      "status": "measured",
+      "lengthMm": 94.939
+    }
+  ]
+}

@@ -10,6 +10,9 @@ struct InspectionEntry: Identifiable, Codable {
     var note: String
     var videoSeconds: Double? = nil
     var equipment: RegisteredEquipment? = nil
+    var measurement: InspectionMeasurement? = nil
+    var measuredPhoto: Data? = nil
+    var photoGeometry: PhotoMeasurementSource? = nil
 }
 
 @MainActor

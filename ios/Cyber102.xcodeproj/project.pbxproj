@@ -4,6 +4,16 @@
 	classes = {};
 	objectVersion = 56;
 	objects = {
+		4E5F582972231FA7201D953F /* MeasurementGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.swift"; name = "MeasurementGeometry.swift"; path = "MeasurementGeometry.swift"; sourceTree = "<group>"; };
+		FF74A0959BCF3CEFF90BFA8D /* build MeasurementGeometry.swift */ = {isa = PBXBuildFile; fileRef = 4E5F582972231FA7201D953F; };
+		D43F03333B394E9FA5CC59E1 /* PhotoMeasurement.swift */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.swift"; name = "PhotoMeasurement.swift"; path = "PhotoMeasurement.swift"; sourceTree = "<group>"; };
+		44411E839A5EFA0A977A25E6 /* build PhotoMeasurement.swift */ = {isa = PBXBuildFile; fileRef = D43F03333B394E9FA5CC59E1; };
+		428D045233113B36B69189DC /* PhotoMeasurementView.swift */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.swift"; name = "PhotoMeasurementView.swift"; path = "PhotoMeasurementView.swift"; sourceTree = "<group>"; };
+		E6DADFBA9A155F8F8A57C3D3 /* build PhotoMeasurementView.swift */ = {isa = PBXBuildFile; fileRef = 428D045233113B36B69189DC; };
+		C6769A320AA42C593F9E94A1 /* LidarMeasurementView.swift */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.swift"; name = "LidarMeasurementView.swift"; path = "LidarMeasurementView.swift"; sourceTree = "<group>"; };
+		8ADF4A053B62F802AC0C6D78 /* build LidarMeasurementView.swift */ = {isa = PBXBuildFile; fileRef = C6769A320AA42C593F9E94A1; };
+		DC21A9C908C4E9CBF11625FF /* LidarSampling.swift */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.swift"; name = "LidarSampling.swift"; path = "LidarSampling.swift"; sourceTree = "<group>"; };
+		22E19556D123E50A8C5EF227 /* build LidarSampling.swift */ = {isa = PBXBuildFile; fileRef = DC21A9C908C4E9CBF11625FF; };
 		A4C264C0E61CA715D730DACB /* equipment-catalog.json */ = {isa = PBXFileReference; lastKnownFileType = "text.json"; name = "equipment-catalog.json"; path = "../mobile/equipment-catalog.json"; sourceTree = "SOURCE_ROOT"; };
 		BB43BBAD9FA38A8F7CF14667 /* build equipment-catalog.json */ = {isa = PBXBuildFile; fileRef = A4C264C0E61CA715D730DACB; };
 		0E46FA58D603717BC5509B76 /* EquipmentCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.swift"; name = "EquipmentCatalog.swift"; path = "EquipmentCatalog.swift"; sourceTree = "<group>"; };
@@ -40,11 +50,11 @@
 		8A4653088CDBA3C17095276A /* QRScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.swift"; name = "QRScanner.swift"; path = "QRScanner.swift"; sourceTree = "<group>"; };
 		C365E6026B6548BAD9593036 /* build QRScanner.swift */ = {isa = PBXBuildFile; fileRef = 8A4653088CDBA3C17095276A; };
 		D6DF0162AA4B79F78614EC0F /* Cyber102.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cyber102.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BCE16DD0260827ECF338C787 /* sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (DF54A9B49225F8B0BA29B75A, 30DB1A7FF73870ABB4F1A168, 6C74A6DD160C2168E0E3A54D, 1FB3BABDA0F454B53BB1C72C, 55BC7228E0EC0E2A24A7FB92, 99B441BCFFB03C6EA02232CD, 65AE05F2AC5A9DFCA06D4A14, B2E175B7FA14DD42E39C3FC4, C365E6026B6548BAD9593036,); runOnlyForDeploymentPostprocessing = 0; };
+		BCE16DD0260827ECF338C787 /* sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (FF74A0959BCF3CEFF90BFA8D, 44411E839A5EFA0A977A25E6, E6DADFBA9A155F8F8A57C3D3, 8ADF4A053B62F802AC0C6D78, 22E19556D123E50A8C5EF227, DF54A9B49225F8B0BA29B75A, 30DB1A7FF73870ABB4F1A168, 6C74A6DD160C2168E0E3A54D, 1FB3BABDA0F454B53BB1C72C, 55BC7228E0EC0E2A24A7FB92, 99B441BCFFB03C6EA02232CD, 65AE05F2AC5A9DFCA06D4A14, B2E175B7FA14DD42E39C3FC4, C365E6026B6548BAD9593036,); runOnlyForDeploymentPostprocessing = 0; };
 		0189424A5A60FED329FA868E /* resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (BB43BBAD9FA38A8F7CF14667, EBAAC2BCA023110D976A4EBE, A751D07B31ED67FD766D975E, D026D8A253D8D298B742569E, ACE4470D6134B62DEDD7812E, B73B8024180645D42CBF6F0E, 142FD66DD7C35877866AEDE4,); runOnlyForDeploymentPostprocessing = 0; };
 		7561BFB015D8F536760CB671 /* frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (BC50BE31A24B714D8578AEB4,); runOnlyForDeploymentPostprocessing = 0; };
 		DC76E9F0C0006E8F919E0C51 /* root */ = {isa = PBXGroup; children = (B9DCD3A937ACCECA05345E4F, 68C2CC7F0CEAA3E499ECB4DB, EE92C8A4B63C9522CF632CE9, 27C968E6692B41BF6E1A241B, FE0A091FDBFB3E9C31B7A1BD,); sourceTree = "<group>"; };
-		B9DCD3A937ACCECA05345E4F /* Cyber102 */ = {isa = PBXGroup; children = (0E46FA58D603717BC5509B76, ECA8B5FF8C70EBC1962D4B33, AB215B9C95D36B9BDFC53792, 0F15ED68CF4CCC649918BE5B, 6CBE60E8643FDC08A244007E, 43BC4A48DFA51F0BE83483E9, 46FE965501E70843AB678442, B38D7BFBAF287AF0113B4217, 8A4653088CDBA3C17095276A, 28AAD1477D5182D66D4B03B3, 7B594B6DB375E1BF3F23CDD6,); path = "Cyber102"; sourceTree = "<group>"; };
+		B9DCD3A937ACCECA05345E4F /* Cyber102 */ = {isa = PBXGroup; children = (4E5F582972231FA7201D953F, D43F03333B394E9FA5CC59E1, 428D045233113B36B69189DC, C6769A320AA42C593F9E94A1, DC21A9C908C4E9CBF11625FF, 0E46FA58D603717BC5509B76, ECA8B5FF8C70EBC1962D4B33, AB215B9C95D36B9BDFC53792, 0F15ED68CF4CCC649918BE5B, 6CBE60E8643FDC08A244007E, 43BC4A48DFA51F0BE83483E9, 46FE965501E70843AB678442, B38D7BFBAF287AF0113B4217, 8A4653088CDBA3C17095276A, 28AAD1477D5182D66D4B03B3, 7B594B6DB375E1BF3F23CDD6,); path = "Cyber102"; sourceTree = "<group>"; };
 		68C2CC7F0CEAA3E499ECB4DB /* Model */ = {isa = PBXGroup; children = (A4C264C0E61CA715D730DACB, 98DBBD183660A1BC71F19D24, 0CC9EED7AD8A5278819D42C3,); name = "Model"; sourceTree = "<group>"; };
 		EE92C8A4B63C9522CF632CE9 /* Licenses */ = {isa = PBXGroup; children = (F630408AD13CCCA8223068F7, 95EF3BA1912B05B25372821E, 8E107B2C6BA5FF8D45AB8A89,); name = "Licenses"; sourceTree = "<group>"; };
 		27C968E6692B41BF6E1A241B /* Libraries */ = {isa = PBXGroup; children = (4DF50F6455C0C6F8D4E37DB1,); name = "Libraries"; sourceTree = "<group>"; };
