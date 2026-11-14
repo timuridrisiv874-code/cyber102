@@ -1,0 +1,80 @@
+[
+  {
+    "file": "rise-01.jpg",
+    "source": "https://smoke.createlab.org/learn.html",
+    "video": "https://smoke.createlab.org/videos/320/2019-01-11/0-8/0-8-2019-01-11-3012-1045-3515-1548-320-320-9367-1547243550-1547243725.mp4",
+    "sha256": "d03a28d7bbcfe1476b35ee2a4af20bf9c45f58edd513ba30a66ffd70dba1de6b",
+    "sourceSha256": "0e4a0b886e0d8c4e587e52dc0a08f5fff9f69fd3d890b24b781e7fd64ee64bfe",
+    "frameTimeSeconds": 1.5,
+    "site": "rise-mon-valley",
+    "scene": "rise-01",
+    "category": "smoke-example",
+    "note": "Two visible plumes with separate origins. The larger diffuse plume is partially masked by terrain.",
+    "objects": [
+      {
+        "class": "smoke",
+        "xyxy": [
+          0.0,
+          0.055,
+          0.304,
+          0.295
+        ]
+      },
+      {
+        "class": "smoke",
+        "xyxy": [
+          0.4,
+          0.2,
+          0.87,
+          0.75
+        ]
+      }
+    ]
+  },
+  {
+    "file": "rise-02.jpg",
+    "source": "https://smoke.createlab.org/learn.html",
+    "video": "https://smoke.createlab.org/videos/320/2019-01-11/0-0/0-0-2019-01-11-6304-884-6807-1387-320-320-8863-1547241025-1547241200.mp4",
+    "sha256": "cef93b8efcea516f3c32efcf502e24e1066ce2a8ab606149d64b96396f30ba2e",
+    "sourceSha256": "9b9ab87d1776730d67ee94e1b2ee784c77f91eb938b212a3134cd3d2762167f7",
+    "frameTimeSeconds": 1.5,
+    "site": "rise-mon-valley",
+    "scene": "rise-02",
+    "category": "smoke-example",
+    "note": "Connected smoke above the paired stacks.",
+    "objects": [
+      {
+        "class": "smoke",
+        "xyxy": [
+          0.435,
+          0.045,
+          0.875,
+          0.46
+        ]
+      }
+    ]
+  },
+  {
+    "file": "rise-10.jpg",
+    "source": "https://smoke.createlab.org/learn.html",
+    "video": "https://smoke.createlab.org/videos/320/2019-01-11/0-7/0-7-2019-01-11-3544-899-4026-1381-320-320-6811-1547230755-1547230930.mp4",
+    "sha256": "b894722fa7d2027837b63517bec513019443ab15f777baafd3012bca79383d51",
+    "sourceSha256": "9ede0794ce7b1d14c1248623aae5e9d95bc3fc4fb9f2261aec5d39fa0287513f",
+    "frameTimeSeconds": 1.5,
+    "site": "rise-mon-valley",
+    "scene": "rise-10",
+    "category": "mixed-smoke-and-steam",
+    "note": "Dark smoke on the left. Steam is visible elsewhere; this benchmark scores smoke only.",
+    "objects": [
+      {
+        "class": "smoke",
+        "xyxy": [
+          0,
+          0.228,
+          0.457,
+          0.436
+        ]
+      }
+    ]
+  }
+]

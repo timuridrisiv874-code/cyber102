@@ -1,0 +1,54 @@
+[
+  {
+    "file": "rise-13.jpg",
+    "source": "https://smoke.createlab.org/learn.html",
+    "video": "https://smoke.createlab.org/videos/320/2019-02-02/0-8/0-8-2019-02-02-3012-1045-3515-1548-320-320-4049-1549113130-1549113305.mp4",
+    "sha256": "f13c697f3733fcc57d34932792fadec043bd1f90e22546391fe67394742a077a",
+    "sourceSha256": "d700e855e80294973f51c049f6e38abd0d923d7b5cd9d36c704923fbc30b7173",
+    "frameTimeSeconds": 1.5,
+    "site": "rise-mon-valley",
+    "scene": "rise-13",
+    "category": "excluded-weather",
+    "note": "Project RISE excludes this low-visibility clip. Smoke absence is unverified.",
+    "objects": []
+  },
+  {
+    "file": "rise-14.jpg",
+    "source": "https://smoke.createlab.org/learn.html",
+    "video": "https://smoke.createlab.org/videos/320/2019-01-17/0-5/0-5-2019-01-17-4365-994-4867-1496-320-320-7902-1547752905-1547753080.mp4",
+    "sha256": "03a3d4d17afeb86a03a65f9476e2857ccb1abe2fc274c7fd7f077a03ba2eaf59",
+    "sourceSha256": "7d829b1618a74a35304fe3ef8f06cd1344516ccf60ffa30387fba6e0b3d65657",
+    "frameTimeSeconds": 1.5,
+    "site": "rise-mon-valley",
+    "scene": "rise-14",
+    "category": "excluded-weather",
+    "note": "Project RISE excludes this low-visibility clip. Smoke absence is unverified.",
+    "objects": []
+  },
+  {
+    "file": "rise-15.jpg",
+    "source": "https://smoke.createlab.org/learn.html",
+    "video": "https://smoke.createlab.org/videos/320/2019-01-17/0-11/0-11-2019-01-17-2053-1023-2556-1526-320-320-9702-1547761915-1547762090.mp4",
+    "sha256": "0a5bdf2bbcce61b399d25c617bafb9ce79b8ebee6e8a9cf410bbfa8878e78652",
+    "sourceSha256": "b374cff54a174cb6ebaf0d147d59f417ac3c5c7017cd814081c95ef8dc17dfa1",
+    "frameTimeSeconds": 1.5,
+    "site": "rise-mon-valley",
+    "scene": "rise-15",
+    "category": "excluded-weather",
+    "note": "Project RISE excludes this low-visibility clip. Smoke absence is unverified.",
+    "objects": []
+  },
+  {
+    "file": "rise-16.jpg",
+    "source": "https://smoke.createlab.org/learn.html",
+    "video": "https://smoke.createlab.org/videos/320/2019-02-02/0-0/0-0-2019-02-02-6304-884-6807-1387-320-320-4589-1549115830-1549116010.mp4",
+    "sha256": "ae5601a0c2587bc467870f243564f615055a258ae6c95c1e1686ea4140feba41",
+    "sourceSha256": "e6f96a8822374f32072c569310d66ce2a59cb534336d6e1b161d49607fe09d70",
+    "frameTimeSeconds": 1.5,
+    "site": "rise-mon-valley",
+    "scene": "rise-16",
+    "category": "excluded-weather",
+    "note": "Project RISE excludes this low-visibility clip. Smoke absence is unverified.",
+    "objects": []
+  }
+]
