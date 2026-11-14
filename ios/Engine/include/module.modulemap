@@ -1,0 +1,4 @@
+module CyberInspection {
+    header "CyberInspection.h"
+    export *
+}
