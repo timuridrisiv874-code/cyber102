@@ -50,11 +50,14 @@ def main():
     p.add_argument('--freeze-layers', type=int, default=0, help='Freeze the first N model layers')
     p.add_argument('--task', choices=('detect', 'segment'), default='detect')
     p.add_argument('--batch', type=int, default=6)
+    p.add_argument('--image-size', type=int, help='Training and export size, divisible by 32')
     args=p.parse_args()
     if args.learning_rate is not None and (not math.isfinite(args.learning_rate) or args.learning_rate <= 0):
         p.error('--learning-rate must be finite and positive')
     if args.freeze_layers < 0:
         p.error('--freeze-layers must be non-negative')
+    if args.image_size is not None and (args.image_size < 32 or args.image_size % 32):
+        p.error('--image-size must be a positive multiple of 32')
     if args.batch < 1:
         p.error('--batch must be positive')
     if args.task == 'segment' and args.transfer_class_head:
@@ -84,6 +87,7 @@ def main():
         raise RuntimeError('CUDA is required')
     settings.update({'sync':False})
     variant, resolution = ('yolo11m',768) if args.role=='online' else ('yolo11n',416)
+    resolution = args.image_size or resolution
     model_name = variant + ('-seg.pt' if args.task == 'segment' else '.pt')
     initial_weights = (args.initial_weights or root/model_name).resolve(strict=True)
     run_name = args.name or args.role
