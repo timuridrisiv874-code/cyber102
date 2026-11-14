@@ -6,7 +6,15 @@
     "sha256": "15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8",
     "objects": [],
     "note": "Overview of pumps and valves. No visible fractured metal at this scale.",
-    "domain": "organizer-supplied case illustration; origin unverified"
+    "domain": "organizer-supplied case illustration; origin unverified",
+    "knownDatasetCopies": {
+      "file": "case-07.jpg",
+      "split": "train",
+      "datasets": [
+        "online-v5-core",
+        "rgb-crack-field-v1"
+      ]
+    }
   },
   {
     "file": "case-valve-body-rupture.jpg",
@@ -25,7 +33,21 @@
       }
     ],
     "note": "Irregular break crossing the end cover of the valve. Box the visible discontinuity, not the circular housing.",
-    "domain": "organizer-supplied case illustration; origin unverified"
+    "domain": "organizer-supplied case illustration; origin unverified",
+    "knownDatasetCopies": {
+      "file": "case-33.jpg",
+      "split": "train",
+      "datasets": [
+        "online-v5-core",
+        "rgb-crack-field-v1"
+      ],
+      "previousCrackBox": [
+        0.31,
+        0.28,
+        0.65,
+        0.74
+      ]
+    }
   },
   {
     "file": "case-painted-valve-seams.jpg",
@@ -34,7 +56,15 @@
     "sha256": "1f024f723634d16ae7b7cabb234cb61d7e0b641a56b7843df0552846b6768d18",
     "objects": [],
     "note": "Paint damage, cast edges and intact joints without a visible split.",
-    "domain": "organizer-supplied case illustration; origin unverified"
+    "domain": "organizer-supplied case illustration; origin unverified",
+    "knownDatasetCopies": {
+      "file": "case-35.jpg",
+      "split": "train",
+      "datasets": [
+        "online-v5-core",
+        "rgb-crack-field-v1"
+      ]
+    }
   },
   {
     "file": "case-scaled-flange.jpg",
@@ -43,7 +73,15 @@
     "sha256": "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f",
     "objects": [],
     "note": "Heavy flaking scale around the flange and hard reflections. No distinct fractured edges.",
-    "domain": "organizer-supplied case illustration; origin unverified"
+    "domain": "organizer-supplied case illustration; origin unverified",
+    "knownDatasetCopies": {
+      "file": "case-36.jpg",
+      "split": "train",
+      "datasets": [
+        "online-v5-core",
+        "rgb-crack-field-v1"
+      ]
+    }
   },
   {
     "file": "case-valve-oxide.jpg",
@@ -52,7 +90,15 @@
     "sha256": "14cd271abc37ba4490131b9c763a8956dc5ae388cc5d5585906b3235d1bee744",
     "objects": [],
     "note": "Heavy oxide around the fitting. Surface loss alone does not establish a crack.",
-    "domain": "organizer-supplied case illustration; origin unverified"
+    "domain": "organizer-supplied case illustration; origin unverified",
+    "knownDatasetCopies": {
+      "file": "case-37.jpg",
+      "split": "train",
+      "datasets": [
+        "online-v5-core",
+        "rgb-crack-field-v1"
+      ]
+    }
   },
   {
     "file": "case-wet-flange.jpg",
@@ -61,7 +107,15 @@
     "sha256": "1295467678396b402d263c96f506508b9c097d4b8e3533e1fbdc4a573257611b",
     "objects": [],
     "note": "Droplets below a corroded flange. No visible break in the metal; no claim about its leak source.",
-    "domain": "organizer-supplied case illustration; origin unverified"
+    "domain": "organizer-supplied case illustration; origin unverified",
+    "knownDatasetCopies": {
+      "file": "case-41.jpg",
+      "split": "train",
+      "datasets": [
+        "online-v5-core",
+        "rgb-crack-field-v1"
+      ]
+    }
   },
   {
     "file": "case-weld-separation.jpg",
@@ -80,7 +134,21 @@
       }
     ],
     "note": "Narrow continuous split along the visible weld; box the fissure, excluding the adjacent intact bead.",
-    "domain": "organizer-supplied case illustration; origin unverified"
+    "domain": "organizer-supplied case illustration; origin unverified",
+    "knownDatasetCopies": {
+      "file": "case-42.jpg",
+      "split": "train",
+      "datasets": [
+        "online-v5-core",
+        "rgb-crack-field-v1"
+      ],
+      "previousCrackBox": [
+        0.31,
+        0.03,
+        0.65,
+        0.97
+      ]
+    }
   },
   {
     "file": "case-long-pipe-split.jpg",
@@ -99,7 +167,21 @@
       }
     ],
     "note": "Long jagged split along the pipe surface. The left end extends beyond the frame.",
-    "domain": "organizer-supplied case illustration; origin unverified"
+    "domain": "organizer-supplied case illustration; origin unverified",
+    "knownDatasetCopies": {
+      "file": "case-44.jpg",
+      "split": "train",
+      "datasets": [
+        "online-v5-core",
+        "rgb-crack-field-v1"
+      ],
+      "previousCrackBox": [
+        0.06,
+        0.18,
+        0.93,
+        0.77
+      ]
+    }
   },
   {
     "file": "case-short-pipe-fissure.jpg",
@@ -118,7 +200,21 @@
       }
     ],
     "note": "Open fissure in a tube close-up; installation status cannot be determined.",
-    "domain": "organizer-supplied case illustration; origin unverified"
+    "domain": "organizer-supplied case illustration; origin unverified",
+    "knownDatasetCopies": {
+      "file": "case-45.jpg",
+      "split": "val",
+      "datasets": [
+        "online-v5-core",
+        "rgb-crack-field-v1"
+      ],
+      "previousCrackBox": [
+        0.25,
+        0.28,
+        0.66,
+        0.59
+      ]
+    }
   },
   {
     "file": "case-pipe-paint-fissures.jpg",
@@ -127,6 +223,14 @@
     "sha256": "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1",
     "objects": [],
     "note": "Rusted pipe joint and paint crazing. No clear through-metal fissure.",
-    "domain": "organizer-supplied case illustration; origin unverified"
+    "domain": "organizer-supplied case illustration; origin unverified",
+    "knownDatasetCopies": {
+      "file": "case-52.jpg",
+      "split": "train",
+      "datasets": [
+        "online-v5-core",
+        "rgb-crack-field-v1"
+      ]
+    }
   }
 ]
