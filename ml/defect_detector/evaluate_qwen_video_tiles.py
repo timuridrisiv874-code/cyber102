@@ -9,7 +9,7 @@ import sys
 from time import perf_counter
 
 from evaluate import merge_boxes
-from evaluate_qwen_boxes import parse_detections
+from evaluate_qwen_boxes import MAX_NEW_TOKENS, make_prompt, parse_detections
 from evaluate_qwen_video_grounding import LABELS
 from evaluate_video_component_crops import project
 from evaluate_video_component_gate import measure_reviewed
@@ -56,6 +56,8 @@ def main():
     parser.add_argument('images', type=Path)
     parser.add_argument('pair_report', type=Path)
     parser.add_argument('output', type=Path)
+    parser.add_argument('--single-crop', action='store_true',
+                        help='Submit each crop as an independent one-image localization request')
     args = parser.parse_args()
     sets = {path.stem: json.loads(path.read_bytes()) for path in args.annotations}
     pairs = json.loads(args.pair_report.read_bytes())
@@ -84,34 +86,46 @@ def main():
     prompt = engine._prompt([{'type': 'text', 'text': 'First crop:'}, {'type': 'image'},
                              {'type': 'text', 'text': 'Second crop:'}, {'type': 'image'},
                              {'type': 'text', 'text': PROMPT}])
+    single = engine._prompt([{'type': 'image'}, {'type': 'text', 'text': make_prompt(LABELS, 'numbered')}])
 
     def detect(image):
+        errors = {}
         crops = windows(*image.size)
         with ExitStack() as stack:
             views = [stack.enter_context(image.crop(crop)) for crop in crops]
-            boxes = engine._run(views, prompt, max_pixels=524_288, max_new_tokens=190,
-                                max_time=30, parse=lambda text: parse_views(text, _parse_json))
-        return merge_projected(boxes, crops, image.size)
+            if args.single_crop:
+                boxes = []
+                for index, view in enumerate(views):
+                    try:
+                        boxes.append(engine._run(
+                            view, single, max_pixels=524_288, max_new_tokens=MAX_NEW_TOKENS['numbered'],
+                            max_time=25, parse=lambda text: parse_detections(text, _parse_json, LABELS, 'numbered')))
+                    except ValueError as error:
+                        errors[str(index)] = str(error)
+                        boxes.append([])
+            else:
+                try:
+                    boxes = engine._run(views, prompt, max_pixels=524_288, max_new_tokens=190,
+                                        max_time=30, parse=lambda text: parse_views(text, _parse_json))
+                except ValueError as error:
+                    return [], {'pair': str(error)}
+        return merge_projected(boxes, crops, image.size), errors
 
     with Image.new('RGB', (640, 384), 'white') as blank:
-        try:
-            detect(blank)
-        except ValueError:
-            pass
+        detect(blank)
     predictions, times, errors = {}, {}, {}
     for row in rows:
         name = row['file']
         start = perf_counter()
         with Image.open(args.images / name) as source, ImageOps.exif_transpose(source).convert('RGB') as image:
-            try:
-                predictions[name] = detect(image)
-            except ValueError as error:
-                predictions[name] = []
-                errors[name] = str(error)
+            predictions[name], failed = detect(image)
+            if failed:
+                errors[name] = failed
         times[name] = round((perf_counter() - start) * 1000, 3)
         print(name, len(predictions[name]), times[name], flush=True)
     combined = {name: merge_boxes(pairs['predictions'][name] + boxes) for name, boxes in predictions.items()}
-    report = {**identity, 'medianMs': median(times.values()), 'frameMs': times, 'errors': errors,
+    report = {**identity, 'separateCropRequests': args.single_crop,
+              'medianMs': median(times.values()), 'frameMs': times, 'errors': errors,
               'predictions': predictions, 'combined': combined,
               'sets': {name: {'fullFrame': measure_reviewed(subset, pairs['predictions']),
                               'tiled': measure_reviewed(subset, predictions),
