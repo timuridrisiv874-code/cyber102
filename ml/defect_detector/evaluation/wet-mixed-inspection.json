@@ -15,7 +15,8 @@
           0.859375,
           0.725
         ],
-        "sourceLabel": "Liquid"
+        "sourceLabel": "Liquid",
+        "liquidType": "wet_surface"
       }
     ]
   },
@@ -35,7 +36,8 @@
           0.8328125,
           0.9472222222222222
         ],
-        "sourceLabel": "Liquid"
+        "sourceLabel": "Liquid",
+        "liquidType": "wet_surface"
       }
     ]
   },
@@ -55,7 +57,8 @@
           0.8265625,
           0.9472222222222222
         ],
-        "sourceLabel": "Liquid"
+        "sourceLabel": "Liquid",
+        "liquidType": "wet_surface"
       }
     ]
   },
@@ -76,7 +79,8 @@
           0.9859375,
           0.8583333333333333
         ],
-        "sourceLabel": "Liquid"
+        "sourceLabel": "Liquid",
+        "liquidType": "wet_surface"
       },
       {
         "class": "wet_patch",
@@ -86,7 +90,8 @@
           0.36403508771929827,
           0.27485380116959063
         ],
-        "sourceLabel": "Liquid"
+        "sourceLabel": "Liquid",
+        "liquidType": "wet_surface"
       }
     ]
   },
@@ -107,7 +112,8 @@
           1.0,
           1.0
         ],
-        "sourceLabel": "Liquid"
+        "sourceLabel": "Liquid",
+        "liquidType": "wet_surface"
       }
     ]
   },
@@ -127,7 +133,8 @@
           0.69,
           1.0,
           1.0
-        ]
+        ],
+        "liquidType": "wet_surface"
       }
     ]
   },
@@ -147,7 +154,8 @@
           0.23,
           0.82,
           1.0
-        ]
+        ],
+        "liquidType": "wet_surface"
       }
     ]
   },
@@ -187,7 +195,8 @@
           0.391,
           0.973,
           0.743
-        ]
+        ],
+        "liquidType": "liquid_flow"
       }
     ]
   },
@@ -196,7 +205,7 @@
     "scene": "rural-pipe",
     "sha256": "dd250591b4ebe474f3e18e4652ede4b7c5a2f4059301770ee4c36967988dce21",
     "source": "https://commons.wikimedia.org/wiki/File:Water_pipeline_leak_%40_Bord_de_Mars_01.jpg",
-    "author": "Rémih",
+    "author": "R\u00e9mih",
     "license": "CC BY-SA 4.0",
     "note": "Visible water jet above the pipe.",
     "objects": [
@@ -207,7 +216,8 @@
           0.269,
           0.614,
           0.761
-        ]
+        ],
+        "liquidType": "liquid_flow"
       }
     ]
   },

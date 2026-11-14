@@ -14,7 +14,8 @@
           0.89,
           0.53,
           1.0
-        ]
+        ],
+        "liquidType": "wet_surface"
       }
     ],
     "note": "Pooling under the pressure gauge, excluding the instrument and the phone image."
@@ -34,7 +35,8 @@
           0.818,
           0.535,
           1.0
-        ]
+        ],
+        "liquidType": "wet_surface"
       }
     ],
     "note": "Amber pooling below the gauge."
@@ -54,7 +56,8 @@
           0.589,
           0.455,
           0.991
-        ]
+        ],
+        "liquidType": "liquid_flow"
       },
       {
         "class": "wet_patch",
@@ -63,7 +66,8 @@
           0.856,
           1.0,
           1.0
-        ]
+        ],
+        "liquidType": "wet_surface"
       }
     ],
     "note": "Streams below the outlet and a separate wet floor patch."
@@ -83,7 +87,8 @@
           0.453,
           0.465,
           0.915
-        ]
+        ],
+        "liquidType": "liquid_flow"
       }
     ],
     "note": "Narrow stream below the gauge fitting. Floor highlights are not measured."
@@ -103,7 +108,8 @@
           0.436,
           0.583,
           0.539
-        ]
+        ],
+        "liquidType": "wet_surface"
       }
     ],
     "note": "Visible wet streak directly below the torn wall in this view."
@@ -123,7 +129,8 @@
           0.39,
           0.496,
           0.472
-        ]
+        ],
+        "liquidType": "wet_surface"
       }
     ],
     "note": "Wet streak below the wall opening."
@@ -143,7 +150,8 @@
           0.735,
           0.394,
           1.0
-        ]
+        ],
+        "liquidType": "liquid_flow"
       },
       {
         "class": "wet_patch",
@@ -152,7 +160,8 @@
           0.735,
           0.521,
           1.0
-        ]
+        ],
+        "liquidType": "liquid_flow"
       },
       {
         "class": "wet_patch",
@@ -161,7 +170,8 @@
           0.738,
           0.724,
           1.0
-        ]
+        ],
+        "liquidType": "liquid_flow"
       }
     ],
     "note": "Three visible trickles coming off the valve and flanges."
@@ -191,7 +201,8 @@
           0.754,
           0.389,
           1.0
-        ]
+        ],
+        "liquidType": "liquid_flow"
       },
       {
         "class": "wet_patch",
@@ -200,7 +211,8 @@
           0.805,
           0.521,
           1.0
-        ]
+        ],
+        "liquidType": "liquid_flow"
       }
     ],
     "note": "The visible left and center trickles below the valve."
