@@ -50,6 +50,8 @@
         get element() { return kind === 'uploaded_video' ? video : image; },
         get ready() { return !loading && (kind === 'uploaded_video' ? video.readyState >= 2 && video.videoWidth > 0 : kind === 'uploaded_photo' && image.complete && image.naturalWidth > 0); },
         clear,
+        reset() { beforeChange(); clear(); changed(); },
+        openFile,
         async openCatalogPhoto(path) {
           beforeChange(); clear();
           const token = generation;
@@ -84,8 +86,7 @@
           if (signal?.aborted) throw abortError();
         },
       };
-      async function openSelectedFile() {
-        const file = input.files?.[0];
+      async function openFile(file) {
         if (!file) return;
         const mime = mediaType(file);
         const isVideo = mime?.startsWith('video/');
@@ -132,10 +133,10 @@
         }
         changed();
       }
-      input.addEventListener('change', openSelectedFile);
+      input.addEventListener('change', () => openFile(input.files?.[0]));
       // A native picker can finish while the deferred app scripts are still
       // arriving. Defer callbacks until the owner has assigned the media state.
-      if (input.files?.length) queueMicrotask(openSelectedFile);
+      if (input.files?.length) queueMicrotask(() => openFile(input.files?.[0]));
       function videoChanged() {
         if (waitingForVideoFrame && state.ready) {
           waitingForVideoFrame = false; message();

@@ -387,11 +387,11 @@
       build(file);
     });
     panel.querySelector('#mesh-replace').addEventListener('click', () => input.click());
-    return { open(file) { draw(); build(file); } };
+    return { get busy() { return busy; }, open(file) { draw(); build(file); } };
   }
 
   window.CyberInspectionMesh = {
-    create({ media, openModel, openMedia }) {
+    create({ media, openModel, openMedia, onModeChange = () => {} }) {
       const modes = document.getElementById('inspection-modes');
       const panel = document.getElementById('inspection-mesh');
       if (!modes || !panel) return null;
@@ -409,6 +409,7 @@
         const prompt = mode === 'video' ? 'Выбрать видео' : 'Выбрать фото';
         label.textContent = prompt;
         input.setAttribute('aria-label', prompt);
+        onModeChange(mode);
       }
       input.addEventListener('cancel', () => {
         if (!media.kind || mode === 'mesh') return;
@@ -419,19 +420,26 @@
         const next = event.target.closest('button')?.dataset.mode;
         if (!next) return;
         mode = next;
+        if (mode !== 'mesh' && media.kind && media.kind !== 'uploaded_' + mode) media.reset();
         display();
         if (mode === 'mesh') {
           openModel();
           preview.open(media.selectedVideo);
         } else {
           openMedia();
-          if (media.kind === 'uploaded_' + mode) return;
-          input.click();
+          if (!document.getElementById('inspection-library') && media.kind !== 'uploaded_' + mode) input.click();
         }
       });
       modes.hidden = false;
       display();
       return {
+        get mode() { return mode; },
+        get busy() { return preview.busy; },
+        openFile(file) {
+          if (preview.busy) return false;
+          mode = 'mesh'; display(); openModel(); preview.open(file);
+          return true;
+        },
         sync() {
           if (media.version === mediaVersion) return;
           mediaVersion = media.version;

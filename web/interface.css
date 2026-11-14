@@ -148,6 +148,29 @@ body[data-page=inspection] .intro { flex-wrap: wrap; }
 .capture-source-controls { padding: 16px 0 0; gap: 12px; }
 .capture-source-controls .button { flex: 1 1 160px; }
 .capture-source-controls .upload-icon { width: 20px; height: 20px; flex: 0 0 auto; }
+.inspection-library { flex: 1 0 100%; min-width: 0; width: 100%; }
+.inspection-library > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  min-height: 44px; padding: 8px 0; color: var(--muted); font-size: 14px; cursor: pointer; list-style: none;
+}
+.inspection-library > summary::-webkit-details-marker { display: none; }
+.inspection-library > summary::after {
+  content: ""; width: 7px; height: 7px; margin: 0 4px 4px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg);
+}
+.inspection-library[open] > summary::after { transform: rotate(225deg); margin-bottom: 0; }
+.inspection-library-list { display: grid; border-top: 1px solid var(--line); }
+.inspection-library-list button {
+  display: grid; grid-template-columns: 56px minmax(0, 1fr) 16px; align-items: center; gap: 12px;
+  min-height: 76px; padding: 10px 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
+  color: var(--ink); background: transparent; text-align: left; font-size: 14px; font-weight: 400;
+}
+.inspection-library-list img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; background: var(--soft); }
+.inspection-library-list .library-arrow { color: var(--accent); font-size: 20px; }
+.inspection-library-list button:disabled { opacity: .45; cursor: wait; }
+.inspection-library .message { margin: 12px 0 0; }
+#mesh-library-home { max-width: 520px; margin-bottom: 12px; }
+@media (hover: hover) { .inspection-library-list button:hover:not(:disabled) { color: var(--accent); } }
 .capture-source-controls #camera { background: var(--surface); color: var(--ink); border-color: var(--control-line); }
 .capture:has(#camera-idle:not([hidden])) .capture-source-controls .media-upload-control { background: var(--accent); border-color: var(--accent); color: #fff; }
 .capture-footer { padding: 20px 0 0; }
@@ -157,6 +180,8 @@ body[data-page=inspection] .intro { flex-wrap: wrap; }
 .capture-settings summary { font-size: 14px; }
 #viewfinder { width: 100%; margin: 0; aspect-ratio: 16 / 11; border-radius: 12px; background: #18262c; }
 #viewfinder[data-portrait=true] { max-height: 72svh; }
+#open-example-photo[data-kind=video] { background: #18262c; }
+#open-example-photo[data-kind=video] img { object-fit: contain; }
 .example-photo-action { left: 24px; bottom: 24px; padding: 12px 16px; min-height: 44px; border-radius: 8px; font-size: 15px; font-weight: 500; }
 .example-photo-action::after { content: none; }
 @media (hover: hover) { #open-example-photo:hover .example-photo-action { background: #eaf3f6; } }

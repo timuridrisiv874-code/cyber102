@@ -46,6 +46,7 @@ let frameMetadata = null;
 let regionController = null;
 let mediaProgress = '';
 let clipReview = null;
+let mediaLibrary = null;
 let demoActive = false;
 let defaultMediaVersion = null, defaultMediaKind = null;
 const media = window.CyberMedia.create({
@@ -55,12 +56,14 @@ const media = window.CyberMedia.create({
 const sourceModes = offlineMode ? null : window.CyberInspectionMesh?.create({
   media,
   openModel: () => {
+    resetInput();
     media.pause();
-    if (stream || openingCamera) stopCamera();
     render();
   },
   openMedia: render,
+  onModeChange: mode => mediaLibrary?.setMode(mode),
 });
+mediaLibrary = offlineMode ? null : window.CyberInspectionLibrary?.create({media, sourceModes});
 clipReview = offlineMode ? null : window.CyberVideoReview?.create({
   media,
   beforeStart: () => {
@@ -114,6 +117,7 @@ function mediaChanged() {
 }
 
 function resetInput() {
+  mediaLibrary?.cancel();
   regionController?.abort();
   clipReview?.reset();
   demoActive = false;
@@ -745,6 +749,7 @@ cameraButton.addEventListener('click', toggleCamera);
 byId('choose-region')?.addEventListener('click', checkSelectedRegion);
 const catalogButton = byId('open-example-photo');
 catalogButton?.addEventListener('click', async () => {
+  if (mediaLibrary) { await mediaLibrary.openFeatured(); return; }
   if (await media.openCatalogPhoto(catalogButton.dataset.photoUrl)) {
     checkButton.focus({ preventScroll: true });
   }
@@ -757,6 +762,10 @@ function hideUnavailablePhoto() {
   }
 }
 catalogPreview?.addEventListener('error', hideUnavailablePhoto);
+catalogPreview?.addEventListener('load', () => {
+  if (catalogButton) catalogButton.hidden = false;
+  cameraIdle.dataset.unavailable = 'false';
+});
 if (catalogPreview?.complete) hideUnavailablePhoto();
 checkButton.addEventListener('click', checkFrame);
 byId('analysis-cancel')?.addEventListener('click', () => {
