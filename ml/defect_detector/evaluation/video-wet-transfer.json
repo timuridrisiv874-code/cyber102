@@ -1,0 +1,238 @@
+[
+  {
+    "file": "clip-2-web-1.jpg",
+    "sha256": "00c93b2ec07b75b3aa4e021c1c2a53066327518da334d5ababc710ac8f9129ae",
+    "timestampSeconds": 1.875,
+    "clip": "2.mp4",
+    "frameIndex": 1,
+    "scene": "video-2-gauge",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.38,
+          0.89,
+          0.53,
+          1.0
+        ]
+      }
+    ],
+    "note": "Pooling under the pressure gauge, excluding the instrument and the phone image."
+  },
+  {
+    "file": "clip-2-web-2.jpg",
+    "sha256": "6cb48c904af2c6fd34626b3ac79ea01d1d93fad3137129b585db9aca33fb4cee",
+    "timestampSeconds": 3.125,
+    "clip": "2.mp4",
+    "frameIndex": 2,
+    "scene": "video-2-gauge",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.257,
+          0.818,
+          0.535,
+          1.0
+        ]
+      }
+    ],
+    "note": "Amber pooling below the gauge."
+  },
+  {
+    "file": "clip-2-web-7.jpg",
+    "sha256": "e325c4eec547d1ccf2b2f9761b2d338a61742a6f1d70ea66a26b390debf2ca43",
+    "timestampSeconds": 9.375,
+    "clip": "2.mp4",
+    "frameIndex": 7,
+    "scene": "video-2-discharge",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.353,
+          0.589,
+          0.455,
+          0.991
+        ]
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.705,
+          0.856,
+          1.0,
+          1.0
+        ]
+      }
+    ],
+    "note": "Streams below the outlet and a separate wet floor patch."
+  },
+  {
+    "file": "clip-3-web-5.jpg",
+    "sha256": "246ddb09991394a266b2038ceea53a2796b11ca81475abcd91f066555ef5a6a1",
+    "timestampSeconds": 6.875,
+    "clip": "3.mp4",
+    "frameIndex": 5,
+    "scene": "video-3-gauge",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.446,
+          0.453,
+          0.465,
+          0.915
+        ]
+      }
+    ],
+    "note": "Narrow stream below the gauge fitting. Floor highlights are not measured."
+  },
+  {
+    "file": "clip-4-web-3.jpg",
+    "sha256": "4ab0d07791c53b2fc9b52bc655a63d250d24b21f3fd3af0db4d8bfc9c0ef3247",
+    "timestampSeconds": 4.375,
+    "clip": "4.mp4",
+    "frameIndex": 3,
+    "scene": "video-4-tank",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.533,
+          0.436,
+          0.583,
+          0.539
+        ]
+      }
+    ],
+    "note": "Visible wet streak directly below the torn wall in this view."
+  },
+  {
+    "file": "clip-4-web-7.jpg",
+    "sha256": "a562f94249a6405ac95025d9ed4efafd79e88a981ce445c153436996d2afe868",
+    "timestampSeconds": 9.375,
+    "clip": "4.mp4",
+    "frameIndex": 7,
+    "scene": "video-4-tank",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.44,
+          0.39,
+          0.496,
+          0.472
+        ]
+      }
+    ],
+    "note": "Wet streak below the wall opening."
+  },
+  {
+    "file": "clip-5-web-0.jpg",
+    "sha256": "55184b93a14cf7cde73d0fef4674a2785589b3f331ffad7616c77b1b9cb05124",
+    "timestampSeconds": 1.25,
+    "clip": "5.mp4",
+    "frameIndex": 0,
+    "scene": "video-5-valve",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.321,
+          0.735,
+          0.394,
+          1.0
+        ]
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.496,
+          0.735,
+          0.521,
+          1.0
+        ]
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.692,
+          0.738,
+          0.724,
+          1.0
+        ]
+      }
+    ],
+    "note": "Three visible trickles coming off the valve and flanges."
+  },
+  {
+    "file": "clip-5-web-2.jpg",
+    "sha256": "b4622c7430dd05c7af951800de744900ff71410aa508931e5d849da582488aa8",
+    "timestampSeconds": 6.25,
+    "clip": "5.mp4",
+    "frameIndex": 2,
+    "scene": "video-5-pump",
+    "objects": [],
+    "note": "Rusted housing and chipped blue coating, with no visible stream or pooling."
+  },
+  {
+    "file": "clip-5-web-4.jpg",
+    "sha256": "a3156c2e192e631446e52e3723585e3e7f7d193ff5a95cb7810ecd40714d2ef5",
+    "timestampSeconds": 11.25,
+    "clip": "5.mp4",
+    "frameIndex": 4,
+    "scene": "video-5-valve",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.342,
+          0.754,
+          0.389,
+          1.0
+        ]
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.49,
+          0.805,
+          0.521,
+          1.0
+        ]
+      }
+    ],
+    "note": "The visible left and center trickles below the valve."
+  },
+  {
+    "file": "clip-5-web-5.jpg",
+    "sha256": "c4d8834309a4f0941633690c7029f9eb7269618c87680e86487df40c807d0b19",
+    "timestampSeconds": 13.75,
+    "clip": "5.mp4",
+    "frameIndex": 5,
+    "scene": "video-5-pump",
+    "objects": [],
+    "note": "Corrosion and dry flaky residues on the pump and base."
+  },
+  {
+    "file": "clip-5-web-6.jpg",
+    "sha256": "c17c92110aa3169b948a686c648fcfa0aa676cc06fdc540514eb71e4faca2102",
+    "timestampSeconds": 16.25,
+    "clip": "5.mp4",
+    "frameIndex": 6,
+    "scene": "video-5-pump",
+    "objects": [],
+    "note": "Corrosion and chipped paint with glare on the housing."
+  },
+  {
+    "file": "clip-5-web-7.jpg",
+    "sha256": "737fac346d9a24becbac16dd649c445d45f4d5bc327624b8fd7eed2da3efb6a6",
+    "timestampSeconds": 18.75,
+    "clip": "5.mp4",
+    "frameIndex": 7,
+    "scene": "video-5-fracture",
+    "objects": [],
+    "note": "An open rupture without visible liquid in this frame."
+  }
+]
