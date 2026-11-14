@@ -6,6 +6,7 @@ are shared with the InternVL worker for a controlled comparison.
 """
 import json
 import math
+import os
 from pathlib import Path
 import threading
 import time
@@ -232,6 +233,12 @@ class Engine:
             max_time=DETAIL_MAX_TIME_SECONDS, parse=worker.parse_observation)
 
     def infer_video(self, images, timestamps):
+        mode = os.environ.get('CYBER102_VIDEO_DEFECT_DETAILS')
+        if mode in ('1', '6'):
+            return self.infer_video_with_defects(images, timestamps, maximum=6 if mode == '6' else 8)
+        return self._video_overview(images, timestamps)
+
+    def _video_overview(self, images, timestamps):
         if not 1 <= len(images) <= worker.MAX_VIDEO_FRAMES or len(images) != len(timestamps):
             raise ValueError('Invalid sampled frame count')
         try:
@@ -239,6 +246,36 @@ class Engine:
         finally:
             # The model stays loaded, but other jobs can use released video buffers.
             self.torch.cuda.empty_cache()
+
+    def infer_video_with_defects(self, images, timestamps, *, maximum=8):
+        """Add separately verified defect boxes to the regular video overview."""
+        from . import video_defects
+
+        deadline = time.monotonic() + VIDEO_MAX_TIME_SECONDS
+        overview = self._video_overview(images, timestamps)
+        metrics = self.last_metrics
+        selected = video_defects.selected_frames(overview['observations'], maximum)
+        details = []
+
+        def run(*args, **kwargs):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError('No time left for defect localization')
+            return self._run(*args, **kwargs, max_time=min(remaining, 25))
+
+        try:
+            for index, (frame, timestamp) in enumerate(zip(images, timestamps, strict=True)):
+                detail = {'status': 'skipped', 'boxes': []}
+                if index in selected:
+                    try:
+                        detail = video_defects.detect(self, frame, run)
+                    except (TypeError, ValueError, TimeoutError, self.torch.cuda.OutOfMemoryError):
+                        detail = {'status': 'unavailable', 'boxes': []}
+                details.append({'frameIndex': index, 'timestampSeconds': timestamp, **detail})
+        finally:
+            self.last_metrics = metrics
+            self.torch.cuda.empty_cache()
+        return {**overview, 'defectDetails': details}
 
     def _infer_video_batches(self, images, timestamps):
         deadline = time.monotonic() + VIDEO_MAX_TIME_SECONDS

@@ -8,6 +8,7 @@ from urllib.error import HTTPError, URLError
 from PIL import Image, PngImagePlugin
 
 from server import video_review, vision
+from vision_runtime.video_defects import selected_frames
 
 
 def encoded_image(size=(32, 24), format='JPEG'):
@@ -118,6 +119,25 @@ class VideoRequestValidationTests(unittest.TestCase):
 
 
 class VideoWorkerRelayTests(unittest.TestCase):
+    def test_detail_budget_prioritizes_visible_damage_then_alternating_frames(self):
+        observations = [{'condition': 'visible_damage' if index == 7 else 'uncertain'} for index in range(8)]
+        self.assertEqual(selected_frames(observations, 6), {0, 1, 2, 4, 6, 7})
+        self.assertEqual(selected_frames(observations[:3], 6), {0, 1, 2})
+
+    def test_verified_boxes_preserve_frame_identity_and_partial_status(self):
+        data = request_data()
+        envelope = worker_response(data)
+        checked = {'frameIndex': 0, 'timestampSeconds': 1.25, 'status': 'checked',
+                   'boxes': [{'kind': 'crack', 'box': [100, 200, 350, 400]}]}
+        partial = {'frameIndex': 1, 'timestampSeconds': 8.75, 'status': 'partial', 'boxes': []}
+        envelope['defectDetails'] = [checked, partial]
+        self.assertEqual(video_review.result_from_envelope(envelope, data)['defectDetails'], [checked, partial])
+        for bad in ({**checked, 'frameIndex': False}, {**checked, 'timestampSeconds': 1.5},
+                    {**checked, 'status': 'unavailable'}, {**checked, 'status': 'skipped'},
+                    {**checked, 'boxes': [{'kind': 'crack', 'box': [100, 200, 100, 400]}]}):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                video_review.result_from_envelope({**envelope, 'defectDetails': [bad, partial]}, data)
+
     def test_one_loopback_request_contains_sequence_and_only_approved_metadata(self):
         data = request_data()
         with patch.object(vision, 'build_opener') as build:

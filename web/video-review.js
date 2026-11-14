@@ -171,7 +171,7 @@
         return { frames, durationSeconds: duration };
       }
 
-      async function thumbnail(frame, observation, token) {
+      async function thumbnail(frame, observation, token, verifiedBoxes = []) {
         const image = new Image();
         image.src = frame.dataUrl;
         await image.decode();
@@ -189,6 +189,12 @@
           context.strokeStyle = observation.status === 'defect' ? '#f6ad55' : '#6ee7b7';
           context.strokeRect(box[0] * canvas.width / 1000, box[1] * canvas.height / 1000,
             (box[2] - box[0]) * canvas.width / 1000, (box[3] - box[1]) * canvas.height / 1000);
+        }
+        context.lineWidth = Math.max(3, canvas.width / 220);
+        context.strokeStyle = '#f87171';
+        for (const [left, top, right, bottom] of verifiedBoxes) {
+          context.strokeRect(left * canvas.width / 1000, top * canvas.height / 1000,
+            (right - left) * canvas.width / 1000, (bottom - top) * canvas.height / 1000);
         }
         return canvas.toDataURL('image/jpeg', 0.85);
       }
@@ -208,8 +214,76 @@
         }
         const grouped = groupObservations(data.observations);
         const fragment = document.createDocumentFragment();
-        fragment.append(text('p', 'video-review-summary', summarize(grouped)));
+        const summary = text('p', 'video-review-summary', summarize(grouped));
+        fragment.append(summary);
         fragment.append(text('p', 'video-review-meta', `Длительность ${evidenceTime(captured.durationSeconds)} · Проверено кадров: ${grouped.frameCount}. Промежутки между ними не проверялись.`));
+        if (Array.isArray(data.defectDetails)) {
+          const names = { crack: 'Признаки трещины', terminal_damage: 'Признаки повреждения клеммы или проводки' };
+          const findings = new Map();
+          if (data.defectDetails.length !== captured.frames.length) throw new Error('Сервер вернул неполную повторную проверку.');
+          for (const [index, row] of data.defectDetails.entries()) {
+            if (row?.frameIndex !== index || row.timestampSeconds !== captured.frames[index].timestampSeconds
+                || !Array.isArray(row.boxes)) {
+              throw new Error('Позиции рамок дефектов не совпали с кадрами.');
+            }
+            for (const item of row.boxes) {
+              if (!Object.hasOwn(names, item.kind)) continue;
+              if (!findings.has(item.kind)) findings.set(item.kind, new Map());
+              const byFrame = findings.get(item.kind);
+              if (!byFrame.has(row.frameIndex)) byFrame.set(row.frameIndex, {row, boxes: []});
+              byFrame.get(row.frameIndex).boxes.push(item.box);
+            }
+          }
+          if (findings.size) {
+            summary.textContent = grouped.groups.length
+              ? `${summarize(grouped)} Ниже показаны признаки после повторной проверки.`
+              : 'Повторная проверка выделила признаки повреждений на отдельных кадрах.';
+            const section = document.createElement('details');
+            section.className = 'video-review-more video-review-evidence';
+            section.open = true;
+            section.append(text('summary', '', 'Признаки после повторной проверки ИИ'));
+            const grid = document.createElement('div'); grid.className = 'video-review-grid';
+            for (const [kind, frames] of findings) {
+              const card = document.createElement('article'); card.className = 'video-review-frame';
+              card.append(text('h4', 'video-review-finding', names[kind]));
+              const times = document.createElement('div'); times.className = 'video-review-times';
+              const image = document.createElement('img');
+              const buttons = new Map();
+              let previewVersion = 0;
+              async function show(row, boxes) {
+                const version = ++previewVersion;
+                const frame = captured.frames[row.frameIndex];
+                const url = await thumbnail(frame, {status: 'unusable'}, token, boxes);
+                if (version !== previewVersion || !active(token)) return;
+                image.src = url; image.alt = `${names[kind]} · ${evidenceTime(row.timestampSeconds)}`;
+                image.width = frame.width; image.height = frame.height;
+                for (const [index, button] of buttons) {
+                  if (index === row.frameIndex) button.setAttribute('aria-current', 'true');
+                  else button.removeAttribute('aria-current');
+                }
+              }
+              for (const [index, {row, boxes}] of frames) {
+                const button = timeButton(row, next => {
+                  navigate(next);
+                  show(next, boxes).catch(error => {
+                    if (active(token) && error.name !== 'AbortError') status.textContent = error.message;
+                  });
+                }, names[kind]);
+                buttons.set(index, button); times.append(button);
+              }
+              card.append(image, times); grid.append(card);
+              const {row, boxes} = frames.values().next().value;
+              await show(row, boxes);
+            }
+            section.append(grid); fragment.append(section);
+          }
+          const inspected = data.defectDetails.filter(row => row.status !== 'skipped').length;
+          if (inspected < captured.frames.length) {
+            fragment.append(text('p', 'video-review-meta', `Повторно проверено ${inspected} из ${captured.frames.length} кадров.`));
+          }
+          const incomplete = data.defectDetails.filter(row => row.status === 'partial' || row.status === 'unavailable').length;
+          if (incomplete) fragment.append(text('p', 'video-review-meta', `Повторная проверка неполная на ${incomplete} кадрах.`));
+        }
         if (grouped.groups.some(group => group.observations.some(row => /[\u3400-\u9fff\u3040-\u30ff]/u.test(row.observation)))) {
           fragment.append(text('p', 'video-review-meta', 'В описании модели есть языковые ошибки. Сверяйте наблюдения с кадрами.'));
         }

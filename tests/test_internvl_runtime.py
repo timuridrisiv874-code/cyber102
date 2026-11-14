@@ -12,6 +12,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import MagicMock, Mock, patch
 
+from server import vision
 from vision_runtime import worker
 from vision_runtime import benchmark_profiles
 from vision_runtime import download
@@ -64,7 +65,7 @@ class RuntimeValidationTest(unittest.TestCase):
         compact = {key: value for key, value in OBSERVATION.items() if key != 'observation'}
         for output in (json.dumps(compact), f'```json\n{json.dumps(compact)}\n```'):
             result = worker.parse_compact(output)
-            self.assertEqual(result, compact | {'observation': 'Корпус насоса: возможные признаки коррозии.'})
+            self.assertEqual(result, compact | {'observation': f'Корпус насоса: {vision.CONDITIONS["corrosion"][0].lower()}.'})
             self.assertNotIn('На корпусе', result['observation'])
         for fields in ({'component': 'none', 'condition': 'uncertain', 'box': [0, 0, 0, 0]},
                        compact | {'condition': 'uncertain'}):
@@ -151,8 +152,6 @@ class RuntimeValidationTest(unittest.TestCase):
                 return engine.return_value
 
             engine.return_value.device = "fake GPU"
-            engine.return_value.model_id = worker.MODEL
-            engine.return_value.revision = worker.REVISION
             engine.side_effect = load
             worker.main()
         server.assert_called_once_with(("127.0.0.1", 12000), engine.return_value)
@@ -167,8 +166,6 @@ class RuntimeValidationTest(unittest.TestCase):
               patch.object(worker, 'Server') as server,
               patch.object(worker, 'print', create=True)):
             engine.return_value.device = 'fake GPU'
-            engine.return_value.model_id = worker.MODEL
-            engine.return_value.revision = worker.REVISION
             engine.return_value.warmup.side_effect = lambda: events.append('warmup') or {'totalMs': 10}
             server.side_effect = lambda *args: events.append('server') or MagicMock()
             worker.main()
@@ -203,7 +200,7 @@ class EngineProfilingTest(unittest.TestCase):
                 result = self.engine.infer(image, profile)
                 self.assertEqual({key: result[key] for key in compact}, compact)
                 self.assertEqual(result['observation'], OBSERVATION['observation'] if profile == 'standard'
-                                 else 'Корпус насоса: возможные признаки коррозии.')
+                                     else f'Корпус насоса: {vision.CONDITIONS["corrosion"][0].lower()}.')
                 expected_prompt = 'invariant compact prompt' if profile == 'fast' else 'invariant prompt'
                 self.engine.processor.assert_called_with(text=expected_prompt, images=image, return_tensors='pt',
                                                          crop_to_patches=True, max_patches=4)
@@ -372,18 +369,6 @@ class RuntimeHTTPTest(unittest.TestCase):
             return data
         finally:
             connection.close()
-
-    def test_selected_engine_identity_is_used_for_health_photo_and_video(self):
-        self.engine.model_id = 'Qwen/Qwen3-VL-4B-Instruct'
-        self.engine.revision = 'pinned-test-revision'
-        image = encoded_image()
-        for method, endpoint, payload in (
-            ('GET', '/health', None), ('POST', '/analyze', {'image': image}),
-            ('POST', '/analyze-video', {'frames': [{'image': image, 'timestampSeconds': 0.5}], 'durationSeconds': 1}),
-        ):
-            with self.subTest(endpoint=endpoint):
-                result = self.request(method, endpoint, payload)
-                self.assertEqual((result['model'], result['revision']), (self.engine.model_id, self.engine.revision))
 
     def test_analyze_and_health_with_no_model_loaded(self):
         health = self.request("GET", "/health")

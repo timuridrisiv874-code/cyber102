@@ -100,11 +100,35 @@ def prepare_request(data):
     return {'frames': prepared, 'durationSeconds': duration}
 
 
+def validated_defect_details(details, frames):
+    if not isinstance(details, list) or len(details) != len(frames):
+        raise ValueError('Defect details must cover the submitted frames')
+    for index, (item, frame) in enumerate(zip(details, frames, strict=True)):
+        if (not isinstance(item, dict) or set(item) != {'frameIndex', 'timestampSeconds', 'status', 'boxes'}
+                or type(item['frameIndex']) is not int or item['frameIndex'] != index
+                or not finite_number(item['timestampSeconds'])
+                or item['timestampSeconds'] != frame['timestampSeconds']
+                or item['status'] not in ('checked', 'partial', 'unavailable', 'skipped')
+                or not isinstance(item['boxes'], list) or len(item['boxes']) > 4
+                or (item['status'] in ('unavailable', 'skipped') and item['boxes'])):
+            raise ValueError('Defect details do not match their frame')
+        for detail in item['boxes']:
+            if (not isinstance(detail, dict) or set(detail) != {'kind', 'box'}
+                    or detail['kind'] not in ('crack', 'terminal_damage')):
+                raise ValueError('Unexpected verified defect class')
+            box = detail['box']
+            if (not isinstance(box, list) or len(box) != 4
+                    or any(type(value) is not int or not 0 <= value <= 1000 for value in box)
+                    or not (box[0] < box[2] and box[1] < box[3])):
+                raise ValueError('Invalid verified defect coordinates')
+    return details
+
+
 def result_from_envelope(envelope, payload):
     expected = vision.model_spec()
     required = {'model', 'revision', 'observations', 'summary', 'durationSeconds'}
     if (not isinstance(envelope, dict) or not required <= set(envelope)
-            or set(envelope) - required - {'clipDurationSeconds', 'metrics'}
+            or set(envelope) - required - {'clipDurationSeconds', 'metrics', 'defectDetails'}
             or envelope['model'] != expected.model_id
             or envelope['revision'] != expected.revision):
         raise ValueError('Unexpected video model response')
@@ -142,11 +166,14 @@ def result_from_envelope(envelope, payload):
                         'frameIndex': index, 'timestampSeconds': payload['frames'][index]['timestampSeconds'],
                         'status': result['status']})
     status = 'defect' if 'defect' in statuses else 'clear' if all(item == 'clear' for item in statuses) else 'unusable'
-    return {'source': 'local_vision', 'mode': 'video_review', 'preliminary': True,
+    result = {'source': 'local_vision', 'mode': 'video_review', 'preliminary': True,
             'status': status, 'model': envelope['model'], 'revision': envelope['revision'],
             'summary': summary.strip(), 'observations': cleaned,
             'sampledFrameCount': len(cleaned), 'clipDurationSeconds': payload['durationSeconds'],
             'inferenceSeconds': duration, 'saved': False}
+    if 'defectDetails' in envelope:
+        result['defectDetails'] = validated_defect_details(envelope['defectDetails'], payload['frames'])
+    return result
 
 
 def _analyze_prepared(payload):
