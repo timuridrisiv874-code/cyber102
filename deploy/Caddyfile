@@ -4,7 +4,8 @@ https://cyber102.94.41.87.102.sslip.io {
     basic_auth @apk bcrypt Cyber102 {
         import C:/cyber102/private/auth.caddy
     }
-    request_body {
+    @regular_uploads not path /api/mesh-jobs
+    request_body @regular_uploads {
         max_size 12MiB
     }
     encode gzip
@@ -85,6 +86,13 @@ https://cyber102.94.41.87.102.sslip.io {
         header Referrer-Policy same-origin
         header Permissions-Policy "camera=(self), microphone=()"
         file_server
+    }
+    @mesh path /api/mesh-jobs /api/mesh-jobs/*
+    handle @mesh {
+        request_body {
+            max_size 40MiB
+        }
+        reverse_proxy 127.0.0.1:8107
     }
     handle {
         reverse_proxy 127.0.0.1:8102 {

@@ -285,44 +285,6 @@ body[data-inspection-layout=capture] #result { display: none; }
   background: transparent;
 }
 .video-review-slide-title { margin: 10px 0 8px; overflow-wrap: anywhere; }
-.video-spatial-review { margin-block: 12px; }
-.video-spatial-review > summary { min-height: 44px; align-content: center; cursor: pointer; font-weight: 650; }
-.video-spatial-viewport {
-  position: relative;
-  display: grid;
-  place-items: center;
-  height: clamp(130px, 47vw, 280px);
-  perspective: 600px;
-  overflow: hidden;
-  touch-action: pan-y pinch-zoom;
-  border-radius: 12px;
-  background: #202626;
-}
-.video-spatial-scene {
-  display: grid;
-  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
-  place-items: center;
-  width: 56%;
-  height: 84%;
-  transform-style: preserve-3d;
-}
-.video-spatial-frame {
-  grid-area: 1 / 1;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  object-fit: contain;
-  transform: translate3d(var(--frame-x), 0, var(--frame-depth)) rotateY(var(--frame-angle));
-  opacity: .55;
-  transition: transform 180ms ease, opacity 180ms ease;
-}
-.video-spatial-frame.is-current { opacity: 1; z-index: 1; }
-.video-spatial-frame[hidden] { display: none; }
-.video-spatial-caption { margin-block: 8px; font-weight: 600; overflow-wrap: anywhere; }
-.video-spatial-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-@media (prefers-reduced-motion: reduce) {
-  .video-spatial-frame { transition: none; }
-}
 .video-review-slide .video-review-seek img { display: block; max-height: min(50svh, 440px); user-select: none; }
 .video-review-slide .video-review-inspect { margin-top: 8px; }
 
@@ -368,3 +330,74 @@ body[data-inspection-layout=capture] #result { display: none; }
 .equipment-card-photo figcaption { margin-top: 6px; }
 #other-equipment-photos .equipment-card-photo { max-width: 360px; }
 #other-equipment-photos img { aspect-ratio: 4 / 3; background: transparent; }
+
+.inspection-modes {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--soft);
+}
+.inspection-modes button {
+  flex: 1;
+  min-height: 44px;
+  padding: 5px 13px;
+  color: var(--muted);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  font-weight: 600;
+}
+.inspection-modes [aria-pressed="true"] {
+  color: var(--accent);
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: 0 1px 1px #22231f12;
+}
+body[data-capture-source=mesh] .workspace { grid-template-columns: minmax(0, 1fr); }
+body[data-capture-source=mesh] :is(.active-equipment-bar, #asset-telemetry, #motor-resource-home),
+body[data-capture-source=mesh] .workspace > #result,
+body[data-capture-source=mesh] .capture > :is(.capture-source-controls, #viewfinder, .capture-footer) { display: none; }
+body[data-capture-source=mesh] .workspace > .capture { display: block; padding: 0; }
+body[data-capture-source=mesh] .capture > .panel-heading { padding: 16px 20px; }
+
+#inspection-mesh { padding: 0 16px 16px; }
+.mesh-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 245px;
+  overflow: hidden;
+  background: var(--soft);
+  border-radius: 8px;
+}
+.mesh-stage:has(canvas:not([hidden])) {
+  aspect-ratio: 4 / 3;
+  max-height: 62vh;
+  background: #172529;
+}
+.mesh-start { text-align: center; max-width: 390px; padding: 22px; }
+.mesh-start h3 { font-weight: 650; }
+.mesh-start p { margin: 8px 0 14px; color: var(--muted); }
+.mesh-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; cursor: grab; }
+.mesh-stage canvas:active { cursor: grabbing; }
+.mesh-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.mesh-toolbar button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 5px 10px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+@media (max-width: 640px) {
+  #inspection-mesh { padding-inline: 12px; }
+  body[data-capture-source=mesh] .capture > .panel-heading { padding-inline: 16px; }
+  .mesh-stage { max-height: 50svh; }
+}
+@media (max-width: 430px) {
+  .inspection-modes { width: 100%; }
+}

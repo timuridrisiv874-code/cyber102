@@ -51,6 +51,15 @@ const media = window.CyberMedia.create({
   input: byId('media-file'), image: byId('uploaded-image'), video: byId('uploaded-video'),
   beforeChange: resetInput, changed: render, message: showMessage,
 });
+const sourceModes = offlineMode ? null : window.CyberInspectionMesh?.create({
+  media,
+  openModel: () => {
+    media.pause();
+    if (stream || openingCamera) stopCamera();
+    render();
+  },
+  openMedia: render,
+});
 clipReview = offlineMode ? null : window.CyberVideoReview?.create({
   media,
   beforeStart: () => {
@@ -165,6 +174,7 @@ function render() {
   }
   if (offlineMode) cameraMode.value = 'single';
   const clipBusy = Boolean(clipReview?.busy);
+  sourceModes?.sync();
   const videoOverview = !offlineMode && media.kind === 'uploaded_video';
   const controls = byId(videoOverview ? 'video-extra-actions' : 'capture-actions');
   if (controls && checkButton.parentElement !== controls) {
@@ -211,6 +221,12 @@ function render() {
   checkedViewfinder.dataset.portrait = String(frozen && snapshot.height > snapshot.width);
   byId('checked-frame').hidden = !videoMode || !frozen;
   byId('guide').hidden = (!live && !demoActive) || (!videoMode && frozen) || Boolean(media.kind);
+  const sourceBadge = byId('source');
+  if (sourceBadge) {
+    sourceBadge.dataset.live = String(live);
+    sourceBadge.hidden = !(media.kind || live || demoActive || frameSource);
+    byId('source-text').textContent = frozen && frameMetadata ? sourceLabel(frameMetadata) : media.kind ? sourceLabel(media.metadata()) : live ? 'Камера' : demoActive ? 'Сохранённый пример' : '';
+  }
   if (byId('mode')) byId('mode').textContent = offlineMode ? 'На телефоне · без сервера' :
     endpoint && (live || frameSource === 'camera' || media.kind) ? 'Модель на сервере' : demoActive ? 'Тестовый пример' : 'Готово к осмотру';
   if (demoScenario) {

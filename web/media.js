@@ -33,16 +33,17 @@
     time(seconds) { const ticks = Math.round(Math.max(0, Number(seconds) || 0) * 10); return `${Math.floor(ticks / 600)}:${((ticks % 600) / 10).toFixed(1).padStart(4, '0')}`; },
     create({ input, image, video, beforeChange, changed, message }) {
       let kind = null, url = null, loading = false, generation = 0, loader = null;
-      let catalogPhoto = false, waitingForVideoFrame = false;
+      let catalogPhoto = false, waitingForVideoFrame = false, selectedVideo = null;
       function clear() {
         generation += 1;
         loader?.abort(); loader = null;
         video.pause(); video.removeAttribute('src'); video.load();
         image.removeAttribute('src');
         if (url) URL.revokeObjectURL(url);
-        url = null; kind = null; catalogPhoto = false; loading = false; waitingForVideoFrame = false; input.value = '';
+        url = null; kind = null; selectedVideo = null; catalogPhoto = false; loading = false; waitingForVideoFrame = false; input.value = '';
       }
       const state = {
+        get selectedVideo() { return selectedVideo; },
         get kind() { return kind; }, get loading() { return loading; },
         get version() { return generation; },
         get catalogPhoto() { return catalogPhoto; },
@@ -99,6 +100,7 @@
         const token = generation;
         try {
           kind = isVideo ? 'uploaded_video' : 'uploaded_photo';
+          if (isVideo) selectedVideo = file;
           loading = true; loader = new AbortController();
           url = URL.createObjectURL(mime === file.type ? file : file.slice(0, file.size, mime));
           message('Открываем файл на устройстве…'); changed();

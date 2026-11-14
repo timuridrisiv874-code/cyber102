@@ -8,7 +8,7 @@
   <link rel="icon" href="/favicon.ico?v=eye-1" type="image/x-icon" sizes="16x16 32x32 48x48 64x64">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=eye-1" sizes="180x180">
   <link rel="stylesheet" href="styles.css?v=field-20261114">
-  <link rel="stylesheet" href="workspace.css?v=video-spatial-1">
+  <link rel="stylesheet" href="workspace.css?v=meshroom-video-2">
   <link rel="stylesheet" href="region-review.css?v=field-20261114">
   <link rel="stylesheet" href="inspection-tools.css?v=motor-resource-1">
   <script src="offline.js" defer></script>
@@ -16,10 +16,11 @@
   <script src="analysis-jobs.js" defer></script>
   <script src="inspection-photo.js?v=1" defer></script>
   <script src="inspection.js?v=capture-controls-1" defer></script>
-  <script src="media.js?v=mobile-recovery-20261114" defer></script>
-  <script src="video-review.js?v=video-spatial-1" defer></script>
+  <script src="media.js?v=meshroom-video-2" defer></script>
+  <script src="video-review.js?v=meshroom-1" defer></script>
   <script src="region-review.js?v=field-20261114" defer></script>
-  <script src="app.js?v=inspection-simple-20261114" defer></script>
+  <script src="inspection-mesh.js?v=video-2" defer></script>
+  <script src="app.js?v=meshroom-1" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
   <script src="equipment-qr.js?v=motor-resource-1" defer></script>
   <script src="photo-measure.js?v=1" defer></script>
@@ -70,10 +71,17 @@
     </div>
     <div class="workspace">
       <section class="capture panel" aria-labelledby="capture-title">
-        <div class="panel-heading"><h2 id="capture-title">Фото и видео</h2></div>
+        <div class="panel-heading">
+          <h2 id="capture-title">Источник осмотра</h2>
+          <div class="inspection-modes" id="inspection-modes" role="group" aria-label="Формат осмотра" hidden>
+            <button type="button" data-mode="photo" aria-pressed="true">Фото</button>
+            <button type="button" data-mode="video" aria-pressed="false">Видео</button>
+            <button type="button" data-mode="mesh" aria-pressed="false">3D</button>
+          </div>
+        </div>
         <div class="capture-source-controls" role="group" aria-label="Источник осмотра">
           <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Камера</span></button>
-          <label class="button secondary media-upload-control" for="media-file"><span>Выбрать файл</span><input id="media-file" type="file" accept="image/*,video/*" aria-label="Загрузить фото или видео"></label>
+          <label class="button secondary media-upload-control" for="media-file"><span id="media-file-label">Выбрать файл</span><input id="media-file" type="file" accept="image/*,video/*" aria-label="Загрузить фото или видео"></label>
           <button id="media-clear" class="button secondary" type="button" hidden>Убрать файл</button>
         </div>
         <div class="viewfinder" id="viewfinder">
@@ -91,6 +99,29 @@
           <canvas id="snapshot" role="img" aria-label="Зафиксированный кадр осмотра" hidden></canvas>
           <div class="finder-guide" id="guide" aria-hidden="true" hidden><i></i><i></i><i></i><i></i></div>
           <button type="button" class="detection" id="detection" aria-controls="result" hidden><span id="detection-label"></span></button>
+        </div>
+        <div id="inspection-mesh" hidden>
+
+            <div class="mesh-stage">
+              <canvas aria-label="Вращаемая 3D-модель из загруженного видео" hidden></canvas>
+              <div class="mesh-start">
+                <h3>3D из видео</h3>
+                <p>Загрузите обход оборудования. MP4, MOV или WebM, 2–30 секунд, до 40 МБ.</p>
+                <label class="button secondary media-upload-control">
+                  <span>Загрузить видео</span>
+                  <input id="mesh-video-file" type="file" accept="video/*,.mov,.mp4,.m4v,.webm" aria-label="Загрузить видео для 3D">
+                </label>
+              </div>
+            </div>
+            <div class="mesh-toolbar" role="group" aria-label="Ракурс модели" hidden>
+              <button type="button" data-action="left" aria-label="Повернуть влево">←</button>
+              <button type="button" data-action="right" aria-label="Повернуть вправо">→</button>
+              <button type="button" data-action="zoom-out" aria-label="Отдалить">−</button>
+              <button type="button" data-action="zoom-in" aria-label="Приблизить">+</button>
+              <button type="button" data-action="reset">Исходный вид</button>
+              <button type="button" id="mesh-replace">Другое видео</button>
+            </div>
+            <p class="message mesh-status" role="status"></p>
         </div>
         <div class="capture-footer">
           <div class="actions" id="capture-actions">
