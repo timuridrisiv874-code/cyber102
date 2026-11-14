@@ -1,0 +1,158 @@
+[
+  {
+    "file": "keystone-trench.jpg",
+    "scene": "keystone-2017",
+    "source": "https://www.ntsb.gov/investigations/AccidentReports/Reports/PAB1801.pdf#page=3",
+    "sourceImage": "keystone-003.jpg",
+    "sha256": "509e950c271878fab10afef47487d46f0541c4946c08b06a1b0b56838a76395d",
+    "sourceSha256": "509e950c271878fab10afef47487d46f0541c4946c08b06a1b0b56838a76395d",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.17,
+          0.13,
+          0.76,
+          1.0
+        ]
+      }
+    ],
+    "note": "Rupture along the coated pipe. The original photo contains a measuring tape."
+  },
+  {
+    "file": "keystone-wall.jpg",
+    "scene": "keystone-2017",
+    "source": "https://www.ntsb.gov/investigations/AccidentReports/Reports/PAB1801.pdf#page=4",
+    "sourceImage": "keystone-005.jpg",
+    "sha256": "bc4deb693f19c2a59fdbca5754c0c784012438033309b46d68084f5ccdb5f917",
+    "sourceSha256": "bc4deb693f19c2a59fdbca5754c0c784012438033309b46d68084f5ccdb5f917",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.035,
+          0.367,
+          0.974,
+          0.858
+        ]
+      }
+    ],
+    "note": "Torn pipe wall below scuffed coating. Same incident as the trench photograph."
+  },
+  {
+    "file": "marshall-trench.jpg",
+    "scene": "marshall-2010",
+    "source": "https://www.ntsb.gov/investigations/AccidentReports/Reports/PAR1201.pdf#page=18",
+    "sourceImage": "marshall-006.jpg",
+    "sha256": "76dcd44ebe9a65733533846f21b2fafd238edc41f1525e5d1902f95258ede177",
+    "sourceSha256": "76dcd44ebe9a65733533846f21b2fafd238edc41f1525e5d1902f95258ede177",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.213,
+          0.484,
+          0.805,
+          0.662
+        ]
+      }
+    ],
+    "note": "Open split beneath the lifted coating. The report image contains overlaid annotations."
+  },
+  {
+    "file": "magellan-split.jpg",
+    "scene": "magellan-2016",
+    "source": "https://www.ntsb.gov/investigations/AccidentReports/Reports/PAB2001.pdf#page=6",
+    "sourceImage": "magellan-007.jpg",
+    "sha256": "680e5f0cbfa146f53a97e4a3e0a09664b2b0955519cb04dab0aa98ccaa608725",
+    "sourceSha256": "680e5f0cbfa146f53a97e4a3e0a09664b2b0955519cb04dab0aa98ccaa608725",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.24,
+          0.0,
+          0.953,
+          1.0
+        ]
+      }
+    ],
+    "note": "Visible diagonal fracture, whose ends reach the image edges. The original image contains overlaid arrows."
+  },
+  {
+    "file": "pedro-close.jpg",
+    "scene": "san-pedro-bay-2021",
+    "source": "https://www.ntsb.gov/investigations/AccidentReports/Reports/MIR2401.pdf#page=63",
+    "sourceImage": "pedro-029.jpg",
+    "sha256": "10f0add0781c6a5e932910ac7e9cda87a44063d8c8c245824b11d20bfa4b735d",
+    "sourceSha256": "20fdcee87d2aa142b04ed121ad550bbf15c59b73c5bd45da4e4ef0c842128771",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.085,
+          0.0,
+          1.0,
+          0.87
+        ]
+      }
+    ],
+    "note": "Detail panel with the open fissure. Cropped away the wider composite and text labels.",
+    "sourceCrop": [
+      4,
+      91,
+      440,
+      192
+    ]
+  },
+  {
+    "file": "pedro-end.jpg",
+    "scene": "san-pedro-bay-2021",
+    "source": "https://www.ntsb.gov/investigations/AccidentReports/Reports/MIR2401.pdf#page=64",
+    "sourceImage": "pedro-031.jpg",
+    "sha256": "5ded0f1049486c7915a2d0c612e343bd12d1175ae5559a21e3cbc81bf5947753",
+    "sourceSha256": "5ded0f1049486c7915a2d0c612e343bd12d1175ae5559a21e3cbc81bf5947753",
+    "objects": [],
+    "note": "The photographed open end and deformation are visible. No clear crack in this view."
+  },
+  {
+    "file": "rusty-flange.jpg",
+    "scene": "rusty-flange-control",
+    "source": "https://commons.wikimedia.org/wiki/File:Rusty_Bolts_on_Pipe_Flange.jpg",
+    "sourceImage": "rust-bolts.jpg",
+    "sha256": "643228cce6d3ce0c5e5f617f4882b1e5e9a91dacead75e095f6910215b9d431d",
+    "sourceSha256": "643228cce6d3ce0c5e5f617f4882b1e5e9a91dacead75e095f6910215b9d431d",
+    "objects": [],
+    "note": "Rust, bolts and an intact joint with no apparent break. Photograph by לקמוס, CC BY-SA 4.0. Shared source with rust-flange.jpg in crack-terminal-transfer.json."
+  },
+  {
+    "file": "rusty-pipe-sections.jpg",
+    "scene": "rusty-sections-control",
+    "source": "https://commons.wikimedia.org/wiki/File:Pipes_042_(ubt).JPG",
+    "sourceImage": "pipe-joints.jpg",
+    "sha256": "d0597c4f36e6266881113681542cebddfdfd25104d659b9e9e0cc5c67382b086",
+    "sourceSha256": "d0597c4f36e6266881113681542cebddfdfd25104d659b9e9e0cc5c67382b086",
+    "objects": [],
+    "note": "Rusty sections with normal open ends. Photograph by Tomasz Sienicki, CC BY 3.0."
+  },
+  {
+    "file": "pipe-wall-control.jpg",
+    "scene": "niosh-pipe-control",
+    "source": "https://commons.wikimedia.org/wiki/File:Corroded_pipe.jpg",
+    "sourceImage": "corroded-pipe.jpg",
+    "sha256": "d8197ec0f27b14f833690b349a3a165e5134a00d738accaad4fb992101068715",
+    "sourceSha256": "d8197ec0f27b14f833690b349a3a165e5134a00d738accaad4fb992101068715",
+    "objects": [],
+    "note": "Oxidized joints and a wall edge. Photograph by NIOSH, CC BY 2.0."
+  },
+  {
+    "file": "industrial-piping-control.jpg",
+    "scene": "industrial-piping-control",
+    "source": "https://commons.wikimedia.org/wiki/File:INdustrial_piping.jpg",
+    "sourceImage": "industrial-piping.jpg",
+    "sha256": "7b29dcd1ba1a6cdcaa161be55c9a378e8785f78925bf9ab9b92ee70331a409ef",
+    "sourceSha256": "7b29dcd1ba1a6cdcaa161be55c9a378e8785f78925bf9ab9b92ee70331a409ef",
+    "objects": [],
+    "note": "Overview of process pipes and intact connections. Photograph by Bitjungle, CC BY-SA 3.0."
+  }
+]
