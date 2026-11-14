@@ -1,4 +1,4 @@
-"""Benchmark defect-level grounding with the local Qwen3-VL worker's weights."""
+"""Benchmark defect-level grounding with pinned local vision models."""
 import argparse
 from collections import Counter
 import hashlib
@@ -290,15 +290,43 @@ def liquid_results(rows, typed_predictions):
                     'liquidSubtypeFrames': len(typed_rows) if typed_metrics else 0}
 
 
+def benchmark_internvl(engine, frame, prompt, max_tokens):
+    inputs = engine.processor(text=prompt, images=frame, return_tensors='pt', crop_to_patches=True,
+                              max_patches=4).to('cuda', dtype=engine.torch.bfloat16)
+    with engine.torch.inference_mode():
+        tokens = engine.model.generate(**inputs, do_sample=False, max_new_tokens=max_tokens,
+                                       max_time=85, use_cache=True)
+    generated = tokens[0, inputs['input_ids'].shape[1]:]
+    return engine.processor.decode(generated, skip_special_tokens=True)
+
+
+def reviewed_metrics(rows, predictions, labels):
+    if not any('reviewedLabels' in row for row in rows):
+        return None
+    metrics = {}
+    for label in labels:
+        scoped = [row for row in rows if label in row.get('reviewedLabels', labels)]
+        if not scoped:
+            continue
+        metrics[label] = {
+            'metrics': {f'{iou:.2f}': measurements(scoped, predictions, (label,), 1, iou)['classes'][label]
+                        for iou in (.3, .5)},
+            'scenes': scene_coverage(scoped, predictions, (label,), 1, .50)[label],
+            'negativeFrames': class_negative_frames(scoped, predictions, (label,), 1)[label],
+        }
+    return metrics
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('repo', type=Path, help='Local Cyber102 checkout with the Qwen vision worker')
+    parser.add_argument('repo', type=Path, help='Local Cyber102 checkout with the vision workers')
     parser.add_argument('model', type=Path, help='Verified local snapshot')
     parser.add_argument('annotations', type=Path)
     parser.add_argument('images', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--mode', choices=MAX_NEW_TOKENS, default='detailed')
     parser.add_argument('--labels', nargs='+', choices=ALL_LABELS, default=tuple(LABELS))
+    parser.add_argument('--engine', choices=('qwen', 'internvl'), default='qwen')
     args = parser.parse_args()
     guard_mode = args.mode in ('guard-state', 'guard-compact', 'guard-evidence')
     if guard_mode and set(args.labels) != set(GUARD_LABELS):
@@ -309,15 +337,31 @@ def main():
         parser.error(f'--mode {args.mode} requires --labels {required_label}')
     rows = json.loads(args.annotations.read_text(encoding='utf-8'))
     paths = checked_images(rows, args.images)
+    for row in rows:
+        if 'reviewedLabels' in row and ({obj['class'] for obj in row['objects']} - set(row['reviewedLabels'])):
+            raise ValueError(f'Annotation has boxes outside its reviewed labels: {row["file"]}')
     sys.path.insert(0, str(args.repo.resolve(strict=True)))
     from PIL import Image, ImageOps
-    from vision_runtime.qwen_worker import Engine, PHOTO_MAX_PIXELS
-    from vision_runtime.worker import _parse_json, deny_external_connections
+    from vision_runtime import worker
+    from vision_runtime.worker import _parse_json
 
-    sys.addaudithook(deny_external_connections)
-    engine = Engine(args.model.resolve(strict=True))
+    sys.addaudithook(worker.deny_external_connections)
+    directory = args.model.resolve(strict=True)
     labels = tuple(dict.fromkeys(args.labels))
-    prompt = engine._prompt([{'type': 'image'}, {'type': 'text', 'text': make_prompt(labels, args.mode)}])
+    content = [{'type': 'image'}, {'type': 'text', 'text': make_prompt(labels, args.mode)}]
+    if args.engine == 'qwen':
+        from vision_runtime.qwen_worker import Engine, PHOTO_MAX_PIXELS
+        engine = Engine(directory)
+        identity = {'model': engine.model_id, 'revision': engine.revision}
+        prompt = engine._prompt(content)
+    else:
+        engine = worker.Engine(directory)
+        identity = {'model': worker.MODEL, 'revision': worker.REVISION}
+        prompt = engine.processor.apply_chat_template(
+            [{'role': 'system', 'content': worker.SYSTEM_PROMPT}, {'role': 'user', 'content': content}],
+            tokenize=False, add_generation_prompt=True)
+
+    max_tokens = MAX_NEW_TOKENS[args.mode]
 
     def parse(raw):
         if args.mode == 'guard-evidence':
@@ -331,8 +375,11 @@ def main():
         return parse_detections(raw, _parse_json, labels, args.mode)
 
     def detect(frame):
+        if args.engine == 'internvl':
+            engine.last_output = benchmark_internvl(engine, frame, prompt, max_tokens)
+            return parse(engine.last_output)
         return engine._run(frame, prompt, max_pixels=PHOTO_MAX_PIXELS,
-                           max_new_tokens=MAX_NEW_TOKENS[args.mode], max_time=85, parse=parse)
+                           max_new_tokens=max_tokens, max_time=85, parse=parse)
 
     with Image.new('RGB', (512, 384), 'white') as warmup:
         try:
@@ -365,21 +412,26 @@ def main():
     extra = {}
     if args.mode == 'liquid':
         predictions, extra = liquid_results(scoped_rows, predictions)
-    report = {'model': engine.model_id, 'revision': engine.revision, 'device': engine.device,
+    reviewed = reviewed_metrics(rows, predictions, labels)
+    report = {**identity, 'engine': args.engine, 'device': engine.device,
               'mode': args.mode, 'labels': labels,
               **extra,
               'score_meaning': 'uniform placeholder for emitted boxes',
               'median_ms': statistics.median(timings.values()), 'timings_ms': timings, 'errors': errors,
               'support_by_scene': dict(Counter(row['scene'] for row in rows)),
-              'metrics': {f'{iou:.2f}': measurements(rows, predictions, labels, 1, iou)
-                          for iou in (.3, .5)},
-              'scene_coverage_at_0.50': scene_coverage(rows, predictions, labels, 1, .50),
-              'class_negative_frames': class_negative_frames(rows, predictions, labels, 1),
-              'localization_errors_at_0.50': localization_errors(scoped_rows, predictions, threshold=1),
               'predictions': predictions, 'samples': samples}
-    if all('site' in row for row in scoped_rows):
-        site_rows = [dict(row, scene=row['site']) for row in scoped_rows]
-        report['site_coverage_at_0.50'] = scene_coverage(site_rows, predictions, labels, 1, .50)
+    if reviewed is not None:
+        report['reviewedMetrics'] = reviewed
+    else:
+        report.update({
+            'metrics': {f'{iou:.2f}': measurements(rows, predictions, labels, 1, iou) for iou in (.3, .5)},
+            'scene_coverage_at_0.50': scene_coverage(rows, predictions, labels, 1, .50),
+            'class_negative_frames': class_negative_frames(rows, predictions, labels, 1),
+            'localization_errors_at_0.50': localization_errors(scoped_rows, predictions, threshold=1),
+        })
+        if all('site' in row for row in scoped_rows):
+            site_rows = [dict(row, scene=row['site']) for row in scoped_rows]
+            report['site_coverage_at_0.50'] = scene_coverage(site_rows, predictions, labels, 1, .50)
     if guard_mode:
         report['guard_states'] = states
         report['guard_state_counts'] = guard_metrics(rows, states)
