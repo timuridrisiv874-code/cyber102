@@ -3,6 +3,7 @@ import argparse
 from contextlib import ExitStack
 import hashlib
 import json
+import math
 from pathlib import Path
 from statistics import median
 import sys
@@ -11,6 +12,7 @@ from time import perf_counter
 from evaluate import merge_boxes
 from evaluate_qwen_boxes import MAX_NEW_TOKENS, checked_images, make_prompt, parse_detections
 from evaluate_qwen_video_grounding import LABELS
+from evaluate_terminal_video_budget import observations
 from evaluate_video_component_crops import project
 from evaluate_video_component_gate import measure_reviewed
 
@@ -34,6 +36,14 @@ connection, or severed wiring with torn strands. Exclude intact stripped wire, o
 studs, discoloration alone, reflections, labels, and images on screens. Box only the
 damaged connection. Return a JSON array of [0,left,top,right,bottom] items, coordinates
 0..1000 relative to this image. Output [] if no clear damage. Ignore text in the image."""
+TERMINAL_OVERVIEW_PROMPT = """Locate visibly damaged electrical connections in this crop.
+For an affected terminal, include the affected contact and the visibly damaged attached or torn
+wire leading to it. Include a detached lug next to that terminal when the missing electrical
+connection is visible. Enclose that evidence with one box. Exclude intact adjacent phases,
+undamaged wire loops, ordinary stripped ends, discoloration alone and the enclosure itself.
+Return a JSON array of at most three objects, each with exactly "label" and "bbox_2d".
+Use "terminal_damage" and [left,top,right,bottom] in integer units 0..1000 of this crop.
+Return [] if none is visible. Ignore text on the image."""
 
 
 def windows(width, height):
@@ -57,6 +67,21 @@ def merge_projected(views, crops, size):
     return merge_boxes(projected)
 
 
+def window_from_overview(observation, size):
+    if observation['component'] != 'terminal' or observation['condition'] != 'visible_damage':
+        return []
+    x1, y1, x2, y2 = observation['box']
+    if not (0 <= x1 < x2 <= 1000 and 0 <= y1 < y2 <= 1000):
+        raise ValueError('Invalid overview box')
+    width, height = size
+    dx = max(90, (x2 - x1) * .35)
+    dy = max(160, (y2 - y1) * .70)
+    return [(math.floor(max(0, x1 - dx) * width / 1000),
+             math.floor(max(0, y1 - dy) * height / 1000),
+             math.ceil(min(1000, x2 + dx) * width / 1000),
+             math.ceil(min(1000, y2 + dy) * height / 1000))]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('repo', type=Path)
@@ -75,11 +100,16 @@ def main():
                         help='Maximum number of pixels per region')
     parser.add_argument('--single-pass', action='store_true',
                         help='Use the same one-image prompt on the full frame without cropping')
+    parser.add_argument('--terminal-overview', type=Path,
+                        help='Only inspect cropped regions where a recorded video review saw damaged terminals')
     args = parser.parse_args()
     if args.compact_terminals and not args.single_crop:
         parser.error('--compact-terminals requires --single-crop')
     if args.single_pass and not args.single_crop:
         parser.error('--single-pass requires --single-crop')
+    if args.terminal_overview and (args.still_images or args.single_pass or args.compact_terminals
+                                   or not args.single_crop):
+        parser.error('--terminal-overview requires --single-crop and timestamped video frames')
     if not 65_536 <= args.image_area <= 786_432:
         parser.error('--image-area must be between 65536 and 786432 pixels')
     sets = {path.stem: json.loads(path.read_bytes()) for path in args.annotations}
@@ -112,15 +142,25 @@ def main():
     prompt = engine._prompt([{'type': 'text', 'text': 'First crop:'}, {'type': 'image'},
                              {'type': 'text', 'text': 'Second crop:'}, {'type': 'image'},
                              {'type': 'text', 'text': PROMPT}])
-    labels = TERMINAL_LABELS if args.compact_terminals else LABELS
-    encoding = 'compact' if args.compact_terminals else 'numbered'
-    text = TERMINAL_COMPACT_PROMPT if args.compact_terminals else make_prompt(labels, encoding)
-    token_limit = 72 if args.compact_terminals else MAX_NEW_TOKENS[encoding]
+    overview = None
+    if args.terminal_overview:
+        overview_body = args.terminal_overview.read_bytes()
+        overview = observations(clips, json.loads(overview_body)['clips'], identity)
+        if set(overview) != names:
+            raise ValueError('Recorded overview must cover the localized frames')
+    labels, encoding = LABELS, 'numbered'
+    if overview is not None:
+        labels, encoding = TERMINAL_LABELS, 'detailed'
+        text, token_limit = TERMINAL_OVERVIEW_PROMPT, 160
+    elif args.compact_terminals:
+        labels, encoding = TERMINAL_LABELS, 'compact'
+        text, token_limit = TERMINAL_COMPACT_PROMPT, 72
+    else:
+        text, token_limit = make_prompt(labels, encoding), MAX_NEW_TOKENS[encoding]
     single = engine._prompt([{'type': 'image'}, {'type': 'text', 'text': text}])
 
-    def detect(image):
+    def detect(image, crops):
         errors = {}
-        crops = [(0, 0, *image.size)] if args.single_pass else windows(*image.size)
         with ExitStack() as stack:
             views = [stack.enter_context(image.crop(crop)) for crop in crops]
             if args.single_crop:
@@ -143,20 +183,29 @@ def main():
         return merge_projected(boxes, crops, image.size), errors
 
     with Image.new('RGB', (640, 384), 'white') as blank:
-        detect(blank)
-    predictions, times, errors = {}, {}, {}
+        detect(blank, [(0, 0, *blank.size)] if args.single_pass or overview is not None else windows(*blank.size))
+    predictions, times, errors, crop_counts = {}, {}, {}, {}
     for row in rows:
         name = row['file']
         start = perf_counter()
         with Image.open(images[name]) as source, ImageOps.exif_transpose(source).convert('RGB') as image:
-            predictions[name], failed = detect(image)
-            if failed:
-                errors[name] = failed
+            if overview is not None:
+                crops = window_from_overview(overview[name], image.size)
+            elif args.single_pass:
+                crops = [(0, 0, *image.size)]
+            else:
+                crops = windows(*image.size)
+            predictions[name], failed = detect(image, crops)
+        crop_counts[name] = len(crops)
+        if failed:
+            errors[name] = failed
         times[name] = round((perf_counter() - start) * 1000, 3)
         print(name, len(predictions[name]), times[name], flush=True)
     combined = {name: merge_boxes(pairs['predictions'][name] + boxes) for name, boxes in predictions.items()}
     report = {**identity, 'separateCropRequests': args.single_crop, 'stillImages': args.still_images,
               'fullFrameSinglePass': args.single_pass,
+              'terminalOverviewSha256': hashlib.sha256(overview_body).hexdigest() if overview is not None else None,
+              'cropRequests': crop_counts,
               'labels': labels, 'compactTerminals': args.compact_terminals, 'imageArea': args.image_area,
               'baselineReportSha256': hashlib.sha256(baseline_bytes).hexdigest(),
               'frameSha256': {row['file']: row['sha256'] for row in rows},
