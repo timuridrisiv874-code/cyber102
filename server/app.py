@@ -47,7 +47,7 @@ def analyze_video_job(payload):
 
 def bounded_analysis_upload(method):
     @wraps(method)
-    def bounded(self):
+    def bounded(self, *args, **kwargs):
         if not self.server.analysis_upload_slots.acquire(blocking=False):
             self.close_connection = True
             self.send_json({'error': 'Сервер принимает другие изображения. Повторите через несколько секунд.',
@@ -55,7 +55,7 @@ def bounded_analysis_upload(method):
                            headers={'Retry-After': '2'})
             return
         try:
-            return method(self)
+            return method(self, *args, **kwargs)
         finally:
             self.server.analysis_upload_slots.release()
     return bounded
@@ -251,12 +251,15 @@ class Handler(SimpleHTTPRequestHandler):
             except (ValueError, KeyError, OSError):
                 self.error(HTTPStatus.SERVICE_UNAVAILABLE, 'Каталог оборудования временно недоступен.')
             return
+        attachment = re.fullmatch(r'/api/history/([0-9a-f-]{36})/(?:closeup|work/([0-9a-f-]{36}))/image', target.path)
         image_match = re.fullmatch(r'/api/analyses/([0-9a-f-]{36})/image', target.path)
         inspection_match = re.fullmatch(r'/api/inspections/([0-9a-f-]{36})', target.path)
-        if image_match or inspection_match:
+        if image_match or inspection_match or attachment:
             try:
                 with closing(connect(self.database)) as connection:
-                    if image_match:
+                    if attachment:
+                        self.send_body(inspections.attachment_image(connection, *attachment.groups()), 'image/jpeg')
+                    elif image_match:
                         self.send_body(inspections.get_analysis(connection, image_match[1], include_image=True), 'image/jpeg')
                     else:
                         record = history.get_record(connection, inspection_match[1])
@@ -355,7 +358,8 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         route = urlsplit(self.path).path
         job_route = route.startswith('/api/analysis-jobs/')
-        if not job_route and route not in ('/api/diagnose', '/api/history', '/analyze', '/api/video-review', '/api/inspections', '/api/inspections/preview'):
+        work = re.fullmatch(r'/api/history/([0-9a-f-]{36})/work', route)
+        if not job_route and not work and route not in ('/api/diagnose', '/api/history', '/analyze', '/api/video-review', '/api/inspections', '/api/inspections/preview'):
             self.error(HTTPStatus.NOT_FOUND, 'Маршрут не найден.')
             return
         origins = self.headers.get_all('Origin', [])
@@ -375,6 +379,9 @@ class Handler(SimpleHTTPRequestHandler):
         if self.headers.get_content_type() != 'application/json':
             self.error(HTTPStatus.UNSUPPORTED_MEDIA_TYPE, 'Ожидается application/json.')
             return
+        if work or route == '/api/inspections':
+            self.save_with_photo(work[1] if work else None)
+            return
         try:
             length = int(self.headers.get('Content-Length', '0'))
             if not 0 < length <= MAX_OBSERVATIONS_BYTES:
@@ -389,8 +396,8 @@ class Handler(SimpleHTTPRequestHandler):
         if route == '/api/history':
             self.save_history(data)
             return
-        if route in ('/api/inspections', '/api/inspections/preview'):
-            self.camera_inspection(data, preview=route.endswith('/preview'))
+        if route == '/api/inspections/preview':
+            self.camera_inspection(data, preview=True)
             return
         if not isinstance(data, dict) or not isinstance(data.get('serial'), str) or any(
             not isinstance(data.get(key), dict) for key in ('telemetry', 'vision')
@@ -403,14 +410,41 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_json({'source': 'submitted', 'passport': passport,
                                 **assessment.diagnose(passport, data['telemetry'], data['vision'])})
 
-    def camera_inspection(self, data, *, preview=False):
+    @bounded_analysis_upload
+    def save_with_photo(self, record_id):
+        lengths = self.headers.get_all('Content-Length', [])
+        if self.headers.get_all('Transfer-Encoding') or len(lengths) != 1:
+            self.error(HTTPStatus.BAD_REQUEST, 'Укажите длину запроса.')
+            return
+        try:
+            size = int(lengths[0])
+            limit = 4 * ((vision.MAX_IMAGE_BYTES + 2) // 3) + MAX_OBSERVATIONS_BYTES
+            if not 0 < size <= limit:
+                self.error(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, 'Недопустимый размер запроса с фотографией.')
+                return
+            body = self.rfile.read(size)
+            if len(body) != size:
+                raise ValueError()
+            data = video_review.strict_json(body)
+        except TimeoutError:
+            self.error(HTTPStatus.REQUEST_TIMEOUT, 'Не удалось получить фото вовремя.')
+            return
+        except (ValueError, RecursionError):
+            self.error(HTTPStatus.BAD_REQUEST, 'Некорректный JSON.')
+            return
+        self.camera_inspection(data, work_record_id=record_id)
+
+    def camera_inspection(self, data, *, preview=False, work_record_id=None):
         try:
             with closing(connect(self.database)) as connection, connection:
                 if preview:
                     result = inspections.preview(connection, data, customer_root=self.customer_root)
                     status = HTTPStatus.OK
                 else:
-                    record, created = inspections.save(connection, data, customer_root=self.customer_root)
+                    if work_record_id is not None:
+                        record, created = inspections.add_work(connection, work_record_id, data)
+                    else:
+                        record, created = inspections.save(connection, data, customer_root=self.customer_root)
                     result = {'record': record, 'created': created}
                     status = HTTPStatus.CREATED if created else HTTPStatus.OK
             self.send_json(result, status)

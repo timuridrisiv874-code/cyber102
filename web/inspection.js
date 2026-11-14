@@ -103,6 +103,11 @@
   const previewButton = byId('inspection-preview');
   const saveButton = byId('inspection-save');
   const message = byId('inspection-message');
+  const closeupPanel = byId('inspection-closeup');
+  const closeupOpen = byId('closeup-open');
+  const closeupLabel = byId('closeup-label');
+  const closeupImage = byId('closeup-image');
+  const closeupStatus = byId('closeup-status');
   const confirms = byId('inspection-confirmations');
   const manual = document.createElement('div');
   manual.id = 'inspection-manual';
@@ -163,9 +168,103 @@
   let serialLoad = 0;
   let revision = 0;
   let preview = null;
-  let saved = false;
+  let saved = '';
   let savePayload = null;
   let controller = null;
+  let closeupPoint = null;
+  let closeupJpeg = '';
+  let closeupMeasurement = null;
+  let closeupVersion = 0;
+  let preparingCloseup = false;
+  let closeupTarget = '';
+  let closeupAnchor = '';
+
+  function showCloseupStatus(text = '', error = false) {
+    closeupStatus.textContent = text;
+    closeupStatus.hidden = !text;
+    closeupStatus.dataset.error = String(error);
+  }
+
+  function resetCloseup() {
+    closeupVersion++;
+    closeupPoint = null;
+    closeupJpeg = '';
+    closeupTarget = '';
+    closeupAnchor = '';
+    closeupMeasurement = null;
+    preparingCloseup = false;
+    closeupLabel.required = false;
+    closeupLabel.value = '';
+    byId('closeup-defect').value = '';
+    delete closeupPanel.dataset.serial;
+    closeupImage.removeAttribute('src');
+    byId('closeup-preview').hidden = true;
+    byId('closeup-remove').hidden = true;
+    byId('closeup-measures').hidden = true;
+    byId('closeup-length').textContent = '';
+    closeupPanel.hidden = true;
+    showCloseupStatus();
+  }
+
+  function setCloseupPoint(point) {
+    closeupPoint = { x: Math.max(0, Math.min(1, point.x)), y: Math.max(0, Math.min(1, point.y)) };
+    const mark = byId('closeup-mark');
+    mark.style.left = (100 * closeupPoint.x) + '%';
+    mark.style.top = (100 * closeupPoint.y) + '%';
+  }
+
+  function openCloseup(point, label, anchor = 'primary') {
+    if (!current || current.regionNote || cameraBusy || pending || saved || savePayload) return false;
+    const frame = byId('snapshot');
+    const overview = byId('closeup-overview');
+    if (!frame.width || !frame.height || !point) return false;
+    if (!closeupPoint || anchor !== closeupAnchor) {
+      resetCloseup();
+      closeupAnchor = anchor;
+      closeupTarget = label || current.component;
+      closeupLabel.value = closeupTarget;
+      const ratio = Math.min(1, 400 / Math.max(frame.width, frame.height));
+      overview.width = Math.max(1, Math.round(frame.width * ratio));
+      overview.height = Math.max(1, Math.round(frame.height * ratio));
+      overview.parentElement.style.width = Math.min(overview.width, 210 * overview.width / overview.height) + 'px';
+      overview.getContext('2d').drawImage(frame, 0, 0, overview.width, overview.height);
+    }
+    setCloseupPoint(point);
+    closeupPanel.hidden = false;
+    closeupPanel.dataset.serial = serialReady || serial.value.trim();
+    sync();
+    byId('closeup-title').focus({ preventScroll: true });
+    closeupPanel.scrollIntoView({ block: 'nearest' });
+    return true;
+  }
+
+  async function selectCloseup(event) {
+    const input = event.target;
+    const file = input.files?.[0];
+    if (!file || !closeupPoint || pending || saved || savePayload) return;
+    input.value = '';
+    const version = ++closeupVersion;
+    preparingCloseup = true;
+    sync();
+    showCloseupStatus('Подготавливаем снимок…');
+    try {
+      const jpeg = await window.CyberInspectionPhoto.toJpeg(file);
+      if (version !== closeupVersion) return;
+      closeupJpeg = jpeg;
+      closeupMeasurement = null;
+      byId('closeup-length').textContent = '';
+      byId('closeup-measures').hidden = !window.CyberPhotoMeasure;
+      closeupImage.src = 'data:image/jpeg;base64,' + jpeg;
+      closeupLabel.required = true;
+      byId('closeup-preview').hidden = false;
+      byId('closeup-remove').hidden = false;
+      showCloseupStatus();
+    } catch (error) {
+      if (version === closeupVersion) showCloseupStatus(error.message, true);
+    } finally {
+      if (version === closeupVersion) { preparingCloseup = false; sync(); }
+    }
+  }
 
   function setMessage(text = '', error = false) {
     message.textContent = text;
@@ -173,10 +272,14 @@
   }
 
   function sync() {
-    fields.disabled = pending || cameraBusy || Boolean(savePayload) || saved;
+    fields.disabled = pending || cameraBusy || Boolean(savePayload) || Boolean(saved);
     const ready = Boolean(current && serialReady && serialReady === serial.value.trim());
-    previewButton.disabled = !ready || pending || cameraBusy || Boolean(savePayload) || saved;
-    saveButton.disabled = !ready || pending || cameraBusy || saved || (!preview && !savePayload);
+    previewButton.disabled = !ready || pending || cameraBusy || Boolean(savePayload) || Boolean(saved) || preparingCloseup;
+    saveButton.disabled = !ready || pending || cameraBusy || Boolean(saved) || preparingCloseup || (!preview && !savePayload);
+    closeupOpen.hidden = !current || Boolean(current.regionNote);
+    closeupOpen.disabled = fields.disabled;
+    closeupOpen.textContent = closeupJpeg ? 'Открыть крупный план' : 'Добавить крупный план';
+    closeupOpen.setAttribute('aria-expanded', String(!closeupPanel.hidden));
     byId('inspection-paused').hidden = !cameraBusy;
     const selected = telemetry.value;
     manual.hidden = selected !== 'manual';
@@ -185,7 +288,10 @@
       'Показания из примера, снятого отдельно от кадра.' : '';
     const historyLink = byId('inspection-history');
     historyLink.hidden = !ready;
-    historyLink.href = ready ? `/checkpoint.html?${new URLSearchParams({ serial: serialReady })}` : '/checkpoint.html';
+    const query = new URLSearchParams({ serial: serialReady });
+    if (saved) query.set('record', saved);
+    historyLink.href = ready ? `/checkpoint.html?${query}` : '/checkpoint.html';
+    historyLink.textContent = saved ? 'Открыть осмотр в журнале' : 'История осмотров';
     if (resource) {
       const data = ready ? pumpThreshold(passports, serialReady, selected, byId('inspection-telemetry-hours')?.valueAsNumber) : null;
       resource.hidden = !data;
@@ -220,7 +326,7 @@
     controller = null;
     pending = false;
     preview = null;
-    saved = false;
+    saved = '';
     savePayload = null;
     byId('inspection-diagnosis').hidden = true;
     byId('inspection-findings').replaceChildren();
@@ -243,6 +349,7 @@
 
   async function loadSerial() {
     const requested = serial.value.trim();
+    if (closeupPoint && closeupPanel.dataset.serial && closeupPanel.dataset.serial !== requested) resetCloseup();
     const load = ++serialLoad;
     serialReady = '';
     telemetry.replaceChildren(new Option('Нет данных датчиков', ''), new Option('Ручные показания', 'manual'));
@@ -261,6 +368,7 @@
       if (load !== serialLoad || requested !== serial.value.trim()) return;
       if (data.passport?.serial !== requested || !Array.isArray(data.scenarios)) throw new Error('Сервер не подтвердил серийный номер.');
       serialReady = requested;
+      if (closeupPoint && !closeupPanel.dataset.serial) closeupPanel.dataset.serial = requested;
       telemetry.querySelector('option[value="manual"]').disabled = !manualFields.length;
       for (const item of data.scenarios) {
         if (typeof item.id === 'string' && typeof item.label === 'string') telemetry.append(new Option(`Пример · ${item.label}`, item.id));
@@ -472,7 +580,18 @@
   async function saveInspection(event) {
     event.preventDefault();
     if (saveButton.disabled) return;
-    if (!savePayload) savePayload = { ...preview, requestId: requestId() };
+    if (!savePayload) {
+      if (closeupJpeg && !closeupLabel.value.trim()) {
+        closeupLabel.focus(); showCloseupStatus('Укажите узел на снимке.', true); return;
+      }
+      savePayload = { ...preview, requestId: requestId() };
+      if (closeupJpeg) {
+        savePayload.closeup = { componentLabel: closeupLabel.value.trim(), point: closeupPoint, image: closeupJpeg };
+        const type = byId('closeup-defect').value;
+        if (type) savePayload.closeup.defectType = type;
+        if (closeupMeasurement) savePayload.closeup.measurement = closeupMeasurement;
+      }
+    }
     const payload = savePayload;
     const activeRevision = revision;
     pending = true;
@@ -484,9 +603,9 @@
       const data = await api('/api/inspections', payload, controller.signal);
       if (activeRevision !== revision) return;
       if (!data.record?.id) throw new Error('Сервер не подтвердил сохранение.');
-      saved = true;
+      saved = data.record.id;
       saveButton.textContent = 'Осмотр сохранён';
-      setMessage(`Осмотр сохранён в историю ${payload.serial}. Запись ${data.record.id}.`);
+      setMessage(`Осмотр сохранён в журнале ${payload.serial}.`);
     } catch (error) {
       if (activeRevision !== revision || error.name === 'AbortError') return;
       saveButton.textContent = 'Повторить сохранение';
@@ -497,6 +616,7 @@
   }
 
   window.CyberInspection = {
+    openCloseup,
     update(result, busy) {
       cameraBusy = Boolean(busy);
       const valid = result?.source === 'local_vision' && ['defect', 'clear'].includes(result.status) &&
@@ -504,6 +624,7 @@
       panel.hidden = !valid;
       if ((valid ? result.analysisId : null) !== (current?.analysisId || null)) {
         current = valid ? result : null;
+        resetCloseup();
         invalidate();
         for (const select of confirms.querySelectorAll('select')) select.value = '';
         gauge.value = note.value = '';
@@ -516,7 +637,45 @@
       sync();
     },
   };
-  serial.addEventListener('input', () => { serialReady = ''; serialLoad += 1; invalidate(); });
+  for (const id of ['closeup-file', 'closeup-camera']) byId(id).addEventListener('change', selectCloseup);
+  byId('closeup-overview').addEventListener('click', event => {
+    if (!closeupPoint || fields.disabled) return;
+    const rect = event.target.getBoundingClientRect();
+    if (rect.width && rect.height) setCloseupPoint({x: (event.clientX - rect.left) / rect.width, y: (event.clientY - rect.top) / rect.height});
+  });
+  byId('closeup-overview').addEventListener('keydown', event => {
+    if (!closeupPoint || fields.disabled) return;
+    const step = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
+    if (!step) return;
+    event.preventDefault();
+    setCloseupPoint({x: closeupPoint.x + 0.01 * step[0], y: closeupPoint.y + 0.01 * step[1]});
+  });
+  byId('closeup-measure').addEventListener('click', async () => {
+    if (!closeupJpeg || fields.disabled || preparingCloseup || !window.CyberPhotoMeasure) return;
+    const version = closeupVersion;
+    try {
+      const value = await window.CyberPhotoMeasure.choose(closeupImage, closeupMeasurement);
+      if (version !== closeupVersion || value === undefined) return;
+      closeupMeasurement = value;
+      const mm = value && window.CyberPhotoMeasure.lengthMm(value, closeupImage.naturalWidth, closeupImage.naturalHeight);
+      byId('closeup-length').textContent = value && Number.isFinite(mm) ? '≈ ' + number.format(mm) + ' мм' : '';
+      showCloseupStatus();
+    } catch (error) { if (version === closeupVersion) showCloseupStatus(error.message, true); }
+  });
+  closeupOpen.addEventListener('click', () => {
+    if (!current) return;
+    const box = current.box;
+    openCloseup(closeupPoint || {x: box.x + box.width / 2, y: box.y + box.height / 2}, closeupTarget || current.component, closeupAnchor || 'primary');
+  });
+  byId('closeup-remove').addEventListener('click', () => {
+    resetCloseup();
+    sync();
+    closeupOpen.focus();
+  });
+  serial.addEventListener('input', () => {
+    if (closeupPoint && closeupPanel.dataset.serial && serial.value.trim() !== closeupPanel.dataset.serial) resetCloseup();
+    serialReady = ''; serialLoad += 1; invalidate();
+  });
   for (const input of [serial, activeEquipment]) input?.addEventListener('focus', () => {
     loadCatalog().catch(() => setMessage('Список оборудования не загрузился. Введите серийный номер вручную.', true));
   });

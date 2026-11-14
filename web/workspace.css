@@ -232,3 +232,17 @@ body[data-inspection-layout=capture] #result { display: none; }
 .video-review-evidence { margin-top: 12px; }
 .video-review-frame { padding: 12px; border-radius: 6px; background: #faf9f6; }
 .video-review-finding { font-size: 15px; font-weight: 650; }
+
+.inspection-closeup { margin: 12px 0 20px; padding: 12px 0; border-block: 1px solid var(--line); }
+.inspection-closeup > h4 { margin: 0 0 12px; font-size: 16px; }
+.inspection-closeup .closeup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.inspection-closeup .closeup-actions .button { min-height: 44px; }
+.closeup-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: start; margin: 12px 0; }
+.closeup-pair figure { margin: 0; min-width: 0; }
+.closeup-pair figcaption { font-size: 13px; color: var(--muted); }
+.closeup-overview { position: relative; width: fit-content; max-width: 100%; }
+.closeup-pair canvas, .closeup-pair img { display: block; max-width: 100%; height: auto; max-height: 210px; border-radius: 4px; }
+#closeup-mark { position: absolute; pointer-events: none; width: 12px; height: 12px; transform: translate(-50%, -50%); border-radius: 50%; background: #ad440d; border: 2px solid white; box-shadow: 0 0 0 1px #582206; }
+#closeup-measures { margin-top: 8px; }
+#closeup-length { margin-inline-start: 4px; font-variant-numeric: tabular-nums; }
+#closeup-open { margin-top: 12px; }

@@ -8,17 +8,21 @@
   <link rel="icon" href="/favicon.ico?v=eye-1" type="image/x-icon" sizes="16x16 32x32 48x48 64x64">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=eye-1" sizes="180x180">
   <link rel="stylesheet" href="styles.css?v=field-20261114">
-  <link rel="stylesheet" href="workspace.css?v=field-20261114">
+  <link rel="stylesheet" href="workspace.css?v=inspection-photos-1">
   <link rel="stylesheet" href="region-review.css?v=field-20261114">
+  <link rel="stylesheet" href="inspection-tools.css?v=1">
   <script src="offline.js" defer></script>
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="analysis-jobs.js" defer></script>
-  <script src="inspection.js?v=liquid-inspection-20261114" defer></script>
+  <script src="inspection-photo.js?v=1" defer></script>
+  <script src="inspection.js?v=inspection-photos-1" defer></script>
   <script src="media.js?v=mobile-recovery-20261114" defer></script>
   <script src="video-review.js?v=resource-20261114" defer></script>
   <script src="region-review.js?v=field-20261114" defer></script>
-  <script src="app.js?v=liquid-inspection-20261114" defer></script>
+  <script src="app.js?v=inspection-photos-1" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
+  <script src="equipment-qr.js?v=1" defer></script>
+  <script src="photo-measure.js?v=1" defer></script>
 </head>
 <body data-page="inspection">
   <a class="skip-link" href="#main-content">К основному содержимому</a>
@@ -47,6 +51,7 @@
           <button id="media-clear" class="button secondary" type="button" hidden>Убрать файл</button>
         </div>
         <div class="viewfinder" id="viewfinder">
+          <button type="button" id="equipment-qr" hidden aria-label="Сканировать QR оборудования" aria-pressed="false">QR</button>
           <div class="camera-idle" id="camera-idle">
             <button class="example-photo" type="button" id="open-example-photo" data-photo-url="/api/customer/images/15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8" aria-label="Открыть фото насосных агрегатов из подборки">
               <img id="example-photo-preview" src="/api/customer/images/15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8" alt="Два насосных агрегата с трубами и арматурой" decoding="async">
@@ -68,6 +73,7 @@
             <button class="button secondary" id="analysis-cancel" type="button" hidden>Отмена</button>
             <button class="button secondary" id="choose-region" type="button" hidden>Выбрать область</button>
           </div>
+          <p id="qr-scan-status" role="status" hidden></p>
           <p class="message" id="message" role="status"></p>
           <button type="button" id="retry-capture-load" class="button secondary" hidden>Повторить загрузку</button>
           <p class="video-metrics" id="media-progress" role="status" hidden></p>
@@ -115,11 +121,32 @@
           <span class="finding" id="finding"></span><h3 id="equipment"></h3><p class="observation-text" id="vision-observation" hidden></p><details class="workspace-details result-provenance"><summary>О данных</summary><p class="equipment-id" id="equipment-id"></p><p class="equipment-id" id="capture-provenance" hidden></p><p class="equipment-id" id="analysis-model"></p><p id="original-observation" class="equipment-id" hidden></p></details>
           <dl class="facts"><div><dt>Узел</dt><dd id="component"></dd></div><div id="service-life-fallback"><dt>Нормативный срок службы</dt><dd id="service-life"></dd></div><div><dt>Обслуживание</dt><dd id="next-service"></dd></div></dl>
           <div class="recommendation"><h4>Следующий шаг</h4><p id="recommendation"></p></div>
+          <button id="closeup-open" type="button" class="button secondary" hidden aria-controls="inspection-closeup">Добавить крупный план</button>
         </div>
         <section class="details" id="inspection-workflow" aria-labelledby="inspection-title" hidden>
           <h3 id="inspection-title">Зафиксировать осмотр</h3><p class="equipment-id" id="inspection-frame"></p><p class="message" id="inspection-paused" hidden>Остановите видеопроверку, чтобы подтвердить и сохранить последний кадр.</p>
           <form id="inspection-form">
             <fieldset id="inspection-fields"><legend>Оборудование и показания</legend>
+              <section id="inspection-closeup" class="inspection-closeup" aria-labelledby="closeup-title" hidden>
+                <h4 id="closeup-title" tabindex="-1">Крупный план узла</h4>
+                <p><label for="closeup-label">Узел на снимке</label><input id="closeup-label" maxlength="120" placeholder="Например, входной фланец"></p>
+                <p><label for="closeup-defect">Что видно инженеру</label><select id="closeup-defect">
+                  <option value="">Не указано</option><option value="corrosion">Коррозия</option><option value="liquid">Следы жидкости</option>
+                  <option value="crack">Трещина или разрыв</option><option value="wiring">Повреждение проводки</option>
+                  <option value="coating">Повреждение покрытия</option><option value="other">Другой признак</option>
+                </select></p>
+                <div class="closeup-pair">
+                  <figure><div class="closeup-overview"><canvas id="closeup-overview" tabindex="0" aria-label="Положение узла на общем кадре. Коснитесь снимка или используйте стрелки."></canvas><i id="closeup-mark" aria-hidden="true"></i></div><figcaption>Общий кадр</figcaption></figure>
+                  <figure id="closeup-preview" hidden><img id="closeup-image" alt="Крупный план выбранного узла"><figcaption>Крупный план</figcaption></figure>
+                </div>
+                <div class="closeup-actions">
+                  <label class="button secondary media-upload-control"><span>Снять крупно</span><input type="file" id="closeup-camera" accept="image/*" capture="environment" aria-label="Снять крупный план"></label>
+                  <label class="button secondary media-upload-control"><span>Выбрать фото</span><input type="file" id="closeup-file" accept="image/*" aria-label="Выбрать фото крупного плана"></label>
+                  <button type="button" class="button secondary" id="closeup-remove" hidden>Убрать фото</button>
+                </div>
+                <div id="closeup-measures" hidden><button type="button" class="button secondary" id="closeup-measure">Измерить</button> <output id="closeup-length" aria-live="polite"></output></div>
+                <p class="message" id="closeup-status" role="status" hidden></p>
+              </section>
               <p><label for="inspection-serial">Серийный номер</label><input id="inspection-serial" placeholder="Выберите или введите" maxlength="128" autocomplete="off" required></p>
               <section id="inspection-resource" aria-labelledby="inspection-resource-title" hidden>
                 <h4 id="inspection-resource-title">Паспорт насосного агрегата</h4>
@@ -148,7 +175,7 @@
       const message = document.getElementById('message');
       const retry = document.getElementById('retry-capture-load');
       const dependencies = [
-        ['analysis-jobs.js', 'CyberAnalysisJobs'], ['inspection.js', 'CyberInspection'],
+        ['analysis-jobs.js', 'CyberAnalysisJobs'], ['inspection-photo.js', 'CyberInspectionPhoto'], ['inspection.js', 'CyberInspection'],
         ['media.js', 'CyberMedia'], ['video-review.js', 'CyberVideoReview'],
       ];
       function loadAgain(name) {

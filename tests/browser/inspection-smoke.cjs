@@ -126,12 +126,21 @@ async function run(browser, engine, state, server, android) {
     assert.equal(await page.locator('#inspection-telemetry').inputValue(), '', 'No demo telemetry is assumed');
     assert.equal(await page.locator('#inspection-save').isDisabled(), true);
     await page.locator('#inspection-telemetry').selectOption('healthy');
+    if (!android) {
+      await page.locator('#detection').tap();
+      await page.locator('#inspection-closeup').waitFor();
+      await page.locator('#closeup-file').setInputFiles(path.join(root, 'web/demo-pump-clean.jpg'));
+      await page.locator('#closeup-image').waitFor();
+      await page.locator('#closeup-label').fill('Выходной фланец');
+      await page.locator('#closeup-defect').selectOption('corrosion');
+    }
     await page.locator('#inspection-confirmations').locator('..').evaluate((node) => node.open = true);
     await page.locator('#inspection-guard_issue').selectOption('true');
     await page.locator('#inspection-preview').click();
     await page.locator('#inspection-save:not([disabled])').waitFor();
     const payload = state.previews[0];
     assert.equal(payload.confirmedVision.guard_issue, true);
+    assert.equal('closeup' in payload, false, 'Diagnosis preview does not upload the close-up');
     assert.equal(payload.confirmedVision.seal_leak, null);
     assert.deepEqual(payload.telemetrySource, { kind: 'demo_scenario', scenarioId: 'healthy' });
     await page.locator('#inspection-diagnosis-source').getByText(android ? 'демонстрационная телеметрия' : 'Показания из примера', { exact: false }).waitFor();
@@ -146,7 +155,14 @@ async function run(browser, engine, state, server, android) {
     await page.getByRole('button', { name: 'Осмотр сохранён' }).waitFor();
     assert.equal(state.saves.length, 2);
     assert.deepEqual(state.saves[0], state.saves[1], 'Save retry keeps exact payload/requestId');
-    assert.equal(await page.locator('#inspection-history').getAttribute('href'), '/checkpoint.html?serial=P-102');
+    if (!android) {
+      assert.equal(state.saves[0].closeup.componentLabel, 'Выходной фланец');
+      assert.equal(state.saves[0].closeup.defectType, 'corrosion');
+      assert.equal(Buffer.from(state.saves[0].closeup.image, 'base64').subarray(0, 2).toString('hex'), 'ffd8');
+      const point = state.saves[0].closeup.point;
+      assert.ok(point.x >= 0 && point.x <= 1 && point.y >= 0 && point.y <= 1);
+    }
+    assert.equal(await page.locator('#inspection-history').getAttribute('href'), '/checkpoint.html?serial=P-102' + (android ? '' : '&record=saved-inspection-1'));
     await page.getByRole('button', { name: 'Новый кадр' }).click();
     assert.equal(await page.locator('#inspection-workflow').isVisible(), false);
     state.next = 'busy';

@@ -51,10 +51,24 @@ def main():
         }
         with closing(app.connect(database)) as connection, connection:
             result |= inspections.store_analysis(connection, jpeg.getvalue(), result)
+        exercise_uploads = '--inspection-work' in sys.argv
+        fixture = {'analysis': result}
+        if exercise_uploads:
+            # Exercise the normal upload, queue, evidence persistence and journal routes.
+            # Replace only model inference in this short-lived process.
+            finding = json.loads((ROOT / 'web/mock-analysis.json').read_text())
+            app.vision.analyze = lambda image, *, backend, profile: {
+                **finding, 'source': 'local_vision', 'model': 'fixture', 'profile': profile,
+                'observation': 'Следы коррозии на наружной поверхности фланца.',
+            }
+            closeup = Path(temporary) / 'flange-detail.jpg'
+            with Image.open(ROOT / 'web/demo-pump.jpg') as photo:
+                photo.crop((722, 220, 1032, 742)).save(closeup, 'JPEG', quality=92)
+            fixture['closeup'] = str(closeup)
         handler = partial(FixtureHandler, database=database, public_url='',
-                          vision_enabled=False, customer_root=customer.ROOT)
+                          vision_enabled=exercise_uploads, customer_root=customer.ROOT)
         with app.BoundedHTTPServer(('127.0.0.1', 0), handler) as server:
-            print(json.dumps({'url': f'http://127.0.0.1:{server.server_port}', 'analysis': result}), flush=True)
+            print(json.dumps({'url': f'http://127.0.0.1:{server.server_port}', **fixture}), flush=True)
             server.serve_forever(poll_interval=.05)
 
 

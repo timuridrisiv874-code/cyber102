@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import json
 import sqlite3
@@ -22,6 +23,18 @@ RESULT = {
     'component': 'Корпус насоса', 'finding': 'Возможная коррозия',
     'box': {'x': .1, 'y': .2, 'width': .4, 'height': .5}, 'observation': 'Ржавчина',
 }
+
+
+def attachment(color='red'):
+    from PIL import Image
+    stream = BytesIO()
+    Image.new('RGB', (400, 200), color).save(stream, 'JPEG', comment=b'private metadata')
+    return base64.b64encode(stream.getvalue()).decode('ascii')
+
+
+def measurement():
+    return {'referenceMm': 100, 'reference': [{'x': 0, 'y': 0}, {'x': .5, 'y': 0}],
+            'target': [{'x': 1, 'y': 0}, {'x': 1, 'y': .5}]}
 
 
 class InspectionsTest(unittest.TestCase):
@@ -161,6 +174,43 @@ class InspectionsTest(unittest.TestCase):
         self.assertEqual(record['evidence'], {})
         self.assertEqual(record['provenance'], {})
 
+    def test_closeup_rejects_invalid_geometry_and_keeps_inspection_atomic(self):
+        closeup = {'point': {'x': .5, 'y': .5}, 'componentLabel': 'Входной фланец', 'image': attachment()}
+        m = measurement()
+        invalid = [
+            {'componentLabel': '   '}, {'point': {'x': False, 'y': .1}}, {'point': {'x': -1, 'y': 0}},
+            {'image': 'not-jpeg'}, {'image': 'data:image/jpeg;base64,abcd'}, {'defectType': 'oil?'},
+            {'measurement': {}}, {'measurement': m | {'referenceMm': float('nan')}},
+            {'measurement': m | {'lengthMm': 400}}, {'measurement': m | {'referenceMm': 10001}},
+            {'measurement': m | {'reference': [{'x': 0, 'y': 0}, {'x': 0, 'y': .03}]}},
+            {'measurement': m | {'target': [{'x': 0, 'y': 0}, {'x': .001, 'y': 0}]}},
+        ]
+        for item in invalid:
+            with self.subTest(item=item), self.assertRaises(ValueError), self.connection:
+                inspections.save(self.connection, self.payload(closeup=closeup | item))
+        self.assertEqual(history.list_records(self.connection, 'P-102'), [])
+        self.assertEqual(self.connection.execute('SELECT retained FROM analysis_evidence').fetchone(), (0,))
+
+    def test_old_record_accepts_concurrent_work_retries_and_preserves_original(self):
+        with self.connection:
+            old, _ = inspections.save(self.connection, self.payload())
+        work = {'requestId': 'mobile-work', 'action': 'checked', 'date': '2026-11-14'}
+        def once(_):
+            with closing(sqlite3.connect(self.database)) as connection, connection:
+                return inspections.add_work(connection, old['id'], work)
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            results = list(executor.map(once, range(2)))
+        self.assertEqual(sum(created for _, created in results), 1)
+        record = results[0][0]
+        self.assertEqual(results[1][0], record)
+        self.assertEqual(record['evidence'], old['evidence'])
+        self.assertNotIn('imageUrl', record['work'][0])
+        self.assertNotIn('closeup', record)
+        self.assertEqual(len(record['work']), 1)
+        with self.connection:
+            retry, created = inspections.save(self.connection, self.payload())
+        self.assertEqual((created, retry), (False, record))
+
 
 class InspectionApiTest(unittest.TestCase):
     def setUp(self):
@@ -229,6 +279,62 @@ class InspectionApiTest(unittest.TestCase):
         self.assertEqual(status, 503)
         self.assertEqual(headers['Retry-After'], '2')
         self.assertEqual(json.loads(raw)['code'], 'vision_busy')
+
+    def test_closeup_work_and_after_photo_roundtrip(self):
+        from PIL import Image
+        with closing(sqlite3.connect(self.database)) as connection, connection:
+            analysis = inspections.store_analysis(connection, b'overview', RESULT | {
+                'media': {'captureSource': 'uploaded_video', 'videoTimeSeconds': 4.39}})
+        closeup = {'image': attachment(), 'componentLabel': 'Выходной фланец', 'point': {'x': .25, 'y': .8},
+                   'defectType': 'crack', 'measurement': measurement()}
+        payload = {'analysisId': analysis['analysisId'], 'serial': 'P-102', 'requestId': 'save-1',
+                   'telemetrySource': {'kind': 'none'}, 'confirmedVision': {}, 'closeup': closeup}
+        status, _, raw = self.request('POST', '/api/inspections', payload)
+        self.assertEqual(status, 201, raw)
+        record = json.loads(raw)['record']
+        self.assertIn('closeup', record)
+        self.assertEqual(record['closeup']['point'], closeup['point'])
+        self.assertEqual(record['closeup']['componentLabel'], closeup['componentLabel'])
+        self.assertEqual(record['closeup']['measurement'], measurement() | {'lengthMm': 50})
+        self.assertEqual(record['closeup']['defectType'], 'crack')
+        self.assertEqual(record['evidence']['result']['media']['videoTimeSeconds'], 4.39)
+        self.assertEqual(self.request('POST', '/api/inspections', payload)[0], 200)
+        for change in ({'image': attachment('white')}, {'componentLabel': 'Другая позиция'},
+                       {'point': {'x': .1, 'y': .2}}, {'defectType': 'other'},
+                       {'measurement': measurement() | {'referenceMm': 18}}):
+            self.assertEqual(self.request('POST', '/api/inspections', payload | {'closeup': closeup | change})[0], 409)
+        work = {'action': 'replaced', 'requestId': 'action-1', 'date': '2026-11-14', 'image': attachment('blue')}
+        endpoint = '/api/history/' + record['id'] + '/work'
+        for bad in ({'action': 'unsafe'}, {'date': '2026-02-30'}, {'date': ''}, {'image': '/tmp/client.jpg'}):
+            self.assertEqual(self.request('POST', endpoint, work | bad)[0], 400)
+        self.assertEqual(self.request('POST', endpoint, work, {'Origin': 'https://elsewhere.test'})[0], 403)
+        status, _, raw = self.request('POST', endpoint, work)
+        self.assertEqual(status, 201, raw)
+        saved = json.loads(raw)['record']
+        entry = saved['work'][0]
+        self.assertEqual((entry['date'], entry['action']), ('2026-11-14', 'replaced'))
+        for url, channel in ((record['closeup']['imageUrl'], 0), (entry['imageUrl'], 2)):
+            status, headers, image = self.request('GET', url)
+            self.assertEqual((status, headers.get_content_type()), (200, 'image/jpeg'))
+            self.assertNotIn(b'private metadata', image)
+            with Image.open(BytesIO(image)) as im:
+                self.assertGreater(im.getpixel((20, 20))[channel], 240)
+        self.assertEqual(self.request('GET', record['evidence']['imageUrl'])[2], b'overview')
+        self.assertEqual(self.request('POST', endpoint, work)[0], 200)
+        for change in ({'action': 'serviced'}, {'date': '2026-10-01'}, {'image': attachment('green')}):
+            self.assertEqual(self.request('POST', endpoint, work | change)[0], 409)
+        self.assertEqual(self.request('GET', entry['imageUrl'].replace(record['id'], '0' * 36))[0], 404)
+        self.assertEqual(self.request('POST', endpoint.replace(record['id'], '0' * 36), work)[0], 404)
+        status, _, raw = self.request('POST', endpoint, {'action': 'checked', 'date': '2026-10-02', 'requestId': '2'})
+        self.assertEqual(status, 201)
+        saved = json.loads(raw)['record']
+        self.assertEqual([e['action'] for e in saved['work']], ['replaced', 'checked'])
+        self.assertEqual(self.request('GET', endpoint + '/' + saved['work'][1]['id'] + '/image')[0], 404)
+        self.assertEqual(json.loads(self.request('GET', '/api/history?serial=P-102')[2])['records'], [saved])
+        details = self.request('GET', '/api/inspections/' + record['id'])[2]
+        self.assertNotIn(closeup['image'].encode(), details)
+        self.assertNotIn(work['image'].encode(), details)
+        self.assertEqual(json.loads(details)['record'], saved)
 
 
 if __name__ == '__main__':

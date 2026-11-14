@@ -1,11 +1,15 @@
 """Server-owned camera evidence and explicitly confirmed inspection snapshots."""
 
+import base64
 import hashlib
 import json
-from datetime import datetime, timedelta, timezone
+import math
+import re
+from datetime import date, datetime, timedelta, timezone
+from io import BytesIO
 from uuid import uuid4
 
-from . import history, customer, assessment
+from . import history, customer, assessment, vision
 from .diagnostics import number
 
 
@@ -86,8 +90,71 @@ def get_analysis(connection, identifier, *, include_image=False, now=None):
             'imageUrl': f'/api/analyses/{row[0]}/image', 'result': json.loads(row[3])}
 
 
+def _attachment_image(encoded):
+    max_chars = 4 * ((vision.MAX_IMAGE_BYTES + 2) // 3)
+    if not isinstance(encoded, str) or not 0 < len(encoded) <= max_chars:
+        raise ValueError('Приложите JPEG-фото до 3 МБ.')
+    try:
+        raw = base64.b64decode(encoded, validate=True)
+    except ValueError as error:
+        raise ValueError('Не удалось прочитать содержимое фото.') from error
+    return hashlib.sha256(raw).hexdigest(), vision.normalize_image(raw, formats=('JPEG',), max_side=1920)
+
+
+def _point(value):
+    if (not isinstance(value, dict) or set(value) != {'x', 'y'}
+            or any(type(v) not in (int, float) or not 0 <= v <= 1 for v in value.values())):
+        raise ValueError('Укажите точку внутри фотографии.')
+    return {'x': float(value['x']), 'y': float(value['y'])}
+
+
+def _measurement(value, jpeg):
+    from PIL import Image
+    if not isinstance(value, dict) or set(value) != {'referenceMm', 'reference', 'target'}:
+        raise ValueError('Для измерения нужны длина эталона и два отрезка.')
+    reference_mm = value['referenceMm']
+    if type(reference_mm) not in (float, int) or not 0 < reference_mm <= 10000:
+        raise ValueError('Укажите длину эталона в миллиметрах (до 10000).')
+    with Image.open(BytesIO(jpeg)) as image:
+        width, height = image.size
+    result = {'referenceMm': reference_mm}
+    lengths = {}
+    for name, min_pixels in (('reference', 12), ('target', 2)):
+        ends = value[name]
+        if not isinstance(ends, list) or len(ends) != 2:
+            raise ValueError('Каждый отрезок должен содержать две точки.')
+        a, b = result[name] = [_point(p) for p in ends]
+        lengths[name] = math.hypot((a['x'] - b['x']) * width, (a['y'] - b['y']) * height)
+        if lengths[name] + 1e-9 < min_pixels:
+            raise ValueError(f'Слишком короткий отрезок на фото. Минимум — {min_pixels} пикс.')
+    result['lengthMm'] = reference_mm * lengths['target'] / lengths['reference']
+    return result
+
+
+def _closeup(data):
+    required = {'point', 'image', 'componentLabel'}
+    if (not isinstance(data, dict) or not required <= set(data)
+            or set(data) - required - {'defectType', 'measurement'}):
+        raise ValueError('Выберите узел и добавьте фотографию крупного плана.')
+    label = data['componentLabel']
+    if not isinstance(label, str) or not 0 < len(label.strip()) <= 120 or not label.strip().isprintable():
+        raise ValueError('Название узла должно содержать от 1 до 120 символов.')
+    point = _point(data['point'])
+    if 'defectType' in data and data['defectType'] not in ('corrosion', 'liquid', 'crack', 'wiring', 'coating', 'other'):
+        raise ValueError('Неизвестный тип дефекта.')
+    sha, image = _attachment_image(data['image'])
+    result = {'point': point, 'componentLabel': label.strip(), 'imageSha256': sha}
+    if 'defectType' in data:
+        result['defectType'] = data['defectType']
+    if 'measurement' in data:
+        result['measurement'] = _measurement(data['measurement'], image)
+    return result, image
+
+
 def validate_request(data, *, saving=False):
     allowed = {'serial', 'analysisId', 'telemetrySource', 'confirmedVision', 'note', 'requestId', 'selectedComponent'}
+    if saving:
+        allowed.add('closeup')
     if not isinstance(data, dict) or set(data) - allowed:
         raise ValueError('Недопустимые поля осмотра.')
     serial = history._identifier(data.get('serial'), 'Серийный номер')
@@ -126,8 +193,13 @@ def validate_request(data, *, saving=False):
         if component not in ('pump', 'seal', 'foundation', 'shaft_joints', 'bearing', 'gearbox', 'motor', 'temperature_transmitter'):
             raise ValueError('Неизвестный узел оборудования.')
         normalized['selectedComponent'] = component
-    # Reject non-finite values and unpaired Unicode before any database write.
+    if 'closeup' in data:
+        normalized['closeup'], closeup_image = _closeup(data['closeup'])
+    # The request fingerprint includes image content and the location on the
+    # particular analysis frame. Previously saved request hashes stay valid.
     encoded = json.dumps(normalized, allow_nan=False, ensure_ascii=False, sort_keys=True).encode('utf-8')
+    if 'closeup' in data:
+        normalized['closeup']['jpeg'] = closeup_image
     return normalized, request_id, hashlib.sha256(encoded).hexdigest()
 
 
@@ -212,4 +284,59 @@ def save(connection, data, *, customer_root=customer.ROOT):
         inspected['telemetry'], inspected['vision'], inspected['findings'], note=normalized['note'],
         request_id=request_id, evidence=inspected['analysis'], provenance=provenance)
     connection.execute('UPDATE analysis_evidence SET retained = 1 WHERE id = ?', (normalized['analysisId'],))
+    if 'closeup' in normalized:
+        closeup = normalized['closeup']
+        connection.execute('''
+            INSERT INTO inspection_closeups(record_id, component_label, point_x, point_y, image_jpeg,
+                                           defect_type, measurement_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?)''', (record['id'], closeup['componentLabel'],
+            closeup['point']['x'], closeup['point']['y'], closeup['jpeg'], closeup.get('defectType'),
+            history._encode(closeup['measurement']) if 'measurement' in closeup else None))
+        record = history.get_record(connection, record['id'])
     return record, created
+
+
+def add_work(connection, record_id, data):
+    if not isinstance(data, dict) or set(data) - {'requestId', 'action', 'date', 'image'}:
+        raise ValueError('Недопустимые поля выполненной работы.')
+    key = history._identifier(data.get('requestId'), 'Идентификатор запроса')
+    action = data.get('action')
+    if action not in ('checked', 'serviced', 'replaced'):
+        raise ValueError('Выберите вид выполненной работы.')
+    day = data.get('date')
+    try:
+        if not isinstance(day, str) or not re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', day):
+            raise ValueError()
+        date.fromisoformat(day)
+    except ValueError as error:
+        raise ValueError('Укажите календарную дату выполненной работы.') from error
+    sha, image = _attachment_image(data['image']) if 'image' in data else (None, None)
+    if not connection.in_transaction:
+        connection.execute('BEGIN IMMEDIATE')
+    if not connection.execute('SELECT 1 FROM inspection_records WHERE id = ?', (record_id,)).fetchone():
+        raise MissingEvidence('Осмотр не найден.')
+    cursor = connection.execute('''
+        INSERT INTO inspection_work (id, record_id, request_id, action, work_date, image_sha256, image_jpeg)
+        VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(record_id, request_id) DO NOTHING
+    ''', (str(uuid4()), record_id, key, action, day, sha, image))
+    created = cursor.rowcount == 1
+    if not created:
+        previous = connection.execute('''
+            SELECT action, work_date, image_sha256 FROM inspection_work
+            WHERE record_id = ? AND request_id = ?
+        ''', (record_id, key)).fetchone()
+        if previous != (action, day, sha):
+            raise history.IdempotencyConflict('Идентификатор запроса уже использован для другой работы.')
+    return history.get_record(connection, record_id), created
+
+
+def attachment_image(connection, record_id, work_id=None):
+    if work_id is None:
+        result = connection.execute('SELECT image_jpeg FROM inspection_closeups WHERE record_id = ?',
+                                    (record_id,)).fetchone()
+    else:
+        result = connection.execute('SELECT image_jpeg FROM inspection_work WHERE record_id = ? AND id = ?',
+                                    (record_id, work_id)).fetchone()
+    if not result or result[0] is None:
+        raise MissingEvidence('Фотография не найдена.')
+    return result[0]
