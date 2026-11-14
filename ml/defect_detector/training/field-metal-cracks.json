@@ -1,0 +1,122 @@
+[
+  {
+    "file": "valero-elbow.jpg",
+    "scene": "valero-elbow",
+    "split": "train",
+    "source": "https://commons.wikimedia.org/wiki/File:Cracked_pipe.jpg",
+    "download": "https://upload.wikimedia.org/wikipedia/commons/7/72/Cracked_pipe.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "author": "U.S. Chemical Safety Board",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "sha256": "29206296db0556165fd9b24716e2a0c08fda10bd68635ac76d94b72354045f3d",
+    "sourceSha256": "62900b28c6555ec990aa442a03ffa9fcdb16b7615e6ee23057c9222bc9c58ea0",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.324,
+          0.43,
+          0.506,
+          0.53
+        ]
+      }
+    ],
+    "note": "Exterior pipe, from the Chemical Safety Board incident."
+  },
+  {
+    "file": "water-hammer-gauge.jpg",
+    "scene": "water-hammer-gauge",
+    "split": "train",
+    "source": "https://commons.wikimedia.org/wiki/File:Joukowsky-Pressure-Shock-01.jpg",
+    "download": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Joukowsky-Pressure-Shock-01.jpg/960px-Joukowsky-Pressure-Shock-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "author": "CEphoto, Uwe Aranas",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sha256": "dcffb5da21664c41d9c9d43f7f050eea7b0d9aa1245e9ea39b558a1eee004abe",
+    "sourceSha256": "408ff097f6adb79293f0322672cd650e15fd2d1f924c0bd685985e807dbfda51",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.345,
+          0.463,
+          0.558,
+          0.568
+        ]
+      }
+    ],
+    "note": "Removed ruptured vessel gauge with a visible opening in the metal wall."
+  },
+  {
+    "file": "steam-pipe-erosion.jpg",
+    "scene": "steam-pipe-erosion",
+    "split": "train",
+    "source": "https://commons.wikimedia.org/wiki/File:Pipe-burst-after-erosion-in-a-steam-pipeline-01.jpg",
+    "download": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Pipe-burst-after-erosion-in-a-steam-pipeline-01.jpg/960px-Pipe-burst-after-erosion-in-a-steam-pipeline-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "author": "CEphoto, Uwe Aranas",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sha256": "238634ec8c6f4911409ec3b6ea2f6ba773d290d3c16c04ed28220dbf1668f819",
+    "sourceSha256": "f357558537ca357fd5ee4b1356c76860e7e1bb9667bc26a3cff6dacde0ee080b",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.275,
+          0.136,
+          0.756,
+          0.916
+        ]
+      }
+    ],
+    "note": "Removed metal elbow with jagged rupture. Other view withheld from the experiment."
+  },
+  {
+    "file": "weld-stress-collar.jpg",
+    "scene": "weld-stress-collar",
+    "split": "val",
+    "source": "https://commons.wikimedia.org/wiki/File:Stress-Corrosion-Cracking-caused-by-weld-stress-01.jpg",
+    "download": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Stress-Corrosion-Cracking-caused-by-weld-stress-01.jpg/960px-Stress-Corrosion-Cracking-caused-by-weld-stress-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "author": "CEphoto, Uwe Aranas",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sha256": "16df1daa252389898bbe585859a7212d56cd28681e23528b496b240c4dcaca4b",
+    "sourceSha256": "16a34422a6202db19dbeaacb041394f915c79d6f74bb349cb35ca5da0cf59c57",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.465,
+          0.415,
+          0.679,
+          0.814
+        ]
+      }
+    ],
+    "note": "Outward facing cluster of fine corrosion cracks beneath the collar."
+  },
+  {
+    "file": "quench-pipe.jpg",
+    "scene": "quench-pipe",
+    "split": "train",
+    "source": "https://commons.wikimedia.org/wiki/File:Stress-Corrosion-Cracking-Quench-Pipe-1.4541-01.jpg",
+    "download": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Stress-Corrosion-Cracking-Quench-Pipe-1.4541-01.jpg/960px-Stress-Corrosion-Cracking-Quench-Pipe-1.4541-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "author": "CEphoto, Uwe Aranas",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sha256": "529b5f23ef6ef4e3d10852ceb3836f44cf105a9db54003000906eb365bdf8dcb",
+    "sourceSha256": "3aa1e98ad86a77734b668e52273be1cf86847c2296b6cf487e9c402b92bacbf1",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.341,
+          0.469,
+          0.704,
+          0.625
+        ]
+      }
+    ],
+    "note": "Removed quench pipe section with visible cracking and separation."
+  }
+]
