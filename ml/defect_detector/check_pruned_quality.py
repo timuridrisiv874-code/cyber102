@@ -1,12 +1,13 @@
 """Rank compressed YOLO candidates by size after strict holdout regression checks."""
 import argparse
+from collections import Counter
 from hashlib import file_digest
 import json
 from pathlib import Path
 
 
 def compare(baseline, candidate, thresholds):
-    failures, positives = [], 0
+    failures, positives = [], Counter()
     if baseline.keys() != candidate.keys() or not baseline:
         raise ValueError('Expected identical, nonempty dataset coverage')
     for name, test in baseline.items():
@@ -36,7 +37,7 @@ def compare(baseline, candidate, thresholds):
                         failures.append({'dataset': name, 'class': label, 'threshold': cutoff,
                                          'frame': frame, 'lostObjects': missing})
                 if cutoff == thresholds[0]:
-                    positives += a['tp']
+                    positives[label] += a['tp']
             for cutoff, clean in row['negativeFrames'].items():
                 if cutoff not in thresholds:
                     continue
@@ -84,9 +85,11 @@ def main():
         if (pruning['onnxBytes'] != onnx_bytes or pruning['onnxSha256'] != digest
                 or not pruning['onnxOutputShape']):
             raise ValueError(f'Expected verified ONNX export: {name}')
-        passed = bool(support and not failures and 0 < onnx_bytes <= limit
+        unsupported = sorted(label for label, hits in support.items() if not hits)
+        passed = bool(support and not unsupported and not failures and 0 < onnx_bytes <= limit
                       and pruning['parametersAfter'] < pruning['parametersBefore'])
-        results[name] = {'passed': passed, 'regressions': failures, 'baselineHits': support,
+        results[name] = {'passed': passed, 'regressions': failures, 'baselineHitsByClass': support,
+                         'unverifiedClasses': unsupported,
                          'onnxBytes': onnx_bytes, 'onnx': str(onnx),
                          'parameters': pruning['parametersAfter'],
                          'peakGpuAllocatedBytes': max((row.get('peakGpuAllocatedBytes') or 0
