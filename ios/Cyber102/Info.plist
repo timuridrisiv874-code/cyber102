@@ -10,6 +10,7 @@
 <key>CFBundleShortVersionString</key><string>$(MARKETING_VERSION)</string>
 <key>CFBundleVersion</key><string>$(CURRENT_PROJECT_VERSION)</string>
 <key>NSCameraUsageDescription</key><string>Камера нужна, чтобы снять оборудование или прочитать его QR-код для осмотра.</string>
+<key>NSMicrophoneUsageDescription</key><string>Микрофон нужен для записи видео при осмотре оборудования.</string>
 <key>LSRequiresIPhoneOS</key><true/>
 <key>UILaunchScreen</key><dict/>
 <key>UISupportedInterfaceOrientations</key><array><string>UIInterfaceOrientationPortrait</string><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>

@@ -11,7 +11,7 @@ struct InspectionView: View {
     private static let ru = Locale.Language(identifier: "ru")
     @Environment(\.scenePhase) private var scenePhase
     private let engine = InspectionEngine.shared
-    @State private var profile: InspectionProfile = .detailed
+    private let profile: InspectionProfile = .quick
     @StateObject private var store = InspectionStore()
     @State private var picked: PhotosPickerItem?
     @State private var clip: InspectionClip?
@@ -42,10 +42,29 @@ struct InspectionView: View {
     @State private var translationRun = UUID()
     @State private var missingLanguage = false
     @State private var showHistory = false
+    @State private var showOnline = false
 
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    Button { showOnline = true } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "viewfinder")
+                                .font(.title3)
+                                .frame(width: 36, height: 36)
+                                .background(.tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("Онлайн-осмотр").font(.headline)
+                                Text("Фото, видео, 3D и общий журнал")
+                                    .font(.subheadline).foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 0)
+                            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
                 Section("Оборудование") {
                     HStack {
                         if let equipment {
@@ -66,7 +85,7 @@ struct InspectionView: View {
                     .disabled(analysis != nil)
                     if let equipment { equipmentDetails(equipment) }
                 }
-                Section("Фотография") {
+                Section("Кадр осмотра") {
                     if let jpeg, let photo = UIImage(data: jpeg) {
                         Image(uiImage: photo).resizable().scaledToFit()
                             .frame(maxWidth: .infinity, maxHeight: 280).accessibilityLabel("Фото осмотра")
@@ -108,13 +127,6 @@ struct InspectionView: View {
                         .accessibilityLabel("Время кадра")
                         .disabled(analysis != nil || translating)
                     }
-                    Picker("Режим анализа", selection: $profile) {
-                        Text("Подробный").tag(InspectionProfile.detailed)
-                        Text("Быстрый").tag(InspectionProfile.quick)
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityIdentifier("offline-analysis-profile")
-                    .disabled(analysis != nil || translating)
                     if analysis == nil && !translating {
                         Button(entry == nil ? "Проверить на iPhone" : "Проверить ещё раз", action: analyze)
                             .disabled(jpeg == nil || loadingFrame)
@@ -124,7 +136,7 @@ struct InspectionView: View {
                     if !phase.isEmpty { HStack { ProgressView(); Text(phase).font(.subheadline) } }
                 }
                 if let entry {
-                    Section("Предварительное наблюдение") {
+                    Section("Наблюдение и действия") {
                         if let timing = entry.timing { timingDetails(timing) }
                         Text(entry.russian ?? entry.english).textSelection(.enabled)
                         if entry.russian != nil {
@@ -149,7 +161,7 @@ struct InspectionView: View {
                     Section { Button("Журнал осмотров (\(store.entries.count))") { showHistory = true } }
                 }
             }
-            .navigationTitle("Осмотр")
+            .navigationTitle("Осмотр на iPhone")
             .navigationDestination(isPresented: $showHistory) {
                 List(store.entries) { row in
                     DisclosureGroup {
@@ -180,6 +192,7 @@ struct InspectionView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $showOnline) { OnlineInspectionScreen(serial: equipment?.serial) }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background && (analysis != nil || translating) {
                 stop()
