@@ -31,21 +31,15 @@
     const kind = {pump:'Насос', motor:'Двигатель', gearbox:'Редуктор', temperature_transmitter:'Датчик температуры'}[item.kind] || 'Оборудование';
     return kind + ' · ' + item.serial;
   }
-  function equipmentPhoto(photo, catalog = true) {
+  function equipmentPhoto(photo, showTitle = false) {
     const figure = node('figure', null, 'equipment-card-photo');
     const image = node('img');
     image.src = '/equipment-photos/' + photo.image;
     image.alt = photo.title;
     image.loading = 'lazy';
     image.decoding = 'async';
-    const caption = node('figcaption', photo.title, 'workspace-note');
-    caption.append(node('br'), external({url: photo.url, title: photo.credit}));
-    if (catalog) caption.append(document.createTextNode(' · Серийный номер на фото не подтверждён'));
-    if (photo.license) {
-      caption.append(document.createTextNode(' · '), external(photo.license),
-        document.createTextNode(' · уменьшенное превью'));
-    }
-    figure.append(image, caption);
+    figure.append(image);
+    if (showTitle) figure.append(node('figcaption', photo.title, 'workspace-note'));
     return figure;
   }
   function sourceLink(documentId, page, label) {
@@ -103,6 +97,11 @@
         list.append(entry);
       }
       details.append(list); card.append(details);
+      if (photo) {
+        const credit = node('p', 'Каталожное фото серии · ', 'workspace-note');
+        credit.append(external({url: photo.url, title: photo.credit}));
+        details.append(credit);
+      }
       const actions = node('div', null, 'equipment-card-actions');
       if (item.serial && (item.kind === 'pump' || item.kind === 'motor')) {
         const action = item.kind === 'motor' ? 'Рассчитать ресурс двигателя' : 'Начать осмотр';
@@ -186,7 +185,13 @@
       url: 'https://blog.wika.com/us/products/pressure-products/eugene-bourdon-history-bourdon-gauge/', credit: 'WIKA',
     },
   ];
-  $('other-equipment-photos').append(...installationPhotos.map(photo => equipmentPhoto(photo, false)));
+  $('other-equipment-photos').append(...installationPhotos.map(photo => equipmentPhoto(photo, true)));
+  for (const photo of installationPhotos) {
+    const credit = node('li', photo.title + ' · ');
+    credit.append(external({url: photo.url, title: photo.credit}));
+    if (photo.license) credit.append(document.createTextNode(' · '), external(photo.license));
+    $('equipment-photo-credits').append(credit);
+  }
   function external(source) {
     const link = node('a', source.title || 'Источник', 'source-link');
     if (!/^https:\/\/[a-z0-9.-]+\//i.test(source.url)) return node('span', link.textContent);
