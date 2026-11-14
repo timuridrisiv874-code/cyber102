@@ -10,7 +10,8 @@ ROOT = Path(__file__).resolve().parents[1] / 'data/customer'
 
 
 def load(name, root=ROOT):
-    if name not in ('materials', 'sensors', 'sensor-import-report', 'documents', 'equipment-passports', 'equipment-knowledge'):
+    if name not in ('materials', 'sensors', 'sensor-import-report', 'documents', 'equipment-passports',
+                   'equipment-knowledge', 'inspection-knowledge'):
         raise ValueError('Unknown dataset')
     root = Path(root).resolve()
     path = (root / f'{name}.json').resolve()

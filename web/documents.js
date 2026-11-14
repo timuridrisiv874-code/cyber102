@@ -120,7 +120,7 @@
   $('equipment-kind').addEventListener('change', () => renderEquipment(currentPassports));
   function external(source) {
     const link = node('a', source.title || 'Источник', 'source-link');
-    if (!/^https:\/\/(?:knz\.ru|am-systems\.ru)\//.test(source.url)) return node('span', link.textContent);
+    if (!/^https:\/\/[a-z0-9.-]+\//i.test(source.url)) return node('span', link.textContent);
     link.href = source.url; link.target = '_blank'; link.rel = 'noopener';
     return link;
   }
@@ -137,7 +137,8 @@
     if (selected.startsWith('serial:')) {
       params.set('serial', selected.slice(7));
       if (component.value) params.set('component', component.value);
-    } else params.set('model', selected.slice(6));
+    } else if (selected.startsWith('model:')) params.set('model', selected.slice(6));
+    else params.set('section', selected.slice(8));
     const results = $('knowledge-results');
     results.replaceChildren(node('p', 'Поиск в документации…'));
     try {
@@ -170,6 +171,9 @@
       for (const item of data.matches) {
         const card = node('article', null, 'document-item');
         card.append(node('h3', item.title), node('p', item.text));
+        if (item.applicability === 'technical_reference') {
+          card.append(node('p', 'Отраслевая справка · ' + item.source.publisher, 'workspace-note'));
+        }
         card.append(item.source.documentId
           ? sourceLink(item.source.documentId, item.source.page, item.source.title + ' · стр. ' + item.source.page)
           : external(item.source));
@@ -207,6 +211,9 @@
       }
       card.append(facts, external(row.source), external(row.manual));
       models.append(card);
+    }
+    for (const section of catalog?.sections || []) {
+      $('knowledge-target').append(new Option(section.title + ' · справка', 'section:' + section.id));
     }
     $('pump-gallery')?.remove();
     if (catalog?.photos?.length) {
