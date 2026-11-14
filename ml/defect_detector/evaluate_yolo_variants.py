@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from statistics import median
 
-from evaluate import class_negative_frames, infer, localization_errors, measurements
+from evaluate import class_negative_frames, infer, localization_errors, match_indices, measurements
 
 THRESHOLDS = (.01, .05, .15, .25)
 
@@ -48,11 +48,24 @@ def summarize(rows, predictions, labels):
         if not scoped:
             continue
         errors = localization_errors(scoped, predictions, .01, .5)
+        matches = {}
+        for floor in THRESHOLDS:
+            hits = {}
+            for row in scoped:
+                filename = row['file']
+                boxes = [obj['xyxy'] for obj in row['objects']]
+                proposed = [box for box in predictions[filename]
+                            if box['class'] == label and box['score'] >= floor]
+                matched = match_indices(proposed, boxes, .5)
+                if matched:
+                    hits[filename] = sorted(matched)
+            matches[f'{floor:.2f}'] = hits
         report[label] = {
+            'matchedObjects': matches,
             'thresholds': {f'{floor:.2f}': measurements(scoped, predictions, (label,), floor, .5)['classes'][label]
                            for floor in THRESHOLDS},
             'negativeFrames': {f'{floor:.2f}': class_negative_frames(scoped, predictions, (label,), floor)[label]
-                               for floor in (.01, .25)},
+                               for floor in (.01, .05, .25)},
             'missesAtFloor': dict(Counter(error['reason'] for error in errors)),
         }
     return report
