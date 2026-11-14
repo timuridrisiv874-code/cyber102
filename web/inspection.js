@@ -120,7 +120,8 @@
   const serialChoices = document.createElement('datalist');
   serialChoices.id = 'inspection-equipment-options';
   serial.setAttribute('list', serialChoices.id);
-  serial.after(serialChoices);
+  const activeEquipment = byId('active-equipment');
+  (activeEquipment || serial).after(serialChoices);
   const navigator = document.createElement('section');
   navigator.id = 'inspection-guidance';
   const references = document.createElement('section');
@@ -130,7 +131,6 @@
   let catalogPromise = null;
   let passportsPromise = null;
   let passports = null;
-  const activeEquipment = byId('active-equipment');
   const resource = byId('inspection-resource');
   const visionLabels = {
     seal_leak: 'Жидкость именно в зоне уплотнения вала',
@@ -192,6 +192,9 @@
       if (data) {
         byId('inspection-resource-title').textContent = `Насосный агрегат · ${serialReady}`;
         byId('inspection-resource-terms').textContent = data.terms;
+        byId('inspection-resource-limit').textContent = component.value === 'pump'
+          ? 'Фактический остаточный ресурс неизвестен.'
+          : 'Норматив относится ко всему агрегату. Фактический остаточный ресурс выбранного узла неизвестен.';
         const hours = byId('inspection-resource-hours');
         if (hours.textContent !== data.hours) hours.textContent = data.hours;
         hours.hidden = !data.hours;
