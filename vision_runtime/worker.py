@@ -225,9 +225,6 @@ def parse_video_observations(text, timestamps):
 
 
 class Engine:
-    model_id = MODEL
-    revision = REVISION
-
     def __init__(self, directory):
         import torch
         from transformers import AutoProcessor, AutoModelForImageTextToText
@@ -363,8 +360,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.path != '/health':
             self.reply(404, {'error': 'Not found'})
             return
-        self.reply(200, {'status': 'ok', 'model': getattr(self.server.engine, 'model_id', MODEL),
-                        'revision': getattr(self.server.engine, 'revision', REVISION),
+        self.reply(200, {'status': 'ok', 'model': MODEL, 'revision': REVISION,
                          'device': self.server.engine.device, 'busy': self.server.engine.lock.locked(),
                          'offline': True, 'profiles': list(PROFILES), 'defaultProfile': 'standard',
                          'video': {'enabled': True, 'mode': 'sampled_multi_image',
@@ -406,41 +402,40 @@ class Handler(BaseHTTPRequestHandler):
                         result = self.server.engine.infer_video(images, timestamps)
                     except (ValueError, KeyError, TypeError):
                         status = 502
-                        self.reply(status, {'error': 'Model did not return valid observations for every frame'})
-                        return
-                status = 200
-                self.reply(status, {'model': getattr(self.server.engine, 'model_id', MODEL),
-                                    'revision': getattr(self.server.engine, 'revision', REVISION), **result,
+                        response = {'error': 'Model did not return valid observations for every frame'}
+                    else:
+                        status = 200
+                        response = {'model': MODEL, 'revision': REVISION, **result,
                                     'durationSeconds': round(time.monotonic() - started, 3),
                                     'clipDurationSeconds': clip_duration,
-                                    'metrics': self.server.engine.last_metrics})
-                return
-            profile = request_profile(payload)
-            image = read_image(payload)
-            try:
-                with image:
-                    observation = self.server.engine.infer(image, profile=profile)
-            except (ValueError, KeyError, TypeError):
-                status = 502
-                self.reply(status, {'error': 'Model did not return a valid observation'})
-                return
-            status = 200
-            self.reply(status, {'model': getattr(self.server.engine, 'model_id', MODEL),
-                                'revision': getattr(self.server.engine, 'revision', REVISION), 'observation': observation,
+                                    'metrics': self.server.engine.last_metrics}
+            else:
+                profile = request_profile(payload)
+                image = read_image(payload)
+                try:
+                    with image:
+                        observation = self.server.engine.infer(image, profile=profile)
+                except (ValueError, KeyError, TypeError):
+                    status = 502
+                    response = {'error': 'Model did not return a valid observation'}
+                else:
+                    status = 200
+                    response = {'model': MODEL, 'revision': REVISION, 'observation': observation,
                                 'profile': profile, 'metrics': self.server.engine.last_metrics,
                                 'observationKind': OBSERVATION_KINDS[profile],
-                                'durationSeconds': round(time.monotonic() - started, 3)})
+                                'durationSeconds': round(time.monotonic() - started, 3)}
         except (ValueError, OSError, TypeError, json.JSONDecodeError):
             status = 400
-            self.reply(status, {'error': 'Invalid image or sampled video request'})
+            response = {'error': 'Invalid image or sampled video request'}
         except Exception as error:
             status = 503
-            self.reply(status, {'error': 'Local inference unavailable'})
+            response = {'error': 'Local inference unavailable'}
             print(json.dumps({'event': 'inference_error', 'type': type(error).__name__}), flush=True)
         finally:
             self.server.engine.lock.release()
             print(json.dumps({'event': 'clip' if self.path == '/analyze-video' else 'frame', 'status': status,
                               'seconds': round(time.monotonic() - started, 3)}), flush=True)
+        self.reply(status, response)
 
 
 class Server(ThreadingHTTPServer):
@@ -469,10 +464,8 @@ class Server(ThreadingHTTPServer):
 
 
 def main():
-    from server.vision_models import DEFAULT_MODEL, MODELS, model_spec
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--model', choices=tuple(MODELS), default=DEFAULT_MODEL)
-    parser.add_argument('--model-directory', type=Path)
+    parser.add_argument('--model-directory', type=Path, default=ROOT / 'models/internvl3_5-2b-hf')
     parser.add_argument('--port', type=int, default=11436)
     parser.add_argument('--warmup', action='store_true', help='Warm CUDA with a synthetic image before accepting requests')
     args = parser.parse_args()
@@ -480,14 +473,10 @@ def main():
         os.environ[key] = '1'
     os.environ['TOKENIZERS_PARALLELISM'] = 'false'
     sys.addaudithook(deny_external_connections)
-    spec = model_spec(args.model)
-    engine_class = Engine
-    if args.model == 'qwen3_vl_4b':
-        from vision_runtime.qwen_worker import Engine as engine_class
-    engine = engine_class(args.model_directory or ROOT / 'models' / spec.directory)
+    engine = Engine(args.model_directory)
     if args.warmup:
         print(json.dumps({'event': 'warmup', 'profile': 'standard', 'metrics': engine.warmup()}), flush=True)
-    print(json.dumps({'event': 'ready', 'model': engine.model_id, 'revision': engine.revision, 'device': engine.device}), flush=True)
+    print(json.dumps({'event': 'ready', 'model': MODEL, 'revision': REVISION, 'device': engine.device}), flush=True)
     with Server(('127.0.0.1', args.port), engine) as server:
         try:
             server.serve_forever()
