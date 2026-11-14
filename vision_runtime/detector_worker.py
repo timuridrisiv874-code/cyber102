@@ -54,7 +54,7 @@ def load_manifest(path):
         raise ValueError('Manifest grew beyond limit')
     manifest = strict_json(body)
     required = {'schemaVersion', 'model', 'modelVersion', 'weightsSha256', 'classMap'}
-    optional = {'minimumScore', 'imageSize'}
+    optional = {'minimumScore', 'imageSize', 'task'}
     if (not isinstance(manifest, dict) or not required <= set(manifest) or set(manifest) - required - optional
             or type(manifest['schemaVersion']) is not int or manifest['schemaVersion'] != 1
             or manifest['model'] != MODEL or not isinstance(manifest['modelVersion'], str)
@@ -80,6 +80,8 @@ def load_manifest(path):
         raise ValueError('minimumScore must be in (0, 1]')
     if type(image_size) is not int or not 320 <= image_size <= 1280 or image_size % 32:
         raise ValueError('imageSize must be a multiple of 32 in [320, 1280]')
+    if manifest.get('task', 'detect') not in ('detect', 'segment'):
+        raise ValueError('Detector task must be detect or segment')
     return {**manifest, 'minimumScore': minimum_score, 'imageSize': image_size}
 
 
@@ -159,7 +161,7 @@ def load_model(weights, device):
     settings.update({'sync': False})
     if device.startswith('cuda:') and not torch.cuda.is_available():
         raise RuntimeError('CUDA requested but unavailable; refusing silent CPU fallback')
-    return YOLO(str(weights), task='detect')
+    return YOLO(str(weights))
 
 
 class Engine:
@@ -172,11 +174,12 @@ class Engine:
         verified = verify_weights(weights, self.manifest['weightsSha256'])
         self.device, self.ready, self.lock = device, False, threading.Lock()
         self.model = (loader or load_model)(verified, device)
-        if self.model.task != 'detect':
-            raise ValueError('This worker supports detection weights only')
+        if self.model.task != self.manifest.get('task', 'detect'):
+            raise ValueError('Weight task does not match manifest')
         validate_model_names(self.model.names, self.manifest['classMap'])
 
     def infer(self, image):
+        # Segmentation results also contain bounding boxes in the original frame.
         results = self.model.predict(source=image, device=self.device, imgsz=self.manifest['imageSize'],
                                      conf=self.manifest['minimumScore'], max_det=MAX_DETECTIONS,
                                      verbose=False, save=False, stream=False, half=self.device.startswith('cuda:'), batch=1)
@@ -309,12 +312,15 @@ def main():
     parser.add_argument('--manifest', type=Path, required=True)
     parser.add_argument('--trusted-local-weights', action='store_true')
     parser.add_argument('--device', default='cuda:0')
+    parser.add_argument('--port', type=int, default=11437)
     args = parser.parse_args()
+    if not 1 <= args.port <= 65535:
+        parser.error('--port must be in [1, 65535]')
     enable_offline()
     engine = Engine(args.weights, args.manifest, trusted_local_weights=args.trusted_local_weights, device=args.device)
     engine.warmup()
     print(json.dumps({'event': 'ready', **engine.health()}), flush=True)
-    with Server(('127.0.0.1', 11437), engine) as server:
+    with Server(('127.0.0.1', args.port), engine) as server:
         try:
             server.serve_forever()
         except KeyboardInterrupt:

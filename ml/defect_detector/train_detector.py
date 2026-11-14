@@ -105,15 +105,14 @@ def main():
     trained=YOLO(str(checkpoint),task=args.task)
     exported=Path(trained.export(format='onnx',imgsz=resolution,opset=17,dynamic=False,simplify=False,device='cpu'))
     torch.cuda.empty_cache()
-    if args.task == 'segment':
-        print('ARTIFACTS',checkpoint,exported,flush=True)
-        return
     catalog = Path(__file__).with_name('classes.json')
     supported_labels = {row['id'] for row in json.loads(catalog.read_text(encoding='utf-8'))['labels']}
     manifest={'schemaVersion':1,'model':'team-detector','modelVersion':'cyber102-'+run_name,
               'weightsSha256':hashlib.sha256(checkpoint.read_bytes()).hexdigest(),'imageSize':resolution,'minimumScore':.25,
               'classMap':{str(i):{'sourceName':label,'class':label if label in supported_labels else 'visible_damage',
                                   'component':'unknown'} for i,label in enumerate(classes)}}
+    if args.task == 'segment':
+        manifest['task'] = 'segment'
     (checkpoint.parent/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print('ARTIFACTS',checkpoint,exported,flush=True)
 if __name__=='__main__':

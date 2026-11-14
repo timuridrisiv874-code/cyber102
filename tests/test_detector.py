@@ -192,6 +192,7 @@ class WorkerContractTest(unittest.TestCase):
         invalid = [
             {'schemaVersion': True}, {'weightsSha256': 'bad'}, {'modelVersion': '../bad'}, {'classMap': {}},
             {'minimumScore': 0}, {'minimumScore': True}, {'minimumScore': float('inf')},
+            {'task': 'classify'}, {'task': None}, {'task': ['segment']},
             {'imageSize': 4096}, {'imageSize': 650}, {'imageSize': True},
             {'classMap': {'00': self.manifest['classMap']['0']}},
             {'classMap': {'0': self.manifest['classMap']['0'] | {'class': 'healthy'}}},
@@ -248,6 +249,23 @@ class WorkerContractTest(unittest.TestCase):
         self.assertFalse(kwargs['half'])
         self.assertEqual(kwargs['device'], 'cpu')
         boxes.xywhn.tolist.assert_not_called()
+
+    def test_segmentation_requires_matching_task_and_keeps_the_frame_envelope(self):
+        boxes = Mock()
+        boxes.__len__ = Mock(return_value=1)
+        boxes.cpu.return_value = boxes
+        boxes.xyxyn.tolist.return_value = [[.1, .2, .6, .8]]
+        boxes.conf.tolist.return_value = [.9]
+        boxes.cls.tolist.return_value = [0.0]
+        model = SimpleNamespace(task='segment', names={0: 'rust'},
+                                predict=Mock(return_value=[SimpleNamespace(boxes=boxes, masks=object())]))
+        with self.assertRaisesRegex(ValueError, 'task does not match'):
+            worker.Engine(self.weights, self.manifest_path, trusted_local_weights=True, loader=Mock(return_value=model))
+        self.write_manifest({'task': 'segment'})
+        engine = worker.Engine(self.weights, self.manifest_path, trusted_local_weights=True, loader=Mock(return_value=model))
+        envelope = detector.validate_envelope(engine.infer(object()))
+        self.assertEqual(envelope['detections'][0]['class'], 'corrosion')
+        self.assertEqual(len(envelope['detections']), 1)
 
     def test_worker_jpeg_input_rejects_urls_extra_fields_png_and_nonimages(self):
         payload = {'image': base64.b64encode(jpeg()).decode()}

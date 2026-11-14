@@ -1,5 +1,6 @@
 """Measure whether crop verification improves frozen Qwen defect proposals."""
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -79,10 +80,16 @@ def main():
     args = parser.parse_args()
     rows = json.loads(args.annotations.read_bytes())
     original = json.loads(args.proposals.read_bytes())
-    inputs = original['predictions']
+    inputs = original.get('proposals', original['predictions'])
     if not rows or set(inputs) != {row['file'] for row in rows} or len(inputs) != len(rows):
         raise ValueError('Recorded predictions and evaluation frames differ')
-    labels = tuple(label for label in LABELS if label in original['labels'])
+    for row in rows:
+        name = row['file']
+        if Path(name).name != name:
+            raise ValueError(f'Expected image basename: {name}')
+        if 'sha256' in row and hashlib.sha256((args.images / name).read_bytes()).hexdigest() != row['sha256']:
+            raise ValueError(f'Image bytes differ from annotations: {name}')
+    labels = tuple(label for label in LABELS if label in original.get('labels', LABELS))
     if not labels:
         raise ValueError('No supported classes in the recorded proposal run')
     sys.path.insert(0, str(args.repo.resolve(strict=True)))
@@ -95,6 +102,9 @@ def main():
     if (engine.model_id, engine.revision) != (original['model'], original['revision']):
         raise ValueError('Model revision differs from the proposal generator')
     proposals = {name: [b for b in boxes if b['class'] in labels] for name, boxes in inputs.items()}
+    partial = any('reviewedLabels' in row for row in rows)
+    if partial:
+        from evaluate_video_component_gate import measure_reviewed
     warmup = [{'class': labels[0], 'xyxy': [.2, .2, .8, .8]}]
     with Image.new('RGB', (512, 384), 'white') as blank:
         try:
@@ -120,10 +130,18 @@ def main():
         checked[name] = [box for box, accepted in zip(boxes, decisions, strict=True) if accepted]
         verdicts[name] = None if name in errors else decisions
         print(f'{name}: {len(checked[name])}/{len(boxes)} proposals, {timing[name]:.0f} ms', flush=True)
-    baseline_times = original['timings_ms']
+    if 'timings_ms' in original:
+        baseline_times = original['timings_ms']
+    else:
+        baseline_times = {name: sum(ms for phase, ms in record['timingsMs'].items() if phase != 'overview')
+                          for name, record in original['records'].items()}
+    if partial:
+        metrics = {'baseline': measure_reviewed(rows, proposals), 'verified': measure_reviewed(rows, checked)}
+    else:
+        metrics = {'baseline': summarize(rows, proposals, labels), 'verified': summarize(rows, checked, labels)}
     report = {'model': engine.model_id, 'revision': engine.revision,
-              'proposalMode': original['mode'], 'labels': labels,
-              'baseline': summarize(rows, proposals, labels), 'verified': summarize(rows, checked, labels),
+              'proposalMode': original.get('mode', 'component-transfer-proposals'), 'labels': labels,
+              **metrics,
               'medianExtraMs': statistics.median(timing.values()),
               'medianTotalMs': statistics.median(baseline_times[name] + extra for name, extra in timing.items()),
               'verificationMs': timing, 'verificationErrors': errors, 'verificationDecisions': verdicts,
