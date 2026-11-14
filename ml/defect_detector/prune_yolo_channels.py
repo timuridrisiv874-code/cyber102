@@ -1,7 +1,8 @@
 """Prune private channels in YOLO11 and YOLO26 bottlenecks and attention feed-forward layers."""
 import argparse
+from collections import defaultdict
 from copy import deepcopy
-from hashlib import file_digest
+from hashlib import file_digest, sha256
 import json
 from pathlib import Path
 
@@ -14,7 +15,7 @@ from ultralytics.nn.modules.block import C3k2, PSABlock
 from stream_checkpoints import StreamCheckpoints
 
 
-def shrink_pair(first, second, fraction):
+def shrink_pair(first, second, fraction, activity=None):
     """Remove matched channels while preserving the block's public input and output shapes."""
     a, b = first.conv, second.conv
     norm = first.bn
@@ -27,9 +28,12 @@ def shrink_pair(first, second, fraction):
         return 0
 
     with torch.no_grad():
-        scale = norm.weight.abs() / (norm.running_var + norm.eps).sqrt()
-        strength = a.weight.flatten(1).norm(dim=1) * scale
-        strength *= b.weight.transpose(0, 1).reshape(width, -1).norm(dim=1)
+        if activity is None:
+            scale = norm.weight.abs() / (norm.running_var + norm.eps).sqrt()
+            strength = a.weight.flatten(1).norm(dim=1) * scale
+        else:
+            strength = activity.to(device=a.weight.device, dtype=a.weight.dtype)
+        strength = strength * b.weight.transpose(0, 1).reshape(width, -1).norm(dim=1)
         indices = strength.argsort(descending=True, stable=True)[:keep].sort().values
         a.weight = nn.Parameter(a.weight.index_select(0, indices))
         if a.bias is not None:
@@ -45,20 +49,72 @@ def shrink_pair(first, second, fraction):
     return width - keep
 
 
-def prune(model, fraction):
-    layers = {}
-    for name, block in list(model.named_modules()):
+def private_pairs(model):
+    for name, block in model.named_modules():
         if isinstance(block, Bottleneck):
-            removed = shrink_pair(block.cv1, block.cv2, fraction)
+            yield name, block.cv1, block.cv2
         elif isinstance(block, PSABlock):
-            removed = shrink_pair(*block.ffn, fraction)
-        else:
-            continue
+            yield name, *block.ffn
+
+
+def prune(model, fraction, activity=None):
+    layers = {}
+    for name, first, second in list(private_pairs(model)):
+        removed = shrink_pair(first, second, fraction, None if activity is None else activity[name])
         if removed:
             layers[name] = removed
     if not layers:
         raise ValueError('No supported internal channels could be removed')
     return layers
+
+
+def measure_activity(model, dataset_config, size, count, device):
+    import numpy as np
+    from PIL import Image, ImageOps
+    from ultralytics.data.augment import LetterBox
+    import yaml
+
+    from calibrate_thresholds import labeled_frames
+
+    config = yaml.safe_load(dataset_config.read_text(encoding='utf-8'))
+    if config['train'] != 'images/train' or config['names'] != model.names:
+        raise ValueError('Activation calibration requires the training images and matching class order')
+    rows, images, _ = labeled_frames(Path(config['path']), 'train', model.names)
+    by_label = defaultdict(list)
+    examples = sorted(zip(rows, images, strict=True), key=lambda pair: sha256(pair[1].name.encode()).digest())
+    for row, path in examples:
+        for label in sorted({box['class'] for box in row['objects']} or {'background'}):
+            by_label[label].append(path)
+    if not by_label:
+        raise ValueError('No training images for activation calibration')
+    selected = list(dict.fromkeys(
+        paths[index] for index in range(max(map(len, by_label.values())))
+        for paths in by_label.values() if index < len(paths)))[:count]
+
+    activity, hooks = {}, []
+
+    def collect(name):
+        def update(_, inputs):
+            activation = inputs[0].float().abs().mean(dim=(0, 2, 3)).cpu()
+            activity[name] = activity.get(name, 0) + activation
+        return update
+
+    accelerator = 'cpu' if device == 'cpu' else f'cuda:{device}'
+    model.to(accelerator)
+    try:
+        hooks = [second.register_forward_pre_hook(collect(name)) for name, _, second in private_pairs(model)]
+        resize = LetterBox(new_shape=(size, size))
+        with torch.inference_mode():
+            for path in selected:
+                with Image.open(path) as image:
+                    pixels = np.asarray(ImageOps.exif_transpose(image).convert('RGB'))
+                tensor = torch.from_numpy(np.ascontiguousarray(resize(image=pixels).transpose(2, 0, 1)))
+                model(tensor[None].to(accelerator, dtype=torch.float32).div_(255))
+    finally:
+        for hook in hooks:
+            hook.remove()
+        model.cpu()
+    return activity, [path.name for path in selected]
 
 
 class PreservePrunedShapes(StreamCheckpoints, DetectionTrainer):
@@ -86,6 +142,7 @@ def main():
     p.add_argument('--size', type=int, default=960)
     p.add_argument('--data', type=Path)
     p.add_argument('--recover', type=int, default=0, help='Number of recovery training epochs')
+    p.add_argument('--calibration-images', type=int, default=0, help='Rank channels by activation on training images')
     p.add_argument('--device', default='0')
     p.add_argument('--batch', type=int, default=2)
     p.add_argument('--smoke', action='store_true', help='Run forward validation at 128 px without ONNX export')
@@ -94,6 +151,8 @@ def main():
         p.error('Specify a valid pruning fraction, input size and batch')
     if args.recover < 0 or (args.recover and (args.data is None or args.smoke)):
         p.error('Recovery requires --data and a normal export')
+    if args.calibration_images < 0 or (args.calibration_images and args.data is None):
+        p.error('Activation calibration requires --data and a positive image count')
     settings.update({'sync': False})
     source = args.weights.resolve(strict=True)
     detector = YOLO(str(source), task='detect')
@@ -104,7 +163,9 @@ def main():
     head = model.model[-1]
     old_shape = (head.nc, head.nl, head.reg_max, getattr(head, 'end2end', False))
     classes = dict(detector.names)
-    layers = prune(model, args.fraction)
+    activity, calibration = (measure_activity(model, args.data, args.size, args.calibration_images, args.device)
+                             if args.calibration_images else (None, []))
+    layers = prune(model, args.fraction, activity)
     after = count_parameters(model)
     if after >= before or (head.nc, head.nl, head.reg_max, getattr(head, 'end2end', False)) != old_shape:
         raise ValueError('Pruning did not preserve detection head semantics')
@@ -153,6 +214,7 @@ def main():
         runtime_shape = list(result.shape)
     report = {'sourceSha256': checksum(source), 'parametersBefore': before, 'parametersAfter': after,
               'removedChannels': layers, 'fraction': args.fraction, 'imageSize': test_size,
+              'calibrationImages': calibration,
               'checkpoint': str(checkpoint), 'checkpointBytes': checkpoint.stat().st_size,
               'checkpointSha256': checksum(checkpoint), 'classes': classes,
               'onnx': str(exported) if exported else None, 'onnxBytes': exported.stat().st_size if exported else None,
