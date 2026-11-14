@@ -382,6 +382,20 @@ body[data-capture-source=mesh] .capture > .panel-heading { padding: 16px 20px; }
 .mesh-start p { margin: 8px 0 14px; color: var(--muted); }
 .mesh-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; cursor: grab; }
 .mesh-stage canvas:active { cursor: grabbing; }
+.mesh-markers { position: absolute; inset: 0; pointer-events: none; }
+.mesh-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid #1b2528;
+  background: #ffc84a;
+  color: #172529;
+  font-weight: 750;
+  box-shadow: 0 2px 8px #0008;
+  pointer-events: auto;
+}
 .mesh-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .mesh-toolbar button {
   min-width: 44px;
@@ -392,6 +406,18 @@ body[data-capture-source=mesh] .capture > .panel-heading { padding: 16px 20px; }
   border: 1px solid var(--line);
   border-radius: 6px;
 }
+.mesh-toolbar #mesh-mark-mode[aria-pressed=true] { background: #ffc84a; border-color: #b77600; }
+.mesh-findings { margin-top: 18px; }
+.mesh-findings h3 { margin: 0 0 5px; font-size: 18px; }
+.mesh-findings-help { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+.mesh-findings-list { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.mesh-findings-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 44px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; }
+.mesh-finding-number { display: grid; place-items: center; flex: 0 0 26px; height: 26px; border-radius: 50%; background: #ffc84a; color: #172529; font-weight: 750; }
+.mesh-findings-list input { flex: 1 1 220px; min-width: 0; padding: 7px; border: 1px solid var(--line); border-radius: 5px; }
+.mesh-findings-list button { margin-left: auto; padding: 6px 8px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; }
+.mesh-source { margin-top: 12px; }
+.mesh-source summary { cursor: pointer; color: var(--accent); }
+.mesh-source-video { display: block; max-width: 100%; max-height: 45vh; margin-top: 8px; background: #172529; }
 
 @media (max-width: 640px) {
   #inspection-mesh { padding-inline: 12px; }

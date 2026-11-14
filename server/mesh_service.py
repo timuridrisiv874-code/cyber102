@@ -20,6 +20,12 @@ UPLOAD_LIMIT = 40 * 1024 * 1024
 RETENTION = 7200
 ROUTE = '/api/mesh-jobs'
 JOB_PATH = re.compile(r'/api/mesh-jobs/([0-9a-f]{40})(/mesh)?')
+FRAME_PROFILES = {'fast': (4, 20), 'detailed': (8, 42)}
+
+
+def frame_plan(duration, profile):
+    rate, limit = FRAME_PROFILES[profile]
+    return min(rate, limit / duration), limit
 
 
 def run(command, log, timeout, *, env=None):
@@ -155,9 +161,10 @@ class Jobs:
         with self.lock:
             return self.jobs.get(token)
 
-    def build(self, token, work):
+    def build(self, token, work, profile='fast'):
+        started = time.monotonic()
         try:
-            self.set(token, 'frames')
+            self.set(token, 'frames', profile=profile)
             (work / 'frames').mkdir()
             (work / 'publish').mkdir()
             ffprobe = self.ffmpeg.with_name('ffprobe' + self.ffmpeg.suffix)
@@ -169,21 +176,23 @@ class Jobs:
             duration = float(probe.get('format', {}).get('duration', 0))
             if not 2 <= duration <= 30 or not 0 < stream.get('width', 0) * stream.get('height', 0) <= 9_000_000:
                 raise ValueError('Выберите видео длительностью 2–30 секунд с разрешением до 4K.')
-            fps = min(8, 42 / duration)
+            fps, frame_limit = frame_plan(duration, profile)
             run([self.ffmpeg, '-nostdin', '-v', 'error', '-threads', '2', '-i', work / 'input.video',
                  '-map', '0:v:0', '-an', '-filter_threads', '2', '-vf',
-                 f"fps={fps:.6f},scale='min(960,iw)':-2", '-frames:v', '42',
+                 f"fps={fps:.6f},scale='min(960,iw)':-2", '-frames:v', str(frame_limit),
                  '-q:v', '2', work / 'frames' / '%03d.jpg'], work / 'frames.log', 90)
             (work / 'input.video').unlink()
-            if len(list((work / 'frames').glob('*.jpg'))) < 8:
+            frame_count = len(list((work / 'frames').glob('*.jpg')))
+            if frame_count < 8:
                 raise ValueError('Слишком мало кадров для 3D. Загрузите короткий обход оборудования.')
-            self.set(token, 'building')
+            self.set(token, 'building', profile=profile, framesUsed=frame_count)
             env = {**os.environ, 'QT_QPA_PLATFORM': 'offscreen'}
             run([self.meshroom, '--input', work / 'frames', '--output', work / 'publish',
                  '--cache', work / 'cache'], work / 'meshroom.log', 1200, env=env)
-            self.set(token, 'exporting')
+            self.set(token, 'exporting', profile=profile, framesUsed=frame_count)
             meta = export_mesh(work, self.ffmpeg)
-            self.set(token, 'ready', **meta)
+            self.set(token, 'ready', **meta, profile=profile, framesUsed=frame_count,
+                     processingSeconds=round(time.monotonic() - started))
         except (ValueError, OSError, KeyError) as error:
             logging.exception('Mesh job %s failed', token)
             message = str(error) if type(error) is ValueError and not str(error).isascii() else (
@@ -225,6 +234,10 @@ class Handler(BaseHTTPRequestHandler):
         if self.headers.get_content_type() not in ('video/mp4', 'video/quicktime', 'video/webm', 'video/x-m4v', 'application/octet-stream'):
             self.reply(415, {'message': 'Выберите видео MP4, MOV или WebM.'})
             return
+        profile = self.headers.get('X-Cyber102-Mesh-Profile', 'fast')
+        if profile not in FRAME_PROFILES:
+            self.reply(400, {'message': 'Выберите быстрый или подробный режим 3D.'})
+            return
         lengths = self.headers.get_all('Content-Length', [])
         if self.headers.get('Transfer-Encoding') or len(lengths) != 1 or not re.fullmatch(r'[0-9]{1,9}', lengths[0]):
             self.reply(400, {'message': 'Не удалось определить размер видео.'})
@@ -256,8 +269,8 @@ class Handler(BaseHTTPRequestHandler):
                         raise OSError('Incomplete upload')
                     video.write(chunk)
                     size -= len(chunk)
-            jobs.set(token, 'queued')
-            threading.Thread(target=jobs.build, args=(token, work), daemon=True).start()
+            jobs.set(token, 'queued', profile=profile)
+            threading.Thread(target=jobs.build, args=(token, work, profile), daemon=True).start()
             handed_off = True
             self.reply(202, {'id': token, 'state': 'queued'})
         except OSError:

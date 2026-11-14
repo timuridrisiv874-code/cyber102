@@ -65,7 +65,53 @@
     gl.enable(gl.DEPTH_TEST);
     const rotation = gl.getUniformLocation(program, 'rotation');
     const scale = gl.getUniformLocation(program, 'scale');
-    return ({ yaw, pitch, zoom }) => {
+    function project(point, view) {
+      const width = canvas.clientWidth, height = canvas.clientHeight;
+      const a = Math.cos(view.yaw), b = Math.sin(view.yaw);
+      const c = Math.cos(view.pitch), d = Math.sin(view.pitch);
+      const x = point[0] * a + point[2] * b;
+      const z = point[2] * a - point[0] * b;
+      const y = point[1] * c - z * d;
+      const depth = z * c + point[1] * d;
+      const w = 1 + .19 * depth;
+      const size = Math.min(width, height) * view.zoom;
+      return { x: width / 2 + x * size / (2 * w),
+        y: height / 2 + y * size / (2 * w), depth, w };
+    }
+    function pick(x, y, view) {
+      const projected = new Float32Array(vertices * 3);
+      for (let i = 0; i < vertices; i++) {
+        const p = project(positions.subarray(i * 3, i * 3 + 3), view);
+        projected[i * 3] = p.x;
+        projected[i * 3 + 1] = p.y;
+        projected[i * 3 + 2] = p.depth;
+      }
+      let nearest = Infinity, hit = null;
+      for (let i = 0; i < indices.length; i += 3) {
+        const a = indices[i] * 3, b = indices[i + 1] * 3, c = indices[i + 2] * 3;
+        const ax = projected[a], ay = projected[a + 1];
+        const bx = projected[b], by = projected[b + 1];
+        const cx = projected[c], cy = projected[c + 1];
+        if (x < Math.min(ax, bx, cx) || x > Math.max(ax, bx, cx) ||
+            y < Math.min(ay, by, cy) || y > Math.max(ay, by, cy)) continue;
+        const area = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
+        if (Math.abs(area) < 1e-8) continue;
+        const u = ((by - cy) * (x - cx) + (cx - bx) * (y - cy)) / area;
+        const v = ((cy - ay) * (x - cx) + (ax - cx) * (y - cy)) / area;
+        const t = 1 - u - v;
+        if (u < 0 || v < 0 || t < 0) continue;
+        const depth = u * projected[a + 2] + v * projected[b + 2] + t * projected[c + 2];
+        if (depth >= nearest) continue;
+        const weights = [u / (1 + .19 * projected[a + 2]),
+          v / (1 + .19 * projected[b + 2]), t / (1 + .19 * projected[c + 2])];
+        const total = weights[0] + weights[1] + weights[2];
+        hit = [0, 1, 2].map(offset => (weights[0] * positions[a + offset] +
+          weights[1] * positions[b + offset] + weights[2] * positions[c + offset]) / total);
+        nearest = depth;
+      }
+      return hit;
+    }
+    function draw({ yaw, pitch, zoom }) {
       const width = canvas.clientWidth, height = canvas.clientHeight;
       if (!width || !height || gl.isContextLost()) return;
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -82,7 +128,8 @@
       gl.clearColor(.09, .145, .16, 1);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
-    };
+    }
+    return { draw, pick, project };
   }
 
   function model(panel) {
@@ -91,20 +138,118 @@
     const input = panel.querySelector('input');
     const status = panel.querySelector('.mesh-status');
     const toolbar = panel.querySelector('.mesh-toolbar');
-    const initialView = { yaw: 0, pitch: 0, zoom: 1 };
+    const markerLayer = panel.querySelector('.mesh-markers');
+    const findings = panel.querySelector('.mesh-findings');
+    const findingList = panel.querySelector('.mesh-findings-list');
+    const sourceVideo = panel.querySelector('.mesh-source-video');
+    const markButton = panel.querySelector('#mesh-mark-mode');
+    const initialView = { yaw: 0, pitch: 0,
+      zoom: window.matchMedia('(max-width: 640px)').matches ? 1.2 : 1 };
     const view = { ...initialView };
-    let render, drag, meta, buffer, currentFile, busy = false;
-    const draw = () => render?.(view);
+    let render, drag, meta, buffer, currentFile, sourceUrl, busy = false, marking = false;
+    const marks = [];
+    function draw() {
+      render?.draw(view);
+      if (!render) return;
+      for (const [index, mark] of marks.entries()) {
+        const point = render.project(mark.point, view);
+        mark.button.style.left = `${point.x}px`;
+        mark.button.style.top = `${point.y}px`;
+        mark.button.hidden = point.w <= 0 || point.x < 0 || point.y < 0 ||
+          point.x > canvas.clientWidth || point.y > canvas.clientHeight;
+        mark.button.textContent = String(index + 1);
+        mark.button.setAttribute('aria-label', `Повреждение ${index + 1}: ${mark.label || 'без описания'}`);
+      }
+    }
     const message = (text, error = false) => {
       status.textContent = text;
       status.dataset.error = String(error);
     };
+    function syncFindings() {
+      findingList.replaceChildren();
+      for (const [index, mark] of marks.entries()) {
+        const row = document.createElement('li');
+        const number = document.createElement('span');
+        number.className = 'mesh-finding-number';
+        number.textContent = String(index + 1);
+        row.append(number);
+        if (mark.label) {
+          const label = document.createElement('span');
+          label.textContent = mark.label;
+          row.append(label);
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.textContent = 'Убрать';
+          remove.setAttribute('aria-label', `Убрать повреждение ${index + 1}`);
+          remove.addEventListener('click', () => {
+            marks.splice(marks.indexOf(mark), 1);
+            mark.button.remove();
+            syncFindings();
+            draw();
+          });
+          row.append(remove);
+        } else {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.maxLength = 100;
+          input.placeholder = 'Что видно в этой точке?';
+          input.setAttribute('aria-label', `Описание повреждения ${index + 1}`);
+          const save = document.createElement('button');
+          save.type = 'button';
+          save.textContent = 'Сохранить';
+          const cancel = document.createElement('button');
+          cancel.type = 'button';
+          cancel.textContent = 'Отмена';
+          const removeDraft = () => {
+            marks.splice(marks.indexOf(mark), 1);
+            mark.button.remove();
+            syncFindings();
+            draw();
+          };
+          save.addEventListener('click', () => {
+            const label = input.value.trim();
+            if (!label) { input.focus(); return; }
+            mark.label = label;
+            syncFindings();
+            draw();
+          });
+          input.addEventListener('keydown', event => {
+            if (event.key === 'Enter') save.click();
+            if (event.key === 'Escape') removeDraft();
+          });
+          cancel.addEventListener('click', removeDraft);
+          row.append(input, save, cancel);
+          queueMicrotask(() => input.focus());
+        }
+        findingList.append(row);
+      }
+    }
+    function addMark(point) {
+      if (!point || marks.length >= 8) return;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'mesh-marker';
+      markerLayer.append(button);
+      const mark = { point, label: '', button };
+      marks.push(mark);
+      button.addEventListener('click', () => findingList.children[marks.indexOf(mark)]?.scrollIntoView({ block: 'nearest' }));
+      marking = false;
+      markButton.setAttribute('aria-pressed', 'false');
+      message('');
+      syncFindings();
+      draw();
+    }
+    markButton.addEventListener('click', () => {
+      marking = !marking;
+      markButton.setAttribute('aria-pressed', String(marking));
+      message(marking ? 'Нажмите на повреждённое место на модели.' : '');
+    });
     function activate() {
       try {
         render = renderer(canvas, meta, buffer);
         upload.hidden = true;
-        canvas.hidden = toolbar.hidden = false;
-        message('');
+        canvas.hidden = toolbar.hidden = markerLayer.hidden = findings.hidden = false;
+        message(meta.framesUsed ? `Готово за ${meta.processingSeconds} с · ${meta.framesUsed} кадров` : '3D-модель готова.');
         draw();
       } catch {
         message('Этот браузер не смог открыть 3D. Попробуйте другой браузер.', true);
@@ -122,16 +267,29 @@
     });
     canvas.addEventListener('pointerdown', event => {
       if (!event.isPrimary || event.button !== 0) return;
-      drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      drag = { id: event.pointerId, x: event.clientX, y: event.clientY,
+        startX: event.clientX, startY: event.clientY, moved: false };
       canvas.setPointerCapture(event.pointerId);
     });
     canvas.addEventListener('pointermove', event => {
       if (drag?.id !== event.pointerId) return;
+      if (Math.abs(event.clientX - drag.startX) + Math.abs(event.clientY - drag.startY) > 4) drag.moved = true;
+      if (marking) return;
       view.yaw += (event.clientX - drag.x) * .009;
       view.pitch = Math.max(-1.15, Math.min(1.15, view.pitch + (event.clientY - drag.y) * .009));
       drag.x = event.clientX;
       drag.y = event.clientY;
       draw();
+    });
+    canvas.addEventListener('pointerup', event => {
+      if (drag?.id !== event.pointerId) return;
+      if (marking && !drag.moved) {
+        const rect = canvas.getBoundingClientRect();
+        const point = render?.pick(event.clientX - rect.left, event.clientY - rect.top, view);
+        if (point) addMark(point);
+        else message('Нажмите на поверхность модели, а не на фон.', true);
+      }
+      drag = null;
     });
     canvas.addEventListener('lostpointercapture', () => { drag = null; });
     canvas.addEventListener('webglcontextlost', event => {
@@ -155,16 +313,19 @@
       }
       busy = true;
       input.disabled = true;
-      canvas.hidden = toolbar.hidden = true;
+      canvas.hidden = toolbar.hidden = markerLayer.hidden = findings.hidden = true;
       upload.hidden = false;
       render = null;
+      marking = false;
+      markButton.setAttribute('aria-pressed', 'false');
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 24 * 60 * 1000);
       const signal = controller.signal;
       try {
         message('Загружаем видео…');
         let job = await (await request('', { method: 'POST', body: file, signal,
-          headers: { 'Content-Type': file.type || 'application/octet-stream' } })).json();
+          headers: { 'Content-Type': file.type || 'application/octet-stream',
+            'X-Cyber102-Mesh-Profile': 'fast' } })).json();
         if (!/^[0-9a-f]{40}$/.test(job.id)) throw new Error('Сервис 3D недоступен.');
         const path = '/' + job.id;
         while (stages[job.state]) {
@@ -177,6 +338,12 @@
         buffer = await (await request(path + '/mesh', { signal })).arrayBuffer();
         meta = job;
         currentFile = file;
+        marks.splice(0);
+        markerLayer.replaceChildren();
+        syncFindings();
+        if (sourceUrl) URL.revokeObjectURL(sourceUrl);
+        sourceUrl = URL.createObjectURL(file);
+        sourceVideo.src = sourceUrl;
         Object.assign(view, initialView);
         activate();
       } catch (error) {
