@@ -70,6 +70,39 @@ class Qwen38RuntimeTest(unittest.TestCase):
         engine.compact_prompt = engine._prompt([{'type': 'image'}, {'type': 'text', 'text': worker.COMPACT_PROMPT}])
         return engine
 
+    def test_grounded_video_keeps_evidence_attached_to_its_submitted_frame(self):
+        rows = [{'frameIndex': 0, 'component': 'other', 'condition': 'corrosion',
+                 'box': [100, 200, 500, 700], 'observation': 'На опоре видны пятна ржавчины.'},
+                {'frameIndex': 1, 'component': 'motor', 'condition': 'no_visible_defect',
+                 'box': [150, 300, 700, 900], 'observation': 'Видимых повреждений корпуса двигателя нет.'}]
+        result = qwen38_worker.parse_grounded_video(json.dumps(rows), [.4, 1.2])
+        self.assertEqual([row['timestampSeconds'] for row in result], [.4, 1.2])
+        self.assertEqual([row['condition'] for row in result], ['corrosion', 'no_visible_defect'])
+        self.assertEqual(result[0]['observation'], rows[0]['observation'])
+
+    def test_grounded_video_rejects_missing_reordered_or_malformed_evidence(self):
+        row = {'frameIndex': 0, 'component': 'other', 'condition': 'corrosion',
+               'box': [100, 200, 500, 700], 'observation': 'Видна ржавчина.'}
+        for rows in ([], [row, row], [row | {'frameIndex': True}], [row | {'frameIndex': 1}],
+                     [row | {'box': [900, 200, 100, 700]}], [row | {'extra': 'untrusted'}],
+                     [row | {'component': 'unknown'}]):
+            with self.subTest(rows=rows), self.assertRaises(qwen38_worker.InvalidVideoOutput):
+                qwen38_worker.parse_grounded_video(json.dumps(rows), [.4])
+
+    def test_invalid_pair_falls_back_to_proven_compact_single_frame_contract(self):
+        engine = self.engine()
+        compact = {'component': 'pipe', 'condition': 'corrosion', 'box': [100, 200, 500, 700]}
+        def infer(images, prompt, *, parse, **kwargs):
+            engine.last_metrics = {'outputTokens': 40, 'frames': kwargs['frame_count']}
+            return parse('[]' if isinstance(images, list) and len(images) > 1 else json.dumps(compact))
+        engine._run = Mock(side_effect=infer)
+        with patch.dict(os.environ, {'CYBER102_VIDEO_DEFECT_DETAILS': '0'}), Image.new('RGB', (100, 80)) as image:
+            result = engine.infer_video([image, image], [.4, 1.2])
+        self.assertEqual(engine._run.call_count, 3)
+        self.assertEqual([row['frameIndex'] for row in result['observations']], [0, 1])
+        self.assertEqual([row['timestampSeconds'] for row in result['observations']], [.4, 1.2])
+        self.assertTrue(all(row['condition'] == 'corrosion' and row['observation'] for row in result['observations']))
+
     def test_real_loopback_protocol_preserves_photo_video_and_detail_contracts_without_torch(self):
         received = []
 
@@ -84,7 +117,9 @@ class Qwen38RuntimeTest(unittest.TestCase):
                 content = payload['messages'][1]['content']
                 images = [item for item in content if item['type'] == 'image_url']
                 prompt = content[-1]['text']
-                if 'exactly two frames' in prompt:
+                if 'one object per frame' in prompt:
+                    answer = [dict(compact, frameIndex=i, observation='На трубе видна коррозия.') for i in range(len(images))]
+                elif 'exactly two frames' in prompt:
                     answer = [dict(compact, frameIndex=i) for i in range(len(images))]
                 elif 'exactly three keys' in prompt:
                     answer = compact
@@ -114,6 +149,7 @@ class Qwen38RuntimeTest(unittest.TestCase):
                 self.assertEqual(engine.last_metrics['outputTokens'], 160)
                 self.assertEqual(len(received), 7)
                 self.assertFalse(hasattr(engine, 'torch'))
+                self.assertEqual(result['observations'][0]['observation'], 'На трубе видна коррозия.')
                 self.assertTrue(all(row['model'] == qwen38_worker.ALIAS for row in received))
                 self.assertTrue(all(row['cache_prompt'] is False for row in received))
             finally:

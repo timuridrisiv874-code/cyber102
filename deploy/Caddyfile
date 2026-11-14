@@ -75,6 +75,17 @@ https://cyber102.94.41.87.102.sslip.io {
         header Cache-Control "private, no-cache"
         file_server
     }
+    # Only these public sample files can be reused across page reloads.
+    @inspectionmedia {
+        method GET HEAD
+        path /inspection-library/*.mp4 /inspection-library/*.jpg
+    }
+    handle @inspectionmedia {
+        root * C:/cyber102/web
+        header X-Content-Type-Options nosniff
+        header Cache-Control "public, max-age=86400"
+        file_server
+    }
     # Load the inspection interface independently of the shared analysis/API sockets.
     @webassets {
         method GET HEAD
