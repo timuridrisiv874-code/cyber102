@@ -45,6 +45,7 @@ def analyze_upload(opener, base, image, version):
     envelope = validate_envelope({'schemaVersion': 1, 'model': result['model'], 'modelVersion': version,
                                   'detections': result['detections']})
     boxes = envelope['detections']
+    normalized = vision.extract_image(content_type, body)
     if boxes:
         evidence_path = f"/api/analyses/{result['analysisId']}/image"
         if result['status'] != 'defect' or result['box'] != boxes[0]['box'] or result['imageUrl'] != evidence_path:
@@ -52,14 +53,27 @@ def analyze_upload(opener, base, image, version):
         identifier = UUID(result['analysisId'])
         if identifier.version != 4 or str(identifier) != result['analysisId']:
             raise ValueError('App route returned an invalid evidence ID')
-        expected = hashlib.sha256(vision.extract_image(content_type, body)).digest()
+        expected = hashlib.sha256(normalized).digest()
         with opener.open(base + evidence_path, timeout=5) as reply:
             content = reply.read(vision.MAX_IMAGE_BYTES + 1)
             if reply.headers.get_content_type() != 'image/jpeg' or hashlib.sha256(content).digest() != expected:
                 raise ValueError('App evidence differs from the normalized upload')
     elif result['status'] != 'unusable' or 'analysisId' in result:
         raise ValueError('Empty detection must stay unusable without evidence')
-    return predictions(boxes), response_ms, bool(boxes)
+    return predictions(boxes), response_ms, normalized
+
+
+def analyze_worker(opener, base, image, version):
+    from server.detector import validate_envelope
+
+    payload = json.dumps({'image': base64.b64encode(image).decode('ascii')}).encode('ascii')
+    request = Request(base + '/analyze', payload, {'Content-Type': 'application/json'})
+    started = perf_counter()
+    with opener.open(request, timeout=30) as reply:
+        result = validate_envelope(json.load(reply))
+    if result['modelVersion'] != version:
+        raise ValueError('Staging checkpoint changed during evaluation')
+    return predictions(result['detections']), round((perf_counter() - started) * 1000, 3)
 
 
 def evaluate_findings(rows, detected, times, labels):
@@ -112,10 +126,8 @@ def main():
         health = json.load(reply)
     if not health['ready'] or health['weightsSha256'] != args.weights_sha256 or not health['offline']:
         raise ValueError('Staging worker failed readiness or checkpoint provenance check')
-    from server.detector import validate_envelope
-
     detected, times = {}, {}
-    app_detected, app_times, evidence = {}, {}, 0
+    app_detected, app_times, normalized_detected, evidence = {}, {}, {}, 0
     app_base = f'http://127.0.0.1:{args.app_port}' if args.app_port else None
     if app_base:
         with opener.open(app_base + '/api/capabilities', timeout=5) as reply:
@@ -123,30 +135,33 @@ def main():
         if capabilities['enabled'] is not True or capabilities['backend'] != 'detector':
             raise ValueError('Expected an isolated Cyber102 app using the detector')
     for row, image in zip(rows, images, strict=True):
+        name = row['file']
         row['scene'] = row['file']
         image_bytes = image.read_bytes()
-        payload = json.dumps({'image': base64.b64encode(image_bytes).decode('ascii')}).encode('ascii')
-        request = Request(base + '/analyze', payload, {'Content-Type': 'application/json'})
-        started = perf_counter()
-        with opener.open(request, timeout=30) as reply:
-            result = validate_envelope(json.load(reply))
-        if result['modelVersion'] != health['modelVersion']:
-            raise ValueError('Staging checkpoint changed during evaluation')
-        times[row['file']] = round((perf_counter() - started) * 1000, 3)
-        detected[row['file']] = predictions(result['detections'])
-        if any(box['class'] not in labels for box in detected[row['file']]):
+        version = health['modelVersion']
+        detected[name], times[name] = analyze_worker(opener, base, image_bytes, version)
+        if any(box['class'] not in labels for box in detected[name]):
             raise ValueError('Unexpected class in staging worker response')
         if app_base:
-            app_boxes, app_ms, saved = analyze_upload(opener, app_base, image_bytes, health['modelVersion'])
+            app_boxes, app_ms, normalized = analyze_upload(opener, app_base, image_bytes, version)
             if any(box['class'] not in labels for box in app_boxes):
                 raise ValueError('Unexpected class in staging app response')
-            app_detected[row['file']], app_times[row['file']] = app_boxes, app_ms
-            evidence += saved
-        print(row['file'], len(detected[row['file']]), times[row['file']], flush=True)
+            app_detected[name], app_times[name] = app_boxes, app_ms
+            # The direct upload uses the source bytes. Repeat with the actual UI input
+            # only when the normalization changed detections.
+            source_boxes = sorted(detected[name], key=lambda box: -box['score'])
+            normalized_detected[name] = source_boxes
+            if source_boxes != app_boxes:
+                boxes, _ = analyze_worker(opener, base, normalized, version)
+                normalized_detected[name] = sorted(boxes, key=lambda box: -box['score'])
+            evidence += bool(app_boxes)
+        print(name, len(detected[name]), times[name], flush=True)
     report = {'worker': health, **evaluate_findings(rows, detected, times, labels)}
     if app_base:
         report['app'] = {**evaluate_findings(rows, app_detected, app_times, labels),
-                         'verifiedEvidenceImages': evidence, 'agreement': agreement(detected, app_detected)}
+                         'verifiedEvidenceImages': evidence, 'agreement': agreement(detected, app_detected),
+                         'normalizedInputDisagreements': [name for name, boxes in app_detected.items()
+                                                          if boxes != normalized_detected[name]]}
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
 
 
