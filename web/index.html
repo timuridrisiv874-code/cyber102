@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f6f3ec">
+  <meta name="theme-color" content="#ffffff">
   <title>Брови и ресницы · Осмотр</title>
   <link rel="icon" href="/favicon.ico?v=eye-1" type="image/x-icon" sizes="16x16 32x32 48x48 64x64">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=eye-1" sizes="180x180">
+  <link rel="preload" href="vendor/fonts/ibm-plex-sans-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css?v=field-20261114">
   <link rel="stylesheet" href="workspace.css?v=meshroom-video-2">
   <link rel="stylesheet" href="region-review.css?v=field-20261114">
   <link rel="stylesheet" href="inspection-tools.css?v=motor-resource-1">
+  <link rel="stylesheet" href="interface.css?v=workspace-20261114-1">
   <script src="offline.js" defer></script>
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="analysis-jobs.js" defer></script>
@@ -29,20 +31,21 @@
 <body data-page="inspection">
   <a class="skip-link" href="#main-content">К основному содержимому</a>
   <aside class="app-sidebar" aria-label="Навигация Cyber102">
-    <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><i></i></span>Cyber<span>102</span></a>
+    <a class="brand" href="index.html" data-serial-link aria-label="Cyber102 — осмотр"><span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V6a1 1 0 0 1 1-1h5m10 0h5a1 1 0 0 1 1 1v5M5 21v5a1 1 0 0 0 1 1h5m10 0h5a1 1 0 0 0 1-1v-5"/><path d="M5 16s4-6 11-6 11 6 11 6-4 6-11 6S5 16 5 16Z"/><circle cx="16" cy="16" r="3"/></svg></span>Cyber<span>102</span></a>
     <nav class="app-nav" aria-label="Разделы Cyber102"><a href="index.html" aria-current="page" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4"/><circle cx="12" cy="12" r="4"/></svg><span>Осмотр</span></a><a href="documents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Оборудование</span></a><a href="checkpoint.html" data-serial-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2Z"/><path d="M4 17h15M8 7h7M8 11h5"/></svg><span>Журнал</span></a><a href="telemetry.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><span>Показания</span></a></nav>
   </aside>
   <p class="sr-only" id="mode" role="status">Готово к осмотру</p>
   <main class="page" id="main-content" data-analysis-endpoint="/analyze">
     <header class="intro">
       <div class="page-heading-group"><h1>Осмотр оборудования</h1></div>
-    </header>
-
     <section class="active-equipment-bar" aria-label="Оборудование текущего осмотра">
       <div class="field"><label for="active-equipment">Серийный номер</label><input id="active-equipment" aria-describedby="shell-equipment-hint" placeholder="Выберите или введите" list="inspection-equipment-options" maxlength="128" autocomplete="off" autocapitalize="characters"></div>
       <p id="shell-equipment-hint" class="sr-only">Сверьте номер с табличкой оборудования.</p>
       <a href="documents.html">Паспорта</a>
     </section>
+    </header>
+
+
 
     <details id="asset-telemetry" class="capture-settings" hidden>
       <summary>Показания насоса · эмулятор</summary>
@@ -72,17 +75,12 @@
     <div class="workspace">
       <section class="capture panel" aria-labelledby="capture-title">
         <div class="panel-heading">
-          <h2 id="capture-title">Источник осмотра</h2>
+          <h2 id="capture-title">Новый осмотр</h2>
           <div class="inspection-modes" id="inspection-modes" role="group" aria-label="Формат осмотра" hidden>
             <button type="button" data-mode="photo" aria-pressed="true">Фото</button>
             <button type="button" data-mode="video" aria-pressed="false">Видео</button>
             <button type="button" data-mode="mesh" aria-pressed="false">3D</button>
           </div>
-        </div>
-        <div class="capture-source-controls" role="group" aria-label="Источник осмотра">
-          <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Камера</span></button>
-          <label class="button secondary media-upload-control" for="media-file"><span id="media-file-label">Выбрать файл</span><input id="media-file" type="file" accept="image/*,video/*" aria-label="Загрузить фото или видео"></label>
-          <button id="media-clear" class="button secondary" type="button" hidden>Убрать файл</button>
         </div>
         <div class="viewfinder" id="viewfinder">
           <button type="button" id="equipment-qr" hidden aria-label="Сканировать QR оборудования" aria-pressed="false">QR</button>
@@ -99,6 +97,11 @@
           <canvas id="snapshot" role="img" aria-label="Зафиксированный кадр осмотра" hidden></canvas>
           <div class="finder-guide" id="guide" aria-hidden="true" hidden><i></i><i></i><i></i><i></i></div>
           <button type="button" class="detection" id="detection" aria-controls="result" hidden><span id="detection-label"></span></button>
+        </div>
+        <div class="capture-source-controls" role="group" aria-label="Источник осмотра">
+          <button class="button secondary" id="camera" type="button"><i class="camera-icon" aria-hidden="true"></i><span id="camera-label">Камера</span></button>
+          <label class="button secondary media-upload-control" for="media-file"><svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 16v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg><span id="media-file-label">Выбрать файл</span><input id="media-file" type="file" accept="image/*,video/*" aria-label="Загрузить фото или видео"></label>
+          <button id="media-clear" class="button secondary" type="button" hidden>Убрать файл</button>
         </div>
         <div id="inspection-mesh" hidden>
 

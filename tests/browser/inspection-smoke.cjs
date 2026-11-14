@@ -12,7 +12,7 @@ const localResult = {
   model: 'cyber102-detector-test', source: 'local_vision', observation: 'Проверка контракта модели',
   analysisId: 'fixture-analysis-1', durationSeconds: 0.5, profile: 'fast', observationKind: 'template', metrics: { generateMs: 400 },
 };
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.json': 'application/json' };
+const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.ico': 'image/x-icon' };
 function makeServer() {
   const state = { analyses: [], previews: [], saves: [], next: 'busy-once', saveAttempts: 0, android: false };
   const reply = (response, status, data, extra = {}) => {

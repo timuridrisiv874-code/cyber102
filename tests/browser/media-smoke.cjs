@@ -12,7 +12,7 @@ const { chromium, webkit, devices } = require(process.env.PLAYWRIGHT_MODULE || '
 const root = path.resolve(__dirname, '../..');
 const fixture = { ...JSON.parse(fs.readFileSync(path.join(root, 'web/mock-analysis.json'))),
   model: 'cyber102-detector-test', source: 'local_vision', analysisId: 'media-test', observationKind: 'template' };
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.json': 'application/json' };
+const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.ico': 'image/x-icon' };
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'cyber-media-'));
 const photo = path.join(temp, 'private-original-name.png');
 const clip = path.join(temp, 'private-video.mp4');

@@ -6,7 +6,7 @@ const path = require('node:path');
 const { chromium, webkit, devices } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(__dirname, '../..');
 const origin = 'https://appassets.androidplatform.net';
-const mime = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.jpg': 'image/jpeg', '.json': 'application/json' };
+const mime = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.jpg': 'image/jpeg', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.ico': 'image/x-icon' };
 
 async function run(browser, name, android) {
   const model = android ? 'LFM3-VL-2B' : name === 'WebKit' ? 'SmolVLM-500M-Instruct' : 'SmolVLM-256M-Instruct';

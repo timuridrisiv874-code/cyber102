@@ -78,7 +78,7 @@ https://cyber102.94.41.87.102.sslip.io {
     # Load the inspection interface independently of the shared analysis/API sockets.
     @webassets {
         method GET HEAD
-        path /analysis-jobs.js /app.js /bootstrap.js /checkpoint.js /documents.js /inspection.js /materials.js /media.js /offline.js /region-review.js /shell.js /telemetry.js /video-review.js /checkpoint.css /materials.css /region-review.css /styles.css /workspace.css /favicon.ico /apple-touch-icon.png /inspection-photo.js /equipment-qr.js /photo-measure.js /inspection-tools.css /vendor/jsQR-1.4.0.js
+        path /analysis-jobs.js /app.js /bootstrap.js /checkpoint.js /documents.js /inspection.js /materials.js /media.js /offline.js /region-review.js /shell.js /telemetry.js /video-review.js /checkpoint.css /materials.css /region-review.css /styles.css /workspace.css /interface.css /vendor/fonts/* /favicon.ico /apple-touch-icon.png /inspection-photo.js /equipment-qr.js /photo-measure.js /inspection-tools.css /vendor/jsQR-1.4.0.js
     }
     handle @webassets {
         root * C:/cyber102/web

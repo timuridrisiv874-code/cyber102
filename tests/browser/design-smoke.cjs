@@ -7,7 +7,7 @@ const { once } = require('node:events');
 const { chromium, webkit } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(__dirname, '../..');
 const screenshots = process.env.DESIGN_SMOKE_SCREENSHOTS;
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.json': 'application/json' };
+const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.ico': 'image/x-icon' };
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, 'http://localhost');
   if (/^\/api\/customer\/images\/[0-9a-f]{64}$/.test(url.pathname)) {

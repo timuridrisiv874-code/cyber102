@@ -9,7 +9,7 @@ const { once } = require('node:events');
 const { chromium, webkit, devices } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const web = path.resolve(__dirname, '../../web');
 const photo = path.join(web, 'demo-pump.jpg');
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg' };
+const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.png': 'image/png', '.ico': 'image/x-icon' };
 
 async function tapAndChoose(page, file) {
   const choice = page.waitForEvent('filechooser');

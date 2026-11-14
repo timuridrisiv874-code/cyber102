@@ -15,7 +15,7 @@ const clip = path.join(temp, 'private-original-name.mp4');
 execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', 'testsrc2=size=1920x1080:rate=10',
   '-vf', 'drawbox=x=1456:y=872:w=192:h=144:color=red:t=fill,drawbox=x=1552:y=872:w=96:h=144:color=blue:t=fill,drawgrid=w=5:h=3:t=1:c=white@0.6',
   '-t', '5', '-c:v', 'libx264', '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', clip]);
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.json': 'application/json' };
+const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.ico': 'image/x-icon' };
 const state = { android: false, posts: [], photoPosts: [], mode: 'success', pending: [], available: true };
 const reply = (res, code, data) => { res.writeHead(code, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(data)); };
 const server = http.createServer(async (req, res) => {

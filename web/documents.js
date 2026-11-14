@@ -70,7 +70,11 @@
     for (const item of equipment.filter(item => selected === 'all' || item.kind === selected)) {
       const card = node('article', null, 'workspace-card');
       card.dataset.equipment = item.id;
-      card.append(node('h3', item.title || item.id));
+      const title = item.title || item.id;
+      const modelSuffix = item.model ? ' · ' + item.model : '';
+      // The model already has its own labelled field below the equipment name.
+      card.append(node('h3', modelSuffix && title.endsWith(modelSuffix)
+        ? title.slice(0, -modelSuffix.length) : title));
       const photo = equipmentPhotos.get(item.model);
       if (photo) card.append(equipmentPhoto(photo));
       const facts = node('dl', null, 'workspace-facts');
@@ -336,6 +340,12 @@
     status.textContent = 'Загружаем документы…';
     status.dataset.error = 'false';
     retry.hidden = true;
+    if (!catalogReady) {
+      $('document-count').textContent = '—';
+      $('document-search').disabled = true;
+      $('document-results').textContent = '';
+    }
+    if (!currentPassports.equipment) picker.disabled = true;
     async function read(url, key) {
       const response = await fetch(url, {signal: active.signal, cache: 'no-store'});
       if (!response.ok) throw new Error('Request failed');

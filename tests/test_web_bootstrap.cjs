@@ -64,13 +64,18 @@ async function documentsFixture(respond) {
     constructor(){super();this.value='';this.textContent='';this.dataset={};this.children=[];}
     append(...nodes){this.children.push(...nodes);}
     replaceChildren(...nodes){this.children=[...nodes];}
+    get childElementCount(){return this.children.length;}
+    get options(){return this.children;}
   }
   const ids = [...source('documents.html').matchAll(/id="([^"]+)"/g)].map(match => match[1]);
   const nodes = new Map(ids.map(id => [id, new Element()]));
   const window = new EventTarget(); window.CyberWebBoot = {blocked:false};
   const calls = [];
   vm.runInNewContext(source('documents.js'), {window,
-    document:{getElementById:id=>nodes.get(id), createElement:()=>new Element()}, AbortController, setTimeout, clearTimeout,
+    document:{getElementById:id=>nodes.get(id), createElement:()=>new Element(),
+      createTextNode:text=>({nodeType:3,textContent:text})},
+    Option:class extends Element {constructor(text,value){super();this.textContent=text;this.value=value;}},
+    AbortController, setTimeout, clearTimeout,
     fetch:async url => {calls.push(url);return new Response(JSON.stringify(await respond(url)), {headers:{'Content-Type':'application/json'}});},
   });
   const flush = async () => {await new Promise(resolve=>setImmediate(resolve));await new Promise(resolve=>setImmediate(resolve));};
