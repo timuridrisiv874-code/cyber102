@@ -194,6 +194,7 @@ struct InspectionView: View {
         }
         .fullScreenCover(isPresented: $showOnline) { OnlineInspectionScreen(serial: equipment?.serial) }
         .onChange(of: scenePhase) { _, phase in
+            if phase == .background { saveDraft() }
             if phase == .background && (analysis != nil || translating) {
                 stop()
                 error = "Проверка остановлена при переходе в фон. Можно продолжить с этим кадром или выбрать другой."
@@ -266,6 +267,7 @@ struct InspectionView: View {
                 entry?.russian = response.targetText
                 missingLanguage = false
                 error = nil
+                saveDraft()
             } catch {
                 guard translationRun == token, translationEntryID == id, entry?.id == id else { return }
                 self.error = "Русский перевод недоступен. \(error.localizedDescription)"
@@ -299,6 +301,7 @@ struct InspectionView: View {
     }
     private func selectPhoto(_ bytes: Data) throws {
         let clean = try inspectionJPEG(bytes)
+        saveDraft()
         stop()
         pickEpoch = UUID(); picked = nil
         frameEpoch = UUID(); clip = nil; frameSeconds = nil; loadingFrame = false
@@ -310,6 +313,7 @@ struct InspectionView: View {
         entry = nil; error = nil; missingLanguage = false; note = ""
     }
     private func invalidateFrame() {
+        saveDraft()
         frameEpoch = UUID(); loadingFrame = false
         originalPhoto = nil; photoSource = nil; measurement = nil; draftID = UUID()
         jpeg = nil; frameSeconds = nil; entry = nil; note = ""; error = nil
@@ -367,6 +371,7 @@ struct InspectionView: View {
                 let inspectionDate = store.entries.first { $0.id == draftID }?.date ?? Date()
                 entry = InspectionEntry(id: draftID, date: inspectionDate, english: output.text, russian: nil, qr: equipment?.serial, note: note, videoSeconds: frameSeconds, equipment: equipment, timing: InspectionTiming(output))
                 phase = ""
+                saveDraft()
                 let status = await LanguageAvailability().status(from: Self.en, to: Self.ru)
                 guard run == id, !Task.isCancelled else { return }
                 if status == .installed { startTranslation(draftID) }

@@ -56,7 +56,7 @@ final class InspectionStore: ObservableObject {
 
     func save(_ entry: InspectionEntry) {
         guard canWrite else { return }
-        let next = Array(([entry] + entries.filter { $0.id != entry.id }).prefix(10))
+        let next = Array(([entry] + entries.filter { $0.id != entry.id }).prefix(100))
         do {
             try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(next).write(to: file, options: [.atomic, .completeFileProtection])
