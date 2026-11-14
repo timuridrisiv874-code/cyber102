@@ -1,0 +1,119 @@
+[
+  {
+    "file": "oil_chemical-Level01-Wheeled-002899-001.jpg",
+    "scene": "draining-flanged-elbow",
+    "sha256": "25bac2cf6f4210e2cdd3a2ca9539e08378d92f699eb628df74e908501db109e4",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.322,
+          0.611,
+          0.399,
+          0.902
+        ]
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "note": "Tight box on falling water; excludes steam and broad wet floor."
+  },
+  {
+    "file": "oil_chemical-Level02-Wheeled-002943-001.jpg",
+    "scene": "dark-fluid-under-motor",
+    "sha256": "3e9671ad6d820bbb888d056db748e78f3f0d8ae5e2a850f66e8ac5f0f8b514c3",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.419,
+          0.462,
+          0.749,
+          0.579
+        ]
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "note": "Dark reflective liquid beneath a motor."
+  },
+  {
+    "file": "oil_chemical-Level02-Wheeled-002944-001.jpg",
+    "scene": "wet-patch-beside-red-machine",
+    "sha256": "e59a9c06a0c0f7a30118aebe6191179cab5545482972997d3a5c45c780d1b897",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.01,
+          0.075,
+          0.382,
+          0.676
+        ]
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "note": "Wet patch at left, beneath steam. Merge the overlapping original regions."
+  },
+  {
+    "file": "oil_chemical-Level02-Wheeled-002949-001.jpg",
+    "scene": "electrolysis-pipe-aisle",
+    "sha256": "525947a39ab77829731b9dcb5ddf02df6cad69a58a4cd2750ea542d35af7d8e5",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.0,
+          0.619,
+          0.372,
+          0.693
+        ]
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.443,
+          0.554,
+          0.824,
+          0.665
+        ]
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "note": "Two visible wet areas alongside opposite grating sections."
+  },
+  {
+    "file": "oil_chemical-Level02-Wheeled-002950-001.jpg",
+    "scene": "outdoor-circulation-pump",
+    "sha256": "cbd5aaec221d402aa6d804e0873e636cd10e561b9f42e80dade507761aecb5b1",
+    "objects": [
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.028,
+          0.634,
+          0.139,
+          0.705
+        ]
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.263,
+          0.849,
+          0.461,
+          0.98
+        ]
+      },
+      {
+        "class": "wet_patch",
+        "xyxy": [
+          0.622,
+          0.868,
+          0.852,
+          0.959
+        ]
+      }
+    ],
+    "source": "https://huggingface.co/datasets/Tetrabot2026/InspecSafe-V1",
+    "note": "Three dark wet floor patches around the pump bank."
+  }
+]
