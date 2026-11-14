@@ -86,6 +86,7 @@ def main():
     parser.add_argument('--size', type=int, action='append', required=True)
     parser.add_argument('--tiles', action='store_true', help='Also test tiled inference at the first size')
     parser.add_argument('--square', action='store_true', help='Use identical square padding for native and ONNX models')
+    parser.add_argument('--nms', action='store_true', help='Use the native YOLO26 one-to-many head with NMS')
     parser.add_argument('--device', default='0')
     args = parser.parse_args()
     if any(size < 32 or size % 32 for size in args.size):
@@ -107,7 +108,7 @@ def main():
     device = select_device(args.device, verbose=False)
     if device.type == 'cpu':
         torch.set_num_threads(min(4, torch.get_num_threads()))
-    report = {'device': args.device, 'excluded': excluded, 'squarePadding': args.square,
+    report = {'device': args.device, 'excluded': excluded, 'squarePadding': args.square, 'nms': args.nms,
               'imageHashes': {name: {row['file']: row['sha256'] for row in rows}
                               for name, (rows, _) in datasets.items()},
               'annotationHashes': {name: file_digest_rows(rows) for name, (rows, _) in datasets.items()},
@@ -118,6 +119,9 @@ def main():
     for name, filename in args.models:
         path = Path(filename).resolve(strict=True)
         model = YOLO(str(path), task='detect')
+        if args.nms and (path.suffix.lower() != '.pt' or not getattr(model.model, 'end2end', False)
+                         or getattr(model.model.model[-1], 'cv3', None) is None):
+            raise ValueError('--nms requires a native checkpoint with an unfused one-to-many head')
         with path.open('rb') as weights:
             result = {'artifact': str(path), 'sha256': file_digest(weights, 'sha256').hexdigest(), 'variants': {}}
         report['runs'][name] = result
@@ -126,7 +130,8 @@ def main():
             for key, (rows, paths) in datasets.items():
                 if device.type == 'cuda':
                     torch.cuda.reset_peak_memory_stats(device)
-                predictions, timings = infer(model, paths, args.device, size, tiles=tiles, rect=not args.square)
+                predictions, timings = infer(model, paths, args.device, size, tiles=tiles,
+                                            rect=not args.square, end2end=False if args.nms else None)
                 labels = sorted({obj['class'] for row in rows for obj in row['objects']} & set(model.names.values()))
                 if not labels:
                     continue

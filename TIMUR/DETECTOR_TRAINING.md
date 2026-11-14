@@ -652,3 +652,16 @@ YOLO11x завершил 24 эпохи и выгрузил полный ONNX н�
 | Roboflow Corrodetect, Rust detection final, pipe damage detection, oil-leaks-detection, smoke detection и Hydraulic Components Detection | Использование оригинальных размеченных выгрузок не подтверждено. Для дыма и пламени использован D-Fire, для коррозии Ostrava |
 
 [PWDID](https://zenodo.org/records/16935930) · [SteelTube](https://github.com/huangyebiaoke/steel-pipe-weld-defect-detection/releases/tag/1.0) · [MVTec AD](https://www.mvtec.com/research-teaching/datasets/mvtec-ad) · [S2DS](https://github.com/ben-z-original/s2ds) · [Mendeley](https://data.mendeley.com/datasets/nbxzxn3ffk/1)
+
+### Результат 18 эпох YOLO26x
+
+Полный ONNX занимает 212,7 МиБ при входе 960 px. Лучший чекпойнт на внутренней валидации получил mAP50 0,364 и mAP50–95 0,124. На девяти внешних выборках при пороге 0,05 и IoU 0,50 медиана полного кадра на 3090 Ti составила 40,8 мс.
+
+| Класс | Попадания до и после | Лишние или неточные рамки до и после |
+| --- | --- | --- |
+| Трещина | 2 → 1 из 30 | 1801 → 263 |
+| Повреждение клеммы | 0 → 1 из 21 | 184 → 5 |
+| Видимая жидкость | 1 → 1 из 33 | 1063 → 179 |
+| Коррозия | 1 → 0 из 7 | 4 → 18 |
+
+Обе версии пропустили все размеченные трещины на видео. Нулевое число попаданий по коррозии у полной версии не позволяет подтвердить сохранение качества этого класса после прунинга. Выполняются три варианта удаления внутренних каналов. Отдельно поставлена проверка головы YOLO26x с NMS на тех же фото и видео. [Бенчмарк](../ml/defect_detector/evaluate_yolo_variants.py)

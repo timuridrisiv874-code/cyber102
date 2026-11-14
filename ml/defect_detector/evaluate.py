@@ -146,11 +146,14 @@ def strip_tiles(width, height):
     return [(0, y, width, y + window) for y in starts]
 
 
-def infer(model, images, device, size, tiles=False, preprocess=None, strips=False, *, rect=True):
+def infer(model, images, device, size, tiles=False, preprocess=None, strips=False, *, rect=True, end2end=None):
     from PIL import Image, ImageOps
 
+    options = {} if end2end is None else {'end2end': end2end}
+
     def detect(image, offset_x=0, offset_y=0, fraction_x=1, fraction_y=1):
-        result = model.predict(image, device=device, imgsz=size, conf=.01, verbose=False, max_det=100, rect=rect)[0]
+        result = model.predict(image, device=device, imgsz=size, conf=.01, verbose=False,
+                               max_det=100, rect=rect, **options)[0]
         boxes = result.boxes.cpu()
         return [{'class': model.names[int(index)], 'score': float(score),
                  'xyxy': [offset_x + fraction_x * left, offset_y + fraction_y * top,
@@ -159,7 +162,7 @@ def infer(model, images, device, size, tiles=False, preprocess=None, strips=Fals
                 zip(boxes.cls.tolist(), boxes.conf.tolist(), boxes.xyxyn.tolist(), strict=True)]
 
     with Image.new('RGB', (size, size)) as blank:
-        model.predict(blank, device=device, imgsz=size, verbose=False, rect=rect)
+        model.predict(blank, device=device, imgsz=size, verbose=False, max_det=100, rect=rect, **options)
     predictions, timings = {}, {}
     for file in images:
         started = time.perf_counter()

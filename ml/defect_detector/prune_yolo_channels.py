@@ -129,6 +129,7 @@ def main():
                        imgsz=args.size, epochs=args.recover, device=args.device, batch=args.batch,
                        project=str(args.output.resolve()), name='recovery', exist_ok=False,
                        workers=0, cache=False, amp=False, mosaic=0, optimizer='AdamW', lr0=.00008,
+                       warmup_epochs=1.0, warmup_bias_lr=0.0,
                        plots=False, seed=102)
         checkpoint = Path(detector.trainer.best)
     runtime_shape = None
