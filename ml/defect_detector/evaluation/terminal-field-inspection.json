@@ -1,0 +1,152 @@
+[
+  {
+    "file": "talete-pump-terminal.jpg",
+    "scene": "talete",
+    "site": "talete",
+    "domain": "pump-motor",
+    "source": "https://downloads.dewesoft.com/brochures/dewesoft-power-energy-case-studies-en.pdf#page=33",
+    "sourceImage": "dewesoft-img-000.jpg",
+    "sha256": "7a1a9dcf5bc83c3fd7a05252f25c643512dc391b5891d44bff2278463d22b04e",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.688,
+          0.499,
+          0.885,
+          0.858
+        ]
+      }
+    ],
+    "note": "Frayed exposed strands and deteriorated cable end at the right-hand connection."
+  },
+  {
+    "file": "fema-breaker-bus.jpg",
+    "scene": "fema-breaker-bus",
+    "site": "fema",
+    "domain": "switchgear",
+    "source": "https://apps.usfa.fema.gov/ax/sm/sm_2112.pdf#page=197",
+    "sourceImage": "fema-img-010.jpg",
+    "sha256": "195e01400077528176dff82b03b5605aa46224032d4219e22e168efa28a22e44",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.217,
+          0.148,
+          0.749,
+          0.771
+        ]
+      }
+    ],
+    "note": "Visible charring and distortion within the opened breaker at the bus-bar connection."
+  },
+  {
+    "file": "fema-breaker-terminal.jpg",
+    "scene": "fema-breaker-terminal",
+    "site": "fema",
+    "domain": "switchgear",
+    "source": "https://apps.usfa.fema.gov/ax/sm/sm_2112.pdf#page=197",
+    "sourceImage": "fema-img-014.jpg",
+    "sha256": "7f4b0494540893aa3f96a70763cc2e4ab5643f78dbfa66df411ca2cfccf4546f",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.747,
+          0.481,
+          0.963,
+          0.918
+        ]
+      }
+    ],
+    "note": "Melted breaker shell and burned material around the right terminal."
+  },
+  {
+    "file": "tsbc-feeder-terminal.jpg",
+    "scene": "tsbc",
+    "site": "tsbc",
+    "domain": "switchgear",
+    "source": "https://files.technicalsafetybc.ca/v3/assets/bltdec2ded849740f4d/bltfa095474030edceb/663e6b70a4bb5f84cbfb1a7f/II-1508420-2023-%2831812%29.pdf#page=6",
+    "sourceImage": "tsbc-img-003.jpg",
+    "sha256": "ba4ff1cb52a36a7fbc64d93970b7a27b42754a505a43c8b01b5b2ff32eddadd2",
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.243,
+          0.174,
+          0.714,
+          0.421
+        ]
+      }
+    ],
+    "note": "Melted conductor and char at the feeder termination. The circle on the report page is a separate PDF overlay."
+  },
+  {
+    "file": "abb-integrated-open.jpg",
+    "scene": "abb-catalog",
+    "site": "abb-catalog",
+    "domain": "catalog",
+    "source": "https://library.e.abb.com/public/b01ae67a13c44727966eff3a276bc594/Process%20perf%209AKK105944%20EN%2002-2020%20Final.pdf#page=81",
+    "sourceImage": "abb-img-001.jpg",
+    "sha256": "27ff3a08f689282bcc661b61de1409a0e94db489280a7804dd1a3d7937b71728",
+    "objects": [],
+    "note": "Intact blue motor with open box and short factory leads."
+  },
+  {
+    "file": "abb-integrated-covered.jpg",
+    "scene": "abb-catalog",
+    "site": "abb-catalog",
+    "domain": "catalog",
+    "source": "https://library.e.abb.com/public/b01ae67a13c44727966eff3a276bc594/Process%20perf%209AKK105944%20EN%2002-2020%20Final.pdf#page=81",
+    "sourceImage": "abb-img-002.jpg",
+    "sha256": "ebe58fa0c0b24eb49413b1796f1f73dffbdbeca39507a3ffdf57d210576747ee",
+    "objects": [],
+    "note": "Closed motor terminal box. No visible damage; interior cannot be assessed."
+  },
+  {
+    "file": "abb-terminal-90.jpg",
+    "scene": "abb-catalog",
+    "site": "abb-catalog",
+    "domain": "catalog",
+    "source": "https://library.e.abb.com/public/b01ae67a13c44727966eff3a276bc594/Process%20perf%209AKK105944%20EN%2002-2020%20Final.pdf#page=81",
+    "sourceImage": "abb-img-003.jpg",
+    "sha256": "a2fa7d8917b55adf34d5c6661f89c700a8987ed7560c8d24087752c79f0424e0",
+    "objects": [],
+    "note": "Open terminal box with normal metal studs and intact wiring."
+  },
+  {
+    "file": "abb-terminal-160.jpg",
+    "scene": "abb-catalog",
+    "site": "abb-catalog",
+    "domain": "catalog",
+    "source": "https://library.e.abb.com/public/b01ae67a13c44727966eff3a276bc594/Process%20perf%209AKK105944%20EN%2002-2020%20Final.pdf#page=81",
+    "sourceImage": "abb-img-004.jpg",
+    "sha256": "568b9ca8a310d08c2f857c8e057855d2e7a080bdadb4f6eae9739cd9ee16a849",
+    "objects": [],
+    "note": "Different factory terminal layout without visible damage."
+  },
+  {
+    "file": "abb-terminal-200.jpg",
+    "scene": "abb-catalog",
+    "site": "abb-catalog",
+    "domain": "catalog",
+    "source": "https://library.e.abb.com/public/b01ae67a13c44727966eff3a276bc594/Process%20perf%209AKK105944%20EN%2002-2020%20Final.pdf#page=81",
+    "sourceImage": "abb-img-005.jpg",
+    "sha256": "c26fab3eed6ad56287212941658f626dc232a555b75eb151f60122f9c5abd1de",
+    "objects": [],
+    "note": "Intact curved leads and green/yellow insulation."
+  },
+  {
+    "file": "abb-terminal-large.jpg",
+    "scene": "abb-catalog",
+    "site": "abb-catalog",
+    "domain": "catalog",
+    "source": "https://library.e.abb.com/public/b01ae67a13c44727966eff3a276bc594/Process%20perf%209AKK105944%20EN%2002-2020%20Final.pdf#page=82",
+    "sourceImage": "abb-img-010.jpg",
+    "sha256": "d9c174121206d41b2bb4746b5129ad455317e01ee51798cbff812ed10ea3cebc",
+    "objects": [],
+    "note": "An intact exposed terminal board with dark insulating material and bright metal."
+  }
+]
