@@ -9,7 +9,7 @@ import sys
 from time import perf_counter
 
 from evaluate import merge_boxes
-from evaluate_qwen_boxes import MAX_NEW_TOKENS, make_prompt, parse_detections
+from evaluate_qwen_boxes import MAX_NEW_TOKENS, checked_images, make_prompt, parse_detections
 from evaluate_qwen_video_grounding import LABELS
 from evaluate_video_component_crops import project
 from evaluate_video_component_gate import measure_reviewed
@@ -52,26 +52,31 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('repo', type=Path)
     parser.add_argument('model', type=Path)
-    parser.add_argument('annotations', nargs=2, type=Path)
+    parser.add_argument('annotations', nargs='+', type=Path)
     parser.add_argument('images', type=Path)
     parser.add_argument('pair_report', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--single-crop', action='store_true',
                         help='Submit each crop as an independent one-image localization request')
+    parser.add_argument('--still-images', action='store_true',
+                        help='Use checksum-verified photographs in place of timestamped video frames')
     args = parser.parse_args()
     sets = {path.stem: json.loads(path.read_bytes()) for path in args.annotations}
-    pairs = json.loads(args.pair_report.read_bytes())
-    clips = json.loads((args.images / 'clips.json').read_bytes())
+    baseline_bytes = args.pair_report.read_bytes()
+    pairs = json.loads(baseline_bytes)
     rows = [row for annotation in sets.values() for row in annotation]
     names = {row['file'] for row in rows}
     if not names or len(rows) != len(names) or names != set(pairs['predictions']):
-        raise ValueError('Both evaluation sets must cover exactly the sampled frames')
-    for row in rows:
-        name = row['file']
-        frame = clips[row['clip']]['frames'][row['frameIndex']]
-        if (Path(name).name != name or any(row[key] != frame[key] for key in ('file', 'sha256', 'timestampSeconds'))
-                or hashlib.sha256((args.images / name).read_bytes()).hexdigest() != row['sha256']):
-            raise ValueError(f'Unexpected source frame: {name}')
+        raise ValueError('Baseline predictions and evaluation annotations must cover the same images')
+    if any('sha256' not in row for row in rows):
+        raise ValueError('Every evaluation image must have a recorded checksum')
+    images = checked_images(rows, args.images)
+    if not args.still_images:
+        clips = json.loads((args.images / 'clips.json').read_bytes())
+        for row in rows:
+            frame = clips[row['clip']]['frames'][row['frameIndex']]
+            if any(row[key] != frame[key] for key in ('file', 'sha256', 'timestampSeconds')):
+                raise ValueError(f'Unexpected source frame: {row["file"]}')
 
     sys.path.insert(0, str(args.repo.resolve(strict=True)))
     from PIL import Image, ImageOps
@@ -117,14 +122,16 @@ def main():
     for row in rows:
         name = row['file']
         start = perf_counter()
-        with Image.open(args.images / name) as source, ImageOps.exif_transpose(source).convert('RGB') as image:
+        with Image.open(images[name]) as source, ImageOps.exif_transpose(source).convert('RGB') as image:
             predictions[name], failed = detect(image)
             if failed:
                 errors[name] = failed
         times[name] = round((perf_counter() - start) * 1000, 3)
         print(name, len(predictions[name]), times[name], flush=True)
     combined = {name: merge_boxes(pairs['predictions'][name] + boxes) for name, boxes in predictions.items()}
-    report = {**identity, 'separateCropRequests': args.single_crop,
+    report = {**identity, 'separateCropRequests': args.single_crop, 'stillImages': args.still_images,
+              'baselineReportSha256': hashlib.sha256(baseline_bytes).hexdigest(),
+              'frameSha256': {row['file']: row['sha256'] for row in rows},
               'medianMs': median(times.values()), 'frameMs': times, 'errors': errors,
               'predictions': predictions, 'combined': combined,
               'sets': {name: {'fullFrame': measure_reviewed(subset, pairs['predictions']),
