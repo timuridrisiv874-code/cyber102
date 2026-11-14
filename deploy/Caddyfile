@@ -1,13 +1,14 @@
 # Imported by the existing Caddy configuration on the 3090 host.
 https://cyber102.94.41.87.102.sslip.io {
-    basic_auth bcrypt Cyber102 {
+    @apk path *.apk
+    basic_auth @apk bcrypt Cyber102 {
         import C:/cyber102/private/auth.caddy
     }
     request_body {
         max_size 12MiB
     }
     encode gzip
-    # Exact APK routes retain the site's Basic Auth and stream through Caddy.
+    # Exact APK routes require Basic Auth and stream through Caddy.
     # No directory listing or other files from output/android are exposed.
     handle /cyber102-0.7-offline.apk {
         root * C:/cyber102/output/android

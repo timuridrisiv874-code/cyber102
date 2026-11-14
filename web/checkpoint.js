@@ -144,6 +144,8 @@ function severityBadge(level) {
 const releaseCheckNotes = new Set([
   'Автопроверка релиза 0.6: синтетическое фото, ручные демонстрационные значения.',
   'Проверка версии 0.5: синтетический тестовый кадр, демонстрационная телеметрия.',
+  'Проверка развёртывания — chromium',
+  'Проверка развёртывания — webkit',
 ]);
 
 const frameDialog = byId('journal-frame');

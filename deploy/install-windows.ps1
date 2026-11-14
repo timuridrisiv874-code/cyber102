@@ -1,4 +1,4 @@
-# Run after copying the release into C:\cyber102 and provisioning private/auth.caddy.
+# Run after copying the release into C:\cyber102 and provisioning private/auth.caddy for APK downloads.
 $ErrorActionPreference = 'Stop'
 $root = 'C:\cyber102'
 $basePython = 'C:\Users\fatik\AppData\Local\Programs\Python\Python311\python.exe'
