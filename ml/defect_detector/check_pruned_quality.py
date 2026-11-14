@@ -38,9 +38,8 @@ def compare(baseline, candidate, thresholds):
                                          'frame': frame, 'lostObjects': missing})
                 if cutoff == thresholds[0]:
                     positives[label] += a['tp']
-            for cutoff, clean in row['negativeFrames'].items():
-                if cutoff not in thresholds:
-                    continue
+            for cutoff in thresholds:
+                clean = row['negativeFrames'][cutoff]
                 after = result['negativeFrames'][cutoff]
                 if clean['count'] != after['count']:
                     raise ValueError(f'Mismatched negative support for {name}/{label}')
@@ -69,8 +68,9 @@ def main():
     runs = evaluation['runs']
     exported = json.loads(args.export_evaluation.read_bytes()) if args.export_evaluation else None
     if exported is not None:
-        if not exported['squarePadding'] or exported['imageHashes'] != evaluation['imageHashes']:
-            raise ValueError('ONNX evaluation needs square padding and identical benchmark images')
+        if (not exported['squarePadding'] or exported['imageHashes'] != evaluation['imageHashes']
+                or exported['annotationHashes'] != evaluation['annotationHashes']):
+            raise ValueError('ONNX evaluation needs square padding and identical benchmark images and annotations')
         baseline_onnx = exported['runs'][f'{args.baseline}-onnx']
         with args.baseline_onnx.open('rb') as file:
             if baseline_onnx['sha256'] != file_digest(file, 'sha256').hexdigest():
@@ -78,7 +78,7 @@ def main():
     baseline = runs[args.baseline]
     baseline_bytes = args.baseline_onnx.stat().st_size
     limit = min(baseline_bytes - 1, args.max_bytes or baseline_bytes)
-    thresholds = ('0.05', '0.25')
+    thresholds = ('0.05', '0.15', '0.25')
     results, eligible = {}, []
     for name, path in args.candidate:
         if name in results:

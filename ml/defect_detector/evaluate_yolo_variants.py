@@ -1,7 +1,7 @@
 """Measure YOLO checkpoints on reviewed images at several input sizes and thresholds."""
 import argparse
 from collections import Counter
-from hashlib import file_digest
+from hashlib import file_digest, sha256
 import json
 from pathlib import Path
 from statistics import median
@@ -9,6 +9,10 @@ from statistics import median
 from evaluate import class_negative_frames, infer, localization_errors, match_indices, measurements
 
 THRESHOLDS = (.01, .05, .15, .25)
+
+
+def file_digest_rows(rows):
+    return sha256(json.dumps(rows, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
 
 
 def load_datasets(specifications, exclusions):
@@ -65,7 +69,7 @@ def summarize(rows, predictions, labels):
             'thresholds': {f'{floor:.2f}': measurements(scoped, predictions, (label,), floor, .5)['classes'][label]
                            for floor in THRESHOLDS},
             'negativeFrames': {f'{floor:.2f}': class_negative_frames(scoped, predictions, (label,), floor)[label]
-                               for floor in (.01, .05, .25)},
+                               for floor in THRESHOLDS},
             'missesAtFloor': dict(Counter(error['reason'] for error in errors)),
         }
     return report
@@ -105,7 +109,9 @@ def main():
         torch.set_num_threads(min(4, torch.get_num_threads()))
     report = {'device': args.device, 'excluded': excluded, 'squarePadding': args.square,
               'imageHashes': {name: {row['file']: row['sha256'] for row in rows}
-                              for name, (rows, _) in datasets.items()}, 'runs': {}}
+                              for name, (rows, _) in datasets.items()},
+              'annotationHashes': {name: file_digest_rows(rows) for name, (rows, _) in datasets.items()},
+              'runs': {}}
     variants = [(str(size), size, False) for size in dict.fromkeys(args.size)]
     if args.tiles:
         variants.append((f'{args.size[0]}-tiles', args.size[0], True))
