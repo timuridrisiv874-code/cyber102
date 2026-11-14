@@ -1,0 +1,295 @@
+[
+  {
+    "file": "aachen.jpg",
+    "split": "train",
+    "scene": "weisweiler",
+    "source": "https://commons.wikimedia.org/wiki/File:Aachen_Lousberg_Richtung_Haaren.jpg",
+    "author": "© Geolina",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceSha256": "c7432a38cc5c5dc8d694afb92e34d0cf8d02f43f549bdde5e8ff34b46e1c52c3",
+    "sha256": "82cb43ab2fb3345032503191cf8cf22cff1a1cd6a3092da27e0be3b1e2b3a762",
+    "derivation": "960px Commons preview; EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0.49,
+          0.085,
+          1,
+          0.379
+        ]
+      }
+    ]
+  },
+  {
+    "file": "austin.jpg",
+    "split": "train",
+    "scene": "austin-hilton",
+    "source": "https://commons.wikimedia.org/wiki/File:2010-365-49_Steamy_Austin_(4369073865).jpg",
+    "author": "cogdogblog",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "sourceSha256": "db10da916b29e76dd72e5bdc7fe49e84eb98708ccfa8ac6cc078507633939dc6",
+    "sha256": "53c83f6e3ec4ed456b53a939ac2bc22141562bcb3b2a2852b91d7996fdcef40e",
+    "derivation": "EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0.239,
+          0,
+          0.642,
+          0.862
+        ]
+      }
+    ]
+  },
+  {
+    "file": "centralia.jpg",
+    "split": "train",
+    "scene": "centralia",
+    "source": "https://commons.wikimedia.org/wiki/File:Cooling_system_for_Centralia_Power_Plant_(1668833199).jpg",
+    "author": "Robert Ashworth from Bellingham, WA., USA",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "sourceSha256": "ddbf44605d1dd74c7e7ced9035a41adf85729f4b50535f1dd07b934fd930c35d",
+    "sha256": "deeacbe92d40895e368846fe9ab66ca7c5128f94037a53662d3f389045546703",
+    "derivation": "EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0,
+          0,
+          0.96,
+          0.577
+        ]
+      }
+    ]
+  },
+  {
+    "file": "columbia.jpg",
+    "split": "train",
+    "scene": "columbia-hanford",
+    "source": "https://commons.wikimedia.org/wiki/File:Columbia_Generating_Station_at_Hanford_Washington.JPG",
+    "author": "Chris Uhlik",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceSha256": "531a7472b246dbeb9ad6965847ab0a625aba8156ce042f62b8dccf79b73d5157",
+    "sha256": "ad01f85534d0edc9260bdc4793d537e49a05290e4ce4100081ca100896d8061f",
+    "derivation": "EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0.017,
+          0.015,
+          0.58,
+          0.62
+        ]
+      }
+    ]
+  },
+  {
+    "file": "cottam.jpg",
+    "split": "val",
+    "scene": "cottam",
+    "source": "https://commons.wikimedia.org/wiki/File:A_distant_Cottam_power_station_-_geograph.org.uk_-_1186695.jpg",
+    "author": "Steve  F",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "sourceSha256": "afc6ffcf88011d6707c5631e6d0ac72fa1e69072b56d3d6807af0d3b8c9bb80b",
+    "sha256": "da2baf36f5038e933ea62448825cf85320a715788f744f94ccf633319e348f94",
+    "derivation": "EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0.548,
+          0.488,
+          0.925,
+          0.668
+        ]
+      }
+    ]
+  },
+  {
+    "file": "creys.jpg",
+    "split": "val",
+    "scene": "creys-malville",
+    "source": "https://commons.wikimedia.org/wiki/File:Centrale_nucl%C3%A9aire_de_Creys-Malville_@_Mont_Marg%C3%A9riaz.jpg",
+    "author": "Rémih",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceSha256": "07dc0ff142c860324622d649e825607300d58582b19a55b6a64236dcea5df5b1",
+    "sha256": "8d314bb9caea7628179a1f023701547425a0b20618026c716b3809a20ffb025c",
+    "derivation": "960px Commons preview; EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0.327,
+          0.215,
+          0.587,
+          0.687
+        ]
+      }
+    ]
+  },
+  {
+    "file": "heilbronn.jpg",
+    "split": "train",
+    "scene": "heilbronn",
+    "source": "https://commons.wikimedia.org/wiki/File:2013_Kraftwerk_Heilbronn_im_Abendlicht.jpg",
+    "author": "Kreuzschnabel",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceSha256": "f2ee20520805bb3da260dc24f2350762e4445bdd45d4d7e6318492acf435195a",
+    "sha256": "2226fbd93953974327da2773d5f0b038975e96558371f68e003d4a3be22c9b67",
+    "derivation": "EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0,
+          0.326,
+          0.472,
+          0.667
+        ]
+      }
+    ]
+  },
+  {
+    "file": "larderello.jpg",
+    "split": "val",
+    "scene": "larderello",
+    "source": "https://commons.wikimedia.org/wiki/File:Larderello_Cooling_Towers.jpg",
+    "author": "User:Goth nespresso",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "sourceSha256": "3db3eb8692c89722fc1cb8d34eff056fbf2500324ee15410302dd8dd51a41c71",
+    "sha256": "fb135d4ed24604910121f79d816c973bf46d79d08f2e9f4e22e20795198b221d",
+    "derivation": "EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": []
+  },
+  {
+    "file": "lippendorf.jpg",
+    "split": "train",
+    "scene": "lippendorf",
+    "source": "https://commons.wikimedia.org/wiki/File:Cooling_tower,_Lippendorf_Power_Station.JPG",
+    "author": "High Contrast",
+    "license": "CC BY 3.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/de/deed.en",
+    "sourceSha256": "da2bb270f116d7c757ec6252d65b0610f5e4ec301c504cf8c33fb23a9df29210",
+    "sha256": "6651bd51b2aeedfce7826e466904f71ca1139a55f91e8467f2ca57f60021bb04",
+    "derivation": "EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0,
+          0,
+          1,
+          0.61
+        ]
+      }
+    ]
+  },
+  {
+    "file": "neckar.jpg",
+    "split": "train",
+    "scene": "neckarwestheim",
+    "source": "https://commons.wikimedia.org/wiki/File:BW-neckarwestheim-liebenstein-AKW.JPG",
+    "author": "Bgabel",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceSha256": "c07df484c7bcb8020cd4240d4b9e527f31c1866893bd76a107079ea61f6a71ff",
+    "sha256": "50fb0044d02e4aa49a4d43a3b94baffd8be6349243fed4351c05ff178995ba36",
+    "derivation": "960px Commons preview; EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0.064,
+          0,
+          0.759,
+          0.617
+        ]
+      },
+      {
+        "class": "steam",
+        "xyxy": [
+          0.543,
+          0.558,
+          0.579,
+          0.66
+        ]
+      },
+      {
+        "class": "steam",
+        "xyxy": [
+          0.304,
+          0.544,
+          0.366,
+          0.626
+        ]
+      }
+    ]
+  },
+  {
+    "file": "nesjavellir.jpg",
+    "split": "train",
+    "scene": "nesjavellir",
+    "source": "https://commons.wikimedia.org/wiki/File:Anthropocumulus_cloud_at_Nesjavellir%27s_geothermal_plant_(Iceland,_August_2009)..JPG",
+    "author": "Mcosta1",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceSha256": "2184275e67c2ca04eb76089f92506a4f847b3bc97bf46696b54f324cae5af3bd",
+    "sha256": "4bbb958303823e4662b16cd235891517e0b474f017d9b472e8682db15d021b69",
+    "derivation": "EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0.245,
+          0.053,
+          0.858,
+          0.931
+        ]
+      },
+      {
+        "class": "steam",
+        "xyxy": [
+          0.287,
+          0.853,
+          0.413,
+          0.946
+        ]
+      }
+    ]
+  },
+  {
+    "file": "rutgers.jpg",
+    "split": "train",
+    "scene": "rutgers-ecological-preserve",
+    "source": "https://commons.wikimedia.org/wiki/File:2013-05-05_10_57_41_Open_man-made_steam_vent_near_the_end_of_an_unnamed_trail_adjacent_to_the_Orange_Trail_in_the_Rutgers_Ecological_Preserve.jpg",
+    "author": "Famartin",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceSha256": "24876895c7ad22096c86f5b05fc940e8f96185d2e832c98961af4a18e64b995c",
+    "sha256": "aca8812bd54f4a5b1275a67919dca9ea6ddee8bc2a40cf0f7ca6f2e8b23fb3ef",
+    "derivation": "EXIF orientation applied, reduced to at most 1280px per side and re-encoded as JPEG",
+    "objects": [
+      {
+        "class": "steam",
+        "xyxy": [
+          0.207,
+          0.291,
+          0.804,
+          0.832
+        ]
+      }
+    ]
+  }
+]
