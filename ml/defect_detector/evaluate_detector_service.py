@@ -1,14 +1,16 @@
 """Score a staging detector's HTTP detections against a local, annotated box split."""
 import argparse
 import base64
+import hashlib
 import json
 from pathlib import Path
 from statistics import median
 from time import perf_counter
 from urllib.request import ProxyHandler, Request, build_opener
+from uuid import UUID, uuid4
 
 from calibrate_thresholds import labeled_frames
-from evaluate import class_negative_frames, measurements
+from evaluate import class_negative_frames, match_indices, measurements
 from evaluate_service import NoRedirects
 
 
@@ -21,15 +23,82 @@ def predictions(detections):
     return result
 
 
+def analyze_upload(opener, base, image, version):
+    """Use the browser's multipart route and check that its evidence is the analyzed JPEG."""
+    from server import vision
+    from server.detector import validate_envelope
+
+    boundary = f'cyber102-{uuid4().hex}'
+    content_type = f'multipart/form-data; boundary={boundary}'
+    body = (f'--{boundary}\r\nContent-Disposition: form-data; name="captureSource"\r\n\r\n'
+            f'uploaded_photo\r\n--{boundary}\r\n'
+            'Content-Disposition: form-data; name="file"; filename="frame.jpg"\r\n'
+            'Content-Type: image/jpeg\r\n\r\n').encode('ascii') + image + f'\r\n--{boundary}--\r\n'.encode('ascii')
+    started = perf_counter()
+    request = Request(base + '/analyze', body, {'Content-Type': content_type})
+    with opener.open(request, timeout=35) as reply:
+        result = json.load(reply)
+    response_ms = round((perf_counter() - started) * 1000, 3)
+    if (result['modelVersion'] != version or result['profile'] != 'standard'
+            or result['source'] != 'local_vision' or result['media']['captureSource'] != 'uploaded_photo'):
+        raise ValueError('App route returned incompatible model provenance or media')
+    envelope = validate_envelope({'schemaVersion': 1, 'model': result['model'], 'modelVersion': version,
+                                  'detections': result['detections']})
+    boxes = envelope['detections']
+    if boxes:
+        evidence_path = f"/api/analyses/{result['analysisId']}/image"
+        if result['status'] != 'defect' or result['box'] != boxes[0]['box'] or result['imageUrl'] != evidence_path:
+            raise ValueError('App route returned an invalid primary box or evidence path')
+        identifier = UUID(result['analysisId'])
+        if identifier.version != 4 or str(identifier) != result['analysisId']:
+            raise ValueError('App route returned an invalid evidence ID')
+        expected = hashlib.sha256(vision.extract_image(content_type, body)).digest()
+        with opener.open(base + evidence_path, timeout=5) as reply:
+            content = reply.read(vision.MAX_IMAGE_BYTES + 1)
+            if reply.headers.get_content_type() != 'image/jpeg' or hashlib.sha256(content).digest() != expected:
+                raise ValueError('App evidence differs from the normalized upload')
+    elif result['status'] != 'unusable' or 'analysisId' in result:
+        raise ValueError('Empty detection must stay unusable without evidence')
+    return predictions(boxes), response_ms, bool(boxes)
+
+
+def evaluate_findings(rows, detected, times, labels):
+    return {'images': len(rows), 'medianHttpMs': median(times.values()),
+            'at0.50': measurements(rows, detected, labels, 0, .50),
+            'negativeFrames': class_negative_frames(rows, detected, labels, 0),
+            'timingsMs': times, 'predictions': detected}
+
+
+def agreement(worker, app):
+    counts = {'sameCount': 0, 'sameBoxesAt0.99': 0, 'differentBoxFrames': []}
+    for name, boxes in worker.items():
+        other = app[name]
+        if len(boxes) == len(other):
+            counts['sameCount'] += 1
+        equivalent = len(boxes) == len(other) and all(
+            len(match_indices([box for box in other if box['class'] == label],
+                              [box['xyxy'] for box in boxes if box['class'] == label], .99))
+            == sum(box['class'] == label for box in boxes) for label in {box['class'] for box in boxes})
+        if equivalent:
+            counts['sameBoxesAt0.99'] += 1
+        else:
+            counts['differentBoxFrames'].append(name)
+    return counts
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('reference', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--port', type=int, required=True)
+    parser.add_argument('--app-port', type=int, help='Also compare a separate Cyber102 app using this detector')
     parser.add_argument('--weights-sha256', required=True)
     args = parser.parse_args()
-    if not 1 <= args.port <= 65535:
-        parser.error('--port must be in [1, 65535]')
+    if not 1 <= args.port <= 65535 or (args.app_port is not None
+                                       and not 1 <= args.app_port <= 65535):
+        parser.error('Ports must be in [1, 65535]')
+    if args.app_port == args.port:
+        parser.error('Worker and app require different ports')
     import yaml
 
     config = yaml.safe_load(args.reference.read_text(encoding='utf-8'))
@@ -46,9 +115,17 @@ def main():
     from server.detector import validate_envelope
 
     detected, times = {}, {}
+    app_detected, app_times, evidence = {}, {}, 0
+    app_base = f'http://127.0.0.1:{args.app_port}' if args.app_port else None
+    if app_base:
+        with opener.open(app_base + '/api/capabilities', timeout=5) as reply:
+            capabilities = json.load(reply)['vision']
+        if capabilities['enabled'] is not True or capabilities['backend'] != 'detector':
+            raise ValueError('Expected an isolated Cyber102 app using the detector')
     for row, image in zip(rows, images, strict=True):
         row['scene'] = row['file']
-        payload = json.dumps({'image': base64.b64encode(image.read_bytes()).decode('ascii')}).encode('ascii')
+        image_bytes = image.read_bytes()
+        payload = json.dumps({'image': base64.b64encode(image_bytes).decode('ascii')}).encode('ascii')
         request = Request(base + '/analyze', payload, {'Content-Type': 'application/json'})
         started = perf_counter()
         with opener.open(request, timeout=30) as reply:
@@ -59,11 +136,17 @@ def main():
         detected[row['file']] = predictions(result['detections'])
         if any(box['class'] not in labels for box in detected[row['file']]):
             raise ValueError('Unexpected class in staging worker response')
+        if app_base:
+            app_boxes, app_ms, saved = analyze_upload(opener, app_base, image_bytes, health['modelVersion'])
+            if any(box['class'] not in labels for box in app_boxes):
+                raise ValueError('Unexpected class in staging app response')
+            app_detected[row['file']], app_times[row['file']] = app_boxes, app_ms
+            evidence += saved
         print(row['file'], len(detected[row['file']]), times[row['file']], flush=True)
-    report = {'worker': health, 'images': len(rows), 'medianHttpMs': median(times.values()),
-              'at0.50': measurements(rows, detected, labels, 0, .50),
-              'negativeFrames': class_negative_frames(rows, detected, labels, 0),
-              'timingsMs': times, 'predictions': detected}
+    report = {'worker': health, **evaluate_findings(rows, detected, times, labels)}
+    if app_base:
+        report['app'] = {**evaluate_findings(rows, app_detected, app_times, labels),
+                         'verifiedEvidenceImages': evidence, 'agreement': agreement(detected, app_detected)}
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
 
 
