@@ -89,6 +89,8 @@ def main():
         results[name] = {'passed': passed, 'regressions': failures, 'baselineHits': support,
                          'onnxBytes': onnx_bytes, 'onnx': str(onnx),
                          'parameters': pruning['parametersAfter'],
+                         'peakGpuAllocatedBytes': max((row.get('peakGpuAllocatedBytes') or 0
+                                                       for row in run['variants'][size].values()), default=0) or None,
                          'medianMsByDataset': {k: v['medianMs'] for k, v in run['variants'][size].items()}}
         if passed:
             eligible.append((onnx_bytes, name))

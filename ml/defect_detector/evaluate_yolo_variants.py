@@ -94,9 +94,12 @@ def main():
         excluded.setdefault(name, []).append(file)
     datasets = load_datasets(args.dataset, excluded)
 
+    import torch
     from ultralytics import YOLO, settings
+    from ultralytics.utils.torch_utils import select_device
 
     settings.update({'sync': False})
+    device = select_device(args.device, verbose=False)
     report = {'device': args.device, 'excluded': excluded, 'runs': {}}
     variants = [(str(size), size, False) for size in dict.fromkeys(args.size)]
     if args.tiles:
@@ -113,13 +116,22 @@ def main():
                 labels = sorted({obj['class'] for row in rows for obj in row['objects']} & set(model.names.values()))
                 if not labels:
                     continue
+                if device.type == 'cuda':
+                    torch.cuda.reset_peak_memory_stats(device)
                 predictions, timings = infer(model, paths, args.device, size, tiles=tiles)
+                if device.type == 'cuda':
+                    torch.cuda.synchronize(device)
+                    peak_gpu_bytes = torch.cuda.max_memory_allocated(device)
+                else:
+                    peak_gpu_bytes = None
                 variant[key] = {'summary': summarize(rows, predictions, labels), 'timing': timings,
-                                'medianMs': median(timings.values()), 'predictions': predictions}
+                                'medianMs': median(timings.values()), 'predictions': predictions,
+                                'peakGpuAllocatedBytes': peak_gpu_bytes}
                 print(name, mode, key, round(variant[key]['medianMs']), flush=True)
                 temporary = args.output.with_suffix(args.output.suffix + '.tmp')
                 temporary.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
                 temporary.replace(args.output)
+        del model
 
 
 if __name__ == '__main__':
