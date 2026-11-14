@@ -54,13 +54,19 @@ def measurements(rows, predictions, labels, threshold, iou):
 
 
 def class_negative_frames(rows, predictions, labels, threshold):
-    """Count false alerts of each class, even when another class is present."""
+    """Count false alerts per frame and per scene without that class."""
     summary = {}
+    scenes = {row['scene'] for row in rows}
     for label in labels:
-        negatives = [row['file'] for row in rows if all(obj['class'] != label for obj in row['objects'])]
-        flagged = [name for name in negatives
-                   if any(p['class'] == label and p['score'] >= threshold for p in predictions[name])]
-        summary[label] = {'count': len(negatives), 'flagged': sorted(flagged)}
+        negatives = [row for row in rows if all(obj['class'] != label for obj in row['objects'])]
+        positive_scenes = {row['scene'] for row in rows
+                           if any(obj['class'] == label for obj in row['objects'])}
+        flagged = [row for row in negatives if any(p['class'] == label and p['score'] >= threshold
+                                                   for p in predictions[row['file']])]
+        negative_scenes = scenes - positive_scenes
+        flagged_scenes = negative_scenes & {row['scene'] for row in flagged}
+        summary[label] = {'count': len(negatives), 'flagged': sorted(row['file'] for row in flagged),
+                          'negative_scenes': sorted(negative_scenes), 'flagged_scenes': sorted(flagged_scenes)}
     return summary
 
 
