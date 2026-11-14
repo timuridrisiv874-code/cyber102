@@ -11,7 +11,7 @@
 | Каталог приложения | `C:\cyber102` |
 | Python | 3.11, отдельная копия интерпретатора и стандартной библиотеки в `C:\cyber102\runtime`, окружение `C:\cyber102\.venv`. Зависимости можно установить из `C:\cyber102\wheelhouse` без доступа к PyPI. |
 | Запуск | Задание `Cyber102Web` в Планировщике заданий. Работает от `LOCAL SERVICE`, запускается при старте Windows, повторяет запуск через минуту после сбоя до 20 раз. |
-| Компьютерное зрение | `Cyber102InternVL` запускает выбранную локальную VLM от `fatik` на `127.0.0.1:11436`. Общий с вебом файл `C:\cyber102\var\vlm-model.txt` содержит `qwen3_vl_4b` (выбранный кандидат) или `internvl3_5`. Журнал — `C:\cyber102\var\internvl-worker.log`. Прежнее задание Ollama `Cyber102Vision` на порту `11435` остановлено и отключено; возврат выполняется явно. |
+| Компьютерное зрение | `Cyber102InternVL` запускает одну Qwen3.8-27B Q4 от `fatik` на `127.0.0.1:11436`. Общий с вебом файл `C:\cyber102\var\vlm-model.txt` содержит `qwen3_8_27b`. Worker управляет одним дочерним llama-server на `127.0.0.1:8114`; 4B выгружена. Журналы — `var/internvl-worker.log` и `var/qwen38-llama.log`. Явные альтернативы `qwen3_vl_4b` и `internvl3_5` требуют замены выбора и перезапуска обоих заданий. [Веса и лимиты памяти](../../vision_runtime/README.md). |
 | Python API | `http://127.0.0.1:8102/api/health` на сервере. |
 | Caddy | Служба `Elektro62Web`, Caddy 2.11.9. Файл `C:\elektro62\caddy\Caddyfile` импортирует `C:/cyber102/deploy/Caddyfile`. |
 | SQLite и журнал | `C:\cyber102\var\cyber102.sqlite3`, `C:\cyber102\var\server.log`. |

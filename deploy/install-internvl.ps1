@@ -8,9 +8,11 @@ if (Test-Path "$root\var\vlm-model.txt") { $modelKey=[IO.File]::ReadAllText("$ro
 $modelDirectory = switch -CaseSensitive ($modelKey) {
     'internvl3_5' { 'internvl3_5-2b-hf' }
     'qwen3_vl_4b' { 'qwen3-vl-4b-instruct' }
+    'qwen3_8_27b' { 'qwen3.8-27b-q4-k-m' }
     default { throw 'Unknown configured local VLM' }
 }
 if (!(Test-Path "$root\models\$modelDirectory\cyber102-manifest.json")) { throw 'Download and verify the selected pinned VLM first' }
+if ($modelKey -ceq 'qwen3_8_27b' -and !(Test-Path "$root\runtime-llama\llama-server.exe")) { throw 'Install pinned llama.cpp b12345 CUDA runtime first' }
 $task='Cyber102InternVL'
 $action=New-ScheduledTaskAction -Execute $python -Argument '-u C:\cyber102\deploy\run-internvl.py' -WorkingDirectory $root
 $principal=New-ScheduledTaskPrincipal -UserId "$env:COMPUTERNAME\fatik" -LogonType S4U -RunLevel Limited

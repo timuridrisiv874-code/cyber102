@@ -193,7 +193,7 @@ def result_from_observation(data, model=MODEL):
 def supported_profiles(backend):
     if backend != 'internvl3':
         return ('standard',)
-    return PROFILES if model_spec() == model_spec('qwen3_vl_4b') else PROFILES[:2]
+    return PROFILES if model_spec() in (model_spec('qwen3_vl_4b'), model_spec('qwen3_8_27b')) else PROFILES[:2]
 
 
 def result_from_liquid(boxes, model):

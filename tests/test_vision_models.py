@@ -26,7 +26,7 @@ class SelectedModelTests(unittest.TestCase):
     def test_photo_accepts_selected_model_and_rejects_other_model_or_revision(self):
         observation = dict(component='pipe', condition='corrosion', box=[100, 200, 800, 900],
                            observation='На трубе виден бурый налёт.')
-        for key in ('internvl3_5', 'qwen3_vl_4b'):
+        for key in ('internvl3_5', 'qwen3_vl_4b', 'qwen3_8_27b'):
             expected = model_spec(key)
             envelope = dict(model=expected.model_id, revision=expected.revision, observation=observation)
             with self.subTest(key=key), patch.dict(os.environ, {MODEL_ENV: key}):
@@ -47,4 +47,16 @@ class SelectedModelTests(unittest.TestCase):
             result = video_review.result_from_envelope(envelope, payload)
             self.assertEqual((result['model'], result['status']), (expected.model_id, 'unusable'))
         with patch.dict(os.environ, {MODEL_ENV: 'internvl3_5'}), self.assertRaises(ValueError):
+            video_review.result_from_envelope(envelope, payload)
+
+    def test_27b_photo_profiles_and_video_identity(self):
+        expected = model_spec('qwen3_8_27b')
+        payload = {'frames': [{'timestampSeconds': 0.5}], 'durationSeconds': 1.0}
+        envelope = dict(model=expected.model_id, revision=expected.revision, durationSeconds=2,
+                        summary='Виден участок трубы.', observations=[dict(frameIndex=0, timestampSeconds=0.5,
+                        component='pipe', condition='uncertain', box=[0, 0, 0, 0], observation='')])
+        with patch.dict(os.environ, {MODEL_ENV: 'qwen3_8_27b'}):
+            self.assertEqual(vision.supported_profiles('internvl3'), ('standard', 'fast', 'liquid'))
+            self.assertEqual(video_review.result_from_envelope(envelope, payload)['model'], expected.model_id)
+        with patch.dict(os.environ, {MODEL_ENV: 'qwen3_vl_4b'}), self.assertRaises(ValueError):
             video_review.result_from_envelope(envelope, payload)

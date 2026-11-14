@@ -143,6 +143,13 @@ class Engine:
             {'role': 'system', 'content': SYSTEM_PROMPT}, {'role': 'user', 'content': content}],
             tokenize=False, add_generation_prompt=True)
 
+    @property
+    def out_of_memory_error(self):
+        return self.torch.cuda.OutOfMemoryError
+
+    def release_buffers(self):
+        self.torch.cuda.empty_cache()
+
     def _run(self, images, prompt, *, max_pixels, max_new_tokens, max_time, parse, frame_count=None):
         self.last_metrics = self.last_memory_metrics = self.last_input_metadata = self.last_output = None
         cuda = self.torch.cuda
@@ -260,7 +267,7 @@ class Engine:
             return self._infer_video_batches(images, timestamps, **options)
         finally:
             # The model stays loaded, but other jobs can use released video buffers.
-            self.torch.cuda.empty_cache()
+            self.release_buffers()
 
     def infer_video_with_defects(self, images, timestamps, *, maximum=8, context=None):
         """Add separately verified defect boxes to the regular video overview."""
@@ -285,12 +292,12 @@ class Engine:
                 if index in selected:
                     try:
                         detail = video_defects.detect(self, frame, run)
-                    except (TypeError, ValueError, TimeoutError, self.torch.cuda.OutOfMemoryError):
+                    except (TypeError, ValueError, TimeoutError, self.out_of_memory_error):
                         detail = {'status': 'unavailable', 'boxes': []}
                 details.append({'frameIndex': index, 'timestampSeconds': timestamp, **detail})
         finally:
             self.last_metrics = metrics
-            self.torch.cuda.empty_cache()
+            self.release_buffers()
         return {**overview, 'defectDetails': details}
 
     def _infer_video_batches(self, images, timestamps, *, context=None):
@@ -306,7 +313,7 @@ class Engine:
             try:
                 options = {'context': context} if context else {}
                 batch = self._infer_video_batch(images[start:end], timestamps[start:end], remaining, **options)
-            except self.torch.cuda.OutOfMemoryError:
+            except self.out_of_memory_error:
                 if end - start == 1:
                     raise
             except InvalidVideoOutput:
@@ -320,7 +327,7 @@ class Engine:
                 continue
             # Leave the exception handler before freeing cached allocations. The
             # traceback can still hold tensors from the failed generation.
-            self.torch.cuda.empty_cache()
+            self.release_buffers()
             batch_size = max(1, (end - start) // 2)
 
         self.last_metrics = metrics

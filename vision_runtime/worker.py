@@ -1,4 +1,4 @@
-"""Bounded, offline InternVL3.5 inference; only the web API talks to it."""
+"""Bounded, offline local VLM inference; only the web API talks to it."""
 import argparse
 import base64
 import ipaddress
@@ -381,6 +381,10 @@ class Handler(BaseHTTPRequestHandler):
         if self.path != '/health':
             self.reply(404, {'error': 'Not found'})
             return
+        healthy = getattr(self.server.engine, 'is_healthy', lambda: True)
+        if not healthy():
+            self.reply(503, {'status': 'unavailable'})
+            return
         self.reply(200, {'status': 'ok', 'model': getattr(self.server.engine, 'model_id', MODEL),
                          'revision': getattr(self.server.engine, 'revision', REVISION),
                          'device': self.server.engine.device, 'busy': self.server.engine.lock.locked(),
@@ -489,6 +493,12 @@ class Server(ThreadingHTTPServer):
             self.slots.release()
             raise
 
+    def service_actions(self):
+        # A failed native child must restart the task, never leave a healthy
+        # HTTP facade serving a model that is no longer resident.
+        if not getattr(self.engine, 'is_healthy', lambda: True)():
+            raise RuntimeError('Local model process exited; restarting inference service')
+
     def process_request_thread(self, request, address):
         try:
             super().process_request_thread(request, address)
@@ -512,16 +522,21 @@ def main():
     engine_class = Engine
     if args.model == 'qwen3_vl_4b':
         from .qwen_worker import Engine as engine_class
+    elif args.model == 'qwen3_8_27b':
+        from .qwen38_worker import Engine as engine_class
     engine = engine_class(args.model_directory or ROOT / 'models' / spec.directory)
-    if args.warmup:
-        print(json.dumps({'event': 'warmup', 'profile': 'standard', 'metrics': engine.warmup()}), flush=True)
-    print(json.dumps({'event': 'ready', 'model': spec.model_id, 'revision': spec.revision, 'device': engine.device}),
-          flush=True)
-    with Server(('127.0.0.1', args.port), engine) as server:
-        try:
-            server.serve_forever()
-        except KeyboardInterrupt:
-            pass
+    try:
+        if args.warmup:
+            print(json.dumps({'event': 'warmup', 'profile': 'standard', 'metrics': engine.warmup()}), flush=True)
+        print(json.dumps({'event': 'ready', 'model': spec.model_id, 'revision': spec.revision, 'device': engine.device}),
+              flush=True)
+        with Server(('127.0.0.1', args.port), engine) as server:
+            try:
+                server.serve_forever()
+            except KeyboardInterrupt:
+                pass
+    finally:
+        getattr(engine, 'close', lambda: None)()
 
 
 if __name__ == '__main__':

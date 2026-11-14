@@ -18,6 +18,8 @@ MODELS = {
                            '3f301ffcf3dcbb47893afae6650ea3e78d96fb6d', 'internvl3_5-2b-hf'),
     'qwen3_vl_4b': ModelSpec('Qwen/Qwen3-VL-4B-Instruct',
                            'ebb281ec70b05090aa6165b016eac8ec08e71b17', 'qwen3-vl-4b-instruct'),
+    'qwen3_8_27b': ModelSpec('Qwen/Qwen3.8-27B',
+                           '4af51b3542f775b0a8e4b310bfb3f17e01c306c9', 'qwen3.8-27b-q4-k-m'),
 }
 
 
