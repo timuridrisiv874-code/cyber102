@@ -33,7 +33,7 @@ def box_reference(model, reference):
         for name, (x, y, w, h) in read_labels(root / 'labels' / 'test' / image.with_suffix('.txt').name,
                                               model.names):
             objects.append({'class': name, 'xyxy': [x - w / 2, y - h / 2, x + w / 2, y + h / 2]})
-        rows.append({'file': image.name, 'objects': objects})
+        rows.append({'file': image.name, 'scene': image.name, 'objects': objects})
     predictions, timings = infer(model, images, 'cpu', 768)
     labels = tuple(model.names.values())
     return {'images': len(images), 'medianMs': statistics.median(timings.values()),
