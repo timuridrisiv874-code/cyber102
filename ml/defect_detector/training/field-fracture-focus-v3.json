@@ -1,0 +1,101 @@
+[
+  {
+    "file": "ballast-pump-open-crack.jpg",
+    "scene": "corroserve-ballast-pump",
+    "source": "https://www.corroserve.com/wp-content/uploads/2022/02/Pump-Case-Studies.pdf#page=3",
+    "sourceImage": "corro-007.jpg",
+    "sha256": "cd4cc691e4fff335915df5ef334d83ed31c00bc9ced09b7883dd9bb6a9eb1c40",
+    "sourceSha256": "84b9e4004383512195fded73abaf731a6427eda9e077618190745feea86ee995",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.379,
+          0.271,
+          0.482,
+          0.413
+        ]
+      },
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.181,
+          0.577,
+          0.52,
+          0.993
+        ]
+      }
+    ],
+    "note": "Corroserve photograph of a ballast pump casing with a jagged opening. The flange mouth is not a crack."
+  },
+  {
+    "file": "ballast-pump-after-repair.jpg",
+    "scene": "corroserve-ballast-pump",
+    "source": "https://www.corroserve.com/wp-content/uploads/2022/02/Pump-Case-Studies.pdf#page=3",
+    "sourceImage": "corro-010.jpg",
+    "sha256": "038ba63513bf63882421c7f03cd9a084d6036260c0b4306ddf24b5c94a8d4eec",
+    "sourceSha256": "dab894d8d18998933bb277e186a1416ac5a279f8e30c76348dae68a5d28cb919",
+    "objects": [],
+    "note": "Same casing after repair; dark port openings and exposed machined joints."
+  },
+  {
+    "file": "blue-split-case-pump.jpg",
+    "scene": "corroserve-fgd-pump",
+    "source": "https://www.corroserve.com/wp-content/uploads/2022/02/Pump-Case-Studies.pdf#page=4",
+    "sourceImage": "corro-013.ppm",
+    "sha256": "cbda7106477b27a2bd9abc7939a78cc2d497afad2f2ffaf417a54f0582ac2ba1",
+    "sourceSha256": "e748d758d92c327600f9dd049f5807778155c9615d88f908b8e6a40d3b53f2ff",
+    "objects": [],
+    "note": "A bolted horizontal casing split and cast edges without a visible rupture."
+  },
+  {
+    "file": "oxidized-suction-cover.jpg",
+    "scene": "corroserve-suction-cover",
+    "source": "https://www.corroserve.com/wp-content/uploads/2022/02/Pump-Case-Studies.pdf#page=2",
+    "sourceImage": "corro-004.jpg",
+    "sha256": "1ed23251eb7f2f2b48f3124462abf65325a14d7ad689cc276e9e006f214d937e",
+    "sourceSha256": "6c86c6611f9427c6a18fe4bb41036c783b665709006d11001f420ee4bc12a418",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.003,
+          0.022,
+          0.989,
+          0.964
+        ]
+      }
+    ],
+    "note": "Corpus surface after service showing scattered corrosion; circular opening is a machined feature."
+  },
+  {
+    "file": "painted-suction-cover.jpg",
+    "scene": "corroserve-suction-cover",
+    "source": "https://www.corroserve.com/wp-content/uploads/2022/02/Pump-Case-Studies.pdf#page=2",
+    "sourceImage": "corro-006.jpg",
+    "sha256": "3b2333493e0a45fa6d0a20d814e2f3ccb848b287dcd45667823e4cd284656931",
+    "sourceSha256": "73c85bb10e231065c28de03a681cc5f593173767b17b7063f14b9a5be16b6732",
+    "objects": [],
+    "note": "Coated cover. The slots, edges and holes are manufacturing features."
+  },
+  {
+    "file": "rusted-pump-port.jpg",
+    "scene": "ace-casing-corrosion",
+    "source": "https://acepumps.com/_Assets/Literature/Warranty%20Guide%2001-08.pdf#page=8",
+    "sourceImage": "ace-019.jpg",
+    "sha256": "5afbd34335c7c6cfd4f9025ab6df3f39b87adf467c021fd6ef2205af1fddc965",
+    "sourceSha256": "7db05cd14986266b0c7bc4869d4110c7388734b795cd44571220f49b15f59af0",
+    "objects": [
+      {
+        "class": "corrosion",
+        "xyxy": [
+          0.008,
+          0.075,
+          0.989,
+          0.993
+        ]
+      }
+    ],
+    "note": "Heavy rust around a cast pump port. The visible annular opening is designed."
+  }
+]
