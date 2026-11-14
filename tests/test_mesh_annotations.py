@@ -12,8 +12,10 @@ class MeshAnnotationsTest(unittest.TestCase):
         [{"kind":"corrosion","part":"tank","box":[200,500,700,720]},
          {"kind":"coating_damage","part":"motor","box":[100,300,400,500]}]
         ```'''
-        with patch.object(mesh_annotations, 'native_completion', side_effect=[proposal, '<answer>[true,false]</answer>']):
+        with patch.object(mesh_annotations, 'native_completion',
+                          side_effect=[proposal, '<answer>[true,false]</answer>']) as completion:
             accepted = mesh_annotations.detect('unused.jpg', '003.jpg', .67)
+        self.assertIn('"part": "tank"', completion.call_args_list[1].args[1])
         self.assertEqual(accepted, [{'kind': 'corrosion', 'part': 'tank',
                                      'box': [200, 500, 700, 720], 'frame': '003.jpg', 'time': .67}])
 
