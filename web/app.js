@@ -211,9 +211,12 @@ function render() {
   checkedViewfinder.dataset.portrait = String(frozen && snapshot.height > snapshot.width);
   byId('checked-frame').hidden = !videoMode || !frozen;
   byId('guide').hidden = (!live && !demoActive) || (!videoMode && frozen) || Boolean(media.kind);
-  byId('source').dataset.live = String(live);
-  byId('source').hidden = !(media.kind || live || demoActive || frameSource);
-  byId('source-text').textContent = frozen && frameMetadata ? sourceLabel(frameMetadata) : media.kind ? sourceLabel(media.metadata()) : live ? 'Камера' : demoActive ? 'Сохранённый пример' : '';
+  const sourceBadge = byId('source');
+  if (sourceBadge) {
+    sourceBadge.dataset.live = String(live);
+    sourceBadge.hidden = !(media.kind || live || demoActive || frameSource);
+    byId('source-text').textContent = frozen && frameMetadata ? sourceLabel(frameMetadata) : media.kind ? sourceLabel(media.metadata()) : live ? 'Камера' : demoActive ? 'Сохранённый пример' : '';
+  }
   if (byId('mode')) byId('mode').textContent = offlineMode ? 'На телефоне · без сервера' :
     endpoint && (live || frameSource === 'camera' || media.kind) ? 'Модель на сервере' : demoActive ? 'Тестовый пример' : 'Готово к осмотру';
   if (demoScenario) {

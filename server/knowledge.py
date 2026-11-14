@@ -176,6 +176,15 @@ def photo_context(serial, root=customer.ROOT):
     references = []
     used_pages = set()
     candidates = [item for item in result['matches'] if item['applicability'] == 'passport']
+    if equipment['kind'] == 'gearbox':
+        # The curated requirement includes the oil grade and volume omitted by the generic excerpt.
+        oil = recommendations.for_equipment(serial, root=root)['recommendations']
+        candidates = [_reference(item['title'], item['text'], source, serial)
+                      for item in oil if item['id'] == 'gearbox_oil' for source in item['sources']] + candidates
+    if equipment['kind'] != 'pump':
+        source = equipment['fields']['serial']['source']
+        candidates.insert(0, _reference('Паспорт экземпляра',
+                                        f'Модель {equipment["model"]}, заводской № {serial}.', source, serial))
     scope = equipment['equipmentType']
     reference_data = _data(root, 'inspection-knowledge')
     background = _rank(list(_public_entries(reference_data, {scope})), background_topics.get(scope, ''))

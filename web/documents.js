@@ -2,7 +2,7 @@
 (() => {
   if (window.CyberWebBoot?.blocked) return;
   const $ = id => document.getElementById(id);
-  let documents = [], equipment = [], currentPassports = {}, catalogReady = false;
+  let documents = [], equipment = [], currentPassports = {}, catalogReady = false, knowledgeReady = false;
   const equipmentPhotos = new Map([
     ['AMS PCP60S12/3 01 Ex B1 HNBR DTS', {
       image: 'ams-pcp-oil.jpg', title: 'Фото серии AMS PCP',
@@ -104,10 +104,12 @@
         inspect.setAttribute('aria-label', `${action} ${item.serial}`);
         card.append(inspect);
       }
-      const knowledge = node('button', 'Поиск по оборудованию', 'button secondary');
-      knowledge.type = 'button';
-      knowledge.onclick = () => selectKnowledge(item.serial);
-      card.append(knowledge);
+      if (knowledgeReady) {
+        const knowledge = node('button', 'Поиск по оборудованию', 'button secondary');
+        knowledge.type = 'button';
+        knowledge.onclick = () => selectKnowledge(item.serial);
+        card.append(knowledge);
+      }
       $('equipment-grid').append(card);
     }
     if (!equipment.length) $('equipment-grid').append(node('p', 'Проверенные паспортные данные пока не добавлены.'));
@@ -292,7 +294,18 @@
       gallery.hidden = selected !== 'pump' && selected !== 'all';
       $('equipment-grid').after(gallery);
     }
-    $('knowledge-panel').hidden = !$('knowledge-target').options.length;
+    $('knowledge-form').hidden = !knowledgeReady;
+    $('knowledge-panel').hidden = !models.childElementCount && (!knowledgeReady || !$('knowledge-target').options.length);
+    $('knowledge-title').textContent = knowledgeReady ? 'База знаний оборудования' : 'Каталог насосов';
+  }
+
+  async function loadKnowledge(signal) {
+    const options = {signal, cache: 'no-store'};
+    const response = await fetch('/api/equipment/models', options);
+    if (response.ok) return {catalog: await response.json(), searchable: true};
+    const fallback = await fetch('/equipment-photos/catalog.json', options);
+    if (!fallback.ok) throw new Error('Фотокаталог недоступен.');
+    return {catalog: await fallback.json(), searchable: false};
   }
 
   function initialize() {
@@ -307,15 +320,18 @@
     $('document-list').replaceChildren();
     $('documents-status').textContent = 'Загружаем документы…';
     $('documents-status').dataset.error = 'false';
-    Promise.allSettled(['/api/customer/documents', '/api/customer/equipment-passports', '/api/equipment/models'].map(async url => {
+    const passportRequests = ['/api/customer/documents', '/api/customer/equipment-passports'].map(async url => {
     const response = await fetch(url, {signal: active.signal, cache: 'no-store'});
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Документы недоступны.');
     return data;
-  })).then(([catalogResult, passportsResult, knowledgeResult]) => {
+    });
+    Promise.allSettled([...passportRequests, loadKnowledge(active.signal)]).then(([catalogResult, passportsResult, knowledgeResult]) => {
     if (current !== generation) return;
     const catalog = catalogResult.status === 'fulfilled' && Array.isArray(catalogResult.value?.documents) ? catalogResult.value : null;
     const passports = passportsResult.status === 'fulfilled' && Array.isArray(passportsResult.value?.equipment) ? passportsResult.value : null;
+    const knowledge = knowledgeResult.status === 'fulfilled' ? knowledgeResult.value : null;
+    knowledgeReady = knowledge?.searchable === true;
     catalogReady = Boolean(catalog);
     documents = catalog?.documents || [];
     const kindTitles = {pump:'Насосы',motor:'Электродвигатели',gearbox:'Редукторы',temperature_transmitter:'Преобразователи температуры'};
@@ -330,7 +346,7 @@
       $('equipment-grid').replaceChildren(node('p', 'Паспортные данные не загрузились.'));
       $('passport-limitations').replaceChildren(); $('requirements-panel').hidden = true;
     }
-    renderKnowledge(knowledgeResult.status === 'fulfilled' ? knowledgeResult.value : null, passports);
+    renderKnowledge(knowledge?.catalog, passports);
     $('equipment-kind').disabled = !passports;
     renderDocuments();
     $('document-count').textContent = catalogReady ? `${documents.length} PDF` : 'Недоступно';

@@ -74,18 +74,22 @@ class EquipmentKnowledgeTest(unittest.TestCase):
 
     def test_model_context_uses_the_kind_of_the_selected_passport(self):
         cases = (
-            ('230201068', 'ABB', 'NETZSCH'),
-            ('SAL023020084_001002', 'SEW‑EURODRIVE', 'NETZSCH'),
-            ('10096664', 'WIKA', 'NETZSCH'),
+            ('230201068', 'ABB', 1),
+            ('SAL023020084_001002', 'SEW‑EURODRIVE', 3),
+            ('10096664', 'WIKA', 6),
         )
-        for serial, publisher, unrelated in cases:
+        for serial, publisher, page in cases:
             with self.subTest(serial=serial):
                 context = knowledge.photo_context(serial)
                 self.assertIn(serial, context['text'])
                 self.assertIn(publisher, context['text'])
-                self.assertNotIn(unrelated, context['text'])
+                self.assertNotIn('NETZSCH', context['text'])
+                self.assertEqual(context['references'][0]['source']['documentId'], 'drive-1-passports')
+                self.assertEqual(context['references'][0]['source']['page'], page)
                 self.assertEqual(context['references'][-1]['applicability'], 'technical_reference')
                 self.assertIsNone(context['references'][-1]['targetSerial'])
+        gearbox = knowledge.photo_context('SAL023020084_001002')['text']
+        self.assertIn('VG220 / Synoil, 3,7 л', gearbox)
 
     def test_unsupported_rules_do_not_become_passport_requirements(self):
         result = knowledge.lookup(serial='21031004-1', query='4000 8000 моточасов')

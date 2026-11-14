@@ -161,7 +161,8 @@ class BoundedHTTPServer(ThreadingHTTPServer):
 
 
 class Handler(SimpleHTTPRequestHandler):
-    def __init__(self, *args, database, public_url, vision_enabled=False, vision_backend='ollama', customer_root=None, telemetry_emulator=False, **kwargs):
+    def __init__(self, *args, database, public_url, vision_enabled=False, vision_backend='ollama', customer_root=None,
+                 telemetry_emulator=False, vision_knowledge=True, **kwargs):
         from server import customer
         self.customer_root = customer_root or customer.ROOT
         self.telemetry_emulator = telemetry_emulator
@@ -169,6 +170,7 @@ class Handler(SimpleHTTPRequestHandler):
         self.public_url = public_url
         self.vision_enabled = vision_enabled
         self.vision_backend = vision_backend
+        self.vision_knowledge = vision_knowledge
         super().__init__(*args, directory=str(WEB), **kwargs)
 
     def list_directory(self, path):
@@ -653,7 +655,7 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json(result)
 
     def equipment_context(self, serial):
-        if not serial or serial == PASSPORT['serial'] or self.vision_backend == 'detector':
+        if not self.vision_knowledge or not serial or serial == PASSPORT['serial'] or self.vision_backend == 'detector':
             return None
         context = knowledge.photo_context(serial, self.customer_root)
         if context is None:
@@ -773,6 +775,7 @@ def main():
     parser.add_argument('--database', type=Path, default=ROOT / 'var' / 'cyber102.sqlite3')
     parser.add_argument('--public-url', default='', help='HTTPS-адрес вебки для QR, без пути')
     parser.add_argument('--telemetry-emulator', action='store_true', help='Записывать эмулированные показания насосов в SQLite')
+    parser.add_argument('--without-vision-knowledge', action='store_true', help='Не добавлять контекст базы знаний в анализ фото и видео')
     parser.add_argument('--vision', action='store_true', help='Включить локальный анализ кадров')
     parser.add_argument('--vision-backend', choices=vision.BACKENDS, default='ollama',
                         help='Локальный сервис анализа кадров (по умолчанию ollama)')
@@ -784,7 +787,8 @@ def main():
             parser.error('--public-url должен быть HTTPS-адресом без пути, параметров и учётных данных')
     initialize(args.database, customer_root=customer.ROOT)
     handler = partial(Handler, database=args.database, public_url=public_url,
-                      vision_enabled=args.vision, vision_backend=args.vision_backend, telemetry_emulator=args.telemetry_emulator)
+                      vision_enabled=args.vision, vision_backend=args.vision_backend, telemetry_emulator=args.telemetry_emulator,
+                      vision_knowledge=not args.without_vision_knowledge)
     with BoundedHTTPServer((args.bind, args.port), handler) as server:
         stop_emulator = threading.Event()
         if args.telemetry_emulator:

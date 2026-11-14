@@ -1,0 +1,66 @@
+{
+  "models": [
+    {
+      "id": "knz-km80-65-160",
+      "model": "КМ80-65-160",
+      "typeLabel": "Центробежный консольный моноблочный насос",
+      "manufacturer": "АО «Катайский насосный завод»",
+      "fields": {
+        "Подача": "50 м³/ч",
+        "Напор": "32 м",
+        "Мощность двигателя": "7,5 кВт",
+        "Допускаемый кавитационный запас": "4 м"
+      },
+      "source": {
+        "title": "Каталог насосов КМ · Катайский насосный завод",
+        "url": "https://knz.ru/catalog/nasosy-dlya-vody/nasosy-konsolnye-monoblochnye-km"
+      },
+      "manual": {
+        "title": "Руководство по эксплуатации насосов КМ",
+        "url": "https://knz.ru/wp-content/uploads/RE-tipa-KM.pdf"
+      },
+      "photo": {
+        "image": "/equipment-photos/knz-km.jpg",
+        "title": "Фото серии КМ из каталога изготовителя"
+      }
+    },
+    {
+      "id": "knz-4d200-90",
+      "model": "4Д200-90",
+      "typeLabel": "Центробежный насос двустороннего входа",
+      "manufacturer": "АО «Катайский насосный завод»",
+      "fields": {
+        "Подача": "200 м³/ч",
+        "Напор": "90 м",
+        "Мощность двигателя": "90 кВт",
+        "Масса агрегата": "770 кг"
+      },
+      "source": {
+        "title": "Каталог насосов Д · Катайский насосный завод",
+        "url": "https://knz.ru/catalog/nasosy-dlya-vody/nasosy-d-dvuhstoronnego-vhoda"
+      },
+      "manual": {
+        "title": "Руководство по эксплуатации насосов 4Д",
+        "url": "https://knz.ru/wp-content/uploads/Rukovodtvo-tipa-4D-N01.63.00.000-RE.pdf"
+      },
+      "photo": {
+        "image": "/equipment-photos/knz-d.jpg",
+        "title": "Фото серии Д из каталога изготовителя"
+      }
+    }
+  ],
+  "photos": [
+    {
+      "image": "/equipment-photos/ams-pcp-oil.jpg",
+      "title": "AMS PCP для нефтепродуктов",
+      "url": "https://am-systems.ru/nefteprodukty-i-nefteshlamy/",
+      "originalUrl": "https://am-systems.ru/wp-content/uploads/2020/10/IMG_178734.png"
+    },
+    {
+      "image": "/equipment-photos/ams-pcp-drilling.jpg",
+      "title": "AMS PCP для бурового раствора",
+      "url": "https://am-systems.ru/ams-pcp-gorizontalnye/",
+      "originalUrl": "https://am-systems.ru/wp-content/uploads/2019/12/Vintovye-nasosy-AMS-RSR-dlja-burovogo-rastvora%E2%80%8B.jpg"
+    }
+  ]
+}

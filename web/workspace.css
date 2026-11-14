@@ -298,6 +298,7 @@ body[data-inspection-layout=capture] #result { display: none; }
 .pump-reference-photo { display: block; width: min(100%, 480px); height: auto; margin: 12px 0 4px; border-radius: 12px; }
 #pump-gallery { margin: 12px 0; }
 #knowledge-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+#knowledge-form[hidden] { display: none; }
 #knowledge-results, #manufacturer-models { margin-top: 16px; }
 #manufacturer-models a { display: block; }
 
