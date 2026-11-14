@@ -1,0 +1,126 @@
+[
+  {
+    "file": "walkthrough-173157-00.jpg",
+    "timestampSeconds": 1.25,
+    "sha256": "2934cbcdca70977f6e8a276129f828b7393828a3f58ba5aeed113b414b33037f",
+    "clip": "walkthrough-173157.mp4",
+    "frameIndex": 0,
+    "scene": "173157-terminal-board",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.374,
+          0.326,
+          0.56,
+          0.793
+        ]
+      }
+    ],
+    "domain": "user-supplied demonstrator; origin unverified"
+  },
+  {
+    "file": "walkthrough-173157-01.jpg",
+    "timestampSeconds": 3.75,
+    "sha256": "1c0c1421fdc61b0ef269fde674f2697d9cb86358a021aed064d461cef6f2da5f",
+    "clip": "walkthrough-173157.mp4",
+    "frameIndex": 1,
+    "scene": "173157-assembled-pump",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [],
+    "domain": "user-supplied demonstrator; origin unverified"
+  },
+  {
+    "file": "walkthrough-173157-02.jpg",
+    "timestampSeconds": 6.25,
+    "sha256": "96bdcc86e828affd1cc52d6b68aaff5c4e117af0ff355f7825419e921f5e137a",
+    "clip": "walkthrough-173157.mp4",
+    "frameIndex": 2,
+    "scene": "173157-assembled-pump",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [],
+    "domain": "user-supplied demonstrator; origin unverified"
+  },
+  {
+    "file": "walkthrough-173157-03.jpg",
+    "timestampSeconds": 8.75,
+    "sha256": "41b3a53f3f31e649f1925885136b6c0f020559e628e794dfd243388e5abaefac",
+    "clip": "walkthrough-173157.mp4",
+    "frameIndex": 3,
+    "scene": "173157-cracked-shell",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [],
+    "domain": "user-supplied demonstrator; origin unverified"
+  },
+  {
+    "file": "walkthrough-173157-04.jpg",
+    "timestampSeconds": 11.25,
+    "sha256": "50bd28eaf5e8ccf087f4f780ba8a4f66d8c394bf504661fcb99aa4915f4d5e0d",
+    "clip": "walkthrough-173157.mp4",
+    "frameIndex": 4,
+    "scene": "173157-terminal-board",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [
+      {
+        "class": "terminal_damage",
+        "xyxy": [
+          0.315,
+          0.495,
+          0.498,
+          0.865
+        ]
+      }
+    ],
+    "domain": "user-supplied demonstrator; origin unverified"
+  },
+  {
+    "file": "walkthrough-173157-05.jpg",
+    "timestampSeconds": 13.75,
+    "sha256": "cab82f675f2653cb191a733e9c71db9fd5af1d764f326dd3ba330e2266cb75af",
+    "clip": "walkthrough-173157.mp4",
+    "frameIndex": 5,
+    "scene": "173157-assembled-pump",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [],
+    "domain": "user-supplied demonstrator; origin unverified"
+  },
+  {
+    "file": "walkthrough-173157-06.jpg",
+    "timestampSeconds": 16.25,
+    "sha256": "fe9ea60c8aa98137f6503464ef38e955e3f3b40e80ad5cfecd0a2f25fa0a4685",
+    "clip": "walkthrough-173157.mp4",
+    "frameIndex": 6,
+    "scene": "173157-assembled-pump",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [],
+    "domain": "user-supplied demonstrator; origin unverified"
+  },
+  {
+    "file": "walkthrough-173157-07.jpg",
+    "timestampSeconds": 18.75,
+    "sha256": "298d0590686e8c208f01d28ef0620dbf618f619ab3c67f14e018e7965e30bab0",
+    "clip": "walkthrough-173157.mp4",
+    "frameIndex": 7,
+    "scene": "173157-cracked-shell",
+    "reviewedLabels": [
+      "terminal_damage"
+    ],
+    "objects": [],
+    "domain": "user-supplied demonstrator; origin unverified"
+  }
+]
