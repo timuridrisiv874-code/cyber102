@@ -39,6 +39,12 @@
 .workspace-page h2, .materials-page > section { scroll-margin-top: 20px; }
 .workspace-card { border: 1px solid var(--line); border-radius: 12px; padding: 16px; min-width: 0; background: #ffffff; }
 .workspace-card h3 { font-size: 15px; margin-bottom: 12px; line-height: 1.45; }
+.equipment-card-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 12px; }
+.equipment-card-actions > * { max-width: 100%; overflow-wrap: anywhere; }
+.equipment-card-actions .text-link { display: inline-flex; align-items: center; min-height: 44px; margin: 0; }
+.equipment-card-actions .button { white-space: normal; }
+#documents-retry { justify-self: start; }
+#documents-retry[hidden] { display: none; }
 .workspace-card p, .workspace-card a, .workspace-facts dd { overflow-wrap: anywhere; }
 .workspace-card[data-level] { position: relative; border-color: #dfe2dc; background: #fafaf9; }
 .workspace-card[data-level]::before { content: ""; display: block; width: 24px; height: 3px; border-radius: 2px; background: #8da17b; margin-bottom: 16px; }
@@ -299,6 +305,12 @@ body[data-inspection-layout=capture] #result { display: none; }
 .pump-reference-photo { display: block; width: min(100%, 480px); height: auto; margin: 12px 0 4px; border-radius: 12px; }
 #pump-gallery { margin: 12px 0; }
 #knowledge-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+#knowledge-form .field { flex: 1 1 180px; min-width: 0; max-width: 100%; }
+#knowledge-form :is(select, input) { width: 100%; min-width: 0; max-width: 100%; }
+@media (max-width: 600px) {
+  #knowledge-form { display: grid; grid-template-columns: minmax(0, 1fr); }
+  #knowledge-form .button { justify-self: start; }
+}
 #knowledge-form[hidden] { display: none; }
 #knowledge-results, #manufacturer-models { margin-top: 16px; }
 #manufacturer-models a { display: block; }

@@ -65,6 +65,7 @@ async function run(browser, options, name) {
   try {
     await loadAfterPageRestore(page, '/documents.html', ['/api/customer/documents', '/api/customer/equipment-passports'],
       page.locator('#equipment-grid .workspace-card').first());
+    await page.getByText('22 PDF', {exact:true}).waitFor();
     assert.equal(await page.locator('.document-item').count() >= 22, true);
     const equipmentSource = page.locator('#equipment-grid').locator('..').getByText('О данных', {exact:true});
     await equipmentSource.click();
@@ -85,12 +86,22 @@ async function run(browser, options, name) {
     assert.equal(await passport.count(), 1);
     assert.match(await passport.textContent(), /AMS PCP60S12/);
     await passport.locator('summary').click();
-    const link = passport.locator('a').first();
+    const link = passport.locator('a[href^="/api/customer/documents/"]').first();
     assert.match(await link.getAttribute('href'), /^\/api\/customer\/documents\/[a-z0-9-]+\/pdf#page=\d+$/);
-    const pdf = await context.request.get(new URL(await link.getAttribute('href'), origin).href);
-    assert.equal(pdf.status(), 200);
+    const pdf = await context.request.get(new URL(await link.getAttribute('href'), origin).href,
+      {headers:{range:'bytes=0-63'}});
+    assert.equal(pdf.status(), 206);
     assert.equal(pdf.headers()['content-type'], 'application/pdf');
     assert.equal((await pdf.body()).subarray(0,5).toString(), '%PDF-');
+    const passportActions = passport.locator('.equipment-card-actions');
+    const originalViewport = page.viewportSize();
+    for (const width of [320, 390, 1280]) {
+      await page.setViewportSize({width, height:900});
+      const [inspect, search] = await passportActions.evaluate(actions => [...actions.children].map(action => action.getBoundingClientRect().toJSON()));
+      assert.ok(inspect.right <= search.left || inspect.bottom <= search.top, 'Card actions must not overlap');
+      assert.ok(search.right <= width, 'Search button must fit on the screen');
+    }
+    if (originalViewport) await page.setViewportSize(originalViewport);
     await page.getByLabel('Поиск по названию и тексту').fill('21031004');
     assert.equal(await page.locator('#document-list .document-item').count() > 0, true);
     await page.getByLabel('Поиск по названию и тексту').fill('not-found-cyber102');
@@ -99,6 +110,17 @@ async function run(browser, options, name) {
     assert.equal(await page.locator('#document-list .document-item').count(), 22);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     if (screenshotDir) await page.screenshot({path:path.join(screenshotDir,`documents-${name}.png`)});
+    const unavailable = route => route.fulfill({status:503, body:'upstream unavailable'});
+    await page.route('**/api/customer/documents', unavailable);
+    await page.goto(new URL('/documents.html', origin).href);
+    await page.getByText('Библиотека временно недоступна.').waitFor({timeout:40000});
+    await page.locator('#equipment-grid .workspace-card').first().waitFor();
+    await page.locator('#equipment-grid .workspace-card summary').first().click();
+    assert.ok(await page.locator('#equipment-grid a[href^="/api/customer/documents/"]').first().isVisible());
+    await page.unroute('**/api/customer/documents', unavailable);
+    await page.getByRole('button', {name:'Повторить загрузку'}).click();
+    await page.getByText('22 PDF', {exact:true}).waitFor();
+    assert.equal(await page.getByRole('button', {name:'Повторить загрузку'}).isVisible(),false);
 
     await loadAfterPageRestore(page, '/telemetry.html', ['/api/telemetry/catalog'],
       page.getByText('Запись 1 из 500', {exact:true}));

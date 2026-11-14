@@ -9,9 +9,9 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=eye-1" sizes="180x180">
   <link rel="stylesheet" href="styles.css?v=field-20261114">
   <link rel="stylesheet" href="checkpoint.css">
-  <link rel="stylesheet" href="workspace.css?v=equipment-photos-2">
+  <link rel="stylesheet" href="workspace.css?v=equipment-cards-3">
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
-  <script src="documents.js?v=equipment-photos-2" defer></script>
+  <script src="documents.js?v=equipment-cards-3" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
 </head>
 <body data-page="equipment">
@@ -23,11 +23,12 @@
   <main id="main-content" class="page workspace-page">
     <header class="intro"><div class="page-heading-group"><h1>Оборудование</h1><nav class="equipment-sections" aria-label="Оборудование"><a href="documents.html" aria-current="page">Карточки</a><a href="materials.html">Фото и примеры</a></nav><nav class="workspace-section-nav" aria-label="На странице карточек"><a href="#equipment-title">Реестр</a><a href="#library-title">Документы</a><a href="#requirements-title">Обслуживание</a></nav></div></header>
     <p class="message" id="documents-status" role="status">Загружаем документы…</p>
+    <button class="button secondary" id="documents-retry" type="button" hidden>Повторить загрузку</button>
     <section class="panel" aria-labelledby="equipment-title">
       <div class="panel-heading"><h2 id="equipment-title">Реестр оборудования</h2></div>
       <div class="section-body">
 
-        <div class="field equipment-filter"><label for="equipment-kind">Тип оборудования</label><select id="equipment-kind"><option value="pump">Насосы</option><option value="all">Все компоненты</option></select></div>
+        <div class="field equipment-filter"><label for="equipment-kind">Тип оборудования</label><select id="equipment-kind" disabled><option value="pump">Насосы</option><option value="all">Все компоненты</option></select></div>
         <div id="equipment-grid" class="workspace-grid"></div><details class="workspace-details"><summary>О данных</summary><p class="workspace-note">Сверьте серийный номер с табличкой. Примеры измерений не привязаны к этим агрегатам.</p><div id="passport-limitations" class="workspace-note"></div></details>
       </div>
     </section>
@@ -54,7 +55,7 @@
     <section class="panel" aria-labelledby="library-title">
       <div class="panel-heading"><h2 id="library-title">Документы и инструкции</h2><span class="source" id="document-count"></span></div>
       <div class="section-body">
-        <div class="field"><label for="document-search">Поиск по названию и тексту</label><input type="search" id="document-search" placeholder="Например, смазка или заводской номер" maxlength="160" autocomplete="off"></div>
+        <div class="field"><label for="document-search">Поиск по названию и тексту</label><input type="search" id="document-search" placeholder="Например, смазка или заводской номер" maxlength="160" autocomplete="off" disabled></div>
         <details class="data-note"><summary>О поиске</summary><p class="workspace-note">Поиск по сканам зависит от распознавания текста. Значения и схемы сверяйте с оригиналом PDF.</p></details>
         <p id="document-results" class="workspace-note" aria-live="polite"></p>
         <div id="document-list" class="document-list"></div>

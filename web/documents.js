@@ -2,7 +2,7 @@
 (() => {
   if (window.CyberWebBoot?.blocked) return;
   const $ = id => document.getElementById(id);
-  let documents = [], equipment = [], currentPassports = {}, catalogReady = false, knowledgeReady = false;
+  let documents = [], currentPassports = {}, catalogReady = false, knowledgeReady = false;
   const equipmentPhotos = new Map([
     ['AMS PCP60S12/3 01 Ex B1 HNBR DTS', {
       image: 'ams-pcp-oil.jpg', title: 'Фото серии AMS PCP',
@@ -27,6 +27,10 @@
     if (className) element.className = className;
     return element;
   }
+  function targetLabel(item) {
+    const kind = {pump:'Насос', motor:'Двигатель', gearbox:'Редуктор', temperature_transmitter:'Датчик температуры'}[item.kind] || 'Оборудование';
+    return kind + ' · ' + item.serial;
+  }
   function equipmentPhoto(photo, catalog = true) {
     const figure = node('figure', null, 'equipment-card-photo');
     const image = node('img');
@@ -45,7 +49,9 @@
     return figure;
   }
   function sourceLink(documentId, page, label) {
-    if (!documents.some(document => document.id === documentId)) return node('span', label || 'Источник не найден');
+    if (typeof documentId !== 'string' || !/^[a-z0-9][a-z0-9-]{0,79}$/.test(documentId)) {
+      return node('span', label || 'Источник не найден');
+    }
     const link = node('a', label || `Оригинал · стр. ${page || 1}`, 'source-link');
     link.href = `/api/customer/documents/${encodeURIComponent(documentId)}/pdf#page=${Number.isInteger(page) && page > 0 ? page : 1}`;
     link.target = '_blank'; link.rel = 'noopener';
@@ -63,7 +69,7 @@
   function renderEquipment(passports) {
     currentPassports = passports;
     $('equipment-grid').replaceChildren();
-    equipment = passports.equipment || [];
+    const equipment = passports.equipment || [];
     const selected = $('equipment-kind').value;
     const pumpGallery = $('pump-gallery');
     if (pumpGallery) pumpGallery.hidden = selected !== 'pump' && selected !== 'all';
@@ -74,14 +80,14 @@
       const photo = equipmentPhotos.get(item.model);
       if (photo) card.append(equipmentPhoto(photo));
       const facts = node('dl', null, 'workspace-facts');
-      for (const [title, value] of [['Модель', item.model], ['Серийный номер', item.serial], ['Изготовитель', item.manufacturer]]) {
+      for (const [title, value] of [['Модель', item.model], ['Серийный номер', item.serial]]) {
         facts.append(node('dt', title), node('dd', valueText(value)));
       }
       card.append(facts);
-      if (item.typeLabel) card.append(node('p', item.typeLabel, 'workspace-note'));
       const details = node('details', null, 'workspace-details');
-      details.append(node('summary', 'Характеристики и источники'));
+      details.append(node('summary', 'Паспорт и характеристики'));
       const extra = node('dl', null, 'workspace-facts');
+      if (item.manufacturer) extra.append(node('dt', 'Изготовитель'), node('dd', valueText(item.manufacturer)));
       for (const [key, value] of Object.entries(item.fields || {})) {
         if (['serial', 'model', 'manufacturer'].includes(key)) continue;
         let display = valueText(value);
@@ -97,19 +103,21 @@
         list.append(entry);
       }
       details.append(list); card.append(details);
+      const actions = node('div', null, 'equipment-card-actions');
       if (item.serial && (item.kind === 'pump' || item.kind === 'motor')) {
         const action = item.kind === 'motor' ? 'Рассчитать ресурс двигателя' : 'Начать осмотр';
         const inspect = node('a', action, 'text-link');
         inspect.href = `index.html?${new URLSearchParams({serial: item.serial})}`;
         inspect.setAttribute('aria-label', `${action} ${item.serial}`);
-        card.append(inspect);
+        actions.append(inspect);
       }
       if (knowledgeReady) {
-        const knowledge = node('button', 'Поиск по оборудованию', 'button secondary');
+        const knowledge = node('button', 'Найти в документации', 'button secondary');
         knowledge.type = 'button';
         knowledge.onclick = () => selectKnowledge(item.serial);
-        card.append(knowledge);
+        actions.append(knowledge);
       }
+      if (actions.childElementCount) card.append(actions);
       $('equipment-grid').append(card);
     }
     if (!equipment.length) $('equipment-grid').append(node('p', 'Проверенные паспортные данные пока не добавлены.'));
@@ -130,7 +138,8 @@
   function renderDocuments() {
     if (!catalogReady) return;
     const query = $('document-search').value.trim().toLocaleLowerCase('ru-RU');
-    const matches = documents.map(document => ({document, pages: (document.pages || []).filter(page => query && page.text?.toLocaleLowerCase('ru-RU').includes(query))}))
+    const matches = documents.map(document => ({document, pages: (Array.isArray(document.pages) ? document.pages : [])
+      .filter(page => query && typeof page?.text === 'string' && page.text.toLocaleLowerCase('ru-RU').includes(query))}))
       .filter(({document, pages}) => !query || `${document.title} ${document.filename}`.toLocaleLowerCase('ru-RU').includes(query) || pages.length);
     $('document-results').textContent = query ? `Найдено документов: ${matches.length} из ${documents.length}` : `${documents.length} документов`;
     $('document-list').replaceChildren();
@@ -157,6 +166,7 @@
     if (!loaded) $('documents-status').textContent = 'Загрузка приостановлена.';
   });
   window.addEventListener('pageshow', () => { if (!loaded && !controller) initialize(); });
+  $('documents-retry').addEventListener('click', initialize);
   $('document-search').addEventListener('input', renderDocuments);
   $('equipment-kind').addEventListener('change', () => renderEquipment(currentPassports));
   const installationPhotos = [
@@ -254,7 +264,7 @@
 
   function renderKnowledge(catalog, passports) {
     $('knowledge-target').replaceChildren(...(passports?.equipment || []).map(item =>
-      new Option(item.title + ' · ' + item.serial, 'serial:' + item.serial)));
+      new Option(targetLabel(item), 'serial:' + item.serial)));
     const models = $('manufacturer-models');
     models.replaceChildren();
     for (const row of catalog?.models || []) {
@@ -301,66 +311,75 @@
 
   async function loadKnowledge(signal) {
     const options = {signal, cache: 'no-store'};
-    const response = await fetch('/api/equipment/models', options);
-    if (response.ok) return {catalog: await response.json(), searchable: true};
+    try {
+      const response = await fetch('/api/equipment/models', options);
+      if (response.ok) return {catalog: await response.json(), searchable: true};
+    } catch (error) {
+      if (signal.aborted) throw error;
+    }
     const fallback = await fetch('/equipment-photos/catalog.json', options);
     if (!fallback.ok) throw new Error('Фотокаталог недоступен.');
     return {catalog: await fallback.json(), searchable: false};
   }
 
-  function initialize() {
-    const active = new AbortController(); controller = active;
+  async function initialize() {
+    if (controller) return;
+    const active = new AbortController();
+    controller = active;
     const current = ++generation;
+    const status = $('documents-status'), retry = $('documents-retry'), picker = $('equipment-kind');
+    status.textContent = 'Загружаем документы…';
+    status.dataset.error = 'false';
+    retry.hidden = true;
+    async function read(url, key) {
+      const response = await fetch(url, {signal: active.signal, cache: 'no-store'});
+      if (!response.ok) throw new Error('Request failed');
+      const data = await response.json();
+      if (!Array.isArray(data?.[key])) throw new Error('Invalid catalog');
+      return data;
+    }
     const timeout = setTimeout(() => active.abort(), 30000);
-    catalogReady = false;
-    $('document-count').textContent = '—';
-    $('document-results').textContent = '';
-    $('document-search').disabled = true;
-    $('equipment-kind').disabled = true;
-    $('document-list').replaceChildren();
-    $('documents-status').textContent = 'Загружаем документы…';
-    $('documents-status').dataset.error = 'false';
-    const passportRequests = ['/api/customer/documents', '/api/customer/equipment-passports'].map(async url => {
-    const response = await fetch(url, {signal: active.signal, cache: 'no-store'});
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Документы недоступны.');
-    return data;
+    const render = async (request, show) => {
+      const data = await request;
+      if (current === generation) show(data);
+    };
+    const library = render(read('/api/customer/documents', 'documents'), catalog => {
+      documents = catalog.documents.filter(item => typeof item?.id === 'string');
+      catalogReady = true;
+      $('document-count').textContent = `${documents.length} PDF`;
+      $('document-search').disabled = false;
+      renderDocuments();
     });
-    Promise.allSettled([...passportRequests, loadKnowledge(active.signal)]).then(([catalogResult, passportsResult, knowledgeResult]) => {
+    let knowledge;
+    const passports = render(read('/api/customer/equipment-passports', 'equipment'), data => {
+      const kindTitles = {pump:'Насосы',motor:'Электродвигатели',gearbox:'Редукторы',temperature_transmitter:'Преобразователи температуры'};
+      const previous = picker.value;
+      data.equipment = data.equipment.filter(item => item && typeof item.kind === 'string');
+      const kinds = [...new Set(data.equipment.map(item => item.kind))];
+      picker.replaceChildren(...kinds.map(kind => new Option(kindTitles[kind] || kind, kind)),
+        new Option('Все компоненты', 'all'));
+      picker.value = previous === 'all' || kinds.includes(previous) ? previous : kinds.includes('pump') ? 'pump' : 'all';
+      renderEquipment(data);
+      picker.disabled = false;
+      renderKnowledge(knowledge?.catalog, data);
+    });
+    const references = render(loadKnowledge(active.signal), data => {
+      knowledge = data;
+      knowledgeReady = data.searchable;
+      renderKnowledge(data.catalog, currentPassports);
+      if (currentPassports.equipment) renderEquipment(currentPassports);
+    });
+    const results = await Promise.allSettled([library, passports, references]);
+    clearTimeout(timeout);
     if (current !== generation) return;
-    const catalog = catalogResult.status === 'fulfilled' && Array.isArray(catalogResult.value?.documents) ? catalogResult.value : null;
-    const passports = passportsResult.status === 'fulfilled' && Array.isArray(passportsResult.value?.equipment) ? passportsResult.value : null;
-    const knowledge = knowledgeResult.status === 'fulfilled' ? knowledgeResult.value : null;
-    knowledgeReady = knowledge?.searchable === true;
-    catalogReady = Boolean(catalog);
-    documents = catalog?.documents || [];
-    const kindTitles = {pump:'Насосы',motor:'Электродвигатели',gearbox:'Редукторы',temperature_transmitter:'Преобразователи температуры'};
-    $('equipment-kind').replaceChildren();
-    for (const kind of [...new Set((passports?.equipment || []).map(item => item.kind))]) {
-      const option = node('option', kindTitles[kind] || kind); option.value = kind; $('equipment-kind').append(option);
-    }
-    const all = node('option', 'Все компоненты'); all.value = 'all'; $('equipment-kind').append(all);
-    $('equipment-kind').value = (passports?.equipment || []).some(item => item.kind === 'pump') ? 'pump' : 'all';
-    if (passports) renderEquipment(passports);
-    else {
-      $('equipment-grid').replaceChildren(node('p', 'Паспортные данные не загрузились.'));
-      $('passport-limitations').replaceChildren(); $('requirements-panel').hidden = true;
-    }
-    renderKnowledge(knowledge?.catalog, passports);
-    $('equipment-kind').disabled = !passports;
-    renderDocuments();
-    $('document-count').textContent = catalogReady ? `${documents.length} PDF` : 'Недоступно';
-    $('document-search').disabled = !catalogReady;
-    const problems = [!catalog && 'Библиотека временно недоступна.', !passports && 'Паспортные записи временно недоступны.'].filter(Boolean);
-    $('documents-status').textContent = problems.join(' ');
-    $('documents-status').dataset.error = String(Boolean(problems.length));
-    loaded = catalogReady && Boolean(passports);
-  }).catch(error => {
-    if (current !== generation) return;
-    $('document-count').textContent = 'Недоступно';
-    $('documents-status').textContent = error.name === 'AbortError' ? 'Загрузка остановлена. Обновите страницу.' : 'Не удалось загрузить документы. Обновите страницу.';
-    $('documents-status').dataset.error = 'true';
-  }).finally(() => { clearTimeout(timeout); if (current === generation) controller = null; });
+    controller = null;
+    const problems = ['Библиотека временно недоступна.', 'Паспорта временно недоступны.', 'База знаний временно недоступна.']
+      .filter((text, index) => results[index].status === 'rejected');
+    if (!catalogReady) $('document-count').textContent = 'Недоступно';
+    status.textContent = problems.join(' ');
+    status.dataset.error = String(Boolean(problems.length));
+    retry.hidden = !problems.length;
+    loaded = !problems.length;
   }
   initialize();
 })();
