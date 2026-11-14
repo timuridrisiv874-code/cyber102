@@ -19,6 +19,22 @@
   };
   const decodedSize = encoded => Math.floor(encoded.length * 3 / 4) - (encoded.endsWith('==') ? 2 : encoded.endsWith('=') ? 1 : 0);
 
+  // A run describes successive sampled frames, not the identity or duration of a physical defect.
+  function sampledEpisodes(rows) {
+    const episodes = [];
+    for (const row of rows) {
+      const previous = episodes.at(-1);
+      if (previous && previous.at(-1).frameIndex + 1 === row.frameIndex) previous.push(row);
+      else episodes.push([row]);
+    }
+    return episodes;
+  }
+
+  function chronologicalEpisodes(groups) {
+    return groups.flatMap(group => group.episodes.map(rows => ({group, rows})))
+      .sort((a, b) => a.rows[0].timestampSeconds - b.rows[0].timestampSeconds);
+  }
+
   function groupObservations(observations) {
     if (!Array.isArray(observations)) throw new Error('Ожидается список наблюдений.');
     const seen = new Set();
@@ -36,25 +52,29 @@
       const componentKnown = Object.prototype.hasOwnProperty.call(COMPONENTS, row.component) && row.component !== 'none';
       if (componentKnown && row.status === 'defect' && ['corrosion', 'wet_patch', 'visible_damage'].includes(row.condition)) {
         const key = `${row.component}:${row.condition}`;
-        if (!grouped.has(key)) grouped.set(key, { component: row.component, condition: row.condition, observations: [], episodes: [] });
-        const group = grouped.get(key);
-        const previous = group.observations.at(-1);
-        // Adjacent sampled frames form one episode. A gap starts another,
-        // without inferring when the defect appeared or disappeared.
-        if (!previous || previous.frameIndex + 1 !== row.frameIndex) group.episodes.push([]);
-        group.episodes.at(-1).push(row);
-        group.observations.push(row);
+        if (!grouped.has(key)) grouped.set(key, { component: row.component, condition: row.condition, observations: [] });
+        grouped.get(key).observations.push(row);
       } else if (componentKnown && row.status === 'clear' && row.condition === 'no_visible_defect') clearFrames.push(row);
       else uncertainFrames.push(row);
     }
-    const groups = [...grouped.values()];
+    const groups = [...grouped.values()].map(group => ({...group, episodes: sampledEpisodes(group.observations)}));
     const clearCount = clearFrames.length, uncertainCount = uncertainFrames.length;
     const mode = !ordered.length ? 'empty' : groups.length ? 'defects' : clearCount && !uncertainCount ? 'clear' : clearCount ? 'partial' : 'uncertain';
-    return { mode, groups, visibleGroups: groups.slice(0, 3), additionalGroups: groups.slice(3),
-      clearFrames, uncertainFrames, clearCount, uncertainCount, frameCount: ordered.length };
+    return { mode, groups, clearFrames, uncertainFrames, clearCount, uncertainCount, frameCount: ordered.length };
   }
 
-  function summarize(grouped) {
+  function summarize(grouped, detailKinds = []) {
+    const names = {crack: 'трещины', terminal_damage: 'повреждения клеммы или проводки'};
+    const kinds = new Set(detailKinds);
+    const findings = Object.keys(names).filter(kind => kinds.has(kind)).map(kind => names[kind]);
+    const base = sampledSummary(grouped);
+    if (!findings.length) return base;
+    const list = new Intl.ListFormat('ru', {type: 'conjunction'}).format(findings);
+    const detail = `При уточнении отмечены признаки ${list}.`;
+    return grouped.groups.length ? `${base} ${detail}` : detail;
+  }
+
+  function sampledSummary(grouped) {
     const { mode, groups, frameCount, clearCount, uncertainCount } = grouped;
     if (mode === 'empty') return 'Нет проверенных кадров.';
     if (mode === 'uncertain') return 'Ни один из выбранных кадров не позволил оценить состояние узла.';
@@ -89,6 +109,8 @@
       const results = document.getElementById('video-review-results');
       let busy = false, generation = 0, controller = null, seekController = null, sourceVersion = media.version;
       let available = true;
+      const idleMessage = () => available ? 'Восемь кадров по всей длительности видео.'
+        : 'Разбор видео недоступен. Проверку отдельного кадра можно выбрать в дополнительных режимах.';
       const ready = () => media.kind === 'uploaded_video' && media.ready && !media.loading;
       const message = (value, error = false) => {
         if (!status) return;
@@ -97,7 +119,10 @@
       };
       const active = token => token === generation && sourceVersion === media.version;
       function syncButtons() {
-        if (panel) panel.hidden = media.kind !== 'uploaded_video';
+        const videoSelected = media.kind === 'uploaded_video';
+        if (panel) panel.hidden = !videoSelected;
+        if (runButton) runButton.hidden = !videoSelected;
+        if (status) status.hidden = !videoSelected || !status.textContent;
         const blocked = busy || isInspecting() || !ready() || !available;
         if (runButton) runButton.disabled = blocked;
         if (results && !results.hidden) {
@@ -115,7 +140,7 @@
         generation += 1;
         controller?.abort(); controller = null; busy = false;
         if (clear && results) { results.replaceChildren(); results.hidden = true; }
-        if (clear) message('Проверяем восемь кадров, выбранных равномерно по ролику.');
+        if (clear) message(idleMessage());
         else if (wasBusy) message('Разбор видео отменён.');
         syncButtons();
         if (announce && wasBusy) onBusyChange();
@@ -135,7 +160,7 @@
           available = Boolean(value);
           if (!available) {
             stop(true);
-            message('Совместный разбор видео сейчас недоступен на сервере. Можно проверить отдельный кадр.');
+            message(idleMessage());
           }
           syncButtons();
         },
@@ -257,50 +282,21 @@
               if (!Object.hasOwn(names, item.kind)) continue;
               if (!findings.has(item.kind)) findings.set(item.kind, new Map());
               const byFrame = findings.get(item.kind);
-              if (!byFrame.has(row.frameIndex)) byFrame.set(row.frameIndex, {row, boxes: []});
+              if (!byFrame.has(row.frameIndex)) byFrame.set(row.frameIndex, {frameIndex: index, timestampSeconds: row.timestampSeconds, boxes: []});
               byFrame.get(row.frameIndex).boxes.push(item.box);
             }
           }
           if (findings.size) {
-            summary.textContent = grouped.groups.length
-              ? `${summarize(grouped)} Ниже показаны признаки после повторной проверки.`
-              : 'Повторная проверка выделила признаки повреждений на отдельных кадрах.';
+            summary.textContent = summarize(grouped, findings.keys());
             const section = document.createElement('details');
             section.className = 'video-review-more video-review-evidence';
             section.open = true;
-            section.append(text('summary', '', 'Признаки после повторной проверки ИИ'));
+            section.append(text('summary', '', 'Уточнённые признаки'));
             const grid = document.createElement('div'); grid.className = 'video-review-grid';
-            for (const [kind, frames] of findings) {
-              const card = document.createElement('article'); card.className = 'video-review-frame';
-              card.append(text('h4', 'video-review-finding', names[kind]));
-              const times = document.createElement('div'); times.className = 'video-review-times';
-              const image = document.createElement('img');
-              const buttons = new Map();
-              let previewVersion = 0;
-              async function show(row, boxes) {
-                const version = ++previewVersion;
-                const frame = captured.frames[row.frameIndex];
-                const url = await thumbnail(frame, {status: 'unusable'}, token, boxes);
-                if (version !== previewVersion || !active(token)) return;
-                image.src = url; image.alt = `${names[kind]} · ${evidenceTime(row.timestampSeconds)}`;
-                image.width = frame.width; image.height = frame.height;
-                for (const [index, button] of buttons) {
-                  if (index === row.frameIndex) button.setAttribute('aria-current', 'true');
-                  else button.removeAttribute('aria-current');
-                }
-              }
-              for (const [index, {row, boxes}] of frames) {
-                const button = timeButton(row, next => {
-                  navigate(next);
-                  show(next, boxes).catch(error => {
-                    if (active(token) && error.name !== 'AbortError') status.textContent = error.message;
-                  });
-                }, names[kind]);
-                buttons.set(index, button); times.append(button);
-              }
-              card.append(image, times); grid.append(card);
-              const {row, boxes} = frames.values().next().value;
-              await show(row, boxes);
+            const kinds = Array.from(findings, ([kind, frames]) => ({kind, episodes: sampledEpisodes(frames.values())}));
+            for (const {group, rows} of chronologicalEpisodes(kinds)) {
+              grid.append(await episodeCard(names[group.kind], rows,
+                row => thumbnail(captured.frames[row.frameIndex], {status: 'unusable'}, token, row.boxes)));
             }
             section.append(grid); fragment.append(section);
           }
@@ -319,7 +315,7 @@
           if (!previews.has(row.frameIndex)) previews.set(row.frameIndex, thumbnail(captured.frames[row.frameIndex], row, token));
           return previews.get(row.frameIndex);
         }
-        async function navigate(row, showSelected, inspect = false) {
+        async function navigate(row, showSelected, inspect = false, getPreview = preview) {
           if (!active(token) || busy || isInspecting() || !ready()) return;
           if (inspect && seekController) return;
           seekController?.abort();
@@ -329,7 +325,7 @@
             onSelectFrame();
             if (!active(token) || navigation.signal.aborted || isInspecting()) return;
             const frame = captured.frames[row.frameIndex];
-            const [url] = await Promise.all([showSelected ? preview(row) : null, media.seek(frame.timestampSeconds, navigation.signal)]);
+            const [url] = await Promise.all([showSelected ? getPreview(row) : null, media.seek(frame.timestampSeconds, navigation.signal)]);
             if (!active(token) || navigation.signal.aborted || busy || isInspecting() || !ready()) return;
             if (Math.abs(media.element.currentTime - frame.timestampSeconds) >= 0.1) {
               message('Позиция видео изменилась. Откройте выбранный момент ещё раз.', true);
@@ -360,8 +356,7 @@
           });
           return button;
         }
-        async function groupCard(group) {
-          const name = `${COMPONENTS[group.component]} · ${CONDITIONS[group.condition]}`;
+        async function episodeCard(name, rows, getPreview) {
           const card = document.createElement('article'); card.className = 'video-review-frame';
           card.append(text('h4', 'video-review-finding', name));
           const seekButton = document.createElement('button'); seekButton.type = 'button'; seekButton.className = 'video-review-seek';
@@ -370,13 +365,13 @@
           const observation = text('p', 'video-review-observation', '');
           seekButton.append(image, caption);
           card.append(seekButton, observation);
-          let selected = group.observations[0];
+          let selected = rows[0];
           const buttons = new Map();
           function showSelected(row, url) {
             selected = row;
             const time = evidenceTime(row.timestampSeconds);
             const frame = captured.frames[row.frameIndex];
-            image.src = url; image.alt = `${COMPONENTS[row.component]} · ${time}`;
+            image.src = url; image.alt = `${name} · ${time}`;
             image.width = frame.width; image.height = frame.height;
             caption.textContent = `Кадр ${time}`;
             seekButton.setAttribute('aria-label', `Открыть кадр ${time} в видео. ${name}`);
@@ -389,35 +384,28 @@
             }
           }
           seekButton.addEventListener('click', () => navigate(selected));
-          if (group.observations.length > 1) {
-            const episodes = document.createElement('div'); episodes.className = 'video-review-episodes';
-            group.episodes.forEach((rows, index) => {
-              const episode = document.createElement('div'); episode.className = 'video-review-episode video-review-times';
-              const label = group.episodes.length > 1 ? `Эпизод ${index + 1}` : 'Проверенные моменты';
-              episode.append(text('span', 'video-review-episode-label', label));
-              for (const row of rows) {
-                const button = timeButton(row, next => navigate(next, showSelected), `${name}. ${label}`);
-                buttons.set(row.frameIndex, button); episode.append(button);
-              }
-              episodes.append(episode);
-            });
-            card.append(episodes);
+          if (rows.length > 1) {
+            const times = document.createElement('div'); times.className = 'video-review-times';
+            for (const row of rows) {
+              const button = timeButton(row, next => navigate(next, showSelected, false, getPreview), name);
+              buttons.set(row.frameIndex, button); times.append(button);
+            }
+            card.append(times);
           }
           if (onInspectFrame) card.append(inspectButton(() => selected));
-          showSelected(selected, await preview(selected));
+          showSelected(selected, await getPreview(selected));
           return card;
         }
-        if (grouped.groups.length) {
+        async function episodeGrid(groups) {
           const grid = document.createElement('div'); grid.className = 'video-review-grid';
-          for (const group of grouped.visibleGroups) grid.append(await groupCard(group));
-          fragment.append(grid);
-          if (grouped.additionalGroups.length) {
-            const more = document.createElement('details'); more.className = 'video-review-more';
-            more.append(text('summary', '', `Другие признаки (${grouped.additionalGroups.length})`));
-            const extra = document.createElement('div'); extra.className = 'video-review-grid';
-            for (const group of grouped.additionalGroups) extra.append(await groupCard(group));
-            more.append(extra); fragment.append(more);
+          for (const {group, rows} of chronologicalEpisodes(groups)) {
+            const name = `${COMPONENTS[group.component]} · ${CONDITIONS[group.condition]}`;
+            grid.append(await episodeCard(name, rows, preview));
           }
+          return grid;
+        }
+        if (grouped.groups.length) {
+          fragment.append(await episodeGrid(grouped.groups));
         }
         if (grouped.clearCount || grouped.uncertainCount) {
           const other = document.createElement('details'); other.className = 'video-review-more video-review-evidence';
@@ -497,7 +485,7 @@
       runButton?.addEventListener('click', run);
       cancelButton?.addEventListener('click', state.cancel);
       window.addEventListener('pagehide', state.cancel);
-      message('Проверяем восемь кадров, выбранных равномерно по ролику.');
+      message(idleMessage());
       state.update();
       return state;
     },

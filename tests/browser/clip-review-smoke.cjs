@@ -41,6 +41,16 @@ const server = http.createServer(async (req, res) => {
           observation: `Тестовое наблюдение ${index + 1}`, box: status === 'unusable' ? [0,0,0,0] : [100+index,100,500,500]};
       }) };
     if (state.mode === 'mismatch') result.observations[0].timestampSeconds += 1;
+    if (state.mode === 'separated-details') {
+      for (const [index, component] of [[0,'pump'],[1,'motor'],[4,'valve'],[5,'other'],[7,'pipe']]) {
+        result.observations[index].component = component;
+      }
+      result.observations[7].condition = 'wet_patch';
+      result.defectDetails = body.frames.map((frame, index) => ({
+        frameIndex: index, timestampSeconds: frame.timestampSeconds, status: 'checked',
+        boxes: [1, 2, 7].includes(index) ? [{kind: 'crack', box: [240, 200, 720, 510]}] : [],
+      }));
+    }
     if (state.mode === 'empty') result.observations = [];
     if (state.mode === 'hold') { state.pending.push(() => reply(res, 200, result)); return; }
     return reply(res, 200, result);
@@ -108,8 +118,7 @@ async function checkRegion(page, timestamp) {
   await page.locator('#uploaded-video').waitFor();
   assert.ok(Math.abs(await page.locator('#uploaded-video').evaluate(v=>v.currentTime)-timestamp)<.001);
   assert.equal(await page.locator('#details').isVisible(),false);
-  assert.equal(await page.locator('.video-review-frame').count(),1);
-  assert.equal(await page.locator('.video-review-time-link[aria-current="true"]').count(),1);
+  assert.equal(await page.locator('.video-review-frame').count(),3);
   assert.equal(state.posts.length,1);
   await page.locator('#choose-region').click();
   await dialog.getByRole('button',{name:'Отмена'}).press('Enter');
@@ -129,6 +138,19 @@ async function run(browser, engine, android) {
     await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
     await page.locator('#media-file').setInputFiles(clip);
     await page.waitForFunction(() => document.querySelector('#uploaded-video').readyState >= 2);
+    if (!android) {
+      const primary = page.locator('#capture-actions button.primary:visible');
+      assert.equal(await primary.count(), 1);
+      assert.equal(await primary.getAttribute('id'), 'video-review-run');
+      assert.equal(await primary.innerText(), 'Проверить всё видео');
+      assert.equal(await page.locator('#check').isVisible(), false);
+      assert.equal(state.posts.length + state.photoPosts.length, 0);
+      await page.locator('#uploaded-video').evaluate(async video => {
+        await new Promise(resolve => {
+          video.addEventListener('seeked', resolve, {once: true}); video.currentTime = 4.8;
+        });
+      });
+    }
     await page.locator('#video-review-run').click();
     await page.locator('#video-review-results').waitFor();
     assert.equal(state.posts.length, 1, 'Eight frames are compared in one bounded request');
@@ -146,7 +168,7 @@ async function run(browser, engine, android) {
       hashes.push(createHash('sha256').update(bytes).digest('hex'));
     });
     assert.equal(new Set(hashes).size, 8, 'Sampling decodes eight distinct actual frames');
-    assert.equal(await page.locator('.video-review-frame').count(), android ? 8 : 1);
+    assert.equal(await page.locator('.video-review-frame').count(), android ? 8 : 3);
     await page.waitForFunction(() => [...document.querySelectorAll('.video-review-seek img')].every(image => image.complete && image.naturalWidth > 0));
     assert.deepEqual(violations, [], 'Bundled Android CSP must allow generated local thumbnails');
     const resultText = await page.locator('#video-review-results').textContent();
@@ -158,19 +180,24 @@ async function run(browser, engine, android) {
       await page.locator('.video-review-seek').nth(3).click();
       await page.waitForFunction(time => Math.abs(document.getElementById('uploaded-video').currentTime - time) < .01, 5 * 3.5 / 8);
     } else {
-      const card = page.locator('.video-review-frame');
-      assert.equal(await card.locator('.video-review-episode').count(), 3);
-      assert.equal(await card.locator('.video-review-time-link').count(), 5);
-      const firstImage = await card.locator('img').getAttribute('src');
-      const last = card.locator('.video-review-time-link').last();
+      const episodes = page.locator('.video-review-frame');
+      assert.deepEqual(await episodes.locator('.video-review-observation').allTextContents(),
+        ['Тестовое наблюдение 1','Тестовое наблюдение 5','Тестовое наблюдение 8']);
+      const thumbnails = await episodes.locator('img').evaluateAll(images => images.map(image => image.src));
+      assert.equal(new Set(thumbnails).size, 3, 'Every nonconsecutive episode starts with its own evidence');
+      const firstEpisode = episodes.first(), lastEpisode = episodes.last();
+      assert.equal(await firstEpisode.locator('.video-review-time-link').count(), 2);
+      await firstEpisode.locator('.video-review-time-link').last().press('Enter');
+      await firstEpisode.getByText('Тестовое наблюдение 2', {exact:true}).waitFor();
+      const last = lastEpisode.locator('.video-review-seek');
       await last.focus(); await last.press('Enter');
       await page.waitForFunction(time => Math.abs(document.querySelector('#uploaded-video').currentTime-time)<.001, post.body.frames[7].timestampSeconds);
-      await card.getByText('Тестовое наблюдение 8', {exact:true}).waitFor();
-      assert.equal(await last.getAttribute('aria-current'), 'true');
-      assert.notEqual(await card.locator('img').getAttribute('src'), firstImage);
+      await lastEpisode.getByText('Тестовое наблюдение 8', {exact:true}).waitFor();
+      assert.equal(await lastEpisode.locator('img').getAttribute('src'), thumbnails[2]);
       assert.equal(state.photoPosts.length,0);
+      await page.locator('#analysis-settings > summary').click();
       await checkRegion(page, post.body.frames[7].timestampSeconds);
-      await card.getByRole('button',{name:'Уточнить кадр'}).press('Enter');
+      await lastEpisode.getByRole('button',{name:'Уточнить кадр'}).press('Enter');
       await until(() => state.photoPosts.length===2 && state.pending.length===1);
       assert.match(state.photoPosts.at(-1), /name="profile"\r?\n\r?\nstandard/);
       const sentTime = /name="videoTimeSeconds"\r?\n\r?\n([\d.]+)/.exec(state.photoPosts.at(-1));
@@ -181,15 +208,36 @@ async function run(browser, engine, android) {
       assert.equal(state.photoPosts.length,2);
       state.pending.shift()();
       await page.locator('#details').waitFor();
-      await card.locator('.video-review-time-link').first().press('Enter');
+      assert.equal(await page.locator('#video-review-results').isVisible(), true, 'Refining a frame keeps the overview and its evidence available');
+      assert.equal(await episodes.count(), 3);
+      await firstEpisode.locator('.video-review-time-link').first().press('Enter');
       await page.locator('#uploaded-video').waitFor();
-      await card.getByText('Тестовое наблюдение 1', {exact:true}).waitFor();
+      await firstEpisode.getByText('Тестовое наблюдение 1', {exact:true}).waitFor();
       assert.equal(await page.locator('#details').isVisible(), false);
       const residual=page.locator('.video-review-evidence');
       await residual.locator('summary').press('Enter');
       await residual.getByRole('button',{name:/Не удалось оценить/}).press('Enter');
       await residual.locator('.video-review-inspect').waitFor();
       assert.equal(state.photoPosts.length,2);
+      state.mode='separated-details';
+      await page.locator('#video-review-run').click();
+      const checked = page.locator('.video-review-evidence').filter({hasText:'Уточнённые признаки'});
+      const checkedEpisodes = checked.locator('.video-review-frame');
+      await checked.waitFor();
+      const headline = await page.locator('.video-review-summary').innerText();
+      assert.match(headline, /При уточнении отмечены признаки трещины\./);
+      assert.doesNotMatch(headline, /проводки/);
+      const allOverview = page.locator('#video-review-results > .video-review-grid .video-review-frame');
+      assert.equal(await allOverview.count(),5);
+      for (const index of [3,4]) assert.equal(await allOverview.nth(index).isVisible(), true,
+        'The fourth and fifth findings must be visible without expanding anything');
+      await allOverview.last().getByText('Трубопровод или фланец · Видимые следы жидкости').waitFor();
+      assert.equal(await checkedEpisodes.count(),2);
+      assert.equal(await checkedEpisodes.first().locator('.video-review-time-link').count(),2);
+      assert.notEqual(await checkedEpisodes.first().locator('img').getAttribute('src'),
+        await checkedEpisodes.last().locator('img').getAttribute('src'));
+      await checkedEpisodes.last().locator('.video-review-seek').click();
+      await page.waitForFunction(time => Math.abs(document.querySelector('#uploaded-video').currentTime-time)<.001, post.body.frames[7].timestampSeconds);
       state.mode='empty';
       await page.locator('#video-review-run').click();
       await page.locator('#video-review-status').getByText('Модель не вернула наблюдений',{exact:false}).waitFor();
@@ -225,6 +273,10 @@ async function run(browser, engine, android) {
     await page.locator('#media-file').setInputFiles(clip);
     await page.waitForFunction(() => document.querySelector('#uploaded-video').readyState >= 2);
     assert.equal(await page.locator('#video-review-run').isDisabled(), true);
+    if (!android) {
+      await page.locator('#video-review-status').getByText(/Разбор видео недоступен/).waitFor();
+      assert.equal(await page.locator('#check').isVisible(), false);
+    }
     assert.equal(requests.includes('/api/inspections'), false);
     assert.deepEqual(errors, []);
     console.log(`${engine} ${android ? 'Android bundle' : 'web'} PASS: eight distinct JPEGs, one request, thumbnails/CSP, timecodes, seek, mismatch, cancellation, capabilities`);

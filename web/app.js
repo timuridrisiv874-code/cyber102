@@ -59,7 +59,7 @@ clipReview = offlineMode ? null : window.CyberVideoReview?.create({
     analysisController?.abort();
     checking = false;
     cameraMode.value = 'single';
-    frameSource = null; frameMetadata = null; result = null; mediaProgress = '';
+    frameSource = null; frameMetadata = null; result = null; videoStats = null; mediaProgress = '';
     viewfinder.append(snapshot, detection);
     showMessage();
     render();
@@ -70,6 +70,8 @@ clipReview = offlineMode ? null : window.CyberVideoReview?.create({
     window.CyberCamera.validateModel(representative);
     const inspected = readResult(representative);
     media.pause();
+    cameraMode.value = 'single';
+    viewfinder.append(snapshot, detection);
     drawFrame(snapshot, image);
     frameSource = 'uploaded_video'; frameMetadata = inspected.media; result = inspected;
     showMessage(); render();
@@ -84,6 +86,7 @@ clipReview = offlineMode ? null : window.CyberVideoReview?.create({
   onInspectFrame: async () => {
     if (media.kind !== 'uploaded_video' || !media.ready || clipReview?.busy || checking || analysisController || videoRun) return;
     cameraMode.value = 'single';
+    viewfinder.append(snapshot, detection);
     result = null; frameSource = null; frameMetadata = null;
     await checkFrame();
   },
@@ -98,6 +101,8 @@ function resetInput() {
   checking = false;
   frameSource = null; frameMetadata = null; result = null; videoStats = null; mediaProgress = '';
   cameraMode.value = 'single';
+  byId('analysis-settings').open = false;
+  intervalSelect.value = '5000';
   viewfinder.append(snapshot, detection);
 }
 
@@ -143,12 +148,24 @@ function render() {
   if (offlineMode) cameraMode.value = 'single';
   const clipBusy = Boolean(clipReview?.busy);
   const videoOverview = !offlineMode && media.kind === 'uploaded_video';
+  const controls = byId(videoOverview ? 'video-extra-actions' : 'capture-actions');
+  if (controls && checkButton.parentElement !== controls) {
+    controls.append(checkButton, videoToggle, byId('analysis-cancel'), byId('choose-region'));
+    checkButton.classList.toggle('primary', !videoOverview);
+    checkButton.classList.toggle('secondary', videoOverview);
+    videoToggle.classList.toggle('primary', !videoOverview);
+    videoToggle.classList.toggle('secondary', videoOverview);
+  }
   if (!offlineMode) {
     const reviewPanel = byId('video-review-panel');
     const destination = videoOverview ? byId('result') : byId('video-review-home');
     if (reviewPanel && destination && reviewPanel.parentElement !== destination) destination.append(reviewPanel);
     byId('result').dataset.videoReview = String(videoOverview);
-    byId('result-title').textContent = videoOverview && !result ? 'Обзор видео' : 'Результат осмотра';
+    const resultTitle = byId('result-title');
+    if (videoOverview && !result) resultTitle.textContent = 'Обзор видео';
+    else if (videoOverview && Number.isFinite(frameMetadata?.videoTimeSeconds))
+      resultTitle.textContent = `${result?.videoReview ? 'Опорный кадр' : 'Кадр'} · ${window.CyberMedia.time(frameMetadata.videoTimeSeconds)}`;
+    else resultTitle.textContent = 'Результат осмотра';
     byId('video-review-title').hidden = videoOverview && !result;
     reviewPanel?.setAttribute('aria-labelledby', videoOverview && !result ? 'result-title' : 'video-review-title');
   }
@@ -188,17 +205,17 @@ function render() {
   const hasVideoSource = Boolean(stream || media.kind === 'uploaded_video');
   byId('analysis-settings').hidden = offlineMode || !endpoint || !hasVideoSource;
   byId('camera-options').hidden = !hasVideoSource;
-  cameraMode.disabled = clipBusy || media.loading || openingCamera || checking || Boolean(videoRun) || Boolean(analysisController);
+  cameraMode.disabled = clipBusy || media.loading || openingCamera || checking || Boolean(videoRun || analysisController || regionController);
   byId('frame-interval-label').hidden = !videoMode;
   intervalSelect.hidden = !videoMode;
   intervalSelect.disabled = Boolean(videoRun);
   byId('video-help').hidden = !videoMode;
   byId('video-help').textContent = media.kind === 'uploaded_video' ?
-    'Проверка с текущей позиции, максимум 20 кадров за запуск. Рамка относится к кадру с указанным таймкодом; промежутки между кадрами не анализируются.' :
+    'С начала ролика с выбранным интервалом, максимум 20 кадров за запуск.' :
     'Проверяем отдельные кадры с камеры. Рамка относится к последнему проверенному кадру.';
   videoToggle.hidden = !videoMode;
   videoToggle.disabled = clipBusy || (!videoRun && ((!stream && media.kind !== 'uploaded_video') || !frameReady || openingCamera || Boolean(analysisController)));
-  byId('video-toggle-label').textContent = videoRun ? 'Остановить проверку' : 'Начать проверку';
+  byId('video-toggle-label').textContent = videoRun ? 'Остановить проверку' : videoOverview ? 'Проверить по интервалу' : 'Начать проверку';
   if (videoMetrics) {
     videoMetrics.hidden = !videoMode || !videoStats;
     if (videoStats) videoMetrics.textContent = `Проверено кадров: ${videoStats.count}`;
@@ -218,7 +235,7 @@ function render() {
   cameraButton.disabled = false;
   if (byId('analysis-cancel')) byId('analysis-cancel').hidden = !checking || frameSource === 'example';
   byId('check-label').textContent = checking ? 'Проверяем…' :
-    frameMetadata?.regionLabel ? 'Весь кадр' : result ? (['camera', 'uploaded_video'].includes(frameSource) ? 'Новый кадр' : 'Проверить ещё раз') : 'Проверить кадр';
+    frameMetadata?.regionLabel ? 'Весь кадр' : result ? (['camera', 'uploaded_video'].includes(frameSource) ? 'Новый кадр' : 'Проверить ещё раз') : videoOverview ? 'Проверить текущий кадр' : 'Проверить кадр';
   byId('camera-label').textContent = openingCamera ? 'Отменить запуск' :
     stream ? 'Выключить камеру' : 'Камера';
   byId('capture-provenance').hidden = !result || !frameMetadata;
@@ -562,6 +579,7 @@ function changeCameraMode() {
   const target = cameraMode.value === 'video' ? checkedViewfinder : viewfinder;
   target.append(snapshot, detection);
   frameSource = null;
+  frameMetadata = null;
   result = null;
   videoStats = null;
   showMessage();
@@ -675,8 +693,7 @@ function toggleVideoRun() {
   let times = null;
   if (media.kind === 'uploaded_video') {
     media.pause(); times = [];
-    // Start at the user's playhead. A new run is needed for any remaining clip.
-    for (let t = Math.min(media.element.currentTime, media.element.duration - 0.001); t < media.element.duration && times.length < 20; t += interval / 1000) times.push(t);
+    for (let t = 0; t < media.element.duration && times.length < 20; t += interval / 1000) times.push(t);
   }
   videoRun = { frame: document.createElement('canvas'), interval,
     timer: null, controller: new AbortController(), times, index: 0 };

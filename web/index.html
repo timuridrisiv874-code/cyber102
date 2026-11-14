@@ -17,9 +17,9 @@
   <script src="inspection-photo.js?v=1" defer></script>
   <script src="inspection.js?v=capture-controls-1" defer></script>
   <script src="media.js?v=mobile-recovery-20261114" defer></script>
-  <script src="video-review.js?v=video-journal-1" defer></script>
+  <script src="video-review.js?v=whole-video-2" defer></script>
   <script src="region-review.js?v=field-20261114" defer></script>
-  <script src="app.js?v=capture-controls-1" defer></script>
+  <script src="app.js?v=whole-video-1" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
   <script src="equipment-qr.js?v=motor-resource-1" defer></script>
   <script src="photo-measure.js?v=1" defer></script>
@@ -86,12 +86,15 @@
           <button type="button" class="detection" id="detection" aria-controls="result" hidden><span id="detection-label"></span></button>
         </div>
         <div class="capture-footer">
-          <div class="actions">
+          <div class="actions" id="capture-actions">
+            <button type="button" class="button primary" id="video-review-run" hidden disabled><i class="scan-icon" aria-hidden="true"></i>Проверить всё видео</button>
+            <button type="button" class="button secondary" id="video-review-cancel" hidden>Отменить разбор видео</button>
             <button class="button primary" id="check" type="button" disabled><i class="scan-icon" aria-hidden="true"></i><span id="check-label">Проверить кадр</span></button>
             <button class="button primary" id="video-toggle" type="button" hidden><i class="scan-icon" aria-hidden="true"></i><span id="video-toggle-label">Начать проверку</span></button>
             <button class="button secondary" id="analysis-cancel" type="button" hidden>Отмена</button>
             <button class="button secondary" id="choose-region" type="button" hidden>Выбрать область</button>
           </div>
+          <p class="message" id="video-review-status" role="status" aria-live="polite" hidden></p>
           <p id="qr-scan-status" role="status" hidden></p>
           <section id="qr-equipment-card" aria-labelledby="qr-equipment-title" hidden>
             <h3 id="qr-equipment-title"></h3>
@@ -107,20 +110,19 @@
           <section class="video-review-panel" id="video-review-panel" aria-labelledby="video-review-title" hidden>
             <h3 id="video-review-title">Обзор видео</h3>
 
-            <div class="actions"><button type="button" class="button primary" id="video-review-run" disabled>Проверить видео</button><button type="button" class="button secondary" id="video-review-cancel" hidden>Отменить</button></div>
-            <p class="message" id="video-review-status" role="status" aria-live="polite"></p>
             <div id="video-review-results" hidden></div>
           </section>
           </div>
 
           <details class="capture-settings" id="analysis-settings" hidden>
-            <summary>Проверка по интервалу</summary>
+            <summary>Дополнительные режимы</summary>
             <div class="camera-options" id="camera-options" hidden>
               <label for="camera-mode" id="camera-mode-label">Проверка</label>
               <select id="camera-mode"><option value="single">Один кадр</option><option value="video">Видеопроверка</option></select>
               <label for="frame-interval" id="frame-interval-label" hidden>Интервал</label>
               <select id="frame-interval" hidden><option value="2000">2 секунды</option><option value="5000" selected>5 секунд</option><option value="10000">10 секунд</option></select>
             </div>
+            <div class="actions" id="video-extra-actions"></div>
             <p class="video-help" id="video-help" hidden>Проверяем отдельные кадры. Рамка относится к последнему проверенному кадру.</p>
 
             <p class="video-metrics" id="video-metrics" hidden></p>

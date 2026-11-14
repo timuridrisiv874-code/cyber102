@@ -86,16 +86,20 @@ async function run(browser, engine, android) {
     await page.locator('#media-file').setInputFiles(clip);
     await page.locator('#uploaded-video').waitFor();
     await page.locator('#uploaded-video').evaluate(async el => { await new Promise(resolve => { el.addEventListener('seeked', resolve, { once: true }); el.currentTime = 1; }); });
+    if (!android) {
+      assert.equal(await page.locator('#video-review-run').isVisible(), true);
+      assert.equal(await page.locator('#check').isVisible(), false);
+      await page.locator('#analysis-settings > summary').click();
+    }
     await page.locator('#check').click();
     await page.locator('#details').waitFor();
     assert.equal(state.posts.at(-1).source, 'uploaded_video'); assert.equal(Number(state.posts.at(-1).time), 1);
     if (!android) await page.locator('.result-provenance > summary').click();
     assert.match(await page.locator('#capture-provenance').innerText(), /0:01\.0/);
     if (!android) await page.locator('.result-provenance > summary').click();
-    if (!android) await page.locator('#analysis-settings > summary').click();
     await page.locator('#camera-mode').selectOption('video');
     await page.locator('#frame-interval').selectOption('2000');
-    await page.locator('#uploaded-video').evaluate(async el => { await new Promise(resolve => { el.addEventListener('seeked', resolve, { once: true }); el.currentTime = 0; }); });
+    await page.locator('#uploaded-video').evaluate(async (el, position) => { await new Promise(resolve => { el.addEventListener('seeked', resolve, { once: true }); el.currentTime = position; }); }, android ? 0 : 4.7);
     const firstVideo = state.posts.length;
     await page.locator('#video-toggle').click();
     await page.locator('#message').getByText('Проверка выбранных кадров завершена.', { exact: false }).waitFor();
@@ -115,6 +119,7 @@ async function run(browser, engine, android) {
     state.pending.shift()(); state.hold = false; await delay(100);
     assert.equal(await page.locator('#details').isVisible(), false);
     assert.equal(await page.locator('#snapshot').isVisible(), false);
+    if (!android) await page.locator('#analysis-settings > summary').click();
     await page.locator('#camera-mode').selectOption('video');
     state.hold = true; const beforeStop = state.posts.length;
     await page.locator('#video-toggle').click(); await waitUntil(() => state.pending.length === 1);
@@ -124,7 +129,13 @@ async function run(browser, engine, android) {
 
     await page.locator('#media-file').setInputFiles(boundedClip);
     await page.locator('#uploaded-video').waitFor();
+    if (!android) {
+      await page.locator('#analysis-settings > summary').click();
+      assert.equal(await page.locator('#camera-mode').inputValue(), 'single');
+      assert.equal(await page.locator('#frame-interval').inputValue(), '5000');
+    }
     await page.locator('#camera-mode').selectOption('video');
+    await page.locator('#frame-interval').selectOption('2000');
     const beforeBounded = state.posts.length;
     await page.locator('#video-toggle').click();
     await page.locator('#message').getByText('Проверка выбранных кадров завершена.', { exact: false }).waitFor();
@@ -158,14 +169,15 @@ async function run(browser, engine, android) {
     } else assert.equal(await page.locator('#analysis-profile').count(), 0);
     assert.deepEqual(errors, []);
     console.log(`${engine} ${android ? 'Android bundle' : 'web'} PASS: real photo/video decoding, JPEG dimensions, real API/provenance, frame sampling, stop/replace, limits, URL cleanup`);
-  } catch (error) { console.error({ engine, android, message: await page.locator('#message').textContent(), errors }); throw error; } finally { state.pending.splice(0).forEach(done => done()); await page.close(); }
+  } catch (error) { console.error({ engine, android, settings: await page.locator('#analysis-settings').evaluate(el => ({open: el.open, hidden: el.hidden})).catch(() => null), message: await page.locator('#message').textContent(), errors }); throw error; } finally { state.pending.splice(0).forEach(done => done()); await page.close(); }
 }
 (async () => {
   server.listen(0, '127.0.0.1'); await once(server, 'listening');
   try {
     for (const [engine, name, options] of [[chromium, 'Chromium', process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}], [webkit, 'WebKit', {}]]) {
+      if (process.env.BROWSER_ENGINE && process.env.BROWSER_ENGINE !== name) continue;
       const browser = await engine.launch(options);
-      try { for (const android of [false, true]) await run(browser, name, android); } finally { await browser.close(); }
+      try { for (const android of (process.env.WEB_ONLY ? [false] : [false, true])) await run(browser, name, android); } finally { await browser.close(); }
     }
   } finally { server.close(); server.closeAllConnections(); fs.rmSync(temp, { recursive: true, force: true }); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

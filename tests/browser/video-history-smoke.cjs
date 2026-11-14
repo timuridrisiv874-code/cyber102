@@ -41,6 +41,7 @@ async function check(browser, device, url, clip) {
   assert.equal((await image.body()).equals(Buffer.from(normalized, 'base64')), true);
   await page.locator('#inspection-history').click();
   await page.waitForURL(address => address.pathname === '/checkpoint.html');
+  await page.locator('.history-entry[data-record-id="' + record.id + '"]').waitFor();
   await page.reload();
   const entry = page.locator('.history-entry[data-record-id="' + record.id + '"]');
   await entry.getByText('Видеоосмотр', {exact: true}).waitFor();
