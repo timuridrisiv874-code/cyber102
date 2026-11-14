@@ -1,0 +1,132 @@
+[
+  {
+    "file": "case-pump-gallery.jpg",
+    "scene": "case-pump-gallery",
+    "sourceFile": "Насосные агрегаты/photo_2026-11-13_12-46-46.jpg",
+    "sha256": "15077563c3e0089bbff8d56388e7382336dcb242719dd0273f836c5ca5c0fdb8",
+    "objects": [],
+    "note": "Overview of pumps and valves. No visible fractured metal at this scale.",
+    "domain": "organizer-supplied case illustration; origin unverified"
+  },
+  {
+    "file": "case-valve-body-rupture.jpg",
+    "scene": "case-valve-body-rupture",
+    "sourceFile": "Запорная арматура/1396430378_7447321.jpg",
+    "sha256": "f03b64891b7aff1c0a9f26af0bcc0ff00435fe463e2ed3f704b9198c31985e31",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.182,
+          0.11,
+          0.565,
+          0.712
+        ]
+      }
+    ],
+    "note": "Irregular break crossing the end cover of the valve. Box the visible discontinuity, not the circular housing.",
+    "domain": "organizer-supplied case illustration; origin unverified"
+  },
+  {
+    "file": "case-painted-valve-seams.jpg",
+    "scene": "case-painted-valve-seams",
+    "sourceFile": "Запорная арматура/IMG_20160324_100411.jpg",
+    "sha256": "1f024f723634d16ae7b7cabb234cb61d7e0b641a56b7843df0552846b6768d18",
+    "objects": [],
+    "note": "Paint damage, cast edges and intact joints without a visible split.",
+    "domain": "organizer-supplied case illustration; origin unverified"
+  },
+  {
+    "file": "case-scaled-flange.jpg",
+    "scene": "case-scaled-flange",
+    "sourceFile": "Запорная арматура/IMG_20261113_142550.jpg",
+    "sha256": "a15c2435c8a622467b998fb2e207f36a5ba25480cb12da6e92cb494374a4f76f",
+    "objects": [],
+    "note": "Heavy flaking scale around the flange and hard reflections. No distinct fractured edges.",
+    "domain": "organizer-supplied case illustration; origin unverified"
+  },
+  {
+    "file": "case-valve-oxide.jpg",
+    "scene": "case-valve-oxide",
+    "sourceFile": "Запорная арматура/IMG_20261113_142555.jpg",
+    "sha256": "14cd271abc37ba4490131b9c763a8956dc5ae388cc5d5585906b3235d1bee744",
+    "objects": [],
+    "note": "Heavy oxide around the fitting. Surface loss alone does not establish a crack.",
+    "domain": "organizer-supplied case illustration; origin unverified"
+  },
+  {
+    "file": "case-wet-flange.jpg",
+    "scene": "case-wet-flange",
+    "sourceFile": "Турбопровод/1corrsia.jpg",
+    "sha256": "1295467678396b402d263c96f506508b9c097d4b8e3533e1fbdc4a573257611b",
+    "objects": [],
+    "note": "Droplets below a corroded flange. No visible break in the metal; no claim about its leak source.",
+    "domain": "organizer-supplied case illustration; origin unverified"
+  },
+  {
+    "file": "case-weld-separation.jpg",
+    "scene": "case-weld-separation",
+    "sourceFile": "Турбопровод/354c86b2f75e35fdf90ce044cf02d997-big.jpg",
+    "sha256": "50ad685c58570cf8e12ff2eda16394eaafe4da1fb42586bbed3b856bf83722be",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.478,
+          0.0,
+          0.544,
+          1.0
+        ]
+      }
+    ],
+    "note": "Narrow continuous split along the visible weld; box the fissure, excluding the adjacent intact bead.",
+    "domain": "organizer-supplied case illustration; origin unverified"
+  },
+  {
+    "file": "case-long-pipe-split.jpg",
+    "scene": "case-long-pipe-split",
+    "sourceFile": "Турбопровод/IMG_20261113_143112.jpg",
+    "sha256": "8ceb225d07663c1463ca7ca4e3ab27da2b155b00ec54abfc2765ea607e0d1826",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.0,
+          0.248,
+          0.956,
+          0.807
+        ]
+      }
+    ],
+    "note": "Long jagged split along the pipe surface. The left end extends beyond the frame.",
+    "domain": "organizer-supplied case illustration; origin unverified"
+  },
+  {
+    "file": "case-short-pipe-fissure.jpg",
+    "scene": "case-short-pipe-fissure",
+    "sourceFile": "Турбопровод/IMG_20261113_143116.jpg",
+    "sha256": "3701f10352453cc4d80e7a4105f63be05075ad4588737a3c201f0bcf757fc2fd",
+    "objects": [
+      {
+        "class": "crack",
+        "xyxy": [
+          0.267,
+          0.393,
+          0.586,
+          0.598
+        ]
+      }
+    ],
+    "note": "Open fissure in a tube close-up; installation status cannot be determined.",
+    "domain": "organizer-supplied case illustration; origin unverified"
+  },
+  {
+    "file": "case-pipe-paint-fissures.jpg",
+    "scene": "case-pipe-paint-fissures",
+    "sourceFile": "Турбопровод/unnamed.jpg",
+    "sha256": "4450a2c8b9221c448ac3ba42196f77225f217a2da09f2ed100c804879d23dbd1",
+    "objects": [],
+    "note": "Rusted pipe joint and paint crazing. No clear through-metal fissure.",
+    "domain": "organizer-supplied case illustration; origin unverified"
+  }
+]
