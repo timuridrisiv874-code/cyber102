@@ -1,0 +1,58 @@
+{
+  "checkedAt": "2026-11-14T23:02:00.560755+03:00",
+  "origin": "https://cyber102.94.41.87.102.sslip.io",
+  "health": {
+    "status": "ok",
+    "model": "timm/vit_small_patch14_dinov2.lvd142m",
+    "revision": "4610ca143709d58a633b6397a74412c2c3842454",
+    "pipeline": "dinov2-small-pad224-v1",
+    "device": "cpu",
+    "count": 63,
+    "indexVersion": "e855544260ab63d0b99bfadcfccc5f1884a5d889d585886439ff7a7b9d06d61f"
+  },
+  "requests": [
+    {
+      "image": "knz-km.jpg",
+      "httpMs": 215,
+      "searchMs": 113,
+      "cached": false,
+      "top": "knz-km",
+      "identityConfirmed": false
+    },
+    {
+      "image": "wanshsin-wxr.jpg",
+      "httpMs": 143,
+      "searchMs": 91,
+      "cached": false,
+      "top": "gearbox-wxr",
+      "identityConfirmed": false
+    },
+    {
+      "image": "eldin-ba-bra.jpg",
+      "httpMs": 165,
+      "searchMs": 98,
+      "cached": false,
+      "top": "motor-eldin",
+      "identityConfirmed": false
+    }
+  ],
+  "note": "Real HTTPS calls to the Windows CPU worker. Catalogue self-image checks, not exact-model recognition validation.",
+  "memorySnapshot": {
+    "workingSetMiB": 388.6,
+    "privateMemoryMiB": 900.5,
+    "note": "Windows process snapshot after model/index load; not a peak measurement."
+  },
+  "publicBrowserChecks": {
+    "chromium": "passed",
+    "webkit": "passed",
+    "scenarios": [
+      "real photo retrieval",
+      "references",
+      "serial preserved",
+      "stale response rejected",
+      "retry",
+      "mobile width"
+    ]
+  },
+  "startupTask": "Cyber102VisualSearch"
+}

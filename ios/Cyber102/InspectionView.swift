@@ -7,6 +7,7 @@ private enum CaptureSheet: String, Identifiable { case photo, qr, measurePhoto, 
 
 @MainActor
 struct InspectionView: View {
+    let openOnline: (String?) -> Void
     private static let en = Locale.Language(identifier: "en")
     private static let ru = Locale.Language(identifier: "ru")
     @Environment(\.scenePhase) private var scenePhase
@@ -42,13 +43,12 @@ struct InspectionView: View {
     @State private var translationRun = UUID()
     @State private var missingLanguage = false
     @State private var showHistory = false
-    @State private var showOnline = false
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    Button { showOnline = true } label: {
+                    Button { openOnline(equipment?.serial) } label: {
                         HStack(spacing: 12) {
                             Image(systemName: "viewfinder")
                                 .font(.title3)
@@ -192,7 +192,6 @@ struct InspectionView: View {
                 }
             }
         }
-        .fullScreenCover(isPresented: $showOnline) { OnlineInspectionScreen(serial: equipment?.serial) }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { saveDraft() }
             if phase == .background && (analysis != nil || translating) {

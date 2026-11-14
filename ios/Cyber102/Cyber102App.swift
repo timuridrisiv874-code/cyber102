@@ -6,7 +6,7 @@ import WebKit
 struct Cyber102App: App {
     var body: some Scene {
         WindowGroup {
-            InspectionView()
+            InspectionHome()
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
                     Task { await InspectionEngine.shared.releaseForMemoryPressure() }
                 }
@@ -14,14 +14,36 @@ struct Cyber102App: App {
     }
 }
 
+private struct InspectionHome: View {
+    @State private var online = true
+    @State private var serial: String?
+
+    var body: some View {
+        ZStack {
+            InspectionView { selectedSerial in
+                serial = selectedSerial
+                online = true
+            }
+            .opacity(online ? 0 : 1)
+            .allowsHitTesting(!online)
+            .accessibilityHidden(online)
+
+            OnlineInspectionScreen(serial: serial) { online = false }
+                .opacity(online ? 1 : 0)
+                .allowsHitTesting(online)
+                .accessibilityHidden(!online)
+        }
+    }
+}
+
 struct OnlineInspectionScreen: View {
     let serial: String?
-    @Environment(\.dismiss) private var dismiss
+    let onOffline: () -> Void
     @State private var failed = false
     @State private var reload = UUID()
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .bottomTrailing) {
             InspectionWebsite(failed: $failed, serial: serial)
                 .id(reload)
                 .ignoresSafeArea(edges: .bottom)
@@ -37,13 +59,13 @@ struct OnlineInspectionScreen: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(.background)
             }
-            Button { dismiss() } label: {
-                Label("На телефоне", systemImage: "iphone")
+            Button(action: onOffline) {
+                Label("Без сети", systemImage: "iphone")
                     .font(.subheadline.weight(.semibold))
                     .padding(.horizontal, 12).padding(.vertical, 9)
                     .background(.regularMaterial, in: Capsule())
             }
-            .padding(.top, 8).padding(.trailing, 12)
+            .padding(.bottom, 18).padding(.trailing, 12)
         }
     }
 }
@@ -71,11 +93,19 @@ private struct InspectionWebsite: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ view: WKWebView, context: Context) {}
+    func updateUIView(_ view: WKWebView, context: Context) {
+        guard context.coordinator.serial != serial else { return }
+        context.coordinator.serial = serial
+        view.load(URLRequest(url: url))
+    }
 
     final class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
         private var parent: InspectionWebsite
-        init(_ parent: InspectionWebsite) { self.parent = parent }
+        var serial: String?
+        init(_ parent: InspectionWebsite) {
+            self.parent = parent
+            serial = parent.serial
+        }
 
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             parent.failed = true

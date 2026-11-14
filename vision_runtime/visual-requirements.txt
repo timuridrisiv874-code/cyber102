@@ -1,0 +1,9 @@
+# CPU worker; on Windows/Linux install the CPU torch wheels (see docs).
+torch==2.8.0
+torchvision==0.23.0
+timm==1.0.22
+safetensors==0.8.0
+numpy>=2.0,<3
+Pillow==12.3.0
+# Include the Windows-only transitive dependency when preparing wheels on macOS/Linux.
+colorama==0.4.6

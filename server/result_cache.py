@@ -12,7 +12,7 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 KEY = re.compile(r'[a-f0-9]{64}\.json\Z')
-PIPELINE_FILES = ('server/vision.py', 'server/video_review.py', 'server/knowledge.py',
+PIPELINE_FILES = ('server/vision.py', 'server/video_review.py', 'server/knowledge.py', 'server/visual_search.py',
                   'vision_runtime/worker.py', 'vision_runtime/qwen_worker.py',
                   'vision_runtime/qwen38_worker.py', 'vision_runtime/video_defects.py',
                   'vision_runtime/liquid.py')
