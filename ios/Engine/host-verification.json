@@ -1,0 +1,27 @@
+{
+  "environment": "macOS 26.0 arm64, Apple M5, Swift CLI",
+  "target": "macOS shared inference core linked as static archive and imported by Swift via the CyberInspection C module",
+  "ios_sdk_tested": false,
+  "photo": "PIPE-04.jpg",
+  "input_file": "artifacts/vlm-quality-2026-11-13/qwen-lora-pilot/data/images/PIPE-04.jpg",
+  "checks": [
+    "Build all dependencies into one archive",
+    "Swift module imported and linked",
+    "Cancelled model loading rejected without setting loaded flag",
+    "Local language model and projector loaded",
+    "Real JPEG visual inference",
+    "Result decoded as UTF-8 JSON",
+    "Unload reset loaded flag"
+  ],
+  "actual_reply": {
+    "text": "The image shows a weathered, cylindrical metal pipe or rail, likely part of industrial piping or a structural component. Clear defect: a long, jagged crack runs along the lower lateral surface, with a smaller branching crack above it. Location: exterior/upper surface of the pipe. No inference made about cause, severity, or internal condition beyond visible fracture.",
+    "promptMs": 3535.104,
+    "generateMs": 1193.208,
+    "totalMs": 4728.312,
+    "generatedTokens": 73,
+    "inputTokens": 260,
+    "visualFindings": false,
+    "truncated": false,
+    "cancelled": false
+  }
+}

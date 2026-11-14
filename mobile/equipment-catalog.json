@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "equipment": [
+    {
+      "serial": "P-102",
+      "name": "Центробежный насос",
+      "model": "Д 160-1126",
+      "demo": true
+    },
+    {
+      "serial": "21031004-1",
+      "name": "Насосный агрегат №1 · AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "model": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "demo": false,
+      "manufacturer": "ООО «Альтернативные Механические Системы»"
+    },
+    {
+      "serial": "230201068",
+      "name": "Электродвигатель №1 · BRA160M4 FБУ1",
+      "model": "BRA160M4 FБУ1",
+      "demo": false,
+      "manufacturer": "АО «Ярославский электромашиностроительный завод»"
+    },
+    {
+      "serial": "SAL023020084_001002",
+      "name": "Редуктор №1 · WXRF87-AM160-5.30-M1-Ø300",
+      "model": "WXRF87-AM160-5.30-M1-Ø300",
+      "demo": false,
+      "manufacturer": "WANSHSIN Seikou (Hunan) Co., Ltd"
+    },
+    {
+      "serial": "10096664",
+      "name": "Термопреобразователь №1 · ПТ 0304Ex-ВТ",
+      "model": "ПТ 0304Ex-ВТ",
+      "demo": false,
+      "manufacturer": "НПП «ЭЛЕМЕР»"
+    },
+    {
+      "serial": "21031004-2",
+      "name": "Насосный агрегат №2 · AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "model": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "demo": false,
+      "manufacturer": "ООО «Альтернативные Механические Системы»"
+    },
+    {
+      "serial": "230201069",
+      "name": "Электродвигатель №2 · BRA160M4 FБУ1",
+      "model": "BRA160M4 FБУ1",
+      "demo": false,
+      "manufacturer": "АО «Ярославский электромашиностроительный завод»"
+    },
+    {
+      "serial": "SAL023020084_001003",
+      "name": "Редуктор №2 · WXRF87-AM160-5.30-M1-Ø300",
+      "model": "WXRF87-AM160-5.30-M1-Ø300",
+      "demo": false,
+      "manufacturer": "WANSHSIN Seikou (Hunan) Co., Ltd"
+    },
+    {
+      "serial": "10096661",
+      "name": "Термопреобразователь №2 · ПТ 0304Ex-ВТ",
+      "model": "ПТ 0304Ex-ВТ",
+      "demo": false,
+      "manufacturer": "НПП «ЭЛЕМЕР»"
+    },
+    {
+      "serial": "21031004-3",
+      "name": "Насосный агрегат №3 · AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "model": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "demo": false,
+      "manufacturer": "ООО «Альтернативные Механические Системы»"
+    },
+    {
+      "serial": "230201067",
+      "name": "Электродвигатель №3 · BRA160M4 FБУ1",
+      "model": "BRA160M4 FБУ1",
+      "demo": false,
+      "manufacturer": "АО «Ярославский электромашиностроительный завод»"
+    },
+    {
+      "serial": "SAL023020084_001004",
+      "name": "Редуктор №3 · WXRF87-AM160-5.30-M1-Ø300",
+      "model": "WXRF87-AM160-5.30-M1-Ø300",
+      "demo": false,
+      "manufacturer": "WANSHSIN Seikou (Hunan) Co., Ltd"
+    },
+    {
+      "serial": "10096663",
+      "name": "Термопреобразователь №3 · ПТ 0304Ex-ВТ",
+      "model": "ПТ 0304Ex-ВТ",
+      "demo": false,
+      "manufacturer": "НПП «ЭЛЕМЕР»"
+    },
+    {
+      "serial": "21031004-4",
+      "name": "Насосный агрегат №4 · AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "model": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "demo": false,
+      "manufacturer": "ООО «Альтернативные Механические Системы»"
+    },
+    {
+      "serial": "230201070",
+      "name": "Электродвигатель №4 · BRA160M4 FБУ1",
+      "model": "BRA160M4 FБУ1",
+      "demo": false,
+      "manufacturer": "АО «Ярославский электромашиностроительный завод»"
+    },
+    {
+      "serial": "SAL023020084_001001",
+      "name": "Редуктор №4 · WXRF87-AM160-5.30-M1-Ø300",
+      "model": "WXRF87-AM160-5.30-M1-Ø300",
+      "demo": false,
+      "manufacturer": "WANSHSIN Seikou (Hunan) Co., Ltd"
+    },
+    {
+      "serial": "10096662",
+      "name": "Термопреобразователь №4 · ПТ 0304Ex-ВТ",
+      "model": "ПТ 0304Ex-ВТ",
+      "demo": false,
+      "manufacturer": "НПП «ЭЛЕМЕР»"
+    }
+  ]
+}
