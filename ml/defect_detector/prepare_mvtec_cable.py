@@ -14,6 +14,7 @@ CLASSES = {
     'cut_inner_insulation': 'inner_insulation_cut', 'cut_outer_insulation': 'outer_insulation_cut',
     'missing_cable': 'cable_missing', 'missing_wire': 'wire_missing', 'poke_insulation': 'insulation_puncture',
 }
+ANY_CABLE_DEFECT = 'cable_damage'
 
 
 def samples(source):
@@ -46,17 +47,19 @@ def annotation(mask_path, size):
     return [left / w, top / h, right / w, bottom / h]
 
 
-def prepare(source, output):
+def prepare(source, output, *, single_class=False):
     dataset = list(samples(source))
     if not all(any(s == split and label is None for s, _, label, _ in dataset) for split in ('train', 'val', 'test')):
         raise ValueError('Missing normal cable controls for one or more splits')
     output.mkdir(parents=True, exist_ok=False)
-    labels = list(CLASSES.values())
+    labels = [ANY_CABLE_DEFECT] if single_class else list(CLASSES.values())
     counts = {split: Counter() for split in ('train', 'val', 'test')}
     size = Counter()
     seen = set()
     test = []
     for split, photo, label, mask in dataset:
+        if label is not None and single_class:
+            label = ANY_CABLE_DEFECT
         digest = hashlib.sha256(photo.read_bytes()).hexdigest()
         if digest in seen:
             raise ValueError(f'Duplicate source photo: {photo.name}')
@@ -99,5 +102,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source', type=Path)
     parser.add_argument('output', type=Path)
+    parser.add_argument('--single-class', action='store_true',
+                        help='Keep the fixed split and boxes, grouping defects into one experimental class')
     args = parser.parse_args()
-    print(json.dumps(prepare(args.source.resolve(strict=True), args.output)))
+    print(json.dumps(prepare(args.source.resolve(strict=True), args.output,
+                             single_class=args.single_class)))
