@@ -1,9 +1,44 @@
 /* Shared functional inspection workflow for the browser and Android WebView. */
 (() => {
   'use strict';
-  if (window.CyberWebBoot?.blocked) return;
-  const byId = (id) => document.getElementById(id);
   const number = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
+
+  function pumpThreshold(catalog, serial, source, reading) {
+    const pump = catalog?.equipment?.find(item => item.kind === 'pump' && item.serial === serial);
+    if (!pump) return null;
+    const terms = [];
+    const sources = new Map();
+    let minimum;
+    for (const [key, units] of [['design_lifetime', ['год', 'года', 'лет']], ['design_resource_before_writeoff', ['ч']]]) {
+      const field = pump.fields?.[key];
+      const ref = field?.source;
+      if (!Number.isFinite(field?.value) || field.value <= 0 || !units.includes(field.unit) ||
+          !/^[a-zA-Z0-9_-]+$/.test(ref?.documentId ?? '') || !Number.isSafeInteger(ref.page) || ref.page < 1) continue;
+      const amount = `${number.format(field.value)} ${field.unit}`;
+      if (key === 'design_lifetime') terms.push(`Срок службы — ${amount}`);
+      else {
+        minimum = field.value;
+        terms.push(`Ресурс до списания — не менее ${amount}`);
+      }
+      sources.set(`/api/customer/documents/${ref.documentId}/pdf#page=${ref.page}`, `Паспорт · стр. ${ref.page}`);
+    }
+    if (!terms.length) return null;
+    let hours = '';
+    if (minimum !== undefined) {
+      if (source !== 'manual' || !Number.isFinite(reading) || reading < 0) {
+        hours = 'Для расчёта до паспортного минимума укажите суммарную наработку в ручных показаниях.';
+      } else if (reading >= minimum) {
+        hours = `Паспортный минимум достигнут при наработке ${number.format(minimum)} ч. Введено ${number.format(reading)} ч.`;
+      } else {
+        hours = `До паспортного минимума — ${number.format(minimum - reading)} ч. Введено ${number.format(reading)} ч.`;
+      }
+    }
+    return { terms: terms.join('. ') + '.', hours, sources };
+  }
+
+  if (typeof module !== 'undefined' && module.exports) module.exports = { pumpThreshold };
+  if (typeof window === 'undefined' || window.CyberWebBoot?.blocked) return;
+  const byId = (id) => document.getElementById(id);
 
   function abortableDelay(milliseconds, signal) {
     return new Promise((resolve, reject) => {
@@ -93,6 +128,10 @@
   byId('inspection-findings').after(navigator, references);
   let manualFields = [];
   let catalogPromise = null;
+  let passportsPromise = null;
+  let passports = null;
+  const activeEquipment = byId('active-equipment');
+  const resource = byId('inspection-resource');
   const visionLabels = {
     seal_leak: 'Жидкость именно в зоне уплотнения вала',
     foundation_issue: 'Коррозия рамы / отсутствие или ослабление анкеров',
@@ -114,7 +153,8 @@
     row.append(label, select);
     confirms.append(row);
   }
-  serial.value = new URLSearchParams(location.search).get('serial') || serial.value;
+  const parameters = new URLSearchParams(location.search);
+  serial.value = parameters.get('serial') || (parameters.get('example') === '1' ? 'P-102' : serial.value);
   let current = null;
   let cameraBusy = false;
   let pending = false;
@@ -133,7 +173,7 @@
 
   function sync() {
     fields.disabled = pending || cameraBusy || Boolean(savePayload) || saved;
-    const ready = Boolean(current && serialReady === serial.value.trim());
+    const ready = Boolean(current && serialReady && serialReady === serial.value.trim());
     previewButton.disabled = !ready || pending || cameraBusy || Boolean(savePayload) || saved;
     saveButton.disabled = !ready || pending || cameraBusy || saved || (!preview && !savePayload);
     byId('inspection-paused').hidden = !cameraBusy;
@@ -142,7 +182,32 @@
     manual.querySelectorAll('input, select').forEach((input) => { input.disabled = manual.hidden; });
     byId('inspection-source').textContent = selected && selected !== 'manual' ?
       'Показания из примера, снятого отдельно от кадра.' : '';
-    byId('inspection-history').href = `/checkpoint.html?${new URLSearchParams({ serial: serial.value.trim() })}`;
+    const historyLink = byId('inspection-history');
+    historyLink.hidden = !ready;
+    historyLink.href = ready ? `/checkpoint.html?${new URLSearchParams({ serial: serialReady })}` : '/checkpoint.html';
+    if (resource) {
+      const data = ready ? pumpThreshold(passports, serialReady, selected, byId('inspection-telemetry-hours')?.valueAsNumber) : null;
+      resource.hidden = !data;
+      byId('service-life-fallback').hidden = Boolean(data);
+      if (data) {
+        byId('inspection-resource-title').textContent = `Насосный агрегат · ${serialReady}`;
+        byId('inspection-resource-terms').textContent = data.terms;
+        const hours = byId('inspection-resource-hours');
+        if (hours.textContent !== data.hours) hours.textContent = data.hours;
+        hours.hidden = !data.hours;
+        const links = byId('inspection-resource-sources');
+        if (links.dataset.serial !== serialReady) {
+          links.replaceChildren();
+          for (const [href, label] of data.sources) {
+            if (links.childNodes.length) links.append(' · ');
+            const a = textNode('a', label);
+            a.href = href; a.target = '_blank'; a.rel = 'noopener'; a.className = 'text-link';
+            links.append(a);
+          }
+          links.dataset.serial = serialReady;
+        }
+      }
+    }
   }
 
   function invalidate() {
@@ -178,6 +243,7 @@
     serialReady = '';
     telemetry.replaceChildren(new Option('Нет данных датчиков', ''), new Option('Ручные показания', 'manual'));
     component.replaceChildren(new Option('Насос', 'pump'));
+    manual.querySelectorAll('input, select').forEach(input => { input.value = ''; });
     invalidate();
     if (!requested) return;
     setMessage('Проверяем серийный номер…');
@@ -186,6 +252,7 @@
         api(`/api/scenarios?${new URLSearchParams({ serial: requested })}`),
         api(`/api/recommendations?${new URLSearchParams({ serial: requested })}`).catch(() => null),
         loadCatalog().catch(() => null),
+        resource && loadPassports().catch(() => null),
       ]);
       if (load !== serialLoad || requested !== serial.value.trim()) return;
       if (data.passport?.serial !== requested || !Array.isArray(data.scenarios)) throw new Error('Сервер не подтвердил серийный номер.');
@@ -203,6 +270,14 @@
     } finally {
       if (load === serialLoad) sync();
     }
+  }
+
+  function loadPassports() {
+    if (!passportsPromise) passportsPromise = api('/api/customer/equipment-passports').then(data => {
+      if (!Array.isArray(data?.equipment)) throw new Error('Реестр паспортов недоступен.');
+      passports = data;
+    }).catch(error => { passportsPromise = null; throw error; });
+    return passportsPromise;
   }
 
   function loadCatalog() {
@@ -236,7 +311,7 @@
   }
 
   function buildPayload() {
-    if (!current || serialReady !== serial.value.trim()) throw new Error('Подтвердите серийный номер оборудования.');
+    if (!current || !serialReady || serialReady !== serial.value.trim()) throw new Error('Подтвердите серийный номер оборудования.');
     if (!form.reportValidity()) return null;
     const confirmedVision = {};
     for (const select of confirms.querySelectorAll('select')) {
@@ -288,8 +363,8 @@
         invalidate();
         const parentDetails = target?.closest('details');
         if (parentDetails) parentDetails.open = true;
-        target?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        target?.focus();
+        target?.focus({ preventScroll: true });
+        target?.scrollIntoView({ block: 'center', behavior: 'instant' });
       });
       item.append(button); next.append(item);
     }
@@ -438,6 +513,9 @@
     },
   };
   serial.addEventListener('input', () => { serialReady = ''; serialLoad += 1; invalidate(); });
+  for (const input of [serial, activeEquipment]) input?.addEventListener('focus', () => {
+    loadCatalog().catch(() => setMessage('Список оборудования не загрузился. Введите серийный номер вручную.', true));
+  });
   serial.addEventListener('change', loadSerial);
   telemetry.addEventListener('change', invalidate);
   manual.addEventListener('input', invalidate);

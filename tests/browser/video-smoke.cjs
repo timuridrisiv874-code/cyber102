@@ -114,7 +114,7 @@ async function run(browser, name, options, mock) {
   page.on('pageerror', error => errors.push(error.message));
   const firstRequest = mock.frames.length;
   const frameCount = () => mock.frames.length - firstRequest;
-  const cameraOn = page.getByRole('button', { name: 'Включить камеру' });
+  const cameraOn = page.locator('#camera');
   const check = page.getByRole('button', { name: 'Проверить кадр' });
   const start = page.getByRole('button', { name: 'Начать проверку' });
   const stop = page.getByRole('button', { name: 'Остановить проверку' });
@@ -130,7 +130,7 @@ async function run(browser, name, options, mock) {
   };
 
   try {
-    await page.goto(`http://127.0.0.1:${mock.server.address().port}/index.html`);
+    await page.goto(`http://127.0.0.1:${mock.server.address().port}/index.html?example=1`);
     await page.locator('#demo-options > summary').click();
     await page.locator('#show-example').click();
     await installTestCamera(page);

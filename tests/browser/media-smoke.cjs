@@ -67,11 +67,11 @@ async function run(browser, engine, android) {
       assert.equal(await page.locator('#analysis-settings').isVisible(), false, 'Analysis settings stay hidden before a source is ready');
     }
     await page.locator('#media-file').setInputFiles(photo);
-    await page.locator('#message').getByText('Фото открыто.', { exact: false }).waitFor();
+    await page.locator('#uploaded-image').waitFor();
     if (!android) await page.locator('#analysis-settings > summary').click();
     await page.locator('#analysis-profile').selectOption('fast');
     await page.locator('#check').click();
-    await page.locator('#message').getByText('Проверка завершена.', { exact: true }).waitFor();
+    await page.locator('#details').waitFor();
     assert.equal(state.posts.length, 1);
     assert.equal(state.posts[0].source, 'uploaded_photo'); assert.equal(state.posts[0].time, null);
     assert.equal(state.posts[0].profile, 'fast'); assert.equal(state.posts[0].name, 'frame.jpg');
@@ -83,10 +83,10 @@ async function run(browser, engine, android) {
     assert.equal(state.mocks, 0, 'An uploaded image must never use a mock result');
 
     await page.locator('#media-file').setInputFiles(clip);
-    await page.locator('#message').getByText('Видео открыто.', { exact: false }).waitFor();
+    await page.locator('#uploaded-video').waitFor();
     await page.locator('#uploaded-video').evaluate(async el => { await new Promise(resolve => { el.addEventListener('seeked', resolve, { once: true }); el.currentTime = 1; }); });
     await page.locator('#check').click();
-    await page.locator('#message').getByText('Проверка завершена.', { exact: true }).waitFor();
+    await page.locator('#details').waitFor();
     assert.equal(state.posts.at(-1).source, 'uploaded_video'); assert.equal(Number(state.posts.at(-1).time), 1);
     if (!android) await page.locator('.result-provenance > summary').click();
     assert.match(await page.locator('#capture-provenance').innerText(), /0:01\.0/);
@@ -105,11 +105,11 @@ async function run(browser, engine, android) {
 
     // Replacing an input during a request aborts that run; its late response must not replace the new file.
     await page.locator('#media-file').setInputFiles(photo);
-    await page.locator('#message').getByText('Фото открыто.', { exact: false }).waitFor();
+    await page.locator('#uploaded-image').waitFor();
     state.hold = true;
     await page.locator('#check').click(); await waitUntil(() => state.pending.length === 1);
     await page.locator('#media-file').setInputFiles(clip);
-    await page.locator('#message').getByText('Видео открыто.', { exact: false }).waitFor();
+    await page.locator('#uploaded-video').waitFor();
     state.pending.shift()(); state.hold = false; await delay(100);
     assert.equal(await page.locator('#details').isVisible(), false);
     assert.equal(await page.locator('#snapshot').isVisible(), false);
@@ -121,7 +121,7 @@ async function run(browser, engine, android) {
     assert.equal(state.posts.length, beforeStop + 1, 'Stop must cancel subsequent sampled frames');
 
     await page.locator('#media-file').setInputFiles(boundedClip);
-    await page.locator('#message').getByText('Видео открыто.', { exact: false }).waitFor();
+    await page.locator('#uploaded-video').waitFor();
     await page.locator('#camera-mode').selectOption('video');
     const beforeBounded = state.posts.length;
     await page.locator('#video-toggle').click();
@@ -135,15 +135,15 @@ async function run(browser, engine, android) {
     await page.locator('#media-file').setInputFiles({ name: 'large.png', mimeType: 'image/png', buffer: Buffer.alloc(20 * 1024 * 1024 + 1) });
     await page.locator('#message').getByText('превышает 20 МБ', { exact: false }).waitFor();
     await page.locator('#media-file').setInputFiles(photo);
-    await page.locator('#message').getByText('Фото открыто.', { exact: false }).waitFor();
+    await page.locator('#uploaded-image').waitFor();
     await page.evaluate(() => { Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia: async () => { throw new DOMException('No camera for test', 'NotFoundError'); } } }); });
     await page.locator('#camera').click();
     await page.locator('#message').getByText('Камера не найдена.', { exact: false }).waitFor();
     await page.locator('#media-file').setInputFiles(photo);
-    await page.locator('#message').getByText('Фото открыто.', { exact: false }).waitFor();
+    await page.locator('#uploaded-image').waitFor();
     await page.locator('#media-clear').click();
     await page.locator('#media-file').setInputFiles(photo);
-    await page.locator('#message').getByText('Фото открыто.', { exact: false }).waitFor();
+    await page.locator('#uploaded-image').waitFor();
     await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')));
     const urls = await page.evaluate(() => mediaUrls);
     assert.deepEqual([...urls.revoked].sort(), [...urls.created].sort(), 'All replaced/cleared object URLs must be revoked');

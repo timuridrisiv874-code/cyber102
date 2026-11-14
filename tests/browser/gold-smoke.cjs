@@ -61,13 +61,11 @@ async function invalidateCheck(page, label) {
 }
 
 async function activate(page, fixture) {
+  // Exercise the public inspection handoff with the evidence pre-saved by the fixture server.
   await page.evaluate(analysis => {
     window.CyberInspection.update(null, false);
-    // Keep the real app state aligned: late media/capability renders may call
-    // CyberInspection.update again. No request or assessment is mocked here.
-    result = analysis;
-    frameMetadata = analysis.media;
-    render();
+    document.body.dataset.inspectionLayout = 'review';
+    window.CyberInspection.update(analysis, false);
   }, fixture.analysis);
   await page.locator('#inspection-preview:not([disabled])').waitFor();
 }
@@ -86,7 +84,7 @@ async function run(browser, engine, fixture, android) {
         if (event.target.id?.startsWith('inspection-')) window.goldTrace.push(`${type}:${event.target.id}`);
       }, true);
     });
-    await page.goto(`${fixture.url}/${android ? 'android.html' : 'index.html'}`);
+    await page.goto(`${fixture.url}/${android ? 'android.html' : 'index.html?serial=P-102'}`);
     await page.waitForFunction(() => typeof window.CyberInspection?.update === 'function');
     await activate(page, fixture);
     await page.locator('#inspection-telemetry').selectOption('manual');
@@ -102,6 +100,17 @@ async function run(browser, engine, fixture, android) {
     const nextCurrent = page.locator('#inspection-guidance ol li').filter({ has: page.getByText('Ток двигателя', { exact: true }) });
     await nextCurrent.getByRole('button', { name: 'Внести результат проверки' }).click();
     assert.equal(await page.evaluate(() => document.activeElement.id), 'inspection-telemetry-current', 'Next-check button focuses the exact input');
+    // A real operator waits for the active field to reach the screen before choosing a value.
+    await page.waitForFunction(async () => {
+      const field = document.getElementById('inspection-telemetry-current');
+      const start = field.getBoundingClientRect();
+      if (start.top < 0 || start.bottom > innerHeight) return false;
+      for (let frame = 0; frame < 4; frame += 1) {
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        if (Math.abs(field.getBoundingClientRect().top - start.top) > 0.5) return false;
+      }
+      return true;
+    });
     await invalidateCheck(page, 'Next check');
     await page.locator('#inspection-telemetry-current').selectOption('normal');
     const complete = await postResult(page, '#inspection-preview', '/api/inspections/preview');

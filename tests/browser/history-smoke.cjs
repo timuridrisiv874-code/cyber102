@@ -16,7 +16,7 @@ const records = [
     provenance: {source: 'camera_inspection', telemetry: 'none'},
     evidence: {analysisId: evidenceId, result: {model: 'LocalModel'}},
     findings: [{severity: 'critical', title: 'Нарушение защиты муфты'}]},
-  {...base, id: 'old-demo', scenarioId: 'coupling_guard', note: 'Старая запись', provenance: {}, evidence: {}},
+  {...base, id: 'old-demo', capturedAt: '2026-11-10T16:00:00Z', scenarioId: 'coupling_guard', note: 'Старая запись', provenance: {}, evidence: {}},
 ];
 const server = http.createServer((req, res) => {
   const pathname = new URL(req.url, 'http://localhost').pathname;
@@ -24,7 +24,7 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/scenarios') return json({passport: {serial: 'P-102', model: 'Demo pump', serviceLife: '—', nextService: '—'},
     qrAvailable: false, scenarios: [{id: 'coupling_guard', label: 'Кожух муфты'}]});
   if (pathname === '/api/history') return json({records});
-  const files = {'/checkpoint.html': 'text/html', '/checkpoint.js': 'application/javascript',
+  const files = {'/checkpoint.html': 'text/html', '/checkpoint.js': 'application/javascript', '/bootstrap.js': 'application/javascript',
     '/styles.css': 'text/css', '/checkpoint.css': 'text/css', '/workspace.css': 'text/css', '/shell.js': 'application/javascript'};
   if (files[pathname] && fs.existsSync(path.join(root, 'web', pathname))) {
     res.writeHead(200, {'Content-Type': files[pathname]}); res.end(fs.readFileSync(path.join(root, 'web', pathname))); return;
@@ -48,22 +48,27 @@ const server = http.createServer((req, res) => {
         await page.getByText('Старая запись', {exact: true}).waitFor();
         const entries = page.locator('#history-records .history-entry');
         assert.equal(await entries.count(), 3);
+        const days = page.locator('#history-records > .history-day-group');
+        assert.equal(await days.count(), 2);
+        assert.equal(await days.first().locator('.history-entry').count(), 2);
+        assert.equal(await days.last().locator('.history-entry').count(), 1);
+        assert.equal(await page.locator('.journal-tools').getAttribute('open'), null);
         const demoCamera = await entries.nth(0).textContent();
         assert.match(demoCamera, /Осмотр с камеры/);
-        assert.match(demoCamera, /Показания: демо · Кожух муфты/);
+        assert.match(demoCamera, /Пример показаний · Кожух муфты/);
         await entries.nth(0).getByText('Данные осмотра', {exact:true}).click();
         assert.match(await entries.nth(0).locator('details').innerText(), /LocalModel/);
         assert.match(await entries.nth(0).locator('details').innerText(), /Оборудование выбрано инженером/);
         await entries.nth(0).getByText('Данные осмотра', {exact:true}).click();
-        assert.match(demoCamera, /Визуальные признаки инженером не оценены/);
-        assert.match(demoCamera, /Неоценённые признаки не считаются нормой/);
+        assert.match(demoCamera, /Признаки инженером не оценены/);
+        assert.match(demoCamera, /Неоценённые признаки остаются неизвестными/);
         assert.equal(await entries.nth(0).locator('a').getAttribute('href'), `/api/analyses/${evidenceId}/image`);
         assert.equal(await page.locator('#unsafe').count(), 0);
         const noSensors = await entries.nth(1).textContent();
-        assert.match(noSensors, /Показаний нет — оценка ограничена/);
+        assert.match(noSensors, /Показаний датчиков нет/);
         assert.match(noSensors, /Проблема с защитным кожухом: Да/);
         assert.doesNotMatch(noSensors, /Влага в зоне уплотнения: Нет/);
-        assert.match(await entries.nth(2).textContent(), /Сохранённый демонстрационный сценарий/);
+        assert.match(await entries.nth(2).textContent(), /Пример показаний/);
         assert.equal(await entries.nth(2).locator('strong').textContent(), 'Кожух муфты');
         assert.deepEqual(errors, []);
         console.log(`${name}: PASS (camera+demo, no telemetry, preserved legacy history, unknown flags, safe evidence link)`);

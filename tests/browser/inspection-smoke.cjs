@@ -85,7 +85,7 @@ async function run(browser, engine, state, server, android) {
   page.on('pageerror', (error) => errors.push(error.message));
   page.setDefaultTimeout(10000);
   try {
-    await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
+    await page.goto(`http://127.0.0.1:${server.address().port}/index.html${android ? '' : '?example=1'}`);
     if (android) {
       await page.locator('.capture-settings').filter({ has: page.locator('#camera-options') }).locator('summary').click();
     } else {
@@ -117,7 +117,7 @@ async function run(browser, engine, state, server, android) {
       await page.locator('#vision-observation').getByText('Проверка контракта модели', {exact:true}).waitFor();
       await page.locator('.result-provenance > summary').click();
       await page.locator('#analysis-model').getByText('cyber102-detector-test', {exact:false}).waitFor();
-      assert.match(await page.locator('#analysis-model').innerText(), /описание по классу/);
+      assert.equal(await page.locator('#analysis-model').innerText(), 'cyber102-detector-test');
       assert.ok((await page.locator('#equipment-id').innerText()).trim());
       await page.locator('.result-provenance > summary').click();
     }
@@ -134,7 +134,7 @@ async function run(browser, engine, state, server, android) {
     assert.equal(payload.confirmedVision.guard_issue, true);
     assert.equal(payload.confirmedVision.seal_leak, null);
     assert.deepEqual(payload.telemetrySource, { kind: 'demo_scenario', scenarioId: 'healthy' });
-    await page.locator('#inspection-diagnosis-source').getByText('демонстрационная телеметрия', { exact: false }).waitFor();
+    await page.locator('#inspection-diagnosis-source').getByText(android ? 'демонстрационная телеметрия' : 'Показания из примера', { exact: false }).waitFor();
     const layout = await page.evaluate(() => ({ width: innerWidth, content: document.documentElement.scrollWidth,
       overflowing: [...document.querySelectorAll('body *')].filter(node => node.getBoundingClientRect().right + scrollX > innerWidth + 1 || node.scrollWidth > node.clientWidth + 1)
         .slice(0, 15).map(node => ({ tag: node.tagName, id: node.id, class: node.className, right: node.getBoundingClientRect().right, scroll: node.scrollWidth, client: node.clientWidth })) }));

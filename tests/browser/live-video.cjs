@@ -43,7 +43,7 @@ const reports=[];
     window.fakeVideo=canvas.captureStream(10);return window.fakeVideo;
    }}});
   });
-  await page.getByRole('button',{name:'Включить камеру'}).click();
+  await page.locator('#camera').click();
   await page.locator('#video').waitFor();
   await page.locator('#analysis-settings > summary').click();
   await page.locator('#camera-mode').selectOption('video');

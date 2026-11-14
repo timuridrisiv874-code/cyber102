@@ -10,6 +10,11 @@ const screenshots = process.env.DESIGN_SMOKE_SCREENSHOTS;
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.json': 'application/json' };
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, 'http://localhost');
+  if (/^\/api\/customer\/images\/[0-9a-f]{64}$/.test(url.pathname)) {
+    response.writeHead(200, { 'Content-Type': 'image/jpeg' });
+    response.end(fs.readFileSync(path.join(root, 'web', 'demo-pump.jpg')));
+    return;
+  }
   if (url.pathname === '/api/capabilities') {
     response.writeHead(200, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify({ vision: { profiles: ['standard', 'fast'], videoReview: false } }));
@@ -37,16 +42,16 @@ async function run(browser, engine, android, width, reducedMotion) {
     await page.goto(`${origin}/${android ? 'android.html' : 'index.html'}`);
     await page.waitForFunction(() => typeof window.CyberInspection?.update === 'function');
     await page.locator('#camera-idle').waitFor();
-    await page.waitForTimeout(450); // Bounded entry animation must settle; idle has no animation loop.
     assert.equal(await page.locator('#check').isDisabled(), true, 'No analysis before a source is chosen');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
     assert.equal(await page.locator('.app-nav a').count(), android ? 5 : 4, 'Shared navigation keeps equipment and photos in one web section');
     if (!android) {
+      assert.equal(await page.locator('#demo-options').isVisible(), false);
       assert.equal(await page.locator('.app-nav a[href*="materials.html"]').count(), 0);
       assert.equal(await page.locator('.app-nav a[href*="documents.html"]').count(), 1);
     }
-    assert.equal(await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === 'running').length), 0,
-      'Idle interface must not continuously animate');
+    await page.waitForFunction(() => document.getAnimations().every(animation => animation.playState !== 'running'),
+      null, { timeout: 2500 });
     if (reducedMotion === 'reduce') {
       assert.equal(await page.locator('.capture').evaluate(node => getComputedStyle(node).animationName), 'none');
       assert.equal(await page.locator('html').evaluate(node => getComputedStyle(node).scrollBehavior), 'auto');
@@ -58,6 +63,27 @@ async function run(browser, engine, android, width, reducedMotion) {
       await page.evaluate(() => { document.activeElement?.blur(); scrollTo({ top: 0, behavior: 'instant' }); });
       await page.screenshot({ path: path.join(screenshots, `${android ? 'android' : 'web'}-${width}-start.png`), fullPage: true });
     }
+    if (!android) {
+      await page.locator('#open-example-photo').click();
+      await page.locator('#check:not([disabled])').waitFor();
+      assert.match(await page.locator('#source-text').innerText(), /Фото из подборки/);
+      assert.equal(await page.locator('#details').isVisible(), false, 'Opening a source must wait for an explicit analysis');
+      assert.equal(requests.some(url => url.pathname === '/analyze'), false);
+      await page.locator('#choose-region').click();
+      const regionDialog = page.getByRole('dialog', { name: 'Выбрать область' });
+      await regionDialog.getByText('Координаты в пикселях', { exact: true }).click();
+      const regionWidth = regionDialog.getByLabel('Ширина', { exact: true });
+      await regionWidth.fill('0');
+      assert.equal(await regionDialog.getByRole('button', { name: 'Проверить область' }).isDisabled(), true);
+      await regionWidth.fill('32');
+      assert.equal(await regionDialog.getByRole('button', { name: 'Проверить область' }).isEnabled(), true);
+      await regionDialog.getByRole('button', { name: 'Отмена' }).click();
+      await regionDialog.waitFor({ state: 'hidden' });
+      assert.equal(requests.some(url => url.pathname === '/analyze'), false, 'Cancelling a selected region must not submit it');
+      await page.locator('#media-clear').click();
+      await page.locator('#open-example-photo').waitFor();
+      await page.goto(`${origin}/index.html?example=1`);
+    }
     await page.locator('#demo-options > summary').click();
     await page.locator('#show-example').click();
     await page.locator('#check:not([disabled])').waitFor();
@@ -67,8 +93,8 @@ async function run(browser, engine, android, width, reducedMotion) {
     assert.match(await page.locator('#mode').textContent(), /Тестовый пример/);
     assert.equal(await page.locator('#result').getAttribute('data-result-ready'), 'true');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
-    await page.waitForTimeout(300);
-    assert.equal(await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === 'running').length), 0);
+    await page.waitForFunction(() => document.getAnimations().every(animation => animation.playState !== 'running'),
+      null, { timeout: 2500 });
     if (screenshots && !reducedMotion && engine === 'Chromium') {
       await page.evaluate(() => { document.activeElement?.blur(); scrollTo({ top: 0, behavior: 'instant' }); });
       await page.screenshot({ path: path.join(screenshots, `${android ? 'android' : 'web'}-${width}-result.png`), fullPage: true });
@@ -76,7 +102,7 @@ async function run(browser, engine, android, width, reducedMotion) {
     assert.deepEqual(errors, []);
     assert.deepEqual(failed, []);
     assert.equal(requests.every(url => url.origin === origin), true, 'No third-party fonts/scripts/services');
-    assert.equal(requests.filter(url => url.pathname === '/api/capabilities').length, 1);
+    assert.equal(requests.filter(url => url.pathname === '/api/capabilities').length, android ? 1 : 2);
     console.log(`${engine} ${android ? 'Android' : 'web'} ${width}px ${reducedMotion || 'motion'}: PASS — layout, assets, animations, explicit demo, no external requests`);
   } finally { await page.close(); }
 }
@@ -88,7 +114,8 @@ async function run(browser, engine, android, width, reducedMotion) {
       const browser = await engine.launch(options);
       try {
         for (const android of [false, true]) {
-          for (const width of [320, 390, 1440]) await run(browser, name, android, width);
+          const widths = android ? [320, 390, 1440] : [320, 390, 820, 1440];
+          for (const width of widths) await run(browser, name, android, width);
           await run(browser, name, android, 390, 'reduce');
         }
       } finally { await browser.close(); }

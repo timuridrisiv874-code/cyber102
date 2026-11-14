@@ -57,7 +57,14 @@
         if (source.quote) entry.append(node('p', source.quote, 'workspace-note'));
         list.append(entry);
       }
-      details.append(list); card.append(details); $('equipment-grid').append(card);
+      details.append(list); card.append(details);
+      if (item.kind === 'pump' && item.serial) {
+        const inspect = node('a', 'Начать осмотр', 'text-link');
+        inspect.href = `index.html?${new URLSearchParams({serial: item.serial})}`;
+        inspect.setAttribute('aria-label', `Начать осмотр ${item.serial}`);
+        card.append(inspect);
+      }
+      $('equipment-grid').append(card);
     }
     if (!equipment.length) $('equipment-grid').append(node('p', 'Проверенные паспортные данные пока не добавлены.'));
     $('passport-limitations').replaceChildren();

@@ -11,9 +11,9 @@
   <script src="offline.js" defer></script>
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="analysis-jobs.js" defer></script>
-  <script src="inspection.js?v=field-20261114" defer></script>
+  <script src="inspection.js?v=resource-20261114" defer></script>
   <script src="media.js?v=field-20261114" defer></script>
-  <script src="video-review.js?v=field-20261114" defer></script>
+  <script src="video-review.js?v=resource-20261114" defer></script>
   <script src="region-review.js?v=field-20261114" defer></script>
   <script src="app.js?v=field-20261114" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
@@ -31,7 +31,7 @@
     </header>
 
     <section class="active-equipment-bar" aria-label="Оборудование текущего осмотра">
-      <div class="field"><label for="active-equipment">Серийный номер</label><input id="active-equipment" aria-describedby="shell-equipment-hint" value="P-102" list="inspection-equipment-options" maxlength="128" autocomplete="off" autocapitalize="characters"></div>
+      <div class="field"><label for="active-equipment">Серийный номер</label><input id="active-equipment" aria-describedby="shell-equipment-hint" placeholder="Выберите или введите" list="inspection-equipment-options" maxlength="128" autocomplete="off" autocapitalize="characters"></div>
       <p id="shell-equipment-hint" class="sr-only">Сверьте номер с табличкой оборудования.</p>
       <a href="documents.html">Паспорта</a>
     </section>
@@ -110,14 +110,21 @@
         </div>
         <div class="details" id="details" hidden>
           <span class="finding" id="finding"></span><h3 id="equipment"></h3><p class="observation-text" id="vision-observation" hidden></p><details class="workspace-details result-provenance"><summary>О данных</summary><p class="equipment-id" id="equipment-id"></p><p class="equipment-id" id="capture-provenance" hidden></p><p class="equipment-id" id="analysis-model"></p><p id="original-observation" class="equipment-id" hidden></p></details>
-          <dl class="facts"><div><dt>Узел</dt><dd id="component"></dd></div><div><dt>Нормативный срок службы</dt><dd id="service-life"></dd></div><div><dt>Обслуживание</dt><dd id="next-service"></dd></div></dl>
+          <dl class="facts"><div><dt>Узел</dt><dd id="component"></dd></div><div id="service-life-fallback"><dt>Нормативный срок службы</dt><dd id="service-life"></dd></div><div><dt>Обслуживание</dt><dd id="next-service"></dd></div></dl>
           <div class="recommendation"><h4>Следующий шаг</h4><p id="recommendation"></p></div>
         </div>
         <section class="details" id="inspection-workflow" aria-labelledby="inspection-title" hidden>
           <h3 id="inspection-title">Зафиксировать осмотр</h3><p class="equipment-id" id="inspection-frame"></p><p class="message" id="inspection-paused" hidden>Остановите видеопроверку, чтобы подтвердить и сохранить последний кадр.</p>
           <form id="inspection-form">
             <fieldset id="inspection-fields"><legend>Оборудование и показания</legend>
-              <p><label for="inspection-serial">Серийный номер</label><input id="inspection-serial" value="P-102" maxlength="128" autocomplete="off" required></p>
+              <p><label for="inspection-serial">Серийный номер</label><input id="inspection-serial" placeholder="Выберите или введите" maxlength="128" autocomplete="off" required></p>
+              <section id="inspection-resource" aria-labelledby="inspection-resource-title" hidden>
+                <h4 id="inspection-resource-title">Паспорт насосного агрегата</h4>
+                <p id="inspection-resource-terms"></p>
+                <p id="inspection-resource-hours" aria-live="polite"></p>
+                <p class="equipment-id">Фактический остаточный ресурс неизвестен.</p>
+                <p id="inspection-resource-sources"></p>
+              </section>
               <div class="demo-options"><label for="inspection-telemetry">Источник показаний</label><select id="inspection-telemetry"><option value="">Нет данных датчиков</option></select></div>
               <p class="equipment-id" id="inspection-source">Данные датчиков не подключены. Проверяются подтверждённые признаки.</p>
               <details><summary>Подтверждённые признаки</summary><p class="equipment-id">Неосмотренные признаки оставьте «Не оценено». След жидкости сам по себе не подтверждает утечку уплотнения.</p><div id="inspection-confirmations"></div><p><label for="inspection-gauge">Манометр нагнетания, МПа · вручную</label><input id="inspection-gauge" type="number" min="0" step="any" inputmode="decimal" placeholder="Не оценено"></p></details>
@@ -126,7 +133,7 @@
             <div class="actions"><button type="button" class="button secondary" id="inspection-preview">Сопоставить данные</button><button type="submit" class="button primary" id="inspection-save" disabled>Сохранить осмотр</button></div>
           </form>
           <p class="message" id="inspection-message" role="status"></p><div id="inspection-diagnosis" hidden><p class="equipment-id" id="inspection-diagnosis-source"></p><ul id="inspection-findings"></ul></div>
-          <p><a id="inspection-history" class="text-link" href="checkpoint.html?serial=P-102">История осмотров</a></p>
+          <p><a id="inspection-history" class="text-link" href="checkpoint.html">История осмотров</a></p>
         </section>
       </section>
     </div>

@@ -280,6 +280,8 @@
             caption.textContent = `Кадр ${time}`;
             seekButton.setAttribute('aria-label', `Открыть кадр ${time} в видео. ${name}`);
             observation.textContent = row.observation;
+            const normalized = value => value.toLocaleLowerCase('ru').replace(/[^а-яёa-z0-9]+/gu, ' ').trim();
+            observation.hidden = !row.observation || normalized(row.observation) === normalized(name);
             for (const [index, button] of buttons) {
               if (index === row.frameIndex) button.setAttribute('aria-current', 'true');
               else button.removeAttribute('aria-current');
@@ -347,7 +349,6 @@
           if (inspect) other.append(inspect);
           fragment.append(other);
         }
-        fragment.append(text('p', 'video-review-meta', 'Разбор не сохранён в историю.'));
         if (!active(token)) throw aborted();
         results.replaceChildren(fragment); results.hidden = false;
       }
@@ -383,7 +384,7 @@
             ? 'Модель занята другим осмотром. Повторите через несколько секунд.'
             : typeof data.error === 'string' ? data.error : 'Не удалось разобрать видео. Повторите попытку.');
           await renderResult(data, captured, token);
-          if (active(token)) message('Разбор готов.');
+          if (active(token)) message('');
         } catch (error) {
           if (active(token)) message(timedOut ? 'Модель не ответила вовремя. Повторите разбор позже.'
             : error.name === 'AbortError' ? 'Разбор видео отменён.' : error.message || 'Не удалось разобрать видео.', error.name !== 'AbortError' || timedOut);
