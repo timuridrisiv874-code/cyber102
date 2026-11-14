@@ -1,0 +1,137 @@
+[
+  {
+    "file": "case-04.jpg",
+    "split": "train",
+    "sha256": "bdec276ad3648762ae392c73762f3f347655949402f71680cb3d3c1cdb00b72c",
+    "labelsSha256": "a520be50fbdbe6766b6a96f0b30657a6688838dd8ce23ee4890e5e7b5f6c92a6",
+    "corrosionBoxes": 1,
+    "cleanSurface": false,
+    "note": "Base plate with visible rough rust around the anchor bolts."
+  },
+  {
+    "file": "case-06.jpg",
+    "split": "train",
+    "sha256": "50580a8f184fcbadf8b9a1a4d9ef4b2c6484c16f8fbff3ccc7eafb4db7fcdd31",
+    "labelsSha256": "16d10cf7e25f92199e4214c9566cd91d117874eb0673a853c00ce1caaf8d723d",
+    "corrosionBoxes": 1,
+    "cleanSurface": false,
+    "note": "Valve body with widespread orange corrosion."
+  },
+  {
+    "file": "case-13.jpg",
+    "split": "train",
+    "sha256": "b33bca503453be08be1fe5b4f70fe47695cd51d2ffa6cdab980b7e1518ae3c67",
+    "labelsSha256": "1c8f68e9cc3c763548d548c9b2d385a3a89143aee8622a0ccb1d75901f633ce7",
+    "corrosionBoxes": 1,
+    "cleanSurface": false,
+    "note": "Rust on the elbow and adjacent connection."
+  },
+  {
+    "file": "case-36.jpg",
+    "split": "train",
+    "sha256": "b36fa9c47c268d31b2c33f7528e020fff35a92a5a95365d0ead83a6cd0e738f0",
+    "labelsSha256": "1f3fdfad599b79b44c0b34c835e3d0e0fe9896f7378e5bd566edb01f5dd6a0b0",
+    "corrosionBoxes": 1,
+    "cleanSurface": false,
+    "note": "Corroded flange edge beside mostly dark pipe surfaces."
+  },
+  {
+    "file": "case-37.jpg",
+    "split": "train",
+    "sha256": "1ac9a4cb813194a4ed4d364503fb2ca7eb71ba619b3bab5b048b279f3d18d7d3",
+    "labelsSha256": "abce151e5795e2533b31beef623481ec85e635f4dfa307309911aab73b48f8b5",
+    "corrosionBoxes": 1,
+    "cleanSurface": false,
+    "note": "Rough rust on the failed fitting, beside visible wet areas."
+  },
+  {
+    "file": "case-39.jpg",
+    "split": "train",
+    "sha256": "55d2c398b3491f6ecb0afb65ffa3be64027d428bc87b62ca7e8302a0df1898f4",
+    "labelsSha256": "de00a744532fcbebbaf72ffaae10871ded8b29231d13f7abcfa5e3fd88c5cd8a",
+    "corrosionBoxes": 1,
+    "cleanSurface": false,
+    "note": "Rust and scaling on a standing stud and its fitting."
+  },
+  {
+    "file": "case-41.jpg",
+    "split": "train",
+    "sha256": "076eebd392768ce5779e513adb70fdb31215326f44fa5f82616cb8849baa405e",
+    "labelsSha256": "451d71490c6da396f65dbd60ea3313f499996c50e3ebe00adb4214a1b114d496",
+    "corrosionBoxes": 1,
+    "cleanSurface": false,
+    "note": "Corrosion near the lower seam, with active droplets below."
+  },
+  {
+    "file": "case-48.jpg",
+    "split": "train",
+    "sha256": "7ce90e106ed5caff817715dfab32a1780a59b1eff2bb5025b2c0aa265e2b21a9",
+    "labelsSha256": "bc955c5e340aa933beabeeb8fc6ae4ea1aaba69ed0246c8d235d290b6b0bf655",
+    "corrosionBoxes": 1,
+    "cleanSurface": false,
+    "note": "Severely corroded sheet with separately labeled perforation."
+  },
+  {
+    "file": "case-52.jpg",
+    "split": "train",
+    "sha256": "91bc790567c88b4b48995352890cc571ae16532eeb4d9713f78459b22ce0cec4",
+    "labelsSha256": "22ec1b8d392a125c65d529a47dbd201275b20fff894e957b076ddfd737722195",
+    "corrosionBoxes": 1,
+    "cleanSurface": false,
+    "note": "Corroded pipe and flange with bolted joint."
+  },
+  {
+    "file": "ref-01.jpg",
+    "split": "train",
+    "sha256": "d1b82fa8352cd23d6d123438383ef416514735390f56064c48a7913d7004d4a1",
+    "labelsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "corrosionBoxes": 0,
+    "cleanSurface": true,
+    "note": "Intact red pump finish. Warm paint is a negative example."
+  },
+  {
+    "file": "safe-ref-11.jpg",
+    "split": "train",
+    "sha256": "61f2d1f1e4b55c2fe9b33b326a31554ef4035ab25b1bfbe39244992e4291e4bf",
+    "labelsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "corrosionBoxes": 0,
+    "cleanSurface": true,
+    "note": "Installed painted valve in outdoor light."
+  },
+  {
+    "file": "safe-ref-23.jpg",
+    "split": "train",
+    "sha256": "346d17d1b8c7dd03834038615f57dea995d57591d922b49c25a00143b701f222",
+    "labelsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "corrosionBoxes": 0,
+    "cleanSurface": true,
+    "note": "Intact blue painted industrial housing."
+  },
+  {
+    "file": "case-17.jpg",
+    "split": "val",
+    "sha256": "0d18ff52b197671e14fa4f56e3a264335585f60a7b282edae2eb3ca477139291",
+    "labelsSha256": "5291a9859d78ddcb07536338b99c3f46922dfe9a45c870d460a3265a8b6020f1",
+    "corrosionBoxes": 1,
+    "cleanSurface": false,
+    "note": "Localized visible corrosion near the valve connection."
+  },
+  {
+    "file": "case-38.jpg",
+    "split": "val",
+    "sha256": "0e85145bdcb5930d1593352a7cbeeb788eb23584b7b245278e22d4ec8707e680",
+    "labelsSha256": "af477ce1749bc4abbe04a48d051c53a216697c1153dd646e33747a4c316260fb",
+    "corrosionBoxes": 0,
+    "cleanSurface": true,
+    "note": "Wet valve and tube with intact dark surfaces in view."
+  },
+  {
+    "file": "ref-24.jpg",
+    "split": "val",
+    "sha256": "36ec27fd355ed85b755b4a3d8c072072c448d34f8c0f05c7e9f23681ec9893d0",
+    "labelsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "corrosionBoxes": 0,
+    "cleanSurface": true,
+    "note": "Clean round gauge mounted on a light panel."
+  }
+]
