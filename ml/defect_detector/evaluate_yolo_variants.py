@@ -6,7 +6,8 @@ import json
 from pathlib import Path
 from statistics import median
 
-from evaluate import class_negative_frames, infer, localization_errors, match_indices, measurements
+from calibrate_thresholds import fit, labeled_frames
+from evaluate import class_negative_frames, infer, localization_errors, match_indices, measurements, scene_coverage
 
 THRESHOLDS = (.01, .05, .15, .25)
 
@@ -43,7 +44,7 @@ def load_datasets(specifications, exclusions):
     return datasets
 
 
-def summarize(rows, predictions, labels):
+def summarize(rows, predictions, labels, calibrated=None):
     report = {}
     for label in labels:
         scoped = [{**r, 'objects': [box for box in r['objects'] if box['class'] == label]}
@@ -72,6 +73,15 @@ def summarize(rows, predictions, labels):
                                for floor in THRESHOLDS},
             'missesAtFloor': dict(Counter(error['reason'] for error in errors)),
         }
+        if calibrated is not None:
+            threshold = calibrated[label]['threshold']
+            report[label]['calibration'] = calibrated[label]
+            if threshold is not None:
+                report[label]['calibrated'] = {
+                    'metrics': measurements(scoped, predictions, (label,), threshold, .5)['classes'][label],
+                    'negativeFrames': class_negative_frames(scoped, predictions, (label,), threshold)[label],
+                    'scenes': scene_coverage(scoped, predictions, (label,), threshold, .5)[label],
+                }
     return report
 
 
@@ -87,6 +97,8 @@ def main():
     parser.add_argument('--tiles', action='store_true', help='Also test tiled inference at the first size')
     parser.add_argument('--square', action='store_true', help='Use identical square padding for native and ONNX models')
     parser.add_argument('--nms', action='store_true', help='Use the native YOLO26 one-to-many head with NMS')
+    parser.add_argument('--calibration-data', type=Path, help='Fit per-class thresholds on the YOLO validation split')
+    parser.add_argument('--calibration-min-instances', type=int, default=4)
     parser.add_argument('--device', default='0')
     args = parser.parse_args()
     if any(size < 32 or size % 32 for size in args.size):
@@ -95,10 +107,14 @@ def main():
         parser.error('--dataset needs a name, images directory and annotation manifest')
     if len(dict(args.models)) != len(args.models):
         parser.error('Model names must be unique')
+    if args.calibration_min_instances < 1:
+        parser.error('--calibration-min-instances needs to be positive')
     excluded = {}
     for name, file in args.exclude:
         excluded.setdefault(name, []).append(file)
     datasets = load_datasets(args.dataset, excluded)
+    holdout_hashes = {bytes.fromhex(row[key]) for rows, _ in datasets.values() for row in rows
+                      for key in ('sha256', 'sourceSha256') if key in row}
 
     import torch
     from ultralytics import YOLO, settings
@@ -116,6 +132,7 @@ def main():
     variants = [(str(size), size, False) for size in dict.fromkeys(args.size)]
     if args.tiles:
         variants.append((f'{args.size[0]}-tiles', args.size[0], True))
+    inference_options = {'rect': not args.square, 'end2end': False if args.nms else None}
     for name, filename in args.models:
         path = Path(filename).resolve(strict=True)
         model = YOLO(str(path), task='detect')
@@ -127,11 +144,17 @@ def main():
         report['runs'][name] = result
         for mode, size, tiles in variants:
             variant = result['variants'][mode] = {}
+            calibrated = None
+            if args.calibration_data is not None:
+                validation, images, _ = labeled_frames(args.calibration_data, 'val', model.names,
+                                                       excluded=holdout_hashes)
+                val_predictions, _ = infer(model, images, args.device, size, tiles=tiles, **inference_options)
+                calibrated = fit(validation, val_predictions, model.names.values(),
+                                 args.calibration_min_instances, .5)
             for key, (rows, paths) in datasets.items():
                 if device.type == 'cuda':
                     torch.cuda.reset_peak_memory_stats(device)
-                predictions, timings = infer(model, paths, args.device, size, tiles=tiles,
-                                            rect=not args.square, end2end=False if args.nms else None)
+                predictions, timings = infer(model, paths, args.device, size, tiles=tiles, **inference_options)
                 labels = sorted({obj['class'] for row in rows for obj in row['objects']} & set(model.names.values()))
                 if not labels:
                     continue
@@ -140,7 +163,7 @@ def main():
                     peak_gpu_bytes = torch.cuda.max_memory_allocated(device)
                 else:
                     peak_gpu_bytes = None
-                variant[key] = {'summary': summarize(rows, predictions, labels), 'timing': timings,
+                variant[key] = {'summary': summarize(rows, predictions, labels, calibrated), 'timing': timings,
                                 'medianMs': median(timings.values()), 'predictions': predictions,
                                 'peakGpuAllocatedBytes': peak_gpu_bytes}
                 print(name, mode, key, round(variant[key]['medianMs']), flush=True)
