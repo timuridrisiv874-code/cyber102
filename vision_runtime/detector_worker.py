@@ -54,7 +54,7 @@ def load_manifest(path):
         raise ValueError('Manifest grew beyond limit')
     manifest = strict_json(body)
     required = {'schemaVersion', 'model', 'modelVersion', 'weightsSha256', 'classMap'}
-    optional = {'minimumScore', 'imageSize', 'task'}
+    optional = {'minimumScore', 'classMinimumScores', 'imageSize', 'task'}
     if (not isinstance(manifest, dict) or not required <= set(manifest) or set(manifest) - required - optional
             or type(manifest['schemaVersion']) is not int or manifest['schemaVersion'] != 1
             or manifest['model'] != MODEL or not isinstance(manifest['modelVersion'], str)
@@ -78,6 +78,10 @@ def load_manifest(path):
     minimum_score, image_size = manifest.get('minimumScore', .25), manifest.get('imageSize', 640)
     if not finite_number(minimum_score) or not 0 < minimum_score <= 1:
         raise ValueError('minimumScore must be in (0, 1]')
+    class_minimum_scores = manifest.get('classMinimumScores', {})
+    if (not isinstance(class_minimum_scores, dict) or not class_minimum_scores.keys() <= class_map.keys()
+            or any(not finite_number(score) or not 0 < score <= 1 for score in class_minimum_scores.values())):
+        raise ValueError('classMinimumScores must map known class IDs to scores in (0, 1]')
     if type(image_size) is not int or not 320 <= image_size <= 1280 or image_size % 32:
         raise ValueError('imageSize must be a multiple of 32 in [320, 1280]')
     if manifest.get('task', 'detect') not in ('detect', 'segment'):
@@ -129,7 +133,12 @@ def envelope_from_rows(coordinates, scores, class_ids, manifest):
                            'box': {'x': left, 'y': top, 'width': right - left, 'height': bottom - top}})
     envelope = validate_envelope({'schemaVersion': 1, 'model': MODEL,
                                   'modelVersion': manifest['modelVersion'], 'detections': detections})
-    envelope['detections'] = [row for row in envelope['detections'] if row['score'] >= manifest['minimumScore']]
+    minimum_score = manifest['minimumScore']
+    by_class = manifest.get('classMinimumScores', {})
+    envelope['detections'] = [
+        row for row, class_id in zip(envelope['detections'], class_ids, strict=True)
+        if row['score'] >= by_class.get(str(int(class_id)), minimum_score)
+    ]
     return envelope
 
 
@@ -172,6 +181,9 @@ class Engine:
             raise ValueError('Device must be cpu or cuda:N')
         self.manifest = load_manifest(manifest_path)
         verified = verify_weights(weights, self.manifest['weightsSha256'])
+        minimum_score = self.manifest['minimumScore']
+        by_class = self.manifest.get('classMinimumScores', {})
+        self.inference_score = min(by_class.get(class_id, minimum_score) for class_id in self.manifest['classMap'])
         self.device, self.ready, self.lock = device, False, threading.Lock()
         self.model = (loader or load_model)(verified, device)
         if self.model.task != self.manifest.get('task', 'detect'):
@@ -181,7 +193,7 @@ class Engine:
     def infer(self, image):
         # Segmentation results also contain bounding boxes in the original frame.
         results = self.model.predict(source=image, device=self.device, imgsz=self.manifest['imageSize'],
-                                     conf=self.manifest['minimumScore'], max_det=MAX_DETECTIONS,
+                                     conf=self.inference_score, max_det=MAX_DETECTIONS,
                                      verbose=False, save=False, stream=False, half=self.device.startswith('cuda:'), batch=1)
         if not isinstance(results, list) or len(results) != 1 or results[0].boxes is None:
             raise ValueError('Expected one detection result')
@@ -198,10 +210,13 @@ class Engine:
         self.ready = True
 
     def health(self):
-        return {'status': 'ok' if self.ready else 'loading', 'ready': self.ready, 'model': MODEL,
-                'modelVersion': self.manifest['modelVersion'], 'weightsSha256': self.manifest['weightsSha256'],
-                'device': self.device, 'busy': self.lock.locked(), 'offline': True,
-                'minimumScore': self.manifest['minimumScore'], 'imageSize': self.manifest['imageSize']}
+        health = {'status': 'ok' if self.ready else 'loading', 'ready': self.ready, 'model': MODEL,
+                  'modelVersion': self.manifest['modelVersion'], 'weightsSha256': self.manifest['weightsSha256'],
+                  'device': self.device, 'busy': self.lock.locked(), 'offline': True,
+                  'minimumScore': self.manifest['minimumScore'], 'imageSize': self.manifest['imageSize']}
+        if self.manifest.get('classMinimumScores'):
+            health['classMinimumScores'] = dict(self.manifest['classMinimumScores'])
+        return health
 
 
 class Handler(BaseHTTPRequestHandler):

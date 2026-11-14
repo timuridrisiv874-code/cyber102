@@ -192,6 +192,8 @@ class WorkerContractTest(unittest.TestCase):
         invalid = [
             {'schemaVersion': True}, {'weightsSha256': 'bad'}, {'modelVersion': '../bad'}, {'classMap': {}},
             {'minimumScore': 0}, {'minimumScore': True}, {'minimumScore': float('inf')},
+            {'classMinimumScores': {'1': .5}}, {'classMinimumScores': {'0': True}},
+            {'classMinimumScores': {'0': 0}}, {'classMinimumScores': {'0': 1.1}}, {'classMinimumScores': []},
             {'task': 'classify'}, {'task': None}, {'task': ['segment']},
             {'imageSize': 4096}, {'imageSize': 650}, {'imageSize': True},
             {'classMap': {'00': self.manifest['classMap']['0']}},
@@ -249,6 +251,32 @@ class WorkerContractTest(unittest.TestCase):
         self.assertFalse(kwargs['half'])
         self.assertEqual(kwargs['device'], 'cpu')
         boxes.xywhn.tolist.assert_not_called()
+
+    def test_class_thresholds_filter_by_weight_id_and_keep_the_default_for_other_classes(self):
+        names = {0: 'rust surface', 1: 'rust joint', 2: 'rust rail'}
+        self.write_manifest({
+            'classMap': {str(key): self.manifest['classMap']['0'] | {'sourceName': name}
+                         for key, name in names.items()},
+            'classMinimumScores': {'0': .3, '2': .8},
+        })
+        coordinates = [[.1, .2, .6, .8], [.2, .2, .6, .8], [.3, .2, .6, .8], [.4, .2, .6, .8]]
+        boxes = Mock()
+        boxes.__len__ = Mock(return_value=4)
+        boxes.cpu.return_value = boxes
+        boxes.xyxyn.tolist.return_value = coordinates
+        boxes.conf.tolist.return_value = [.35, .35, .65, .80]
+        boxes.cls.tolist.return_value = [0, 1, 2, 2]
+        model = SimpleNamespace(task='detect', names=names, predict=Mock(return_value=[SimpleNamespace(boxes=boxes)]))
+        engine = worker.Engine(self.weights, self.manifest_path, trusted_local_weights=True,
+                               device='cpu', loader=Mock(return_value=model))
+        output = engine.infer(object())
+        self.assertEqual(model.predict.call_args.kwargs['conf'], .3)
+        self.assertEqual([row['box']['x'] for row in output['detections']], [.1, .4])
+        self.assertEqual(engine.health()['classMinimumScores'], {'0': .3, '2': .8})
+
+        boxes.conf.tolist.return_value = [.35, True, .65, .80]
+        with self.assertRaisesRegex(ValueError, 'Invalid detector classification or score'):
+            engine.infer(object())
 
     def test_segmentation_requires_matching_task_and_keeps_the_frame_envelope(self):
         boxes = Mock()
