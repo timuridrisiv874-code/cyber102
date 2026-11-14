@@ -160,7 +160,7 @@ async function run(browser, name, options, mock) {
     assert.equal(await page.locator('#viewfinder #detection').count(), 0);
     await page.locator('#vision-observation').getByText('Проверка контура', {exact:true}).waitFor();
     await page.locator('.result-provenance > summary').click();
-    assert.equal(await page.locator('#analysis-model').innerText(), model);
+    assert.ok(!(await page.locator('.result-provenance').innerText()).includes(model));
     await page.locator('.result-provenance > summary').click();
     const firstImage = await snapshot.evaluate(canvas => canvas.toDataURL());
     const second = await next;
@@ -173,7 +173,7 @@ async function run(browser, name, options, mock) {
     const thirdPending = mock.nextFrame();
     second.reply(200, { status: 'unusable', source: 'local_vision', model });
     await checkCount(2);
-    assert.match(await metrics.innerText(), /Темп: [\d.,]+ кадра\/с/);
+    assert.equal(await metrics.innerText(), 'Проверено кадров: 2');
     await page.getByText('Не удалось оценить узел').waitFor();
     assert.equal(await marker.isVisible(), false);
     assert.notEqual(await snapshot.evaluate(canvas => canvas.toDataURL()), firstImage);

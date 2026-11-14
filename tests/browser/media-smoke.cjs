@@ -68,18 +68,19 @@ async function run(browser, engine, android) {
     }
     await page.locator('#media-file').setInputFiles(photo);
     await page.locator('#uploaded-image').waitFor();
-    if (!android) await page.locator('#analysis-settings > summary').click();
-    await page.locator('#analysis-profile').selectOption('fast');
+    if (android) await page.locator('#analysis-profile').selectOption('fast');
+    else assert.equal(await page.locator('#analysis-settings').isVisible(), false);
     await page.locator('#check').click();
     await page.locator('#details').waitFor();
     assert.equal(state.posts.length, 1);
     assert.equal(state.posts[0].source, 'uploaded_photo'); assert.equal(state.posts[0].time, null);
-    assert.equal(state.posts[0].profile, 'fast'); assert.equal(state.posts[0].name, 'frame.jpg');
+    assert.equal(state.posts[0].profile, android ? 'fast' : 'standard'); assert.equal(state.posts[0].name, 'frame.jpg');
     assert.equal(state.posts[0].type, 'image/jpeg'); assert.equal(state.posts[0].image.subarray(0, 2).toString('hex'), 'ffd8');
     assert.deepEqual(await page.locator('#snapshot').evaluate(el => [el.width, el.height]), [1280, 720]);
     if (!android) await page.locator('.result-provenance > summary').click();
     assert.match(await page.locator('#capture-provenance').innerText(), /Загруженное фото/);
     if (!android) await page.locator('.result-provenance > summary').click();
+    if (!android) assert.equal(await page.locator('#analysis-settings').isVisible(), false);
     assert.equal(state.mocks, 0, 'An uploaded image must never use a mock result');
 
     await page.locator('#media-file').setInputFiles(clip);
@@ -91,6 +92,7 @@ async function run(browser, engine, android) {
     if (!android) await page.locator('.result-provenance > summary').click();
     assert.match(await page.locator('#capture-provenance').innerText(), /0:01\.0/);
     if (!android) await page.locator('.result-provenance > summary').click();
+    if (!android) await page.locator('#analysis-settings > summary').click();
     await page.locator('#camera-mode').selectOption('video');
     await page.locator('#frame-interval').selectOption('2000');
     await page.locator('#uploaded-video').evaluate(async el => { await new Promise(resolve => { el.addEventListener('seeked', resolve, { once: true }); el.currentTime = 0; }); });
@@ -149,9 +151,11 @@ async function run(browser, engine, android) {
     assert.deepEqual([...urls.revoked].sort(), [...urls.created].sort(), 'All replaced/cleared object URLs must be revoked');
     state.profiles = ['standard'];
     await page.reload();
-    await page.waitForFunction(() => document.querySelector('#analysis-profile option[value="fast"]').disabled);
-    assert.equal(await page.locator('#analysis-profile').inputValue(), 'standard');
-    assert.equal(await page.locator('#analysis-profile option[value="fast"]').evaluate(el => el.hidden), true);
+    if (android) {
+      await page.waitForFunction(() => document.querySelector('#analysis-profile option[value="fast"]').disabled);
+      assert.equal(await page.locator('#analysis-profile').inputValue(), 'standard');
+      assert.equal(await page.locator('#analysis-profile option[value="fast"]').evaluate(el => el.hidden), true);
+    } else assert.equal(await page.locator('#analysis-profile').count(), 0);
     assert.deepEqual(errors, []);
     console.log(`${engine} ${android ? 'Android bundle' : 'web'} PASS: real photo/video decoding, JPEG dimensions, real API/provenance, frame sampling, stop/replace, limits, URL cleanup`);
   } catch (error) { console.error({ engine, android, message: await page.locator('#message').textContent(), errors }); throw error; } finally { state.pending.splice(0).forEach(done => done()); await page.close(); }

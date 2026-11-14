@@ -102,21 +102,7 @@
     }
   }
 
-  function renderTiming(result) {
-    const node = byId('analysis-timing');
-    if (!node) return;
-    const timings = [];
-    if (Number.isFinite(result?.clientDurationSeconds)) timings.push(`Ответ на телефоне: ${number.format(result.clientDurationSeconds)} с`);
-    if (Number.isFinite(result?.durationSeconds)) timings.push(`Сервер: ${number.format(result.durationSeconds)} с`);
-    if (Number.isFinite(result?.metrics?.generateMs)) timings.push(`Модель: ${number.format(result.metrics.generateMs / 1000)} с`);
-    if (result?.profile === 'fast') timings.push('быстрый режим');
-    if (result?.profile === 'standard') timings.push('подробный режим');
-    if (result?.profile === 'liquid') timings.push('поиск жидкости');
-    node.textContent = timings.join(' · ');
-    node.hidden = !timings.length;
-  }
-
-  window.CyberCamera = { fetchAnalysis, validateModel, renderTiming };
+  window.CyberCamera = { fetchAnalysis, validateModel };
   const panel = byId('inspection-workflow');
   if (!panel) return;
   const form = byId('inspection-form');

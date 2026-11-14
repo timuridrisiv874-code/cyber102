@@ -20,6 +20,9 @@ async function run(browser, options, name) {
   page.on('request', request => {
     if (request.method() === 'POST' && request.url().endsWith('/api/diagnose')) diagnose = request.postDataJSON();
   });
+  await page.route('**/api/customer/images/*', route => route.fulfill({
+    contentType: 'image/jpeg', path: path.resolve(__dirname, '../../web/demo-pump.jpg'),
+  }));
   await page.route('**/analyze', async route => {
     const attempt = uploads.push(route.request());
     const pending = attempt === 2 || attempt === 4;
@@ -89,9 +92,9 @@ async function run(browser, options, name) {
     await photo.click();
     const analyze = page.getByRole('button',{name:'Проверить фото'});
     await analyze.click();
-    await page.getByText('Предварительная оценка', {exact:true}).waitFor();
+    await page.locator('#photo-result').getByText(mock.finding, {exact:true}).waitFor();
     await page.locator('#photo-result').getByText('О результате', {exact:true}).click();
-    assert.match(await page.locator('#photo-result details').innerText(), /InternVL3/);
+    assert.ok(!(await page.locator('#photo-result').innerText()).includes(mock.model));
     await page.locator('#photo-result').getByText('О результате', {exact:true}).click();
     assert.match(uploads[0].headers()['content-type'], /^multipart\/form-data; boundary=/);
     assert.match(uploads[0].postDataBuffer().toString('latin1'), /filename="frame.jpg"/);

@@ -21,14 +21,11 @@ const demoScenario = byId('demo-scenario');
 const examplesRequested = new URLSearchParams(location.search).get('example') === '1';
 const cameraMode = byId('camera-mode');
 const intervalSelect = byId('frame-interval');
-const profileSelect = byId('analysis-profile');
 const videoToggle = byId('video-toggle');
 const checkedViewfinder = byId('checked-viewfinder');
 const videoMetrics = byId('video-metrics');
 const endpoint = document.querySelector('main').dataset.analysisEndpoint.trim();
 const offlineMode = window.CyberOffline?.enabled === true;
-const latencyFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 });
-const rateFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
 
 const unavailableResults = {
   no_marker: ['Оборудование не распознано', 'Метка не видна. Наведите камеру на метку и сделайте новый кадр.'],
@@ -88,7 +85,7 @@ clipReview = offlineMode ? null : window.CyberVideoReview?.create({
     if (media.kind !== 'uploaded_video' || !media.ready || clipReview?.busy || checking || analysisController || videoRun) return;
     cameraMode.value = 'single';
     result = null; frameSource = null; frameMetadata = null;
-    await checkFrame({ profile: 'standard' });
+    await checkFrame();
   },
 });
 
@@ -188,13 +185,13 @@ function render() {
     byId('demo-options').hidden = !examplesRequested || !example || Boolean(stream || openingCamera || frameSource === 'camera' || media.kind);
     demoScenario.disabled = checking;
   }
-  byId('camera-options').hidden = (!stream && !media.kind) || !endpoint;
-  cameraMode.hidden = byId('camera-mode-label').hidden = media.kind === 'uploaded_photo';
+  const hasVideoSource = Boolean(stream || media.kind === 'uploaded_video');
+  byId('analysis-settings').hidden = offlineMode || !endpoint || !hasVideoSource;
+  byId('camera-options').hidden = !hasVideoSource;
   cameraMode.disabled = clipBusy || media.loading || openingCamera || checking || Boolean(videoRun) || Boolean(analysisController);
   byId('frame-interval-label').hidden = !videoMode;
   intervalSelect.hidden = !videoMode;
   intervalSelect.disabled = Boolean(videoRun);
-  profileSelect.disabled = clipBusy || openingCamera || checking || Boolean(videoRun) || Boolean(analysisController);
   byId('video-help').hidden = !videoMode;
   byId('video-help').textContent = media.kind === 'uploaded_video' ?
     'Проверка с текущей позиции, максимум 20 кадров за запуск. Рамка относится к кадру с указанным таймкодом; промежутки между кадрами не анализируются.' :
@@ -204,11 +201,7 @@ function render() {
   byId('video-toggle-label').textContent = videoRun ? 'Остановить проверку' : 'Начать проверку';
   if (videoMetrics) {
     videoMetrics.hidden = !videoMode || !videoStats;
-    if (videoStats) {
-      const { count, latency, rate } = videoStats;
-      videoMetrics.textContent = count ?
-        `Проверено кадров: ${count} · Задержка: ${latencyFormat.format(latency)} с${count > 1 ? ` · Темп: ${rateFormat.format(rate)} кадра/с` : ''}` : 'Проверено кадров: 0';
-    }
+    if (videoStats) videoMetrics.textContent = `Проверено кадров: ${videoStats.count}`;
   }
   if (byId('video-summary')) renderVideoSummary();
   checkButton.hidden = videoMode || (!frameReady && !checking && !result);
@@ -275,9 +268,8 @@ function render() {
     const original = byId('original-observation');
     if (original) {
       original.hidden = !originalOnly;
-      original.textContent = originalOnly ? `Исходное описание модели — ${observation}` : '';
+      original.textContent = originalOnly ? `Исходное описание — ${observation}` : '';
     }
-    if (byId('analysis-model')) byId('analysis-model').textContent = result.model || 'Сохранённый ответ';
     byId('component').textContent = result.component;
     if (byId('service-life')) byId('service-life').textContent = result.serviceLife;
     if (byId('next-service')) byId('next-service').textContent = result.nextService;
@@ -293,10 +285,6 @@ function render() {
     byId('empty-title').textContent = checking ? 'Проверяем кадр…' : title;
     byId('empty-text').textContent = checking ? '' : description;
   }
-  if (!offlineMode) window.CyberCamera.renderTiming(result);
-  const settings = byId('analysis-settings');
-  if (settings) settings.hidden = offlineMode || (byId('camera-options').hidden &&
-    byId('analysis-timing').hidden && (!videoMetrics || videoMetrics.hidden));
   window.CyberInspection.update(result, clipBusy || checking || Boolean(videoRun));
   clipReview?.update();
   if (offlineMode) window.CyberOffline.render(result, checking);
@@ -401,9 +389,8 @@ function drawFrame(canvas, source) {
   canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
 }
 
-async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camera' }, profile = profileSelect.value) {
+async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camera' }) {
   const controller = new AbortController();
-  const started = performance.now();
   analysisController = controller;
   let timedOut = false;
   const timeout = setTimeout(() => {
@@ -417,7 +404,6 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
       const data = await window.CyberOffline.analyze(image, {
         signal: controller.signal, onProgress: showMessage, metadata,
       });
-      data.clientDurationSeconds = (performance.now() - started) / 1000;
       return readResult(data);
     }
     const options = { signal: controller.signal, cache: 'no-store' };
@@ -426,7 +412,7 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
       if (!image) throw new Error('Не удалось подготовить кадр.');
       const body = new FormData();
       body.append('file', image, 'frame.jpg');
-      body.append('profile', profile);
+      body.append('profile', 'standard');
       body.append('captureSource', metadata.captureSource);
       if (metadata.captureSource === 'uploaded_video') body.append('videoTimeSeconds', String(metadata.videoTimeSeconds));
       Object.assign(options, { method: 'POST', body });
@@ -440,10 +426,7 @@ async function analyzeFrame(useServer, frame, metadata = { captureSource: 'camer
       throw new Error(error.error || `Ошибка анализа: ${response.status}`);
     }
     const data = await response.json();
-    if (useServer) {
-      window.CyberCamera.validateModel(data);
-      data.clientDurationSeconds = (performance.now() - started) / 1000;
-    }
+    if (useServer) window.CyberCamera.validateModel(data);
     return readResult(data);
   } catch (error) {
     if (timedOut) throw new Error(offlineMode ? 'Модель на телефоне не завершила анализ вовремя. Попробуйте другой кадр.' : 'Сервер не ответил вовремя. Повторите проверку.');
@@ -480,7 +463,7 @@ function readResult(data) {
   return data;
 }
 
-async function checkFrame({ profile = profileSelect.value } = {}) {
+async function checkFrame() {
   if (clipReview?.busy || openingCamera || checking || videoRun || analysisController || media.loading) return;
   showMessage();
   if (frameMetadata?.regionLabel || (result && frameSource === 'uploaded_video')) {
@@ -511,7 +494,7 @@ async function checkFrame({ profile = profileSelect.value } = {}) {
     if (useServer && !endpoint && !offlineMode) throw new Error('Не задан адрес сервера анализа.');
     if (useServer) showMessage(offlineMode ? 'SmolVLM анализирует кадр на телефоне…' : 'Проверяем кадр…');
     render();
-    const nextResult = await analyzeFrame(useServer, snapshot, frameMetadata, profile);
+    const nextResult = await analyzeFrame(useServer, snapshot, frameMetadata);
     if (generation !== inputGeneration) return;
     result = nextResult;
     showMessage();
@@ -557,7 +540,7 @@ async function checkSelectedRegion() {
     cropped.getContext('2d').drawImage(original, left, top, w, h, 0, 0, cropped.width, cropped.height);
     checking = true;
     render(); showMessage('Проверяем выбранную область…');
-    const answer = await analyzeFrame(true, cropped, metadata, 'standard');
+    const answer = await analyzeFrame(true, cropped, metadata);
     if (generation !== inputGeneration || selection.signal.aborted) return;
     snapshot.width = cropped.width; snapshot.height = cropped.height;
     snapshot.getContext('2d').drawImage(cropped, 0, 0);
@@ -660,9 +643,6 @@ async function checkVideoFrame(run) {
     result = nextResult;
     const completed = performance.now();
     videoStats.count += 1;
-    if (videoStats.count === 1) run.firstCompleted = completed;
-    videoStats.latency = (completed - started) / 1000;
-    videoStats.rate = videoStats.count > 1 ? (videoStats.count - 1) * 1000 / (completed - run.firstCompleted) : null;
     recordVideoResult(nextResult);
     if (run.times) {
       run.index += 1;
@@ -698,7 +678,7 @@ function toggleVideoRun() {
     // Start at the user's playhead. A new run is needed for any remaining clip.
     for (let t = Math.min(media.element.currentTime, media.element.duration - 0.001); t < media.element.duration && times.length < 20; t += interval / 1000) times.push(t);
   }
-  videoRun = { frame: document.createElement('canvas'), firstCompleted: null, interval,
+  videoRun = { frame: document.createElement('canvas'), interval,
     timer: null, controller: new AbortController(), times, index: 0 };
   showMessage('Модель анализирует первый кадр.'); render(); checkVideoFrame(videoRun);
 }
@@ -810,14 +790,6 @@ async function loadCapabilities() {
     if (typeof capabilities?.vision?.videoReview === 'boolean') {
       clipReview?.setAvailable(capabilities.vision.videoReview);
     }
-    const profiles = capabilities?.vision?.profiles;
-    // Ignore missing/old capability responses; the standard profile remains the default.
-    if (!Array.isArray(profiles) || !profiles.includes('standard')) return;
-    for (const option of profileSelect.options) {
-      option.disabled = !profiles.includes(option.value);
-      option.hidden = option.disabled;
-    }
-    if (!profiles.includes(profileSelect.value)) profileSelect.value = 'standard';
     render();
   } catch (_) {
     // Discovery is optional: camera and file selection never wait for this request.

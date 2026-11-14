@@ -64,7 +64,7 @@ const reports=[];
    if(record.body.revision!==undefined) assert.equal(record.body.revision,capabilities.revision);
   }
   await page.locator('.result-provenance > summary').click();
-  assert.equal(await page.locator('#analysis-model').innerText(),successful.at(-1).body.model);
+  assert.ok(!(await page.locator('.result-provenance').innerText()).includes(capabilities.model));
   await page.locator('.result-provenance > summary').click();
   const afterResponse=await page.request.get(origin+'/api/capabilities',{headers:{authorization}});
   assert.equal(afterResponse.ok(),true);

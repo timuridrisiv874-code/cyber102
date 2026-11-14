@@ -100,24 +100,23 @@ async function run(browser, engine, state, server, android) {
     await camera(page);
     await page.locator('#camera').click();
     await page.locator('#video').waitFor();
-    if (!android) await page.locator('#analysis-settings > summary').click();
-    await page.locator('#analysis-profile').selectOption('fast');
+    if (android) await page.locator('#analysis-profile').selectOption('fast');
     await page.locator('#check').click();
     await page.locator('#inspection-preview:not([disabled])').waitFor();
     assert.equal(state.analyses.length, 2, 'Typed GPU busy gets one retry');
     const frameHash = body => createHash('sha256').update(Buffer.from(body.slice(body.indexOf('ÿØ'), body.lastIndexOf('ÿÙ') + 2), 'latin1')).digest('hex');
     assert.equal(frameHash(state.analyses[0]), frameHash(state.analyses[1]), 'Retry must keep the identical JPEG');
-    assert.match(state.analyses[0], /name="profile"\r\n\r\nfast/);
-    await page.locator('#analysis-timing').getByText('Ответ на телефоне:', { exact: false }).waitFor();
-    await page.locator('#analysis-timing').getByText('Сервер:', { exact: false }).waitFor();
+    assert.ok(state.analyses[0].includes('name="profile"\r\n\r\n' + (android ? 'fast' : 'standard')));
     if (android) {
+      await page.locator('#analysis-timing').getByText('Ответ на телефоне:', { exact: false }).waitFor();
+      await page.locator('#analysis-timing').getByText('Сервер:', { exact: false }).waitFor();
       await page.locator('#vision-observation').getByText('cyber102-detector-test', { exact: false }).waitFor();
       await page.locator('#vision-observation').getByText('описание по классу', { exact: false }).waitFor();
     } else {
       await page.locator('#vision-observation').getByText('Проверка контракта модели', {exact:true}).waitFor();
       await page.locator('.result-provenance > summary').click();
-      await page.locator('#analysis-model').getByText('cyber102-detector-test', {exact:false}).waitFor();
-      assert.equal(await page.locator('#analysis-model').innerText(), 'cyber102-detector-test');
+      assert.ok(!(await page.locator('.result-provenance').innerText()).includes(localResult.model));
+      assert.equal(await page.getByText(/Ответ на телефоне|подробный режим/i).count(), 0);
       assert.ok((await page.locator('#equipment-id').innerText()).trim());
       await page.locator('.result-provenance > summary').click();
     }

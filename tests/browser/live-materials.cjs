@@ -44,7 +44,7 @@ const authorization='Basic '+Buffer.from(access.username+':'+access.password).to
    assert.ok(['defect','clear','unusable'].includes(body.status));
    if(['defect','clear'].includes(body.status)){
     await page.locator('#photo-result').getByText('О результате',{exact:true}).click();
-    assert.ok((await page.locator('#photo-result details').innerText()).includes(body.model));
+    assert.ok(!(await page.locator('#photo-result').innerText()).includes(body.model));
     await page.locator('#photo-result').getByText('О результате',{exact:true}).click();
    }else await page.locator('#photo-status').getByText(/Не удалось оценить узел/).waitFor();
    const afterResponse=await page.request.get(origin+'/api/capabilities',{headers:{authorization}});

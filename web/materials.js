@@ -166,9 +166,9 @@ function showPhotoResult(data) {
     photoBox.hidden = false;
   }
   message('photo-status');
-  const modelDetails = element('details', undefined, 'data-note');
-  modelDetails.append(element('summary', 'О результате'), element('p', `${data.model || 'Модель не указана'}. Наблюдение требует подтверждения инженером.`, 'material-note'));
-  photoResult.append(modelDetails);
+  const details = element('details', undefined, 'data-note');
+  details.append(element('summary', 'О результате'), element('p', 'Наблюдение требует подтверждения инженером.', 'material-note'));
+  photoResult.append(details);
 }
 
 function changePhotoFilter() {

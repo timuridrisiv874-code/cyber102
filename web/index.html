@@ -15,11 +15,11 @@
   <script src="bootstrap.js?v=local-file-20261114" defer></script>
   <script src="analysis-jobs.js" defer></script>
   <script src="inspection-photo.js?v=1" defer></script>
-  <script src="inspection.js?v=motor-resource-1" defer></script>
+  <script src="inspection.js?v=capture-controls-1" defer></script>
   <script src="media.js?v=mobile-recovery-20261114" defer></script>
   <script src="video-review.js?v=video-journal-1" defer></script>
   <script src="region-review.js?v=field-20261114" defer></script>
-  <script src="app.js?v=video-journal-1" defer></script>
+  <script src="app.js?v=capture-controls-1" defer></script>
   <script src="shell.js?v=field-20261114" defer></script>
   <script src="equipment-qr.js?v=motor-resource-1" defer></script>
   <script src="photo-measure.js?v=1" defer></script>
@@ -114,18 +114,16 @@
           </div>
 
           <details class="capture-settings" id="analysis-settings" hidden>
-            <summary>Настройки анализа</summary>
+            <summary>Проверка по интервалу</summary>
             <div class="camera-options" id="camera-options" hidden>
               <label for="camera-mode" id="camera-mode-label">Проверка</label>
               <select id="camera-mode"><option value="single">Один кадр</option><option value="video">Видеопроверка</option></select>
-              <label for="analysis-profile">Режим модели</label>
-              <select id="analysis-profile"><option value="standard" selected>Подробный</option><option value="fast">Краткий</option><option value="liquid" hidden disabled>Струи и мокрые участки</option></select>
               <label for="frame-interval" id="frame-interval-label" hidden>Интервал</label>
               <select id="frame-interval" hidden><option value="2000">2 секунды</option><option value="5000" selected>5 секунд</option><option value="10000">10 секунд</option></select>
             </div>
             <p class="video-help" id="video-help" hidden>Проверяем отдельные кадры. Рамка относится к последнему проверенному кадру.</p>
 
-            <p class="video-metrics" id="analysis-timing" hidden></p><p class="video-metrics" id="video-metrics" hidden></p>
+            <p class="video-metrics" id="video-metrics" hidden></p>
           </details>
           <details class="capture-settings demo-examples" id="demo-options" hidden>
             <summary>Пример осмотра</summary>
@@ -143,7 +141,7 @@
           <h3 id="empty-title">Ожидание кадра</h3><p id="empty-text"></p>
         </div>
         <div class="details" id="details" hidden>
-          <span class="finding" id="finding"></span><h3 id="equipment"></h3><p class="observation-text" id="vision-observation" hidden></p><details class="workspace-details result-provenance"><summary>О данных</summary><p class="equipment-id" id="equipment-id"></p><p class="equipment-id" id="capture-provenance" hidden></p><p class="equipment-id" id="analysis-model"></p><p id="original-observation" class="equipment-id" hidden></p></details>
+          <span class="finding" id="finding"></span><h3 id="equipment"></h3><p class="observation-text" id="vision-observation" hidden></p><details class="workspace-details result-provenance"><summary>О данных</summary><p class="equipment-id" id="equipment-id"></p><p class="equipment-id" id="capture-provenance" hidden></p><p id="original-observation" class="equipment-id" hidden></p></details>
           <dl class="facts"><div><dt>Узел</dt><dd id="component"></dd></div><div id="service-life-fallback"><dt>Нормативный срок службы</dt><dd id="service-life"></dd></div><div><dt>Обслуживание</dt><dd id="next-service"></dd></div></dl>
           <div class="recommendation"><h4>Следующий шаг</h4><p id="recommendation"></p></div>
           <button id="closeup-open" type="button" class="button secondary" hidden aria-controls="inspection-closeup">Добавить крупный план</button>
